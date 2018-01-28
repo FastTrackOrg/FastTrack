@@ -33,7 +33,9 @@ INCLUDEPATH += /usr/include/opencv
 LIBS += -L /usr/lib -lopencv_core -lopencv_imgproc -lopencv_highgui -lopencv_imgcodecs -lopencv_videoio -lopencv_video
 
 HEADERS += \
-        mainwindow.h
+        mainwindow.h\
+        functions.h \
+        Hungarian.h
 
 FORMS += \
         mainwindow.ui

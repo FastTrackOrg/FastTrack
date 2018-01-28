@@ -16,6 +16,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     setFixedSize(1600, 1000);
+    setWindowTitle("Fishy Tracking");
 
 
     QuitButton = new QPushButton("Quit", this);
@@ -34,18 +35,19 @@ MainWindow::MainWindow(QWidget *parent) :
     path->adjustSize();
 
     pathField = new QLineEdit(this);
-    pathField ->move(200,50);
+    pathField ->move(250,50);
     pathField->setText("/home/benjamin/Videos/collectiveBehavior3Weeks/*png");
     pathField->adjustSize();
 
 
     numLabel = new QLabel(this);
-    numLabel->setText("Number of objects:");
+    numLabel->setText("Number of objects: \n (can't be changed after the start)");
     numLabel->move(50, 100);
     numLabel->adjustSize();
 
+
     numField = new QLineEdit(this);
-    numField ->move(200,100);
+    numField ->move(250,100);
     numField->setText("6");
 
 
@@ -55,7 +57,7 @@ MainWindow::MainWindow(QWidget *parent) :
     maxArea->adjustSize();
 
     maxAreaField = new QLineEdit(this);
-    maxAreaField ->move(200,150);
+    maxAreaField ->move(250,150);
     maxAreaField->setText("300");
 
 
@@ -66,7 +68,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
     minAreaField = new QLineEdit(this);
-    minAreaField ->move(200,200);
+    minAreaField ->move(250,200);
     minAreaField->setText("50");
 
 
@@ -77,7 +79,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
     threshField = new QLineEdit(this);
-    threshField ->move(200,250);
+    threshField ->move(250,250);
     threshField->setText("35");
     threshField->adjustSize();
 
@@ -187,6 +189,7 @@ MainWindow::MainWindow(QWidget *parent) :
     y2ROI = new QLabel(this);
     y2ROI->setText("Bottom corner y position for the ROI:");
     y2ROI->move(900, 250);
+    y2ROI->adjustSize();
 
 
 
@@ -203,7 +206,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
     progressBar = new QProgressBar(this);
-    progressBar ->move(50, 350);
+    progressBar ->move(50, 370);
     progressBar->setFixedWidth(1400);
 
 
