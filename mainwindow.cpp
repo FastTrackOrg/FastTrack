@@ -15,14 +15,16 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    setFixedSize(1600, 1400);
+    setFixedSize(1600, 1000);
+
 
     QuitButton = new QPushButton("Quit", this);
-    QuitButton->move(400, 300);
+    QuitButton->move(300, 320);
     QObject::connect(QuitButton, SIGNAL(clicked()), qApp, SLOT(quit()));
 
+
     GoButton = new QPushButton("Go", this);
-    GoButton->move(100, 300);
+    GoButton->move(50, 320);
     QObject::connect(GoButton, SIGNAL(clicked()), this, SLOT(Go()));
 
 
@@ -185,7 +187,7 @@ MainWindow::MainWindow(QWidget *parent) :
     y2ROI = new QLabel(this);
     y2ROI->setText("Bottom corner y position for the ROI:");
     y2ROI->move(900, 250);
-    y2ROI->adjustSize();
+
 
 
     y2ROIField = new QLineEdit(this);
@@ -194,9 +196,16 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
     display = new QLabel(this);
-    display ->move(50, 350);
+    display ->move(50, 400);
     display ->setScaledContents(true);
     display->adjustSize();
+
+
+
+    progressBar = new QProgressBar(this);
+    progressBar ->move(50, 350);
+    progressBar->setFixedWidth(1400);
+
 
 
 
@@ -253,6 +262,7 @@ void MainWindow::Go(){
         sort(files.begin(), files.end());
         a = files.begin();
         string name = *a;
+        progressBar ->setRange(0, files.size());
         cameraFrame = imread(name, IMREAD_GRAYSCALE);
         visu = imread(name);
         img0 = imread(name, IMREAD_GRAYSCALE);
@@ -341,13 +351,26 @@ void MainWindow::Go(){
 
     cvtColor(visu,visu,CV_BGR2RGB);
     Size size = visu.size();
-    display->setFixedHeight(size.height);
-    display->setFixedWidth(size.width);
+
+    if(size.height > 600){
+        display->setFixedHeight(600);
+        display->setFixedWidth((600*size.height)/(size.width));
+    }
+    else if(size.width > 1500){
+        display->setFixedWidth(1500);
+        display->setFixedWidth((1500*size.width)/(size.height));
+    }
+    else{
+        display->setFixedHeight(size.height);
+        display->setFixedWidth(size.width);
+    }
+
     display->setPixmap(QPixmap::fromImage(QImage(visu.data, visu.cols, visu.rows, visu.step, QImage::Format_RGB888)));
 
     if(im < files.size() - 1){
         a ++;
         im ++;
+        progressBar->setValue(im);
      }
 
     else{

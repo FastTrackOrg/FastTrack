@@ -5,6 +5,7 @@
 #include <QPushButton>
 #include <QLabel>
 #include <QLineEdit>
+#include <QProgressBar>
 #include <QImage>
 #include <QMessageBox>
 #include <string>
@@ -71,6 +72,7 @@ private:
     QLabel *display;
     QTimer *timer;
     QMessageBox msgBox;
+    QProgressBar *progressBar;
 
     vector<String> files;
     vector <String>::iterator a;
