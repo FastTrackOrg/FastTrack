@@ -28,13 +28,17 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
+    static int const EXIT_CODE_REBOOT = -123456789;
 
 
 
 private:
+
     Ui::MainWindow *ui;
     QPushButton *QuitButton;
     QPushButton *GoButton;
+    QPushButton *DefaultButton;
+    QPushButton *ResetButton;
 
     QLabel *path;
     QLabel *numLabel;
@@ -91,6 +95,8 @@ private:
 
     public slots:
     void Go();
+    void Write();
+    void Reset();
 };
 
 #endif // MAINWINDOW_H

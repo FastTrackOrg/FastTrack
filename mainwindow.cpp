@@ -2,6 +2,8 @@
 #include "ui_mainwindow.h"
 #include <QDebug>
 #include <QTimer>
+#include <QFile>
+#include <QFileInfo>
 #include "opencv2/imgproc/imgproc.hpp"
 #include "opencv2/highgui/highgui.hpp"
 #include <string>
@@ -19,14 +21,53 @@ MainWindow::MainWindow(QWidget *parent) :
     setWindowTitle("Fishy Tracking");
 
 
+
+    QStringList defParameters;
+    QFile file("conf.txt");
+
+    if(QFileInfo::exists("conf.txt")){
+        if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+            return;
+
+
+        QTextStream in(&file);
+
+        while(!in.atEnd()) {
+            QString line = in.readLine();
+            defParameters.append(line);
+        }
+
+        file.close();
+    }
+
+    else{
+        int i = 0;
+        while(i<15) {
+            QString line = "0";
+            defParameters.append(line);
+            i++;
+        }
+    }
+
+
     QuitButton = new QPushButton("Quit", this);
-    QuitButton->move(300, 320);
+    QuitButton->move(450, 320);
     QObject::connect(QuitButton, SIGNAL(clicked()), qApp, SLOT(quit()));
+
+    ResetButton = new QPushButton("Reset", this);
+    ResetButton->move(550, 320);
+    QObject::connect(ResetButton, SIGNAL(clicked()), this, SLOT(Reset()));
 
 
     GoButton = new QPushButton("Go", this);
     GoButton->move(50, 320);
     QObject::connect(GoButton, SIGNAL(clicked()), this, SLOT(Go()));
+
+
+
+    DefaultButton = new QPushButton("Set default", this);
+    DefaultButton->move(350, 320);
+    QObject::connect(DefaultButton, SIGNAL(clicked()), this, SLOT(Write()));
 
 
     path = new QLabel(this);
@@ -36,7 +77,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     pathField = new QLineEdit(this);
     pathField ->move(250,50);
-    pathField->setText("/home/benjamin/Videos/collectiveBehavior3Weeks/*png");
+    pathField->setText(defParameters.at(0));
     pathField->adjustSize();
 
 
@@ -48,7 +89,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     numField = new QLineEdit(this);
     numField ->move(250,100);
-    numField->setText("6");
+    numField->setText(defParameters.at(1));
 
 
     maxArea = new QLabel(this);
@@ -58,7 +99,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     maxAreaField = new QLineEdit(this);
     maxAreaField ->move(250,150);
-    maxAreaField->setText("300");
+    maxAreaField->setText(defParameters.at(2));
 
 
     minArea = new QLabel(this);
@@ -69,7 +110,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     minAreaField = new QLineEdit(this);
     minAreaField ->move(250,200);
-    minAreaField->setText("50");
+    minAreaField->setText(defParameters.at(3));
 
 
     thresh = new QLabel(this);
@@ -80,7 +121,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     threshField = new QLineEdit(this);
     threshField ->move(250,250);
-    threshField->setText("35");
+    threshField->setText(defParameters.at(9));
     threshField->adjustSize();
 
 
@@ -89,9 +130,10 @@ MainWindow::MainWindow(QWidget *parent) :
     length->move(500, 50);
     length->adjustSize();
 
+
     lengthField = new QLineEdit(this);
     lengthField ->move(700,50);
-    lengthField->setText("20");
+    lengthField->setText(defParameters.at(4));
 
 
     angle = new QLabel(this);
@@ -102,7 +144,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     angleField = new QLineEdit(this);
     angleField ->move(700,100);
-    angleField->setText("90");
+    angleField->setText(defParameters.at(5));
 
 
 
@@ -114,7 +156,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     loField = new QLineEdit(this);
     loField ->move(700,150);
-    loField->setText("50");
+    loField->setText(defParameters.at(6));
 
 
     w = new QLabel(this);
@@ -125,7 +167,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     wField = new QLineEdit(this);
     wField ->move(700,200);
-    wField->setText("0.2");
+    wField->setText(defParameters.at(7));
 
 
     nBack = new QLabel(this);
@@ -136,7 +178,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     nBackField = new QLineEdit(this);
     nBackField ->move(700,250);
-    nBackField->setText("200");
+    nBackField->setText(defParameters.at(8));
 
 
     save = new QLabel(this);
@@ -147,7 +189,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     saveField = new QLineEdit(this);
     saveField ->move(1200,50);
-    saveField->setText("/home/benjamin/Videos/collectiveBehavior3Weeks/save.txt");
+    saveField->setText(defParameters.at(10));
 
 
     x1ROI = new QLabel(this);
@@ -158,7 +200,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     x1ROIField = new QLineEdit(this);
     x1ROIField ->move(1200,100);
-    x1ROIField->setText("253");
+    x1ROIField->setText(defParameters.at(11));
 
 
 
@@ -170,7 +212,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     x2ROIField = new QLineEdit(this);
     x2ROIField ->move(1200,150);
-    x2ROIField->setText("1200");
+    x2ROIField->setText(defParameters.at(12));
 
 
 
@@ -182,7 +224,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     y1ROIField = new QLineEdit(this);
     y1ROIField ->move(1200,200);
-    y1ROIField->setText("33");
+    y1ROIField->setText(defParameters.at(13));
 
 
 
@@ -195,7 +237,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     y2ROIField = new QLineEdit(this);
     y2ROIField ->move(1200,250);
-    y2ROIField->setText("350");
+    y2ROIField->setText(defParameters.at(14));
 
 
     display = new QLabel(this);
@@ -385,6 +427,40 @@ void MainWindow::Go(){
 
 }
 
+
+
+void MainWindow::Write(){
+
+    QString filename = "conf.txt";
+    QFile file(filename);
+    if(file.open(QIODevice::ReadWrite))
+    {
+        QTextStream stream( &file );
+        stream << pathField->text()<< endl;
+        stream << numField->text()<< endl;
+        stream << maxAreaField->text()<< endl;
+        stream << minAreaField->text()<< endl;
+        stream << lengthField->text()<< endl;
+        stream << angleField->text()<< endl;
+        stream << loField->text()<< endl;
+        stream << wField->text()<< endl;
+        stream << nBackField->text()<< endl;
+        stream << threshField->text()<< endl;
+        stream << saveField->text()<< endl;
+        stream << x1ROIField->text()<< endl;
+        stream << x2ROIField->text()<< endl;
+        stream << y1ROIField->text()<< endl;
+        stream << y2ROIField->text()<< endl;
+    }
+}
+
+
+
+void MainWindow::Reset()
+{
+    qDebug() << "Performing application reboot...";
+    qApp->exit(MainWindow::EXIT_CODE_REBOOT );
+}
 
 
 

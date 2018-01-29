@@ -3,10 +3,14 @@
 
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
-    MainWindow w;
-    w.show();
+ int currentExitCode = 0;
 
-    return a.exec();
+ do {
+  QApplication a(argc, argv);
+  MainWindow w;
+  w.show();
+  currentExitCode = a.exec();
+ } while( currentExitCode == MainWindow::EXIT_CODE_REBOOT );
 
+ return currentExitCode;
 }
