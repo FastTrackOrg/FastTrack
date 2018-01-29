@@ -1,1 +1,1 @@
-FishyGui
+Fishy tracking software
