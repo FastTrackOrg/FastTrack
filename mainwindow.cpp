@@ -270,7 +270,7 @@ void MainWindow::Go(){
         visu = imread(name);
         img0 = imread(name, IMREAD_GRAYSCALE);
         background = BackgroundExtraction(files, nBackground);
-        vector<vector<Point>> tmp(NUMBER, vector<Point>());
+        vector<vector<Point> > tmp(NUMBER, vector<Point>());
         memory = tmp;
         colorMap = Color(NUMBER);
 

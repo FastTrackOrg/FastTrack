@@ -81,10 +81,10 @@ private:
     Mat visu;
     Mat img0;;
     Mat background;;
-    vector<vector<Point>> memory;
+    vector<vector<Point> > memory;
     vector<Point3f> colorMap;
-    vector<vector<Point3f>> out;
-    vector<vector<Point3f>> outPrev;
+    vector<vector<Point3f> > out;
+    vector<vector<Point3f> > outPrev;
     vector<int> identity;
     int im;
     ofstream savefile;

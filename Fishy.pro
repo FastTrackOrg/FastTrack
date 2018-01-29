@@ -29,6 +29,9 @@ SOURCES += \
         functions.cpp \
         Hungarian.cpp
 
+QMAKE_CXXFLAGS += -std=c++11
+
+
 INCLUDEPATH += /usr/include/opencv
 LIBS += -L /usr/lib -lopencv_core -lopencv_imgproc -lopencv_highgui -lopencv_imgcodecs -lopencv_videoio -lopencv_video
 
@@ -39,3 +42,4 @@ HEADERS += \
 
 FORMS += \
         mainwindow.ui
+
