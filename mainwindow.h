@@ -81,6 +81,7 @@ private:
     QTimer *timer;
     QMessageBox msgBox;
     QMessageBox errorBox;
+    QMessageBox *welcomeBox;
     QProgressBar *progressBar;
 
     vector<String> files;

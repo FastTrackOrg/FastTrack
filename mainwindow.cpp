@@ -12,6 +12,7 @@
 using namespace cv;
 using namespace std;
 
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -19,6 +20,10 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     setFixedSize(1600, 1000);
     setWindowTitle("Fishy Tracking");
+
+    QMessageBox welcomeBox;
+    welcomeBox.setText(" Welcome in Fishy Tracking! \n To have help hove the relevant parameter. \n Check new version at https://bgallois.github.io/FishyTracking/. \n Have a wonderful tracking. \n © Benjamin GALLOIS benjamin.gallois@upmc.fr.");
+    welcomeBox.exec();
 
 
 
@@ -74,10 +79,11 @@ MainWindow::MainWindow(QWidget *parent) :
     normal ->move(660, 310);
     normal ->setChecked(1);
     normal ->isChecked();
+    normal ->setToolTip(tr("Check this option to display the original image with trajectories of tracked objects."));
 
     binary = new QCheckBox("Binary", this);
     binary ->move(660, 340);
-
+    binary ->setToolTip(tr("Check this option to display the binary image. Useful to ajust the binary threshold parameter."));
 
 
 
@@ -86,6 +92,8 @@ MainWindow::MainWindow(QWidget *parent) :
     path->setText("Path:");
     path->move(50, 50);
     path->adjustSize();
+    path ->setToolTip(tr("Path to the folder that contains images. Have to add /*extension at the end."));
+
 
     pathField = new QLineEdit(this);
     pathField ->move(250,50);
@@ -94,9 +102,10 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
     numLabel = new QLabel(this);
-    numLabel->setText("Number of objects: \n (can't be changed after the start)");
+    numLabel->setText("Number of objects:");
     numLabel->move(50, 100);
     numLabel->adjustSize();
+    numLabel->setToolTip(tr("Number of objects to track, can't be changed during the tracking phase."));
 
 
     numField = new QLineEdit(this);
@@ -108,6 +117,7 @@ MainWindow::MainWindow(QWidget *parent) :
     maxArea->setText("Maximal area:");
     maxArea->move(50, 150);
     maxArea->adjustSize();
+    maxArea->setToolTip(tr("Maximal area in px*px of objects to track."));
 
     maxAreaField = new QLineEdit(this);
     maxAreaField ->move(250,150);
@@ -118,6 +128,7 @@ MainWindow::MainWindow(QWidget *parent) :
     minArea->setText("Minimal area:");
     minArea->move(50, 200);
     minArea->adjustSize();
+    minArea->setToolTip(tr("Minimal area in px*px of objects to track."));
 
 
     minAreaField = new QLineEdit(this);
@@ -129,6 +140,7 @@ MainWindow::MainWindow(QWidget *parent) :
     thresh->setText("Binary threshold:");
     thresh->move(50, 250);
     thresh->adjustSize();
+    thresh->setToolTip(tr("Binary threshold, image[i,j] < thresh = 0, image[i,j] > thresh = 1."));
 
 
     threshField = new QLineEdit(this);
@@ -141,6 +153,8 @@ MainWindow::MainWindow(QWidget *parent) :
     length->setText("Max displacement:");
     length->move(500, 50);
     length->adjustSize();
+    length->setToolTip(tr("Maximal displacement possible of an object between two frames in px."));
+
 
 
     lengthField = new QLineEdit(this);
@@ -152,6 +166,7 @@ MainWindow::MainWindow(QWidget *parent) :
     angle->setText("Max angle:");
     angle->move(500, 100);
     angle->adjustSize();
+    angle->setToolTip(tr("Maximal orientation change of an object between two frames in degree."));
 
 
     angleField = new QLineEdit(this);
@@ -164,6 +179,8 @@ MainWindow::MainWindow(QWidget *parent) :
     lo->setText("Max occlusion:");
     lo->move(500, 150);
     lo->adjustSize();
+    lo->setToolTip(tr("Maximum distance in px that an object can move when it is occulted by another object."));
+
 
 
     loField = new QLineEdit(this);
@@ -175,6 +192,8 @@ MainWindow::MainWindow(QWidget *parent) :
     w->setText("Weight:");
     w->move(500, 200);
     w->adjustSize();
+    w->setToolTip(tr("Importance of orientation and distance for the tracking. Closer to 0 the tracking is more sensitive to the orientation of objects and closer to 1 is more sensitive to the distance."));
+
 
 
     wField = new QLineEdit(this);
@@ -186,6 +205,8 @@ MainWindow::MainWindow(QWidget *parent) :
     nBack->setText("Background images: \n (can't be changed after the start)");
     nBack->move(500, 250);
     nBack->adjustSize();
+    nBack->setToolTip(tr("Number of images to compute the background."));
+
 
 
     nBackField = new QLineEdit(this);
@@ -197,6 +218,7 @@ MainWindow::MainWindow(QWidget *parent) :
     save->setText("Save to:");
     save->move(900, 50);
     save->adjustSize();
+    save->setToolTip(tr("Path to a .txt file where the result of the tracking will be saved."));
 
 
     saveField = new QLineEdit(this);
@@ -204,10 +226,13 @@ MainWindow::MainWindow(QWidget *parent) :
     saveField->setText(defParameters.at(10));
 
 
+
     x1ROI = new QLabel(this);
     x1ROI->setText("Top corner x position for the ROI:");
     x1ROI->move(900, 100);
     x1ROI->adjustSize();
+    x1ROI->setToolTip(tr("Horizontale position of the top right corner of the region of interest."));
+
 
 
     x1ROIField = new QLineEdit(this);
@@ -220,6 +245,7 @@ MainWindow::MainWindow(QWidget *parent) :
     x2ROI->setText("Bottom corner x position for the ROI:");
     x2ROI->move(900, 150);
     x2ROI->adjustSize();
+    x2ROI->setToolTip(tr("Horizontale position of the bottom left corner of the region of interest."));
 
 
     x2ROIField = new QLineEdit(this);
@@ -232,6 +258,7 @@ MainWindow::MainWindow(QWidget *parent) :
     y1ROI->setText("Top corner y position for the ROI:");
     y1ROI->move(900, 200);
     y1ROI->adjustSize();
+    y1ROI->setToolTip(tr("Verticale position of the top right corner of the region of interest."));
 
 
     y1ROIField = new QLineEdit(this);
@@ -244,6 +271,7 @@ MainWindow::MainWindow(QWidget *parent) :
     y2ROI->setText("Bottom corner y position for the ROI:");
     y2ROI->move(900, 250);
     y2ROI->adjustSize();
+    y2ROI->setToolTip(tr("Verticale position of the bottom left corner of the region of interest."));
 
 
 
@@ -366,10 +394,10 @@ void MainWindow::Go(){
             outPrev = out;
         }
 
-        else{ // Error message
+        else if(out.at(0).size() == 0){ // Error message
             timer->stop();
             QMessageBox errorBox;
-            msgBox.setText("No fish detected!");
+            msgBox.setText("No fish detected! Change parameters!");
             msgBox.exec();
 
         }
