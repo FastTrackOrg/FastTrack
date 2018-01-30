@@ -25,7 +25,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QStringList defParameters;
     QFile file("conf.txt");
 
-    if(QFileInfo::exists("conf.txt")){
+    if(QFileInfo("conf.txt").exists()){
         if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
             return;
 
