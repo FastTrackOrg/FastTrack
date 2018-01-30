@@ -71,14 +71,13 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
     normal = new QCheckBox("Normal", this);
-    normal ->move(650, 310);
+    normal ->move(660, 310);
     normal ->setChecked(1);
     normal ->isChecked();
 
     binary = new QCheckBox("Binary", this);
-    binary ->move(650, 340);
-    QObject::connect(normal, SIGNAL(stateChanged()), this, SLOT(check(binary)));
-    QObject::connect(binary, SIGNAL(stateChanged()), this, SLOT(check(normal)));
+    binary ->move(660, 340);
+
 
 
 
@@ -260,6 +259,13 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
 
+    display2 = new QLabel(this);
+    display2 ->move(50, 400);
+    display2 ->setScaledContents(true);
+    display2->adjustSize();
+
+
+
     progressBar = new QProgressBar(this);
     progressBar ->move(50, 370);
     progressBar->setFixedWidth(1400);
@@ -427,26 +433,51 @@ void MainWindow::Go(){
         }
 
         display->setPixmap(QPixmap::fromImage(QImage(visu.data, visu.cols, visu.rows, visu.step, QImage::Format_RGB888)));
+        display2->clear();
     }
 
     else if (!normal->isChecked() && binary->isChecked()){
         Size size = cameraFrame.size();
 
         if(size.height > 600){
-            display->setFixedHeight(600);
-            display->setFixedWidth((600*size.height)/(size.width));
+            display2->setFixedHeight(600);
+            display2->setFixedWidth((600*size.height)/(size.width));
         }
         else if(size.width > 1500){
-            display->setFixedWidth(1500);
-            display->setFixedWidth((1500*size.width)/(size.height));
+            display2->setFixedWidth(1500);
+            display2->setFixedWidth((1500*size.width)/(size.height));
         }
         else{
-            display->setFixedHeight(size.height);
-            display->setFixedWidth(size.width);
+            display2->setFixedHeight(size.height);
+            display2->setFixedWidth(size.width);
         }
+        display2->move(50, 400);
+        display2->setPixmap(QPixmap::fromImage(QImage(cameraFrame.data, cameraFrame.cols, cameraFrame.rows, cameraFrame.step, QImage::Format_Grayscale8)));
+        display->clear();
+    }
 
+    else if (normal->isChecked() && binary->isChecked()){
+        Size size = cameraFrame.size();
+
+        if(size.height > 600){
+            display->setFixedHeight(600/2);
+            display->setFixedWidth((600*size.height)/(size.width*2));
+        }
+        else if(size.width > 1500){
+            display->setFixedWidth(1500/2);
+            display->setFixedWidth((1500*size.width)/(size.height*2));
+        }
+        else{
+            display->setFixedHeight(size.height/2);
+            display->setFixedWidth(size.width/2);
+        }
+        display2->move(800, 400);
+        display2->setFixedHeight(display->height());
+        display2->setFixedWidth(display->width());
+        display2->setPixmap(QPixmap::fromImage(QImage(visu.data, visu.cols, visu.rows, visu.step, QImage::Format_RGB888)));
         display->setPixmap(QPixmap::fromImage(QImage(cameraFrame.data, cameraFrame.cols, cameraFrame.rows, cameraFrame.step, QImage::Format_Grayscale8)));
     }
+
 
 
 

@@ -76,8 +76,8 @@ private:
     QLineEdit *x2ROIField;
     QLineEdit *y2ROIField;
 
-    QImage *imdisplay;
     QLabel *display;
+    QLabel *display2;
     QTimer *timer;
     QMessageBox msgBox;
     QMessageBox errorBox;
