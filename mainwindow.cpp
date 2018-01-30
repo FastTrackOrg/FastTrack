@@ -348,7 +348,7 @@ void MainWindow::Go(){
 
         else{ // Error message
             cout << "ERROR minArea too small!!!";
-            //break;
+            imshow("Binary", cameraFrame);
 
         }
     }
