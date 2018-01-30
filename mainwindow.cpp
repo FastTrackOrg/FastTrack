@@ -70,6 +70,19 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(DefaultButton, SIGNAL(clicked()), this, SLOT(Write()));
 
 
+    normal = new QCheckBox("Normal", this);
+    normal ->move(650, 310);
+    normal ->setChecked(1);
+    normal ->isChecked();
+
+    binary = new QCheckBox("Binary", this);
+    binary ->move(650, 340);
+    QObject::connect(normal, SIGNAL(stateChanged()), this, SLOT(check(binary)));
+    QObject::connect(binary, SIGNAL(stateChanged()), this, SLOT(check(normal)));
+
+
+
+
     path = new QLabel(this);
     path->setText("Path:");
     path->move(50, 50);
@@ -266,6 +279,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 void MainWindow::Go(){
 
+    // Get parameters
     QString path = pathField->text();
     QString num = numField->text();
     QString maxArea = maxAreaField->text();
@@ -285,6 +299,7 @@ void MainWindow::Go(){
 
 
 
+    // Convert parameters
     int MAXAREA = maxArea.toInt(); //9000; //minimal area of detected objects
     int MINAREA = minArea.toInt(); //3000; //maximal area of detected objects
     double LENGTH = lenght.toInt(); //maximal distance covered between two frames
@@ -294,7 +309,6 @@ void MainWindow::Go(){
     double LO = lo.toInt(); // maximum occlusion distance
     int nBackground = nBack.toInt();
     int threshValue = thresh.toInt();
-
     string save = savePath.toStdString();
 
 
@@ -347,8 +361,10 @@ void MainWindow::Go(){
         }
 
         else{ // Error message
-            cout << "ERROR minArea too small!!!";
-            imshow("Binary", cameraFrame);
+            timer->stop();
+            QMessageBox errorBox;
+            msgBox.setText("No fish detected!");
+            msgBox.exec();
 
         }
     }
@@ -393,24 +409,46 @@ void MainWindow::Go(){
     }
 
 
+    if (normal->isChecked() && !binary->isChecked()){
+        cvtColor(visu,visu,CV_BGR2RGB);
+        Size size = visu.size();
 
-    cvtColor(visu,visu,CV_BGR2RGB);
-    Size size = visu.size();
+        if(size.height > 600){
+            display->setFixedHeight(600);
+            display->setFixedWidth((600*size.height)/(size.width));
+        }
+        else if(size.width > 1500){
+            display->setFixedWidth(1500);
+            display->setFixedWidth((1500*size.width)/(size.height));
+        }
+        else{
+            display->setFixedHeight(size.height);
+            display->setFixedWidth(size.width);
+        }
 
-    if(size.height > 600){
-        display->setFixedHeight(600);
-        display->setFixedWidth((600*size.height)/(size.width));
-    }
-    else if(size.width > 1500){
-        display->setFixedWidth(1500);
-        display->setFixedWidth((1500*size.width)/(size.height));
-    }
-    else{
-        display->setFixedHeight(size.height);
-        display->setFixedWidth(size.width);
+        display->setPixmap(QPixmap::fromImage(QImage(visu.data, visu.cols, visu.rows, visu.step, QImage::Format_RGB888)));
     }
 
-    display->setPixmap(QPixmap::fromImage(QImage(visu.data, visu.cols, visu.rows, visu.step, QImage::Format_RGB888)));
+    else if (!normal->isChecked() && binary->isChecked()){
+        Size size = cameraFrame.size();
+
+        if(size.height > 600){
+            display->setFixedHeight(600);
+            display->setFixedWidth((600*size.height)/(size.width));
+        }
+        else if(size.width > 1500){
+            display->setFixedWidth(1500);
+            display->setFixedWidth((1500*size.width)/(size.height));
+        }
+        else{
+            display->setFixedHeight(size.height);
+            display->setFixedWidth(size.width);
+        }
+
+        display->setPixmap(QPixmap::fromImage(QImage(cameraFrame.data, cameraFrame.cols, cameraFrame.rows, cameraFrame.step, QImage::Format_Grayscale8)));
+    }
+
+
 
     if(im < files.size() - 1){
         a ++;

@@ -12,6 +12,8 @@
 #include "opencv2/imgproc/imgproc.hpp"
 #include "opencv2/highgui/highgui.hpp"
 #include <fstream>
+#include <QCheckBox>
+
 
 
 using namespace std;
@@ -39,6 +41,8 @@ private:
     QPushButton *GoButton;
     QPushButton *DefaultButton;
     QPushButton *ResetButton;
+    QCheckBox *normal;
+    QCheckBox *binary;
 
     QLabel *path;
     QLabel *numLabel;
@@ -76,6 +80,7 @@ private:
     QLabel *display;
     QTimer *timer;
     QMessageBox msgBox;
+    QMessageBox errorBox;
     QProgressBar *progressBar;
 
     vector<String> files;
