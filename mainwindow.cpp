@@ -488,8 +488,8 @@ void MainWindow::Go(){
         Size size = cameraFrame.size();
 
         if(size.height > 600){
-            display->setFixedHeight(600/2);
-            display->setFixedWidth((600*size.height)/(size.width*2));
+            display->setFixedHeight(600);
+            display->setFixedWidth((600*size.height)/(size.width));
         }
         else if(size.width > 1500){
             display->setFixedWidth(1500/2);
