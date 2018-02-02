@@ -13,6 +13,8 @@
 #include "opencv2/highgui/highgui.hpp"
 #include <fstream>
 #include <QCheckBox>
+#include <QSlider>
+#include <QLCDNumber>
 
 
 
@@ -41,8 +43,10 @@ private:
     QPushButton *GoButton;
     QPushButton *DefaultButton;
     QPushButton *ResetButton;
+    QPushButton *ReplayButton;
     QCheckBox *normal;
     QCheckBox *binary;
+    QString version = "v2.1.1dev";
 
     QLabel *path;
     QLabel *numLabel;
@@ -59,6 +63,8 @@ private:
     QLabel *y1ROI;
     QLabel *x2ROI;
     QLabel *y2ROI;
+    QLabel *arrow;
+    QLabel *fps;
 
     QLineEdit *pathField;
     QLineEdit *numField;
@@ -75,14 +81,19 @@ private:
     QLineEdit *y1ROIField;
     QLineEdit *x2ROIField;
     QLineEdit *y2ROIField;
+    QLCDNumber *arrowField;
+    QLCDNumber *fpsField;
 
     QLabel *display;
     QLabel *display2;
     QTimer *timer;
+    QTimer *timerReplay;
     QMessageBox msgBox;
     QMessageBox errorBox;
     QMessageBox *welcomeBox;
     QProgressBar *progressBar;
+    QSlider *arrowSlider;
+    QSlider *fpsSlider;
 
     vector<String> files;
     vector <String>::iterator a;
@@ -96,13 +107,16 @@ private:
     vector<vector<Point3f> > out;
     vector<vector<Point3f> > outPrev;
     vector<int> identity;
-    int im;
+    unsigned int im;
+    unsigned int imr;
     ofstream savefile;
+    vector<Point3f> internalSaving;
 
-    public slots:
+public slots:
     void Go();
     void Write();
     void Reset();
+    void Replay();
 };
 
 #endif // MAINWINDOW_H

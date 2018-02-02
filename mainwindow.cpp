@@ -9,6 +9,7 @@
 #include <string>
 #include <functions.h>
 
+
 using namespace cv;
 using namespace std;
 
@@ -22,7 +23,7 @@ MainWindow::MainWindow(QWidget *parent) :
     setWindowTitle("Fishy Tracking");
 
     QMessageBox welcomeBox;
-    welcomeBox.setText(" Welcome in Fishy Tracking! \n To have help hove the relevant parameter. \n Check new version at https://bgallois.github.io/FishyTracking/. \n Have a wonderful tracking. \n © Benjamin GALLOIS benjamin.gallois@upmc.fr.");
+    welcomeBox.setText(" Welcome in Fishy Tracking " + version + "! \n To have help hove the relevant parameter. \n Check new version at https://bgallois.github.io/FishyTracking/. \n Have a wonderful tracking. \n © Benjamin GALLOIS benjamin.gallois@upmc.fr.");
     welcomeBox.exec();
 
 
@@ -70,9 +71,14 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
 
-    DefaultButton = new QPushButton("Set default", this);
+    DefaultButton = new QPushButton("Set as default", this);
     DefaultButton->move(350, 320);
     QObject::connect(DefaultButton, SIGNAL(clicked()), this, SLOT(Write()));
+
+    ReplayButton = new QPushButton("Replay", this);
+    ReplayButton->move(250, 320);
+    QObject::connect(ReplayButton, SIGNAL(clicked()), this, SLOT(Replay()));
+    ReplayButton ->hide();
 
 
     normal = new QCheckBox("Normal", this);
@@ -202,7 +208,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
     nBack = new QLabel(this);
-    nBack->setText("Background images: \n (can't be changed after the start)");
+    nBack->setText("Background images:");
     nBack->move(500, 250);
     nBack->adjustSize();
     nBack->setToolTip(tr("Number of images to compute the background."));
@@ -218,7 +224,7 @@ MainWindow::MainWindow(QWidget *parent) :
     save->setText("Save to:");
     save->move(900, 50);
     save->adjustSize();
-    save->setToolTip(tr("Path to a .txt file where the result of the tracking will be saved."));
+    save->setToolTip(tr("Path to a .txt file where the result of the tracking will be saved. Saved in the reference frame of the croped image."));
 
 
     saveField = new QLineEdit(this);
@@ -280,6 +286,46 @@ MainWindow::MainWindow(QWidget *parent) :
     y2ROIField->setText(defParameters.at(14));
 
 
+    arrow = new QLabel(this);
+    arrow -> move(1400, 50);
+    arrow -> setText("Arrow size:");
+
+
+    arrowField = new QLCDNumber(this);
+    arrowField ->move(1490,50);
+    arrowField ->display(2);
+
+
+    arrowSlider = new QSlider(Qt::Horizontal, this);
+    arrowSlider ->setGeometry(10, 60, 100, 20);
+    arrowSlider -> move(1400, 100);
+    arrowSlider -> setMinimum(2);
+
+    QObject::connect(arrowSlider, SIGNAL(valueChanged(int)), arrowField, SLOT(display(int))) ;
+
+    fps = new QLabel(this);
+    fps -> move(1400, 200);
+    fps -> setText("FPS:");
+    fps -> hide();
+
+
+    fpsField = new QLCDNumber(this);
+    fpsField ->move(1490,200);
+    fpsField ->display(20);
+    fpsField -> hide();
+
+
+    fpsSlider = new QSlider(Qt::Horizontal, this);
+    fpsSlider ->setGeometry(10, 60, 100, 20);
+    fpsSlider -> move(1400, 250);
+    fpsSlider -> setMinimum(1);
+    fpsSlider -> setMaximum(300);
+    fpsSlider-> hide();
+
+    QObject::connect(fpsSlider, SIGNAL(valueChanged(int)), fpsField, SLOT(display(int)));
+
+
+
     display = new QLabel(this);
     display ->move(50, 400);
     display ->setScaledContents(true);
@@ -306,6 +352,9 @@ MainWindow::MainWindow(QWidget *parent) :
     im = 0;
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(Go()));
+    imr = 0;
+    timerReplay = new QTimer(this);
+    connect(timerReplay, SIGNAL(timeout()), this, SLOT(Replay()));
 
 
 
@@ -329,6 +378,12 @@ void MainWindow::Go(){
     QString x2ROI = x2ROIField->text();
     QString y1ROI = y1ROIField->text();
     QString y2ROI = y2ROIField->text();
+    int arrowSize = arrowField-> value();
+
+    pathField->setDisabled(true);
+    numField->setDisabled(true);
+    nBackField->setDisabled(true);
+    saveField->setDisabled(true);
 
 
 
@@ -344,6 +399,7 @@ void MainWindow::Go(){
     int nBackground = nBack.toInt();
     int threshValue = thresh.toInt();
     string save = savePath.toStdString();
+
 
 
 
@@ -422,10 +478,10 @@ void MainWindow::Go(){
         coord = out.at(0).at(l);
         //putText(visu, to_string(l), Point(coord.x, coord.y), FONT_HERSHEY_DUPLEX, .5, Scalar(colorMap.at(l).x, colorMap.at(l).y, colorMap.at(l).z), 1);
         //circle(visu, Point(coord.x, coord.y), 1, Scalar(colorMap.at(l).x, colorMap.at(l).y, colorMap.at(l).z), 2, 2, 0);
-        //arrowedLine(visu, Point(coord.x, coord.y), Point(coord.x + 10*cos(coord.z), coord.y - 10*sin(coord.z)), Scalar(colorMap.at(l).x, colorMap.at(l).y, colorMap.at(l).z), 10, 10, 0);
+        arrowedLine(visu, Point(coord.x, coord.y), Point(coord.x + 5*arrowSize*cos(coord.z), coord.y - 5*arrowSize*sin(coord.z)), Scalar(colorMap.at(l).x, colorMap.at(l).y, colorMap.at(l).z), arrowSize, 10*arrowSize, 0);
 
         if((im > 5)){
-            polylines(visu, memory.at(l), false, Scalar(colorMap.at(l).x, colorMap.at(l).y, colorMap.at(l).z), 1, 8, 0);
+            polylines(visu, memory.at(l), false, Scalar(colorMap.at(l).x, colorMap.at(l).y, colorMap.at(l).z), arrowSize, 8, 0);
             memory.at(l).push_back(Point((int)coord.x, (int)coord.y));
             if(im>50){
                 memory.at(l).erase(memory.at(l).begin());
@@ -435,6 +491,7 @@ void MainWindow::Go(){
 
 
         // Saving
+        internalSaving.push_back(coord);
         ofstream savefile;
         savefile.open(save, ios::out | ios::app );
         savefile << coord.x << "   " << coord.y << "   " << coord.z << "   "  << out.at(2).at(l).x  <<  "   " << im << "\n";
@@ -517,13 +574,145 @@ void MainWindow::Go(){
 
     else{
         timer->stop();
+        ReplayButton->show();
+        fps ->show();
+        fpsField ->show();
+        fpsSlider->show();
+        im = 0;
         QMessageBox msgBox;
-        msgBox.setText("The tracking is done, go to work now!!!");
+        msgBox.setText("The tracking is done, go to work now!!! \n You can replay the tracking by clicking the replay button.");
         msgBox.exec();
     }
 
 }
 
+
+
+
+void MainWindow::Replay(){
+
+    // Get parameters
+    QString path = pathField->text();
+    QString num = numField->text();
+
+    int arrowSize = arrowField-> value();
+    QString x1ROI = x1ROIField->text();
+    QString x2ROI = x2ROIField->text();
+    QString y1ROI = y1ROIField->text();
+    QString y2ROI = y2ROIField->text();
+    Rect ROI(x1ROI.toInt(), y1ROI.toInt(), x2ROI.toInt() - x1ROI.toInt(), y2ROI.toInt() - y1ROI.toInt());
+
+    pathField->setDisabled(true);
+    numField->setDisabled(true);
+    maxAreaField->setDisabled(true);
+     minAreaField->setDisabled(true);
+    lengthField->setDisabled(true);
+    angleField->setDisabled(true);
+    loField->setDisabled(true);
+    wField->setDisabled(true);
+    nBackField->setDisabled(true);
+    threshField->setDisabled(true);
+    saveField->setDisabled(true);
+    x1ROIField->setDisabled(true);
+    x2ROIField->setDisabled(true);
+    y1ROIField->setDisabled(true);
+    y2ROIField->setDisabled(true);
+
+
+
+
+    // Convert parameters
+    unsigned int NUMBER = num.toInt(); //number of objects to track
+    int FPS = fpsField->value();
+    FPS = int((100.)/(float(FPS)));
+
+
+
+
+
+
+
+    if(imr == 0){ // Initialization
+
+        timerReplay->start(FPS);
+        a = files.begin();
+        string name = *a;
+        progressBar ->setRange(0, files.size());
+        visu = imread(name);
+        vector<vector<Point> > tmp(NUMBER, vector<Point>());
+        memory = tmp;
+
+
+    }
+
+
+    string name = *a;
+    visu = imread(name);
+    cameraFrame.convertTo(cameraFrame, CV_8U);
+    visu = visu(ROI);
+    timerReplay ->setInterval(FPS);
+
+
+
+    // Visualization & saving
+   for(unsigned int l = 0; l < NUMBER; l++){
+        Point3f coord;
+        coord = internalSaving.at(imr*NUMBER + l);
+        //putText(visu, to_string(l), Point(coord.x, coord.y), FONT_HERSHEY_DUPLEX, .5, Scalar(colorMap.at(l).x, colorMap.at(l).y, colorMap.at(l).z), 1);
+        //circle(visu, Point(coord.x, coord.y), 1, Scalar(colorMap.at(l).x, colorMap.at(l).y, colorMap.at(l).z), 2, 2, 0);
+        arrowedLine(visu, Point(coord.x, coord.y), Point(coord.x + 5*arrowSize*cos(coord.z), coord.y - 5*arrowSize*sin(coord.z)), Scalar(colorMap.at(l).x, colorMap.at(l).y, colorMap.at(l).z), arrowSize, 10*arrowSize, 0);
+
+        if((imr > 5)){
+            polylines(visu, memory.at(l), false, Scalar(colorMap.at(l).x, colorMap.at(l).y, colorMap.at(l).z), arrowSize, 8, 0);
+            memory.at(l).push_back(Point((int)coord.x, (int)coord.y));
+            if(imr>50){
+                memory.at(l).erase(memory.at(l).begin());
+                }
+        }
+
+
+    }
+
+
+
+    cvtColor(visu,visu,CV_BGR2RGB);
+    Size size = visu.size();
+
+    if(size.height > 600){
+        display->setFixedHeight(600);
+        display->setFixedWidth((600*size.height)/(size.width));
+    }
+    else if(size.width > 1500){
+        display->setFixedWidth(1500);
+        display->setFixedWidth((1500*size.width)/(size.height));
+    }
+    else{
+        display->setFixedHeight(size.height);
+        display->setFixedWidth(size.width);
+    }
+
+    display->setPixmap(QPixmap::fromImage(QImage(visu.data, visu.cols, visu.rows, visu.step, QImage::Format_RGB888)));
+    display2->clear();
+
+
+
+
+
+
+
+
+    if(imr < files.size() - 1){
+        a ++;
+        imr ++;
+        progressBar->setValue(im);
+     }
+
+    else{
+        timerReplay->stop();
+        imr = 0;
+    }
+
+}
 
 
 void MainWindow::Write(){
