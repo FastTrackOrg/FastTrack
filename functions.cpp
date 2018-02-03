@@ -335,6 +335,7 @@ vector<vector<Point3f>> ObjectPosition(Mat frame, int minSize, int maxSize){
 	vector<vector<Point> > contours;
 	vector<Point3f> positionHead;
 	vector<Point3f> positionTail;
+    vector<Point3f> positionFull;
 	vector<Point3f> globalParam;
 	Mat dst;
 
@@ -419,11 +420,12 @@ vector<vector<Point3f>> ObjectPosition(Mat frame, int minSize, int maxSize){
 
 				positionHead.push_back(Point3f(xHead, yHead, angleHead));
 				positionTail.push_back(Point3f(xTail, yTail, angleTail));
+                positionFull.push_back(Point3f(parameter.at(0) + roiFull.tl().x, parameter.at(1) + roiFull.tl().y, parameter.at(2)));
 				globalParam.push_back(Point3f(curv, 0, 0));
 			}
 		}
 
-		vector<vector<Point3f>> out = {positionHead, positionTail, globalParam};	
+        vector<vector<Point3f>> out = {positionHead, positionTail, positionFull, globalParam};
 		return out;
 }
 

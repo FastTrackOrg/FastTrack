@@ -15,6 +15,7 @@
 #include <QCheckBox>
 #include <QSlider>
 #include <QLCDNumber>
+#include <QComboBox>
 
 
 
@@ -65,6 +66,7 @@ private:
     QLabel *y2ROI;
     QLabel *arrow;
     QLabel *fps;
+    QLabel *trackingSpotLabel;
 
     QLineEdit *pathField;
     QLineEdit *numField;
@@ -94,6 +96,7 @@ private:
     QProgressBar *progressBar;
     QSlider *arrowSlider;
     QSlider *fpsSlider;
+    QComboBox *trackingSpot;
 
     vector<String> files;
     vector <String>::iterator a;

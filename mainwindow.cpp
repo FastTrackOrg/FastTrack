@@ -324,6 +324,17 @@ MainWindow::MainWindow(QWidget *parent) :
 
     QObject::connect(fpsSlider, SIGNAL(valueChanged(int)), fpsField, SLOT(display(int)));
 
+    trackingSpotLabel = new QLabel(this);
+    trackingSpotLabel ->move(1400, 150);
+    trackingSpotLabel ->setText("Spot to track:");
+
+    trackingSpot = new QComboBox(this);
+    trackingSpot ->move(1400, 180);
+    trackingSpot ->addItem(tr("Body head"));
+    trackingSpot ->addItem(tr("Body tail"));
+    trackingSpot ->addItem(tr("Body center of mass"));
+    trackingSpot ->adjustSize();
+
 
 
     display = new QLabel(this);
@@ -378,6 +389,7 @@ void MainWindow::Go(){
     QString x2ROI = x2ROIField->text();
     QString y1ROI = y1ROIField->text();
     QString y2ROI = y2ROIField->text();
+    int spot = trackingSpot->currentIndex();
     int arrowSize = arrowField-> value();
 
     pathField->setDisabled(true);
@@ -446,6 +458,7 @@ void MainWindow::Go(){
                 out.at(0).push_back(Point3f(0, 0, 0));
                 out.at(1).push_back(Point3f(0, 0, 0));
                 out.at(2).push_back(Point3f(0, 0, 0));
+                out.at(3).push_back(Point3f(0, 0, 0));
             }
             outPrev = out;
         }
@@ -462,10 +475,11 @@ void MainWindow::Go(){
 
 
     else if(im > 0){ // Matching fish identity with the previous frame
-        identity = CostFunc(outPrev.at(0), out.at(0), LENGTH, ANGLE, WEIGHT, LO);
+        identity = CostFunc(outPrev.at(spot), out.at(spot), LENGTH, ANGLE, WEIGHT, LO);
         out.at(0) = Reassignment(outPrev.at(0), out.at(0), identity);
         out.at(1) = Reassignment(outPrev.at(1), out.at(1), identity);
         out.at(2) = Reassignment(outPrev.at(2), out.at(2), identity);
+        out.at(3) = Reassignment(outPrev.at(3), out.at(3), identity);
         out.at(0) = Prevision(outPrev.at(0), out.at(0));
         outPrev = out;
     }
@@ -475,7 +489,7 @@ void MainWindow::Go(){
     // Visualization & saving
    for(unsigned int l = 0; l < out.at(0).size(); l++){
         Point3f coord;
-        coord = out.at(0).at(l);
+        coord = out.at(spot).at(l);
         //putText(visu, to_string(l), Point(coord.x, coord.y), FONT_HERSHEY_DUPLEX, .5, Scalar(colorMap.at(l).x, colorMap.at(l).y, colorMap.at(l).z), 1);
         //circle(visu, Point(coord.x, coord.y), 1, Scalar(colorMap.at(l).x, colorMap.at(l).y, colorMap.at(l).z), 2, 2, 0);
         arrowedLine(visu, Point(coord.x, coord.y), Point(coord.x + 5*arrowSize*cos(coord.z), coord.y - 5*arrowSize*sin(coord.z)), Scalar(colorMap.at(l).x, colorMap.at(l).y, colorMap.at(l).z), arrowSize, 10*arrowSize, 0);
@@ -494,8 +508,13 @@ void MainWindow::Go(){
         internalSaving.push_back(coord);
         ofstream savefile;
         savefile.open(save, ios::out | ios::app );
-        savefile << coord.x << "   " << coord.y << "   " << coord.z << "   "  << out.at(2).at(l).x  <<  "   " << im << "\n";
+        if(im == 0){
+            savefile << "xHead" << "   " << "yHead" << "   " << "tHead" << "   "  << "xTail" << "   " << "yTail" << "   " << "tTail"   <<  "   " << "xBody" << "   " << "yBody" << "   " << "tBody"   <<  "   " << "curvature" <<  "   " << "imageNumber" << "\n";
+        }
 
+        else{
+            savefile << out.at(0).at(l).x << "   " << out.at(0).at(l).y << "   " << out.at(0).at(l).z << "   "  << out.at(1).at(l).x << "   " << out.at(1).at(l).y << "   " << out.at(1).at(l).z  <<  "   " << out.at(2).at(l).x << "   " << out.at(2).at(l).y << "   " << out.at(2).at(l).z <<  "   " << out.at(3).at(l).x <<  "   " << im << "\n";
+        }
 
     }
 
@@ -617,6 +636,8 @@ void MainWindow::Replay(){
     x2ROIField->setDisabled(true);
     y1ROIField->setDisabled(true);
     y2ROIField->setDisabled(true);
+    trackingSpot->hide();
+    trackingSpotLabel->hide();
 
 
 
