@@ -488,14 +488,12 @@ void MainWindow::Go(){
         internalSaving.push_back(coord);
         ofstream savefile;
         savefile.open(savePath, ios::out | ios::app );
-        if(im == 0){
+        if(im == 0 && l == 0){
             savefile << "xHead" << "   " << "yHead" << "   " << "tHead" << "   "  << "xTail" << "   " << "yTail" << "   " << "tTail"   <<  "   " << "xBody" << "   " << "yBody" << "   " << "tBody"   <<  "   " << "curvature" <<  "   " << "imageNumber" << "\n";
-            break;
         }
 
-        else{
-            savefile << out.at(0).at(l).x << "   " << out.at(0).at(l).y << "   " << out.at(0).at(l).z << "   "  << out.at(1).at(l).x << "   " << out.at(1).at(l).y << "   " << out.at(1).at(l).z  <<  "   " << out.at(2).at(l).x << "   " << out.at(2).at(l).y << "   " << out.at(2).at(l).z <<  "   " << out.at(3).at(l).x <<  "   " << im << "\n";
-        }
+        savefile << out.at(0).at(l).x << "   " << out.at(0).at(l).y << "   " << out.at(0).at(l).z << "   "  << out.at(1).at(l).x << "   " << out.at(1).at(l).y << "   " << out.at(1).at(l).z  <<  "   " << out.at(2).at(l).x << "   " << out.at(2).at(l).y << "   " << out.at(2).at(l).z <<  "   " << out.at(3).at(l).x <<  "   " << im << "\n";
+
 
     }
 
