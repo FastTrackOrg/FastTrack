@@ -374,23 +374,18 @@ MainWindow::MainWindow(QWidget *parent) :
 void MainWindow::Go(){
 
     // Get parameters
-    QString path = pathField->text();
-    QString num = numField->text();
-    QString maxArea = maxAreaField->text();
-    QString minArea = minAreaField->text();
-    QString lenght = lengthField->text();
-    QString angle = angleField->text();
-    QString lo = loField->text();
-    QString w = wField->text();
-    QString nBack = nBackField->text();
-    QString thresh = threshField->text();
-    QString savePath = saveField->text();
-    QString x1ROI = x1ROIField->text();
-    QString x2ROI = x2ROIField->text();
-    QString y1ROI = y1ROIField->text();
-    QString y2ROI = y2ROIField->text();
-    int spot = trackingSpot->currentIndex();
-    int arrowSize = arrowField-> value();
+    spot = trackingSpot->currentIndex();
+    arrowSize = arrowField-> value();
+    MAXAREA = maxAreaField->text().toInt(); //9000; //minimal area of detected objects
+    MINAREA = minAreaField->text().toInt(); //3000; //maximal area of detected objects
+    LENGTH = lengthField->text().toInt(); //maximal distance covered between two frames
+    ANGLE = (angleField->text().toDouble()*M_PI)/180; //maximal angle between two frames
+    NUMBER = numField->text().toInt(); //number of objects to track
+    WEIGHT = wField->text().toDouble();// weight of the orientation/angle in the cost function, 0 = orientation, 1 = distance
+    LO = loField->text().toInt(); // maximum occlusion distance
+    nBackground = nBackField->text().toInt();
+    threshValue = threshField->text().toInt();
+    savePath = saveField->text().toStdString();
 
     pathField->setDisabled(true);
     numField->setDisabled(true);
@@ -400,25 +395,10 @@ void MainWindow::Go(){
 
 
 
-    // Convert parameters
-    int MAXAREA = maxArea.toInt(); //9000; //minimal area of detected objects
-    int MINAREA = minArea.toInt(); //3000; //maximal area of detected objects
-    double LENGTH = lenght.toInt(); //maximal distance covered between two frames
-    double ANGLE = (angle.toDouble()*M_PI)/180; //maximal angle between two frames
-    unsigned int NUMBER = num.toInt(); //number of objects to track
-    double WEIGHT = w.toDouble();// weight of the orientation/angle in the cost function, 0 = orientation, 1 = distance
-    double LO = lo.toInt(); // maximum occlusion distance
-    int nBackground = nBack.toInt();
-    int threshValue = thresh.toInt();
-    string save = savePath.toStdString();
-
-
-
-
     if(im == 0){ // Initialization
 
         timer->start(1);
-        string folder = path.toStdString();
+        string folder = pathField->text().toStdString();
         glob(folder, files, false);
         sort(files.begin(), files.end());
         a = files.begin();
@@ -436,8 +416,8 @@ void MainWindow::Go(){
 
 
     string name = *a;
-    savefile.open(save);
-    Rect ROI(x1ROI.toInt(), y1ROI.toInt(), x2ROI.toInt() - x1ROI.toInt(), y2ROI.toInt() - y1ROI.toInt());
+    savefile.open(savePath);
+    Rect ROI(x1ROIField->text().toInt(), y1ROIField->text().toInt(), x2ROIField->text().toInt() - x1ROIField->text().toInt(), y2ROIField->text().toInt() - y1ROIField->text().toInt());
     cameraFrame = imread(name, IMREAD_GRAYSCALE);
     visu = imread(name);
     cameraFrame.convertTo(cameraFrame, CV_8U);
@@ -507,7 +487,7 @@ void MainWindow::Go(){
         // Saving
         internalSaving.push_back(coord);
         ofstream savefile;
-        savefile.open(save, ios::out | ios::app );
+        savefile.open(savePath, ios::out | ios::app );
         if(im == 0){
             savefile << "xHead" << "   " << "yHead" << "   " << "tHead" << "   "  << "xTail" << "   " << "yTail" << "   " << "tTail"   <<  "   " << "xBody" << "   " << "yBody" << "   " << "tBody"   <<  "   " << "curvature" <<  "   " << "imageNumber" << "\n";
         }

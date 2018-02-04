@@ -114,6 +114,18 @@ private:
     unsigned int imr;
     ofstream savefile;
     vector<Point3f> internalSaving;
+    int spot;
+    int arrowSize;
+    int MAXAREA;
+    int MINAREA;
+    double LENGTH;
+    double ANGLE;
+    unsigned int NUMBER;
+    double WEIGHT;
+    double LO;
+    int nBackground;
+    int threshValue;
+    string savePath;
 
 public slots:
     void Go();
