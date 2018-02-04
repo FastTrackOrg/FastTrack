@@ -47,7 +47,7 @@ private:
     QPushButton *ReplayButton;
     QCheckBox *normal;
     QCheckBox *binary;
-    QString version = "v2.3.1dev";
+    QString version = "v3.0.1";
 
     QLabel *path;
     QLabel *numLabel;

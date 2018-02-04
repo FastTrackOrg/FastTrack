@@ -490,6 +490,7 @@ void MainWindow::Go(){
         savefile.open(savePath, ios::out | ios::app );
         if(im == 0){
             savefile << "xHead" << "   " << "yHead" << "   " << "tHead" << "   "  << "xTail" << "   " << "yTail" << "   " << "tTail"   <<  "   " << "xBody" << "   " << "yBody" << "   " << "tBody"   <<  "   " << "curvature" <<  "   " << "imageNumber" << "\n";
+            break;
         }
 
         else{
@@ -577,6 +578,8 @@ void MainWindow::Go(){
         fps ->show();
         fpsField ->show();
         fpsSlider->show();
+        trackingSpot->hide();
+        trackingSpotLabel->hide();
         im = 0;
         QMessageBox msgBox;
         msgBox.setText("The tracking is done, go to work now!!! \n You can replay the tracking by clicking the replay button.");
@@ -616,8 +619,7 @@ void MainWindow::Replay(){
     x2ROIField->setDisabled(true);
     y1ROIField->setDisabled(true);
     y2ROIField->setDisabled(true);
-    trackingSpot->hide();
-    trackingSpotLabel->hide();
+
 
 
 
