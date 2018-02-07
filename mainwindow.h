@@ -90,9 +90,6 @@ private:
     QLabel *display2;
     QTimer *timer;
     QTimer *timerReplay;
-    QMessageBox msgBox;
-    QMessageBox errorBox;
-    QMessageBox *welcomeBox;
     QProgressBar *progressBar;
     QSlider *arrowSlider;
     QSlider *fpsSlider;

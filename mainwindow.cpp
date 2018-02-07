@@ -385,8 +385,8 @@ void MainWindow::Go(){
     LO = loField->text().toInt(); // maximum occlusion distance
     nBackground = nBackField->text().toInt();
     threshValue = threshField->text().toInt();
-    savePath = saveField->text().toStdString();
 
+    //Visualization
     pathField->setDisabled(true);
     numField->setDisabled(true);
     nBackField->setDisabled(true);
@@ -394,12 +394,21 @@ void MainWindow::Go(){
 
 
 
-
     if(im == 0){ // Initialization
 
         timer->start(1);
         string folder = pathField->text().toStdString();
-        glob(folder, files, false);
+
+        try{
+            glob(folder, files, false);
+        }
+        catch (...){
+            timer->stop();
+            QMessageBox pathError;
+            pathError.setText("No files found");
+            pathError.exec();
+        }
+
         sort(files.begin(), files.end());
         a = files.begin();
         string name = *a;
@@ -411,6 +420,7 @@ void MainWindow::Go(){
         vector<vector<Point> > tmp(NUMBER, vector<Point>());
         memory = tmp;
         colorMap = Color(NUMBER);
+        savePath = saveField->text().toStdString();
 
     }
 
@@ -443,11 +453,11 @@ void MainWindow::Go(){
             outPrev = out;
         }
 
-        else if(out.at(0).size() == 0){ // Error message
+        else if(out.at(0).empty()){ // Error message
             timer->stop();
             QMessageBox errorBox;
-            msgBox.setText("No fish detected! Change parameters!");
-            msgBox.exec();
+            errorBox.setText("No fish detected! Change parameters!");
+            errorBox.exec();
 
         }
     }
@@ -460,7 +470,7 @@ void MainWindow::Go(){
         out.at(1) = Reassignment(outPrev.at(1), out.at(1), identity);
         out.at(2) = Reassignment(outPrev.at(2), out.at(2), identity);
         out.at(3) = Reassignment(outPrev.at(3), out.at(3), identity);
-        out.at(0) = Prevision(outPrev.at(0), out.at(0));
+        //out.at(spot) = Prevision(outPrev.at(spot), out.at(spot));
         outPrev = out;
     }
 
@@ -470,8 +480,6 @@ void MainWindow::Go(){
    for(unsigned int l = 0; l < out.at(0).size(); l++){
         Point3f coord;
         coord = out.at(spot).at(l);
-        //putText(visu, to_string(l), Point(coord.x, coord.y), FONT_HERSHEY_DUPLEX, .5, Scalar(colorMap.at(l).x, colorMap.at(l).y, colorMap.at(l).z), 1);
-        //circle(visu, Point(coord.x, coord.y), 1, Scalar(colorMap.at(l).x, colorMap.at(l).y, colorMap.at(l).z), 2, 2, 0);
         arrowedLine(visu, Point(coord.x, coord.y), Point(coord.x + 5*arrowSize*cos(coord.z), coord.y - 5*arrowSize*sin(coord.z)), Scalar(colorMap.at(l).x, colorMap.at(l).y, colorMap.at(l).z), arrowSize, 10*arrowSize, 0);
 
         if((im > 5)){
@@ -498,17 +506,18 @@ void MainWindow::Go(){
     }
 
 
+
     if (normal->isChecked() && !binary->isChecked()){
         cvtColor(visu,visu,CV_BGR2RGB);
         Size size = visu.size();
 
         if(size.height > 600){
             display->setFixedHeight(600);
-            display->setFixedWidth((600*size.height)/(size.width));
+            display->setFixedWidth((size.width)/(600*size.height));
         }
-        else if(size.width > 1500){
+        if(size.width > 1500){
             display->setFixedWidth(1500);
-            display->setFixedWidth((1500*size.width)/(size.height));
+            display->setFixedHeight((size.height)/(1500*size.width));
         }
         else{
             display->setFixedHeight(size.height);
@@ -524,11 +533,11 @@ void MainWindow::Go(){
 
         if(size.height > 600){
             display2->setFixedHeight(600);
-            display2->setFixedWidth((600*size.height)/(size.width));
+            display2->setFixedWidth((size.width)/(600*size.height));
         }
-        else if(size.width > 1500){
+        if(size.width > 1500){
             display2->setFixedWidth(1500);
-            display2->setFixedWidth((1500*size.width)/(size.height));
+            display2->setFixedHeight((size.height)/(1500*size.width));
         }
         else{
             display2->setFixedHeight(size.height);
@@ -542,13 +551,13 @@ void MainWindow::Go(){
     else if (normal->isChecked() && binary->isChecked()){
         Size size = cameraFrame.size();
 
+        if(size.width > 1500/2){
+            display->setFixedWidth(1500/2);
+            display->setFixedHeight((size.height*2)/(1500*size.width));
+        }
         if(size.height > 600){
             display->setFixedHeight(600);
-            display->setFixedWidth((600*size.height)/(size.width));
-        }
-        else if(size.width > 1500){
-            display->setFixedWidth(1500/2);
-            display->setFixedWidth((1500*size.width)/(size.height*2));
+            display->setFixedWidth((size.width)/(600*size.height));
         }
         else{
             display->setFixedHeight(size.height/2);
@@ -681,11 +690,11 @@ void MainWindow::Replay(){
 
     if(size.height > 600){
         display->setFixedHeight(600);
-        display->setFixedWidth((600*size.height)/(size.width));
+        display->setFixedWidth((size.width)/(600*size.height));
     }
-    else if(size.width > 1500){
+    if(size.width > 1500){
         display->setFixedWidth(1500);
-        display->setFixedWidth((1500*size.width)/(size.height));
+        display->setFixedHeight((size.height)/(1500*size.width));
     }
     else{
         display->setFixedHeight(size.height);

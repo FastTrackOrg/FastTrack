@@ -457,13 +457,12 @@ vector<int> CostFunc(vector<Point3f> prevPos, vector<Point3f> pos, const double 
 		Point3f prevCoord = prevPos.at(i);
 		for(int j = 0; j < m; ++j){
 			Point3f coord = pos.at(j);
-
-			if(pow(pow(prevCoord.x - coord.x, 2) + pow(prevCoord.y - coord.y, 2), 0.5) < LO){
-				c = WEIGHT*((pow(pow(prevCoord.x - coord.x, 2) + pow(prevCoord.y - coord.y, 2), 0.5))/(LENGTH)) + (1 - WEIGHT)*((abs(Modul(prevCoord.z - coord.z + M_PI) - M_PI))/(ANGLE)); //cost function
-
+            double d = pow(pow(prevCoord.x - coord.x, 2) + pow(prevCoord.y - coord.y, 2), 0.5);
+            if(d < LO){
+                c = WEIGHT*(d/LENGTH) + (1 - WEIGHT)*((abs(Modul(prevCoord.z - coord.z + M_PI) - M_PI))/(ANGLE)); //cost function
 				costMatrix[i][j] = c;
 			}
-			else{
+            else if (d > LO){
 				costMatrix[i][j] = 2e53;
 			}
 			
