@@ -47,6 +47,7 @@ private:
     QPushButton *ReplayButton;
     QCheckBox *normal;
     QCheckBox *binary;
+    QCheckBox *invert;
     QString version = "v3.0.1";
 
     QLabel *path;
@@ -98,10 +99,10 @@ private:
     vector<String> files;
     vector <String>::iterator a;
 
-    Mat cameraFrame;
+    UMat cameraFrame;
     Mat visu;
-    Mat img0;;
-    Mat background;;
+    UMat img0;;
+    UMat background;;
     vector<vector<Point> > memory;
     vector<Point3f> colorMap;
     vector<vector<Point3f> > out;

@@ -179,44 +179,6 @@ vector<double> Orientation(Mat image, bool dir) {
 			}
 		}
 
-		//////////////////////With a projection//////////////////////////////////////////////
-
-
-		/* !!! terminate called after throwing an instance of 'std::bad_alloc'
-				what():  std::bad_alloc
-				Aborted       For one frame 003507 (to check)
-		*/
-
-
-
-
-
-
-		/*vector<double> offSet = {cos(orientation)*(float(image.cols)-x) - sin(orientation)*(float(image.rows)-y), cos(orientation)*(float(image.cols)-x) - sin(orientation)*(float(0)-y), cos(orientation)*(float(0)-x) - sin(orientation)*(float(image.rows)-y), cos(orientation)*(float(0)-x) - sin(orientation)*(float(0)-y)};
-		double offSetMin = *min_element(offSet.begin(), offSet.end());
-		double offSetMax = *max_element(offSet.begin(), offSet.end()) + 1;
-
-		vector<double> tmpMat(int(offSetMax + abs(offSetMin)), 0.0);
-		vector<double> tmp;
-
-		for (int row = 0; row < image.rows; ++row){
-			for (int col = 0; col < image.cols; ++col){
-		  		double proj = cos(orientation)*(float(col)-x) - sin(orientation)*(float(row)-y);
-		  		tmpMat.at(int(proj + abs(offSetMin))) += image.at<uchar>(row, col);; 
-		  	}
-		}
-
-		double ccMax = *max_element(tmpMat.begin(), tmpMat.end())/100;
-		for (unsigned int it = 0; it < tmpMat.size(); ++it){
-			int cc = tmpMat.at(it);
-			for (int jt = 0; jt < cc/(ccMax); ++jt){
-		 		tmp.push_back((double)(it+1));
-			}
-		}*/
-		//////////////////////////////////////////////////////////////////////////////////
-
-
-
 
 		double mean = accumulate(tmp.begin(), tmp.end(), 0)/(double)tmp.size();
 
@@ -252,27 +214,36 @@ vector<double> Orientation(Mat image, bool dir) {
   @param double n: number of frames to average 
   * @return Mat: background image of a movie
 */
-Mat BackgroundExtraction(vector<String> files, double n){
+UMat BackgroundExtraction(vector<String> files, double n){
 
-	Mat background = imread(files[0], IMREAD_GRAYSCALE);
-	Mat img0 = imread(files[0], IMREAD_GRAYSCALE);
-	background.convertTo(background, CV_32F);
-	img0.convertTo(img0, CV_32FC1);
-	Rect registrationFrame(0, 0, 200, 50);
-	int step = files.size()/n;
+    UMat background;
+    UMat img0;
+    imread(files[0], IMREAD_GRAYSCALE).copyTo(background);
+    imread(files[0], IMREAD_GRAYSCALE).copyTo(img0);
+    background.convertTo(background, CV_32F);
+    img0.convertTo(img0, CV_32FC1);
+    Rect registrationFrame(0, 0, 200, 50);
+    int step = files.size()/n;
+    //Mat tmp = imread(files[0], IMREAD_GRAYSCALE);
+    UMat tmp;
+    UMat cameraFrameReg;
+    Mat H;
+    UMat identity = UMat::ones(background.rows, background.cols, CV_32F);
 
 	for(unsigned int i = 1; i < files.size(); i += step){
-		Mat tmp = imread(files[i], IMREAD_GRAYSCALE);
+        //tmp = imread(files[i], IMREAD_GRAYSCALE);
+        imread(files[i], IMREAD_GRAYSCALE).copyTo(tmp);
 		tmp.convertTo(tmp, CV_32FC1);
-		Mat cameraFrameReg = tmp(registrationFrame);
+        cameraFrameReg = tmp(registrationFrame);
 		img0 = img0(registrationFrame);
-		Point2d shift = phaseCorrelate(cameraFrameReg, img0);
-		Mat H = (Mat_<float>(2, 3) << 1.0, 0.0, shift.x, 0.0, 1.0, shift.y);
+        Point2d shift = phaseCorrelate(cameraFrameReg, img0);
+        H = (Mat_<float>(2, 3) << 1.0, 0.0, shift.x, 0.0, 1.0, shift.y);
 		warpAffine(tmp, tmp, H, tmp.size());
 		accumulate(tmp, background);
 	}
-	background /= (n-1);
-	background.convertTo(background, CV_8U);
+    //background /= (n-1);
+    multiply(background, identity, background, 1/(n-1));
+    background.convertTo(background, CV_8U);
 
 	return background;
 }
@@ -285,7 +256,7 @@ Mat BackgroundExtraction(vector<String> files, double n){
   * @param Mat imageReference: reference image for the registration, one channel
 	* @param Mat frame: image to register
 */
-void Registration(Mat imageReference, Mat frame){
+void Registration(UMat imageReference, UMat frame){
 
 	//Rect registrationFrame(0, 0, 500, 500);
 	frame.convertTo(frame, CV_32FC1);
@@ -294,7 +265,7 @@ void Registration(Mat imageReference, Mat frame){
 	//Mat frameReg = frame(registrationFrame);
 
 	Point2d shift = phaseCorrelate(frame, imageReference);
-	Mat H = (Mat_<float>(2, 3) << 1.0, 0.0, shift.x, 0.0, 1.0, shift.y);
+    Mat H = (Mat_<float>(2, 3) << 1.0, 0.0, shift.x, 0.0, 1.0, shift.y);
 	warpAffine(frame, frame, H, frame.size());
 }
 
@@ -306,9 +277,9 @@ void Registration(Mat imageReference, Mat frame){
   * @param Mat frame: image to binarized
 	* @param char backgroundColor: 'b' if the background is black, 'w' is the background is white
 */
-void Binarisation(Mat frame, char backgroundColor, int value){
+void Binarisation(UMat frame, char backgroundColor, int value){
 
-	frame.convertTo(frame, CV_8U);
+    frame.convertTo(frame, CV_8U);
 
 	if(backgroundColor == 'b'){
 		//threshold(frame, frame, 0, 255, CV_THRESH_BINARY| CV_THRESH_OTSU);

@@ -91,6 +91,10 @@ MainWindow::MainWindow(QWidget *parent) :
     binary ->move(660, 340);
     binary ->setToolTip(tr("Check this option to display the binary image. Useful to ajust the binary threshold parameter."));
 
+    invert = new QCheckBox("Invert", this);
+    invert ->move(660, 360);
+    invert ->setToolTip(tr("Check this option if the background is dark."));
+
 
 
 
@@ -413,9 +417,9 @@ void MainWindow::Go(){
         a = files.begin();
         string name = *a;
         progressBar ->setRange(0, files.size());
-        cameraFrame = imread(name, IMREAD_GRAYSCALE);
+        imread(name, IMREAD_GRAYSCALE).copyTo(cameraFrame);
         visu = imread(name);
-        img0 = imread(name, IMREAD_GRAYSCALE);
+        imread(name, IMREAD_GRAYSCALE).copyTo(img0);
         background = BackgroundExtraction(files, nBackground);
         vector<vector<Point> > tmp(NUMBER, vector<Point>());
         memory = tmp;
@@ -428,17 +432,16 @@ void MainWindow::Go(){
     string name = *a;
     savefile.open(savePath);
     Rect ROI(x1ROIField->text().toInt(), y1ROIField->text().toInt(), x2ROIField->text().toInt() - x1ROIField->text().toInt(), y2ROIField->text().toInt() - y1ROIField->text().toInt());
-    cameraFrame = imread(name, IMREAD_GRAYSCALE);
+    imread(name, IMREAD_GRAYSCALE).copyTo(cameraFrame);
     visu = imread(name);
-    cameraFrame.convertTo(cameraFrame, CV_8U);
-    cameraFrame = background - cameraFrame;
+    subtract(background, cameraFrame, cameraFrame);
     Binarisation(cameraFrame, 'b', threshValue);
     cameraFrame = cameraFrame(ROI);
     visu = visu(ROI);
 
 
     // Position computation
-    out = ObjectPosition(cameraFrame, MINAREA, MAXAREA);
+    out = ObjectPosition(cameraFrame.getMat(cv::ACCESS_READ), MINAREA, MAXAREA);
 
 
     if(im == 0){ // First frame initialization
@@ -470,7 +473,7 @@ void MainWindow::Go(){
         out.at(1) = Reassignment(outPrev.at(1), out.at(1), identity);
         out.at(2) = Reassignment(outPrev.at(2), out.at(2), identity);
         out.at(3) = Reassignment(outPrev.at(3), out.at(3), identity);
-        //out.at(spot) = Prevision(outPrev.at(spot), out.at(spot));
+        out.at(spot) = Prevision(outPrev.at(spot), out.at(spot));
         outPrev = out;
     }
 
@@ -511,14 +514,26 @@ void MainWindow::Go(){
         cvtColor(visu,visu,CV_BGR2RGB);
         Size size = visu.size();
 
-        if(size.height > 600){
+        if(size.height > 600 & size.width < 1500){
             display->setFixedHeight(600);
-            display->setFixedWidth((size.width)/(600*size.height));
+            display->setFixedWidth((600*size.height)/(size.width));
         }
-        if(size.width > 1500){
+
+        else if(size.height < 600 & size.width > 1500){
             display->setFixedWidth(1500);
-            display->setFixedHeight((size.height)/(1500*size.width));
+            display->setFixedHeight((1500*size.width)/(size.height));
         }
+
+        else if(size.height > 600 & size.width > 1500){
+            double c = 600;
+            while((c*size.height)/(size.width) > 1500){
+                display->setFixedWidth((600*size.height)/(size.width));
+                c /= 2;
+            }
+            display->setFixedHeight(c);
+            display->setFixedWidth((c*size.height)/(size.width));
+        }
+
         else{
             display->setFixedHeight(size.height);
             display->setFixedWidth(size.width);
@@ -531,43 +546,68 @@ void MainWindow::Go(){
     else if (!normal->isChecked() && binary->isChecked()){
         Size size = cameraFrame.size();
 
-        if(size.height > 600){
+        if(size.height > 600 & size.width < 1500){
             display2->setFixedHeight(600);
-            display2->setFixedWidth((size.width)/(600*size.height));
+            display2->setFixedWidth((600*size.height)/(size.width));
         }
-        if(size.width > 1500){
+
+        else if(size.height < 600 & size.width > 1500){
             display2->setFixedWidth(1500);
-            display2->setFixedHeight((size.height)/(1500*size.width));
+            display2->setFixedHeight((1500*size.width)/(size.height));
         }
+
+        else if(size.height > 600 & size.width > 1500){
+            double c = 600;
+            while((c*size.height)/(size.width) > 1500){
+                display2->setFixedWidth((600*size.height)/(size.width));
+                c /= 2;
+            }
+            display2->setFixedHeight(c);
+            display2->setFixedWidth((c*size.height)/(size.width));
+        }
+
         else{
             display2->setFixedHeight(size.height);
             display2->setFixedWidth(size.width);
         }
         display2->move(50, 400);
-        display2->setPixmap(QPixmap::fromImage(QImage(cameraFrame.data, cameraFrame.cols, cameraFrame.rows, cameraFrame.step, QImage::Format_Grayscale8)));
+        display2->setPixmap(QPixmap::fromImage(QImage(cameraFrame.getMat(cv::ACCESS_READ).data, cameraFrame.cols, cameraFrame.rows, cameraFrame.step, QImage::Format_Grayscale8)));
         display->clear();
     }
 
     else if (normal->isChecked() && binary->isChecked()){
         Size size = cameraFrame.size();
 
-        if(size.width > 1500/2){
-            display->setFixedWidth(1500/2);
-            display->setFixedHeight((size.height*2)/(1500*size.width));
-        }
-        if(size.height > 600){
+        if(size.height > 600 & size.width < 1500/2.){
             display->setFixedHeight(600);
-            display->setFixedWidth((size.width)/(600*size.height));
+            display->setFixedWidth((600*size.height)/(size.width));
         }
+
+        else if(size.height < 600 & size.width > 1500/2.){
+            display->setFixedWidth(1500);
+            display->setFixedHeight((1500*size.width)/(size.height));
+        }
+
+        else if(size.height > 600 & size.width > 1500/2.){
+            double c = 600;
+            while((c*size.height)/(size.width) > 1500/2.){
+                display->setFixedWidth((600*size.height)/(size.width));
+                c /= 2;
+            }
+            display->setFixedHeight(c);
+            display->setFixedWidth((c*size.height)/(size.width));
+        }
+
         else{
-            display->setFixedHeight(size.height/2);
-            display->setFixedWidth(size.width/2);
+            display->setFixedHeight(size.height);
+            display->setFixedWidth(size.width);
         }
+
         display2->move(800, 400);
         display2->setFixedHeight(display->height());
         display2->setFixedWidth(display->width());
         display2->setPixmap(QPixmap::fromImage(QImage(visu.data, visu.cols, visu.rows, visu.step, QImage::Format_RGB888)));
-        display->setPixmap(QPixmap::fromImage(QImage(cameraFrame.data, cameraFrame.cols, cameraFrame.rows, cameraFrame.step, QImage::Format_Grayscale8)));
+        display->setPixmap(QPixmap::fromImage(QImage(cameraFrame.getMat(cv::ACCESS_READ).data, cameraFrame.cols, cameraFrame.rows, cameraFrame.step, QImage::Format_Grayscale8)));
     }
 
 
@@ -688,19 +728,30 @@ void MainWindow::Replay(){
     cvtColor(visu,visu,CV_BGR2RGB);
     Size size = visu.size();
 
-    if(size.height > 600){
+    if(size.height > 600 & size.width < 1500){
         display->setFixedHeight(600);
-        display->setFixedWidth((size.width)/(600*size.height));
+        display->setFixedWidth((600*size.height)/(size.width));
     }
-    if(size.width > 1500){
+
+    else if(size.height < 600 & size.width > 1500){
         display->setFixedWidth(1500);
-        display->setFixedHeight((size.height)/(1500*size.width));
+        display->setFixedHeight((1500*size.width)/(size.height));
     }
+
+    else if(size.height > 600 & size.width > 1500){
+        double c = 600;
+        while((c*size.height)/(size.width) > 1500){
+            display->setFixedWidth((600*size.height)/(size.width));
+            c /= 2;
+        }
+        display->setFixedHeight(c);
+        display->setFixedWidth((c*size.height)/(size.width));
+    }
+
     else{
         display->setFixedHeight(size.height);
         display->setFixedWidth(size.width);
     }
-
     display->setPixmap(QPixmap::fromImage(QImage(visu.data, visu.cols, visu.rows, visu.step, QImage::Format_RGB888)));
     display2->clear();
 
