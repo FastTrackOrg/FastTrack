@@ -22,16 +22,18 @@ MainWindow::MainWindow(QWidget *parent) :
     setFixedSize(1600, 1000);
     setWindowTitle("Fishy Tracking");
 
+
+    // Welcome message
     QMessageBox welcomeBox;
     welcomeBox.setText(" Welcome in Fishy Tracking " + version + "! \n To have help hove the relevant parameter. \n Check new version at https://bgallois.github.io/FishyTracking/. \n Have a wonderful tracking. \n © Benjamin GALLOIS benjamin.gallois@upmc.fr.");
     welcomeBox.exec();
 
 
-
+    // Default parameters reading
     QStringList defParameters;
     QFile file("conf.txt");
 
-    if(QFileInfo("conf.txt").exists()){
+    if(QFileInfo("conf.txt").exists()){ // Existing default parameters
         if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
             return;
 
@@ -46,7 +48,7 @@ MainWindow::MainWindow(QWidget *parent) :
         file.close();
     }
 
-    else{
+    else{ // Create a defaults files if not existing
         int i = 0;
         while(i<15) {
             QString line = "0";
@@ -55,6 +57,8 @@ MainWindow::MainWindow(QWidget *parent) :
         }
     }
 
+
+    // Widgets layout
 
     QuitButton = new QPushButton("Quit", this);
     QuitButton->move(450, 320);
@@ -91,11 +95,15 @@ MainWindow::MainWindow(QWidget *parent) :
     binary ->move(660, 340);
     binary ->setToolTip(tr("Check this option to display the binary image. Useful to ajust the binary threshold parameter."));
 
-    invert = new QCheckBox("Invert", this);
-    invert ->move(660, 360);
-    invert ->setToolTip(tr("Check this option if the background is dark."));
 
+    /*refreshRateLabel = new QLabel(this);
+    refreshRateLabel->setText("Display refresh rate:");
+    refreshRateLabel->move(750, 310);
+    refreshRateLabel->adjustSize();
 
+    refreshRate = new QSpinBox(this);
+    refreshRate ->move(880, 310);
+    refreshRate ->setValue(25);*/
 
 
     path = new QLabel(this);
@@ -334,9 +342,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     trackingSpot = new QComboBox(this);
     trackingSpot ->move(1400, 180);
-    trackingSpot ->addItem(tr("Body head"));
-    trackingSpot ->addItem(tr("Body tail"));
-    trackingSpot ->addItem(tr("Body center of mass"));
+    trackingSpot ->addItem(tr("Head"));
+    trackingSpot ->addItem(tr("Tail"));
+    trackingSpot ->addItem(tr("Center of mass"));
     trackingSpot ->adjustSize();
 
 
@@ -361,36 +369,64 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
 
-
-
-
+    // Execution
     im = 0;
     timer = new QTimer(this);
-    connect(timer, SIGNAL(timeout()), this, SLOT(Go()));
+
+    connect(timer, SIGNAL(timeout()), this, SLOT(Go())); // Tracking
+
+    timerDisplay = new QTimer(this);
+    connect(timerDisplay, SIGNAL(timeout()), this, SLOT(Display())); // Displaying
+
+
+
     imr = 0;
     timerReplay = new QTimer(this);
-    connect(timerReplay, SIGNAL(timeout()), this, SLOT(Replay()));
+    connect(timerReplay, SIGNAL(timeout()), this, SLOT(Replay())); // Replaying
 
 
 
 }
 
-void MainWindow::Go(){
 
-    // Get parameters
+void MainWindow::UpdateParameters(){
+
     spot = trackingSpot->currentIndex();
     arrowSize = arrowField-> value();
     MAXAREA = maxAreaField->text().toInt(); //9000; //minimal area of detected objects
     MINAREA = minAreaField->text().toInt(); //3000; //maximal area of detected objects
     LENGTH = lengthField->text().toInt(); //maximal distance covered between two frames
     ANGLE = (angleField->text().toDouble()*M_PI)/180; //maximal angle between two frames
-    NUMBER = numField->text().toInt(); //number of objects to track
     WEIGHT = wField->text().toDouble();// weight of the orientation/angle in the cost function, 0 = orientation, 1 = distance
     LO = loField->text().toInt(); // maximum occlusion distance
-    nBackground = nBackField->text().toInt();
     threshValue = threshField->text().toInt();
+    x1 = x1ROIField->text().toInt();
+    x2 = x2ROIField->text().toInt();
+    y1 = y1ROIField->text().toInt();
+    y2 = y2ROIField->text().toInt();
 
-    //Visualization
+}
+
+void MainWindow::Go(){
+
+
+    connect(trackingSpot, SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateParameters()));
+    connect(arrowSlider, SIGNAL(valueChanged(int)), this, SLOT(UpdateParameters()));
+    connect(maxAreaField, SIGNAL(textChanged(QString)), this, SLOT(UpdateParameters()));
+    connect(minAreaField, SIGNAL(textChanged(QString)), this, SLOT(UpdateParameters()));
+    connect(lengthField, SIGNAL(textChanged(QString)), this, SLOT(UpdateParameters()));
+    connect(angleField, SIGNAL(textChanged(QString)), this, SLOT(UpdateParameters()));
+    connect(wField, SIGNAL(textChanged(QString)), this, SLOT(UpdateParameters()));
+    connect(loField, SIGNAL(textChanged(QString)), this, SLOT(UpdateParameters()));
+    connect(x1ROIField, SIGNAL(textChanged(QString)), this, SLOT(UpdateParameters()));
+    connect(y1ROIField, SIGNAL(textChanged(QString)), this, SLOT(UpdateParameters()));
+    connect(x2ROIField, SIGNAL(textChanged(QString)), this, SLOT(UpdateParameters()));
+    connect(y2ROIField, SIGNAL(textChanged(QString)), this, SLOT(UpdateParameters()));
+    connect(threshField, SIGNAL(textChanged(QString)), this, SLOT(UpdateParameters()));
+
+
+
+    // Widgets
     pathField->setDisabled(true);
     numField->setDisabled(true);
     nBackField->setDisabled(true);
@@ -400,8 +436,13 @@ void MainWindow::Go(){
 
     if(im == 0){ // Initialization
 
-        timer->start(1);
+
+        timer->start(0);
+        timerDisplay->start(40);
+        UpdateParameters();
         string folder = pathField->text().toStdString();
+        nBackground = nBackField->text().toInt();
+        NUMBER = numField->text().toInt(); //number of objects to track
 
         try{
             glob(folder, files, false);
@@ -431,14 +472,13 @@ void MainWindow::Go(){
 
     string name = *a;
     savefile.open(savePath);
-    Rect ROI(x1ROIField->text().toInt(), y1ROIField->text().toInt(), x2ROIField->text().toInt() - x1ROIField->text().toInt(), y2ROIField->text().toInt() - y1ROIField->text().toInt());
+    Rect ROI(x1, y1, x2 - x1, y2 - y1);
     imread(name, IMREAD_GRAYSCALE).copyTo(cameraFrame);
     visu = imread(name);
     subtract(background, cameraFrame, cameraFrame);
     Binarisation(cameraFrame, 'b', threshValue);
     cameraFrame = cameraFrame(ROI);
     visu = visu(ROI);
-
 
     // Position computation
     out = ObjectPosition(cameraFrame.getMat(cv::ACCESS_READ), MINAREA, MAXAREA);
@@ -505,33 +545,61 @@ void MainWindow::Go(){
 
         savefile << out.at(0).at(l).x << "   " << out.at(0).at(l).y << "   " << out.at(0).at(l).z << "   "  << out.at(1).at(l).x << "   " << out.at(1).at(l).y << "   " << out.at(1).at(l).z  <<  "   " << out.at(2).at(l).x << "   " << out.at(2).at(l).y << "   " << out.at(2).at(l).z <<  "   " << out.at(3).at(l).x <<  "   " << im << "\n";
 
-
     }
 
+   if(im < files.size() - 1){
+       a ++;
+       im ++;
+       progressBar->setValue(im);
+    }
+
+   else{
+       timer->stop();
+       timerDisplay->stop();
+       ReplayButton->show();
+       fps ->show();
+       fpsField ->show();
+       fpsSlider->show();
+       trackingSpot->hide();
+       trackingSpotLabel->hide();
+       im = 0;
+       QMessageBox msgBox;
+       msgBox.setText("The tracking is done, go to work now!!! \n You can replay the tracking by clicking the replay button.");
+       msgBox.exec();
+   }
+
+}
 
 
-    if (normal->isChecked() && !binary->isChecked()){
+void MainWindow::Display(){
+
+    if (!normal->isChecked() && !binary->isChecked()){
+        display->clear();
+        display2->clear();
+    }
+
+    else if (normal->isChecked() && !binary->isChecked()){
         cvtColor(visu,visu,CV_BGR2RGB);
         Size size = visu.size();
 
         if(size.height > 600 & size.width < 1500){
             display->setFixedHeight(600);
-            display->setFixedWidth((600*size.height)/(size.width));
+            display->setFixedWidth((600*size.width)/(size.height));
         }
 
         else if(size.height < 600 & size.width > 1500){
             display->setFixedWidth(1500);
-            display->setFixedHeight((1500*size.width)/(size.height));
+            display->setFixedHeight((1500*size.height)/(size.width));
         }
 
         else if(size.height > 600 & size.width > 1500){
             double c = 600;
             while((c*size.height)/(size.width) > 1500){
-                display->setFixedWidth((600*size.height)/(size.width));
+                display->setFixedWidth((600*size.width)/(size.height));
                 c /= 2;
             }
             display->setFixedHeight(c);
-            display->setFixedWidth((c*size.height)/(size.width));
+            display->setFixedWidth((c*size.width)/(size.height));
         }
 
         else{
@@ -548,22 +616,22 @@ void MainWindow::Go(){
 
         if(size.height > 600 & size.width < 1500){
             display2->setFixedHeight(600);
-            display2->setFixedWidth((600*size.height)/(size.width));
+            display2->setFixedWidth((600*size.width)/(size.height));
         }
 
         else if(size.height < 600 & size.width > 1500){
             display2->setFixedWidth(1500);
-            display2->setFixedHeight((1500*size.width)/(size.height));
+            display2->setFixedHeight((1500*size.height)/(size.width));
         }
 
         else if(size.height > 600 & size.width > 1500){
             double c = 600;
             while((c*size.height)/(size.width) > 1500){
-                display2->setFixedWidth((600*size.height)/(size.width));
+                display2->setFixedWidth((600*size.width)/(size.height));
                 c /= 2;
             }
             display2->setFixedHeight(c);
-            display2->setFixedWidth((c*size.height)/(size.width));
+            display2->setFixedWidth((c*size.width)/(size.height));
         }
 
         else{
@@ -578,24 +646,24 @@ void MainWindow::Go(){
     else if (normal->isChecked() && binary->isChecked()){
         Size size = cameraFrame.size();
 
-        if(size.height > 600 & size.width < 1500/2.){
+        if(size.height > 600 & size.width < 750){
             display->setFixedHeight(600);
-            display->setFixedWidth((600*size.height)/(size.width));
+            display->setFixedWidth((600*size.width)/(size.height));
         }
 
-        else if(size.height < 600 & size.width > 1500/2.){
-            display->setFixedWidth(1500);
-            display->setFixedHeight((1500*size.width)/(size.height));
+        else if(size.height < 600 & size.width > 750){
+            display->setFixedWidth(750);
+            display->setFixedHeight((750*size.height)/(size.width));
         }
 
-        else if(size.height > 600 & size.width > 1500/2.){
+        else if(size.height > 600 & size.width > 1500){
             double c = 600;
-            while((c*size.height)/(size.width) > 1500/2.){
-                display->setFixedWidth((600*size.height)/(size.width));
+            while((c*size.height)/(size.width) > 1500){
+                display->setFixedWidth((600*size.width)/(size.height));
                 c /= 2;
             }
             display->setFixedHeight(c);
-            display->setFixedWidth((c*size.height)/(size.width));
+            display->setFixedWidth((c*size.width)/(size.height));
         }
 
         else{
@@ -610,30 +678,12 @@ void MainWindow::Go(){
         display->setPixmap(QPixmap::fromImage(QImage(cameraFrame.getMat(cv::ACCESS_READ).data, cameraFrame.cols, cameraFrame.rows, cameraFrame.step, QImage::Format_Grayscale8)));
     }
 
-
-
-
-    if(im < files.size() - 1){
-        a ++;
-        im ++;
-        progressBar->setValue(im);
-     }
-
-    else{
-        timer->stop();
-        ReplayButton->show();
-        fps ->show();
-        fpsField ->show();
-        fpsSlider->show();
-        trackingSpot->hide();
-        trackingSpotLabel->hide();
-        im = 0;
-        QMessageBox msgBox;
-        msgBox.setText("The tracking is done, go to work now!!! \n You can replay the tracking by clicking the replay button.");
-        msgBox.exec();
-    }
-
 }
+
+
+
+
+
 
 
 
@@ -666,6 +716,8 @@ void MainWindow::Replay(){
     x2ROIField->setDisabled(true);
     y1ROIField->setDisabled(true);
     y2ROIField->setDisabled(true);
+    refreshRateLabel->setDisabled(true);
+    refreshRate->setDisabled(true);
 
 
 
@@ -674,7 +726,7 @@ void MainWindow::Replay(){
     // Convert parameters
     unsigned int NUMBER = num.toInt(); //number of objects to track
     int FPS = fpsField->value();
-    FPS = int((100.)/(float(FPS)));
+    FPS = int((1000.)/(float(FPS)));
 
 
 

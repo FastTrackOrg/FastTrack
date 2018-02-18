@@ -319,7 +319,7 @@ vector<vector<Point3f>> ObjectPosition(Mat frame, int minSize, int maxSize){
 			if(contourArea(contours[i]) > minSize && contourArea(contours[i]) < maxSize){ // Only select objects minArea << objectArea <<maxArea
 				
 				dst = Mat::zeros(frame.size(), CV_8U);
-				drawContours(dst, contours, i, Scalar(255, 255, 255),CV_FILLED,8); // Draw the fish in a temporary black image,avoid select a part of another fish if two fish are very close
+                drawContours(dst, contours, i, Scalar(255, 255, 255), CV_FILLED,8); // Draw the fish in a temporary black image,avoid select a part of another fish if two fish are very close
 				
 				Rect roiFull = boundingRect(contours[i]);
 				Mat RoiFull = dst(roiFull);

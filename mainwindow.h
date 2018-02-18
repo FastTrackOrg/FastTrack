@@ -16,6 +16,8 @@
 #include <QSlider>
 #include <QLCDNumber>
 #include <QComboBox>
+#include <QThread>
+#include <QSpinBox>
 
 
 
@@ -40,6 +42,7 @@ public:
 private:
 
     Ui::MainWindow *ui;
+    QThread *thread;
     QPushButton *QuitButton;
     QPushButton *GoButton;
     QPushButton *DefaultButton;
@@ -47,9 +50,11 @@ private:
     QPushButton *ReplayButton;
     QCheckBox *normal;
     QCheckBox *binary;
-    QCheckBox *invert;
+    QSpinBox *refreshRate;
     QString version = "v3.0.1";
 
+
+    QLabel *refreshRateLabel;
     QLabel *path;
     QLabel *numLabel;
     QLabel *maxArea;
@@ -90,6 +95,7 @@ private:
     QLabel *display;
     QLabel *display2;
     QTimer *timer;
+    QTimer *timerDisplay;
     QTimer *timerReplay;
     QProgressBar *progressBar;
     QSlider *arrowSlider;
@@ -116,6 +122,10 @@ private:
     int arrowSize;
     int MAXAREA;
     int MINAREA;
+    int x1;
+    int y1;
+    int x2;
+    int y2;
     double LENGTH;
     double ANGLE;
     unsigned int NUMBER;
@@ -129,7 +139,9 @@ public slots:
     void Go();
     void Write();
     void Reset();
+    void Display();
     void Replay();
+    void UpdateParameters();
 };
 
 #endif // MAINWINDOW_H
