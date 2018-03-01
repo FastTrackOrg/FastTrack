@@ -139,9 +139,12 @@ public slots:
     void Go();
     void Write();
     void Reset();
-    void Display();
+    void Display(Mat visu, UMat cameraFrame);
     void Replay();
     void UpdateParameters();
+
+signals:
+    void grabFrame(Mat visu, UMat cameraFrame);
 };
 
 #endif // MAINWINDOW_H

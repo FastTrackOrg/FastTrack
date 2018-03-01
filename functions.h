@@ -40,6 +40,7 @@ using namespace cv;
 using namespace std;
 
 
+
 double Moment(Mat image, int p, int q);
 
 
@@ -76,4 +77,5 @@ vector<Point3f> Prevision(vector<Point3f> past, vector<Point3f> present);
 
 
 vector<Point3f> Color(int number);
+
 #endif

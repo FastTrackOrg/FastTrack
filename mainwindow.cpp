@@ -370,15 +370,13 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
     // Execution
+    //QThread* thread = new QThread;
     im = 0;
     timer = new QTimer(this);
-
+    //timer->moveToThread(this_thread);
+    //thread->start();
     connect(timer, SIGNAL(timeout()), this, SLOT(Go())); // Tracking
-
-    timerDisplay = new QTimer(this);
-    connect(timerDisplay, SIGNAL(timeout()), this, SLOT(Display())); // Displaying
-
-
+    connect(this, SIGNAL(grabFrame(Mat, UMat)), this, SLOT(Display(Mat, UMat))); // Displaying
 
     imr = 0;
     timerReplay = new QTimer(this);
@@ -412,17 +410,17 @@ void MainWindow::Go(){
 
     connect(trackingSpot, SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateParameters()));
     connect(arrowSlider, SIGNAL(valueChanged(int)), this, SLOT(UpdateParameters()));
-    connect(maxAreaField, SIGNAL(textChanged(QString)), this, SLOT(UpdateParameters()));
-    connect(minAreaField, SIGNAL(textChanged(QString)), this, SLOT(UpdateParameters()));
-    connect(lengthField, SIGNAL(textChanged(QString)), this, SLOT(UpdateParameters()));
-    connect(angleField, SIGNAL(textChanged(QString)), this, SLOT(UpdateParameters()));
-    connect(wField, SIGNAL(textChanged(QString)), this, SLOT(UpdateParameters()));
-    connect(loField, SIGNAL(textChanged(QString)), this, SLOT(UpdateParameters()));
-    connect(x1ROIField, SIGNAL(textChanged(QString)), this, SLOT(UpdateParameters()));
-    connect(y1ROIField, SIGNAL(textChanged(QString)), this, SLOT(UpdateParameters()));
-    connect(x2ROIField, SIGNAL(textChanged(QString)), this, SLOT(UpdateParameters()));
-    connect(y2ROIField, SIGNAL(textChanged(QString)), this, SLOT(UpdateParameters()));
-    connect(threshField, SIGNAL(textChanged(QString)), this, SLOT(UpdateParameters()));
+    connect(maxAreaField, SIGNAL(editingFinished()), this, SLOT(UpdateParameters()));
+    connect(minAreaField, SIGNAL(editingFinished()), this, SLOT(UpdateParameters()));
+    connect(lengthField, SIGNAL(editingFinished()), this, SLOT(UpdateParameters()));
+    connect(angleField, SIGNAL(editingFinished()), this, SLOT(UpdateParameters()));
+    connect(wField, SIGNAL(editingFinished()), this, SLOT(UpdateParameters()));
+    connect(loField, SIGNAL(editingFinished()), this, SLOT(UpdateParameters()));
+    connect(x1ROIField, SIGNAL(editingFinished()), this, SLOT(UpdateParameters()));
+    connect(y1ROIField, SIGNAL(editingFinished()), this, SLOT(UpdateParameters()));
+    connect(x2ROIField, SIGNAL(editingFinished()), this, SLOT(UpdateParameters()));
+    connect(y2ROIField, SIGNAL(editingFinished()), this, SLOT(UpdateParameters()));
+    connect(threshField, SIGNAL(editingFinished()), this, SLOT(UpdateParameters()));
 
 
 
@@ -438,7 +436,6 @@ void MainWindow::Go(){
 
 
         timer->start(0);
-        timerDisplay->start(40);
         UpdateParameters();
         string folder = pathField->text().toStdString();
         nBackground = nBackField->text().toInt();
@@ -547,6 +544,9 @@ void MainWindow::Go(){
 
     }
 
+   emit grabFrame(visu, cameraFrame);
+
+
    if(im < files.size() - 1){
        a ++;
        im ++;
@@ -555,7 +555,6 @@ void MainWindow::Go(){
 
    else{
        timer->stop();
-       timerDisplay->stop();
        ReplayButton->show();
        fps ->show();
        fpsField ->show();
@@ -571,7 +570,7 @@ void MainWindow::Go(){
 }
 
 
-void MainWindow::Display(){
+void MainWindow::Display(Mat visu, UMat cameraFrame){
 
     if (!normal->isChecked() && !binary->isChecked()){
         display->clear();
@@ -701,10 +700,11 @@ void MainWindow::Replay(){
     QString y2ROI = y2ROIField->text();
     Rect ROI(x1ROI.toInt(), y1ROI.toInt(), x2ROI.toInt() - x1ROI.toInt(), y2ROI.toInt() - y1ROI.toInt());
 
+
     pathField->setDisabled(true);
     numField->setDisabled(true);
     maxAreaField->setDisabled(true);
-     minAreaField->setDisabled(true);
+    minAreaField->setDisabled(true);
     lengthField->setDisabled(true);
     angleField->setDisabled(true);
     loField->setDisabled(true);
@@ -716,8 +716,6 @@ void MainWindow::Replay(){
     x2ROIField->setDisabled(true);
     y1ROIField->setDisabled(true);
     y2ROIField->setDisabled(true);
-    refreshRateLabel->setDisabled(true);
-    refreshRate->setDisabled(true);
 
 
 
@@ -750,7 +748,6 @@ void MainWindow::Replay(){
 
     string name = *a;
     visu = imread(name);
-    cameraFrame.convertTo(cameraFrame, CV_8U);
     visu = visu(ROI);
     timerReplay ->setInterval(FPS);
 
@@ -777,35 +774,37 @@ void MainWindow::Replay(){
 
 
 
-    cvtColor(visu,visu,CV_BGR2RGB);
-    Size size = visu.size();
+   cvtColor(visu,visu,CV_BGR2RGB);
+   Size size = visu.size();
 
-    if(size.height > 600 & size.width < 1500){
-        display->setFixedHeight(600);
-        display->setFixedWidth((600*size.height)/(size.width));
-    }
+   if(size.height > 600 & size.width < 1500){
+       display->setFixedHeight(600);
+       display->setFixedWidth((600*size.width)/(size.height));
+   }
 
-    else if(size.height < 600 & size.width > 1500){
-        display->setFixedWidth(1500);
-        display->setFixedHeight((1500*size.width)/(size.height));
-    }
+   else if(size.height < 600 & size.width > 1500){
+       display->setFixedWidth(1500);
+       display->setFixedHeight((1500*size.height)/(size.width));
+   }
 
-    else if(size.height > 600 & size.width > 1500){
-        double c = 600;
-        while((c*size.height)/(size.width) > 1500){
-            display->setFixedWidth((600*size.height)/(size.width));
-            c /= 2;
-        }
-        display->setFixedHeight(c);
-        display->setFixedWidth((c*size.height)/(size.width));
-    }
+   else if(size.height > 600 & size.width > 1500){
+       double c = 600;
+       while((c*size.height)/(size.width) > 1500){
+           display->setFixedWidth((600*size.width)/(size.height));
+           c /= 2;
+       }
+       display->setFixedHeight(c);
+       display->setFixedWidth((c*size.width)/(size.height));
+   }
 
-    else{
-        display->setFixedHeight(size.height);
-        display->setFixedWidth(size.width);
-    }
-    display->setPixmap(QPixmap::fromImage(QImage(visu.data, visu.cols, visu.rows, visu.step, QImage::Format_RGB888)));
-    display2->clear();
+   else{
+       display->setFixedHeight(size.height);
+       display->setFixedWidth(size.width);
+   }
+
+   display->setPixmap(QPixmap::fromImage(QImage(visu.data, visu.cols, visu.rows, visu.step, QImage::Format_RGB888)));
+   display2->clear();
+
 
 
 
