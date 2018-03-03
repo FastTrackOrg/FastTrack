@@ -24,10 +24,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
     // Welcome message
-    QMessageBox welcomeBox;
-    welcomeBox.setText(" Welcome in Fishy Tracking " + version + "! \n To have help hove the relevant parameter. \n Check new version at https://bgallois.github.io/FishyTracking/. \n Have a wonderful tracking. \n © Benjamin GALLOIS benjamin.gallois@upmc.fr.");
-    welcomeBox.exec();
-
+    welcomeBox = new QMessageBox;
+    welcomeBox ->setText("Check new version at https://bgallois.github.io/FishyTracking/.\n © Benjamin GALLOIS benjamin.gallois@upmc.fr. \n Subscribe to the mailing list to be kept informed of new releases and new features: http://benjamin-gallois.fr/fishyTracking.html");
 
     // Default parameters reading
     QStringList defParameters;
@@ -63,6 +61,8 @@ MainWindow::MainWindow(QWidget *parent) :
     QuitButton = new QPushButton("Quit", this);
     QuitButton->move(450, 320);
     QObject::connect(QuitButton, SIGNAL(clicked()), qApp, SLOT(quit()));
+    QObject::connect(qApp, SIGNAL(aboutToQuit()), welcomeBox, SLOT(exec()));
+
 
     ResetButton = new QPushButton("Reset", this);
     ResetButton->move(550, 320);
@@ -95,15 +95,6 @@ MainWindow::MainWindow(QWidget *parent) :
     binary ->move(660, 340);
     binary ->setToolTip(tr("Check this option to display the binary image. Useful to ajust the binary threshold parameter."));
 
-
-    /*refreshRateLabel = new QLabel(this);
-    refreshRateLabel->setText("Display refresh rate:");
-    refreshRateLabel->move(750, 310);
-    refreshRateLabel->adjustSize();
-
-    refreshRate = new QSpinBox(this);
-    refreshRate ->move(880, 310);
-    refreshRate ->setValue(25);*/
 
 
     path = new QLabel(this);
@@ -407,165 +398,194 @@ void MainWindow::UpdateParameters(){
 
 void MainWindow::Go(){
 
-
-    connect(trackingSpot, SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateParameters()));
-    connect(arrowSlider, SIGNAL(valueChanged(int)), this, SLOT(UpdateParameters()));
-    connect(maxAreaField, SIGNAL(editingFinished()), this, SLOT(UpdateParameters()));
-    connect(minAreaField, SIGNAL(editingFinished()), this, SLOT(UpdateParameters()));
-    connect(lengthField, SIGNAL(editingFinished()), this, SLOT(UpdateParameters()));
-    connect(angleField, SIGNAL(editingFinished()), this, SLOT(UpdateParameters()));
-    connect(wField, SIGNAL(editingFinished()), this, SLOT(UpdateParameters()));
-    connect(loField, SIGNAL(editingFinished()), this, SLOT(UpdateParameters()));
-    connect(x1ROIField, SIGNAL(editingFinished()), this, SLOT(UpdateParameters()));
-    connect(y1ROIField, SIGNAL(editingFinished()), this, SLOT(UpdateParameters()));
-    connect(x2ROIField, SIGNAL(editingFinished()), this, SLOT(UpdateParameters()));
-    connect(y2ROIField, SIGNAL(editingFinished()), this, SLOT(UpdateParameters()));
-    connect(threshField, SIGNAL(editingFinished()), this, SLOT(UpdateParameters()));
-
-
-
-    // Widgets
-    pathField->setDisabled(true);
-    numField->setDisabled(true);
-    nBackField->setDisabled(true);
-    saveField->setDisabled(true);
-
-
-
-    if(im == 0){ // Initialization
-
-
-        timer->start(0);
-        UpdateParameters();
-        string folder = pathField->text().toStdString();
-        nBackground = nBackField->text().toInt();
-        NUMBER = numField->text().toInt(); //number of objects to track
-
         try{
-            glob(folder, files, false);
-        }
-        catch (...){
-            timer->stop();
-            QMessageBox pathError;
-            pathError.setText("No files found");
-            pathError.exec();
+
+        connect(trackingSpot, SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateParameters()));
+        connect(arrowSlider, SIGNAL(valueChanged(int)), this, SLOT(UpdateParameters()));
+        connect(maxAreaField, SIGNAL(editingFinished()), this, SLOT(UpdateParameters()));
+        connect(minAreaField, SIGNAL(editingFinished()), this, SLOT(UpdateParameters()));
+        connect(lengthField, SIGNAL(editingFinished()), this, SLOT(UpdateParameters()));
+        connect(angleField, SIGNAL(editingFinished()), this, SLOT(UpdateParameters()));
+        connect(wField, SIGNAL(editingFinished()), this, SLOT(UpdateParameters()));
+        connect(loField, SIGNAL(editingFinished()), this, SLOT(UpdateParameters()));
+        connect(x1ROIField, SIGNAL(editingFinished()), this, SLOT(UpdateParameters()));
+        connect(y1ROIField, SIGNAL(editingFinished()), this, SLOT(UpdateParameters()));
+        connect(x2ROIField, SIGNAL(editingFinished()), this, SLOT(UpdateParameters()));
+        connect(y2ROIField, SIGNAL(editingFinished()), this, SLOT(UpdateParameters()));
+        connect(threshField, SIGNAL(editingFinished()), this, SLOT(UpdateParameters()));
+
+
+
+        // Widgets
+        pathField->setDisabled(true);
+        numField->setDisabled(true);
+        nBackField->setDisabled(true);
+        saveField->setDisabled(true);
+
+
+
+        if(im == 0){ // Initialization
+
+
+            timer->start(0);
+            UpdateParameters();
+            string folder = pathField->text().toStdString();
+            nBackground = nBackField->text().toInt();
+            NUMBER = numField->text().toInt(); //number of objects to track
+
+            try{
+                glob(folder, files, false);
+            }
+            catch (...){
+                timer->stop();
+                QMessageBox pathError;
+                pathError.setText("No files found");
+                pathError.exec();
+            }
+
+            sort(files.begin(), files.end());
+            a = files.begin();
+            string name = *a;
+            progressBar ->setRange(0, files.size());
+            imread(name, IMREAD_GRAYSCALE).copyTo(cameraFrame);
+            visu = imread(name);
+            imread(name, IMREAD_GRAYSCALE).copyTo(img0);
+            background = BackgroundExtraction(files, nBackground);
+            vector<vector<Point> > tmp(NUMBER, vector<Point>());
+            memory = tmp;
+            colorMap = Color(NUMBER);
+            savePath = saveField->text().toStdString();
+
         }
 
-        sort(files.begin(), files.end());
-        a = files.begin();
+
         string name = *a;
-        progressBar ->setRange(0, files.size());
+        savefile.open(savePath);
+        Rect ROI(x1, y1, x2 - x1, y2 - y1);
         imread(name, IMREAD_GRAYSCALE).copyTo(cameraFrame);
         visu = imread(name);
-        imread(name, IMREAD_GRAYSCALE).copyTo(img0);
-        background = BackgroundExtraction(files, nBackground);
-        vector<vector<Point> > tmp(NUMBER, vector<Point>());
-        memory = tmp;
-        colorMap = Color(NUMBER);
-        savePath = saveField->text().toStdString();
+        subtract(background, cameraFrame, cameraFrame);
+        Binarisation(cameraFrame, 'b', threshValue);
+        cameraFrame = cameraFrame(ROI);
+        visu = visu(ROI);
 
-    }
-
-
-    string name = *a;
-    savefile.open(savePath);
-    Rect ROI(x1, y1, x2 - x1, y2 - y1);
-    imread(name, IMREAD_GRAYSCALE).copyTo(cameraFrame);
-    visu = imread(name);
-    subtract(background, cameraFrame, cameraFrame);
-    Binarisation(cameraFrame, 'b', threshValue);
-    cameraFrame = cameraFrame(ROI);
-    visu = visu(ROI);
-
-    // Position computation
-    out = ObjectPosition(cameraFrame.getMat(cv::ACCESS_READ), MINAREA, MAXAREA);
+        // Position computation
+        out = ObjectPosition(cameraFrame.getMat(cv::ACCESS_READ), MINAREA, MAXAREA);
 
 
-    if(im == 0){ // First frame initialization
+        if(im == 0){ // First frame initialization
 
-        if(out.at(0).size() <= NUMBER + 1 && out.at(0).size() != 0){
-            while((out.at(0).size() - NUMBER) > 0){
-                out.at(0).push_back(Point3f(0, 0, 0));
-                out.at(1).push_back(Point3f(0, 0, 0));
-                out.at(2).push_back(Point3f(0, 0, 0));
-                out.at(3).push_back(Point3f(0, 0, 0));
+            if(out.at(0).size() < NUMBER && out.at(0).size() != 0){
+                while((out.at(0).size() - NUMBER) > 0){
+                    out.at(0).push_back(Point3f(0, 0, 0));
+                    out.at(1).push_back(Point3f(0, 0, 0));
+                    out.at(2).push_back(Point3f(0, 0, 0));
+                    out.at(3).push_back(Point3f(0, 0, 0));
+                }
+                outPrev = out;
             }
+
+            else if(out.at(0).empty()){ // Error message
+                timer->stop();
+                QMessageBox errorBox;
+                errorBox.setText("No fish detected! Change parameters!");
+                errorBox.exec();
+
+            }
+
+            else{
+                outPrev = out;
+            }
+        }
+
+
+
+        else if(im > 0){ // Matching fish identity with the previous frame
+            identity = CostFunc(outPrev.at(spot), out.at(spot), LENGTH, ANGLE, WEIGHT, LO);
+            out.at(0) = Reassignment(outPrev.at(0), out.at(0), identity);
+            out.at(1) = Reassignment(outPrev.at(1), out.at(1), identity);
+            out.at(2) = Reassignment(outPrev.at(2), out.at(2), identity);
+            out.at(3) = Reassignment(outPrev.at(3), out.at(3), identity);
+            out.at(spot) = Prevision(outPrev.at(spot), out.at(spot));
             outPrev = out;
         }
 
-        else if(out.at(0).empty()){ // Error message
-            timer->stop();
-            QMessageBox errorBox;
-            errorBox.setText("No fish detected! Change parameters!");
-            errorBox.exec();
+
+
+        // Visualization & saving
+       for(unsigned int l = 0; l < out.at(0).size(); l++){
+            Point3f coord;
+            coord = out.at(spot).at(l);
+            arrowedLine(visu, Point(coord.x, coord.y), Point(coord.x + 5*arrowSize*cos(coord.z), coord.y - 5*arrowSize*sin(coord.z)), Scalar(colorMap.at(l).x, colorMap.at(l).y, colorMap.at(l).z), arrowSize, 10*arrowSize, 0);
+
+            if((im > 5)){
+                polylines(visu, memory.at(l), false, Scalar(colorMap.at(l).x, colorMap.at(l).y, colorMap.at(l).z), arrowSize, 8, 0);
+                memory.at(l).push_back(Point((int)coord.x, (int)coord.y));
+                if(im>50){
+                    memory.at(l).erase(memory.at(l).begin());
+                    }
+            }
+
+
+
+            // Saving
+            internalSaving.push_back(coord);
+            ofstream savefile;
+            savefile.open(savePath, ios::out | ios::app );
+            if(im == 0 && l == 0){
+                savefile << "xHead" << "   " << "yHead" << "   " << "tHead" << "   "  << "xTail" << "   " << "yTail" << "   " << "tTail"   <<  "   " << "xBody" << "   " << "yBody" << "   " << "tBody"   <<  "   " << "curvature" <<  "   " << "imageNumber" << "\n";
+            }
+
+            savefile << out.at(0).at(l).x << "   " << out.at(0).at(l).y << "   " << out.at(0).at(l).z << "   "  << out.at(1).at(l).x << "   " << out.at(1).at(l).y << "   " << out.at(1).at(l).z  <<  "   " << out.at(2).at(l).x << "   " << out.at(2).at(l).y << "   " << out.at(2).at(l).z <<  "   " << out.at(3).at(l).x <<  "   " << im << "\n";
 
         }
-    }
+
+       emit grabFrame(visu, cameraFrame);
 
 
-
-    else if(im > 0){ // Matching fish identity with the previous frame
-        identity = CostFunc(outPrev.at(spot), out.at(spot), LENGTH, ANGLE, WEIGHT, LO);
-        out.at(0) = Reassignment(outPrev.at(0), out.at(0), identity);
-        out.at(1) = Reassignment(outPrev.at(1), out.at(1), identity);
-        out.at(2) = Reassignment(outPrev.at(2), out.at(2), identity);
-        out.at(3) = Reassignment(outPrev.at(3), out.at(3), identity);
-        out.at(spot) = Prevision(outPrev.at(spot), out.at(spot));
-        outPrev = out;
-    }
-
-
-
-    // Visualization & saving
-   for(unsigned int l = 0; l < out.at(0).size(); l++){
-        Point3f coord;
-        coord = out.at(spot).at(l);
-        arrowedLine(visu, Point(coord.x, coord.y), Point(coord.x + 5*arrowSize*cos(coord.z), coord.y - 5*arrowSize*sin(coord.z)), Scalar(colorMap.at(l).x, colorMap.at(l).y, colorMap.at(l).z), arrowSize, 10*arrowSize, 0);
-
-        if((im > 5)){
-            polylines(visu, memory.at(l), false, Scalar(colorMap.at(l).x, colorMap.at(l).y, colorMap.at(l).z), arrowSize, 8, 0);
-            memory.at(l).push_back(Point((int)coord.x, (int)coord.y));
-            if(im>50){
-                memory.at(l).erase(memory.at(l).begin());
-                }
+       if(im < files.size() - 1){
+           a ++;
+           im ++;
+           progressBar->setValue(im);
         }
 
-
-
-        // Saving
-        internalSaving.push_back(coord);
-        ofstream savefile;
-        savefile.open(savePath, ios::out | ios::app );
-        if(im == 0 && l == 0){
-            savefile << "xHead" << "   " << "yHead" << "   " << "tHead" << "   "  << "xTail" << "   " << "yTail" << "   " << "tTail"   <<  "   " << "xBody" << "   " << "yBody" << "   " << "tBody"   <<  "   " << "curvature" <<  "   " << "imageNumber" << "\n";
-        }
-
-        savefile << out.at(0).at(l).x << "   " << out.at(0).at(l).y << "   " << out.at(0).at(l).z << "   "  << out.at(1).at(l).x << "   " << out.at(1).at(l).y << "   " << out.at(1).at(l).z  <<  "   " << out.at(2).at(l).x << "   " << out.at(2).at(l).y << "   " << out.at(2).at(l).z <<  "   " << out.at(3).at(l).x <<  "   " << im << "\n";
-
+       else{
+           timer->stop();
+           ReplayButton->show();
+           fps ->show();
+           fpsField ->show();
+           fpsSlider->show();
+           trackingSpot->hide();
+           trackingSpotLabel->hide();
+           im = 0;
+           QMessageBox msgBox;
+           msgBox.setText("The tracking is done, go to work now!!! \n You can replay the tracking by clicking the replay button.");
+           msgBox.exec();
+       }
     }
 
-   emit grabFrame(visu, cameraFrame);
-
-
-   if(im < files.size() - 1){
-       a ++;
-       im ++;
-       progressBar->setValue(im);
+    catch (const Exception &exc){
+        timer->stop();
+        QMessageBox pathError;
+        pathError.setText("The ROI do not fit the image size or there is no object in the image. Please try changing the ROI and the minimal area of the object.");
+        pathError.exec();
     }
 
-   else{
-       timer->stop();
-       ReplayButton->show();
-       fps ->show();
-       fpsField ->show();
-       fpsSlider->show();
-       trackingSpot->hide();
-       trackingSpotLabel->hide();
-       im = 0;
-       QMessageBox msgBox;
-       msgBox.setText("The tracking is done, go to work now!!! \n You can replay the tracking by clicking the replay button.");
-       msgBox.exec();
-   }
+    catch(const std::out_of_range& oor)
+    {
+        timer->stop();
+        QMessageBox pathError;
+        pathError.setText("Too many objects in the image that indicated in parameters, try to increase the number of objects or to increase the minimal area of an object.");
+        pathError.exec();
+    }
+
+
+    catch (const exception &exc){
+        timer->stop();
+        QMessageBox pathError;
+        pathError.setText(exc.what());
+        pathError.exec();
+    }
 
 }
 

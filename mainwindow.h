@@ -50,8 +50,8 @@ private:
     QPushButton *ReplayButton;
     QCheckBox *normal;
     QCheckBox *binary;
-    QSpinBox *refreshRate;
-    QString version = "v3.0.1";
+    QMessageBox *welcomeBox;
+    QString version = "v3.5.2";
 
 
     QLabel *refreshRateLabel;
