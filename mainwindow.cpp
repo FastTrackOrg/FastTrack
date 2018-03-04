@@ -126,7 +126,7 @@ MainWindow::MainWindow(QWidget *parent) :
     maxArea->setText("Maximal area:");
     maxArea->move(50, 150);
     maxArea->adjustSize();
-    maxArea->setToolTip(tr("Maximal area in px*px of objects to track."));
+    maxArea->setToolTip(tr("Maximal area in px of objects to track."));
 
     maxAreaField = new QLineEdit(this);
     maxAreaField ->move(250,150);
@@ -137,7 +137,7 @@ MainWindow::MainWindow(QWidget *parent) :
     minArea->setText("Minimal area:");
     minArea->move(50, 200);
     minArea->adjustSize();
-    minArea->setToolTip(tr("Minimal area in px*px of objects to track."));
+    minArea->setToolTip(tr("Minimal area in px of objects to track."));
 
 
     minAreaField = new QLineEdit(this);
@@ -447,9 +447,6 @@ void MainWindow::Go(){
             a = files.begin();
             string name = *a;
             progressBar ->setRange(0, files.size());
-            imread(name, IMREAD_GRAYSCALE).copyTo(cameraFrame);
-            visu = imread(name);
-            imread(name, IMREAD_GRAYSCALE).copyTo(img0);
             background = BackgroundExtraction(files, nBackground);
             vector<vector<Point> > tmp(NUMBER, vector<Point>());
             memory = tmp;
@@ -461,6 +458,7 @@ void MainWindow::Go(){
 
         string name = *a;
         savefile.open(savePath);
+
         Rect ROI(x1, y1, x2 - x1, y2 - y1);
         imread(name, IMREAD_GRAYSCALE).copyTo(cameraFrame);
         visu = imread(name);
@@ -836,7 +834,7 @@ void MainWindow::Replay(){
     if(imr < files.size() - 1){
         a ++;
         imr ++;
-        progressBar->setValue(im);
+        progressBar->setValue(imr);
      }
 
     else{
