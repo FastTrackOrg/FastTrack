@@ -662,6 +662,7 @@ void MainWindow::Display(Mat visu, UMat cameraFrame){
 
     else if (normal->isChecked() && binary->isChecked()){
         Size size = cameraFrame.size();
+        cvtColor(visu,visu,CV_BGR2RGB);
 
         if(size.height > 600 & size.width < 750){
             display->setFixedHeight(600);
