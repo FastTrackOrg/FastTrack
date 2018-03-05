@@ -527,6 +527,8 @@ void MainWindow::Go(){
 
 
             // Saving
+            coord.x += ROI.tl().x;
+            coord.y += ROI.tl().y;
             internalSaving.push_back(coord);
             ofstream savefile;
             savefile.open(savePath, ios::out | ios::app );
@@ -534,7 +536,7 @@ void MainWindow::Go(){
                 savefile << "xHead" << "   " << "yHead" << "   " << "tHead" << "   "  << "xTail" << "   " << "yTail" << "   " << "tTail"   <<  "   " << "xBody" << "   " << "yBody" << "   " << "tBody"   <<  "   " << "curvature" <<  "   " << "imageNumber" << "\n";
             }
 
-            savefile << out.at(0).at(l).x << "   " << out.at(0).at(l).y << "   " << out.at(0).at(l).z << "   "  << out.at(1).at(l).x << "   " << out.at(1).at(l).y << "   " << out.at(1).at(l).z  <<  "   " << out.at(2).at(l).x << "   " << out.at(2).at(l).y << "   " << out.at(2).at(l).z <<  "   " << out.at(3).at(l).x <<  "   " << im << "\n";
+            savefile << out.at(0).at(l).x + ROI.tl().x << "   " << out.at(0).at(l).y + ROI.tl().y << "   " << out.at(0).at(l).z << "   "  << out.at(1).at(l).x + ROI.tl().x << "   " << out.at(1).at(l).y + ROI.tl().y << "   " << out.at(1).at(l).z  <<  "   " << out.at(2).at(l).x + ROI.tl().y << "   " << out.at(2).at(l).y << "   " << out.at(2).at(l).z <<  "   " << out.at(3).at(l).x <<  "   " << im << "\n";
 
         }
 
@@ -717,7 +719,6 @@ void MainWindow::Replay(){
     QString x2ROI = x2ROIField->text();
     QString y1ROI = y1ROIField->text();
     QString y2ROI = y2ROIField->text();
-    Rect ROI(x1ROI.toInt(), y1ROI.toInt(), x2ROI.toInt() - x1ROI.toInt(), y2ROI.toInt() - y1ROI.toInt());
 
 
     pathField->setDisabled(true);
@@ -767,7 +768,6 @@ void MainWindow::Replay(){
 
     string name = *a;
     visu = imread(name);
-    visu = visu(ROI);
     timerReplay ->setInterval(FPS);
 
 
