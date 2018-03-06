@@ -45,6 +45,7 @@ private:
     QThread *thread;
     QPushButton *QuitButton;
     QPushButton *GoButton;
+    QPushButton *PauseButton;
     QPushButton *DefaultButton;
     QPushButton *ResetButton;
     QPushButton *ReplayButton;
@@ -134,6 +135,7 @@ private:
     int nBackground;
     int threshValue;
     string savePath;
+    bool pause;
 
 public slots:
     void Go();
@@ -142,6 +144,7 @@ public slots:
     void Display(Mat visu, UMat cameraFrame);
     void Replay();
     void UpdateParameters();
+    void PlayPause();
 
 signals:
     void grabFrame(Mat visu, UMat cameraFrame);

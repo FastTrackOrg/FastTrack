@@ -73,7 +73,9 @@ MainWindow::MainWindow(QWidget *parent) :
     GoButton->move(50, 320);
     QObject::connect(GoButton, SIGNAL(clicked()), this, SLOT(Go()));
 
-
+    PauseButton = new QPushButton("Pause", this);
+    PauseButton->move(150, 320);
+    pause = true;
 
     DefaultButton = new QPushButton("Set as default", this);
     DefaultButton->move(350, 320);
@@ -374,7 +376,22 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(timerReplay, SIGNAL(timeout()), this, SLOT(Replay())); // Replaying
 
 
+    QObject::connect(PauseButton, SIGNAL(clicked()), this, SLOT(PlayPause()));
 
+}
+
+void MainWindow::PlayPause(){
+    if (pause){
+        PauseButton ->setText("Play");
+        timer ->stop();
+        pause = false;
+    }
+
+    else if (pause == false){
+        PauseButton ->setText("Pause");
+        timer ->start();
+        pause = true;
+    }
 }
 
 
@@ -438,6 +455,8 @@ void MainWindow::Go(){
             }
             catch (...){
                 timer->stop();
+                PauseButton ->setText("Play");
+                pause = false;
                 QMessageBox pathError;
                 pathError.setText("No files found");
                 pathError.exec();
@@ -566,6 +585,8 @@ void MainWindow::Go(){
 
     catch (const Exception &exc){
         timer->stop();
+        PauseButton ->setText("Play");
+        pause = false;
         QMessageBox pathError;
         pathError.setText("The ROI do not fit the image size or there is no object in the image. Please try changing the ROI and the minimal area of the object.");
         pathError.exec();
@@ -574,6 +595,8 @@ void MainWindow::Go(){
     catch(const std::out_of_range& oor)
     {
         timer->stop();
+        PauseButton ->setText("Play");
+        pause = false;
         QMessageBox pathError;
         pathError.setText("Too many objects in the image that indicated in parameters, try to increase the number of objects or to increase the minimal area of an object.");
         pathError.exec();
@@ -582,6 +605,8 @@ void MainWindow::Go(){
 
     catch (const exception &exc){
         timer->stop();
+        PauseButton ->setText("Play");
+        pause = false;
         QMessageBox pathError;
         pathError.setText(exc.what());
         pathError.exec();
