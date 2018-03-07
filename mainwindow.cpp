@@ -571,6 +571,7 @@ void MainWindow::Go(){
        else{
            timer->stop();
            ReplayButton->show();
+           PauseButton ->hide();
            fps ->show();
            fpsField ->show();
            fpsSlider->show();
