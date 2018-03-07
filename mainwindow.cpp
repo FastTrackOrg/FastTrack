@@ -472,6 +472,9 @@ void MainWindow::Go(){
             colorMap = Color(NUMBER);
             savePath = saveField->text().toStdString();
 
+            for(unsigned int ini = 0; ini < files.size(); ini++){
+                internalSaving.push_back(Point3f(0., 0., 0.));
+            }
         }
 
 
@@ -548,7 +551,7 @@ void MainWindow::Go(){
             // Saving
             coord.x += ROI.tl().x;
             coord.y += ROI.tl().y;
-            internalSaving.push_back(coord);
+            internalSaving.at(im) = coord;
             ofstream savefile;
             savefile.open(savePath, ios::out | ios::app );
             if(im == 0 && l == 0){
