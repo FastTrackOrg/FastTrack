@@ -16,6 +16,8 @@
 #include <QSlider>
 #include <QLCDNumber>
 #include <QComboBox>
+#include <QThread>
+#include <QSpinBox>
 
 
 
@@ -40,15 +42,20 @@ public:
 private:
 
     Ui::MainWindow *ui;
+    QThread *thread;
     QPushButton *QuitButton;
     QPushButton *GoButton;
+    QPushButton *PauseButton;
     QPushButton *DefaultButton;
     QPushButton *ResetButton;
     QPushButton *ReplayButton;
     QCheckBox *normal;
     QCheckBox *binary;
-    QString version = "v3.0.1";
+    QMessageBox *welcomeBox;
+    QString version = "v3.5.2";
 
+
+    QLabel *refreshRateLabel;
     QLabel *path;
     QLabel *numLabel;
     QLabel *maxArea;
@@ -89,6 +96,7 @@ private:
     QLabel *display;
     QLabel *display2;
     QTimer *timer;
+    QTimer *timerDisplay;
     QTimer *timerReplay;
     QProgressBar *progressBar;
     QSlider *arrowSlider;
@@ -98,10 +106,10 @@ private:
     vector<String> files;
     vector <String>::iterator a;
 
-    Mat cameraFrame;
+    UMat cameraFrame;
     Mat visu;
-    Mat img0;;
-    Mat background;;
+    UMat img0;;
+    UMat background;;
     vector<vector<Point> > memory;
     vector<Point3f> colorMap;
     vector<vector<Point3f> > out;
@@ -115,6 +123,10 @@ private:
     int arrowSize;
     int MAXAREA;
     int MINAREA;
+    int x1;
+    int y1;
+    int x2;
+    int y2;
     double LENGTH;
     double ANGLE;
     unsigned int NUMBER;
@@ -123,12 +135,19 @@ private:
     int nBackground;
     int threshValue;
     string savePath;
+    bool pause;
 
 public slots:
     void Go();
     void Write();
     void Reset();
+    void Display(Mat visu, UMat cameraFrame);
     void Replay();
+    void UpdateParameters();
+    void PlayPause();
+
+signals:
+    void grabFrame(Mat visu, UMat cameraFrame);
 };
 
 #endif // MAINWINDOW_H

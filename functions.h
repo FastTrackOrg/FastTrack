@@ -40,6 +40,7 @@ using namespace cv;
 using namespace std;
 
 
+
 double Moment(Mat image, int p, int q);
 
 
@@ -58,13 +59,13 @@ vector<double> Orientation(Mat image, bool dir);
 vector<Point3f> Reassignment(vector<Point3f> inputPrev, vector<Point3f> input, vector<int> assignment);
 
 
-Mat BackgroundExtraction(vector<String> files, double n);
+UMat BackgroundExtraction(vector<String> files, double n);
 
 
-void Registration(Mat imageReference, Mat frame);
+void Registration(UMat imageReference, UMat frame);
 
 
-void Binarisation(Mat frame, char backgroundColor, int value);
+void Binarisation(UMat frame, char backgroundColor, int value);
 
 
 vector<vector<Point3f> > ObjectPosition(Mat frame, int minSize, int maxSize);
@@ -76,4 +77,5 @@ vector<Point3f> Prevision(vector<Point3f> past, vector<Point3f> present);
 
 
 vector<Point3f> Color(int number);
+
 #endif

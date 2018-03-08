@@ -22,16 +22,16 @@ MainWindow::MainWindow(QWidget *parent) :
     setFixedSize(1600, 1000);
     setWindowTitle("Fishy Tracking");
 
-    QMessageBox welcomeBox;
-    welcomeBox.setText(" Welcome in Fishy Tracking " + version + "! \n To have help hove the relevant parameter. \n Check new version at https://bgallois.github.io/FishyTracking/. \n Have a wonderful tracking. \n © Benjamin GALLOIS benjamin.gallois@upmc.fr.");
-    welcomeBox.exec();
 
+    // Welcome message
+    welcomeBox = new QMessageBox;
+    welcomeBox ->setText("Check new version at https://bgallois.github.io/FishyTracking/.\n © Benjamin GALLOIS benjamin.gallois@upmc.fr. \n Subscribe to the mailing list to be kept informed of new releases and new features: http://benjamin-gallois.fr/fishyTracking.html");
 
-
+    // Default parameters reading
     QStringList defParameters;
     QFile file("conf.txt");
 
-    if(QFileInfo("conf.txt").exists()){
+    if(QFileInfo("conf.txt").exists()){ // Existing default parameters
         if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
             return;
 
@@ -46,7 +46,7 @@ MainWindow::MainWindow(QWidget *parent) :
         file.close();
     }
 
-    else{
+    else{ // Create a defaults files if not existing
         int i = 0;
         while(i<15) {
             QString line = "0";
@@ -56,9 +56,13 @@ MainWindow::MainWindow(QWidget *parent) :
     }
 
 
+    // Widgets layout
+
     QuitButton = new QPushButton("Quit", this);
     QuitButton->move(450, 320);
     QObject::connect(QuitButton, SIGNAL(clicked()), qApp, SLOT(quit()));
+    QObject::connect(qApp, SIGNAL(aboutToQuit()), welcomeBox, SLOT(exec()));
+
 
     ResetButton = new QPushButton("Reset", this);
     ResetButton->move(550, 320);
@@ -69,7 +73,9 @@ MainWindow::MainWindow(QWidget *parent) :
     GoButton->move(50, 320);
     QObject::connect(GoButton, SIGNAL(clicked()), this, SLOT(Go()));
 
-
+    PauseButton = new QPushButton("Pause", this);
+    PauseButton->move(150, 320);
+    pause = true;
 
     DefaultButton = new QPushButton("Set as default", this);
     DefaultButton->move(350, 320);
@@ -90,7 +96,6 @@ MainWindow::MainWindow(QWidget *parent) :
     binary = new QCheckBox("Binary", this);
     binary ->move(660, 340);
     binary ->setToolTip(tr("Check this option to display the binary image. Useful to ajust the binary threshold parameter."));
-
 
 
 
@@ -123,7 +128,7 @@ MainWindow::MainWindow(QWidget *parent) :
     maxArea->setText("Maximal area:");
     maxArea->move(50, 150);
     maxArea->adjustSize();
-    maxArea->setToolTip(tr("Maximal area in px*px of objects to track."));
+    maxArea->setToolTip(tr("Maximal area in px of objects to track."));
 
     maxAreaField = new QLineEdit(this);
     maxAreaField ->move(250,150);
@@ -134,7 +139,7 @@ MainWindow::MainWindow(QWidget *parent) :
     minArea->setText("Minimal area:");
     minArea->move(50, 200);
     minArea->adjustSize();
-    minArea->setToolTip(tr("Minimal area in px*px of objects to track."));
+    minArea->setToolTip(tr("Minimal area in px of objects to track."));
 
 
     minAreaField = new QLineEdit(this);
@@ -330,9 +335,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     trackingSpot = new QComboBox(this);
     trackingSpot ->move(1400, 180);
-    trackingSpot ->addItem(tr("Body head"));
-    trackingSpot ->addItem(tr("Body tail"));
-    trackingSpot ->addItem(tr("Body center of mass"));
+    trackingSpot ->addItem(tr("Head"));
+    trackingSpot ->addItem(tr("Tail"));
+    trackingSpot ->addItem(tr("Center of mass"));
     trackingSpot ->adjustSize();
 
 
@@ -357,168 +362,294 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
 
-
-
-
+    // Execution
+    //QThread* thread = new QThread;
     im = 0;
     timer = new QTimer(this);
-    connect(timer, SIGNAL(timeout()), this, SLOT(Go()));
+    //timer->moveToThread(this_thread);
+    //thread->start();
+    connect(timer, SIGNAL(timeout()), this, SLOT(Go())); // Tracking
+    connect(this, SIGNAL(grabFrame(Mat, UMat)), this, SLOT(Display(Mat, UMat))); // Displaying
+
     imr = 0;
     timerReplay = new QTimer(this);
-    connect(timerReplay, SIGNAL(timeout()), this, SLOT(Replay()));
+    connect(timerReplay, SIGNAL(timeout()), this, SLOT(Replay())); // Replaying
 
 
+    QObject::connect(PauseButton, SIGNAL(clicked()), this, SLOT(PlayPause()));
 
 }
 
-void MainWindow::Go(){
+void MainWindow::PlayPause(){
+    if (pause){
+        PauseButton ->setText("Play");
+        timer ->stop();
+        pause = false;
+    }
 
-    // Get parameters
+    else if (pause == false){
+        PauseButton ->setText("Pause");
+        timer ->start();
+        pause = true;
+    }
+}
+
+
+void MainWindow::UpdateParameters(){
+
     spot = trackingSpot->currentIndex();
     arrowSize = arrowField-> value();
     MAXAREA = maxAreaField->text().toInt(); //9000; //minimal area of detected objects
     MINAREA = minAreaField->text().toInt(); //3000; //maximal area of detected objects
     LENGTH = lengthField->text().toInt(); //maximal distance covered between two frames
     ANGLE = (angleField->text().toDouble()*M_PI)/180; //maximal angle between two frames
-    NUMBER = numField->text().toInt(); //number of objects to track
     WEIGHT = wField->text().toDouble();// weight of the orientation/angle in the cost function, 0 = orientation, 1 = distance
     LO = loField->text().toInt(); // maximum occlusion distance
-    nBackground = nBackField->text().toInt();
     threshValue = threshField->text().toInt();
+    x1 = x1ROIField->text().toInt();
+    x2 = x2ROIField->text().toInt();
+    y1 = y1ROIField->text().toInt();
+    y2 = y2ROIField->text().toInt();
 
-    //Visualization
-    pathField->setDisabled(true);
-    numField->setDisabled(true);
-    nBackField->setDisabled(true);
-    saveField->setDisabled(true);
+}
 
-
-
-    if(im == 0){ // Initialization
-
-        timer->start(1);
-        string folder = pathField->text().toStdString();
+void MainWindow::Go(){
 
         try{
-            glob(folder, files, false);
-        }
-        catch (...){
-            timer->stop();
-            QMessageBox pathError;
-            pathError.setText("No files found");
-            pathError.exec();
-        }
 
-        sort(files.begin(), files.end());
-        a = files.begin();
-        string name = *a;
-        progressBar ->setRange(0, files.size());
-        cameraFrame = imread(name, IMREAD_GRAYSCALE);
-        visu = imread(name);
-        img0 = imread(name, IMREAD_GRAYSCALE);
-        background = BackgroundExtraction(files, nBackground);
-        vector<vector<Point> > tmp(NUMBER, vector<Point>());
-        memory = tmp;
-        colorMap = Color(NUMBER);
-        savePath = saveField->text().toStdString();
-
-    }
+        connect(trackingSpot, SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateParameters()));
+        connect(arrowSlider, SIGNAL(valueChanged(int)), this, SLOT(UpdateParameters()));
+        connect(maxAreaField, SIGNAL(editingFinished()), this, SLOT(UpdateParameters()));
+        connect(minAreaField, SIGNAL(editingFinished()), this, SLOT(UpdateParameters()));
+        connect(lengthField, SIGNAL(editingFinished()), this, SLOT(UpdateParameters()));
+        connect(angleField, SIGNAL(editingFinished()), this, SLOT(UpdateParameters()));
+        connect(wField, SIGNAL(editingFinished()), this, SLOT(UpdateParameters()));
+        connect(loField, SIGNAL(editingFinished()), this, SLOT(UpdateParameters()));
+        connect(x1ROIField, SIGNAL(editingFinished()), this, SLOT(UpdateParameters()));
+        connect(y1ROIField, SIGNAL(editingFinished()), this, SLOT(UpdateParameters()));
+        connect(x2ROIField, SIGNAL(editingFinished()), this, SLOT(UpdateParameters()));
+        connect(y2ROIField, SIGNAL(editingFinished()), this, SLOT(UpdateParameters()));
+        connect(threshField, SIGNAL(editingFinished()), this, SLOT(UpdateParameters()));
 
 
-    string name = *a;
-    savefile.open(savePath);
-    Rect ROI(x1ROIField->text().toInt(), y1ROIField->text().toInt(), x2ROIField->text().toInt() - x1ROIField->text().toInt(), y2ROIField->text().toInt() - y1ROIField->text().toInt());
-    cameraFrame = imread(name, IMREAD_GRAYSCALE);
-    visu = imread(name);
-    cameraFrame.convertTo(cameraFrame, CV_8U);
-    cameraFrame = background - cameraFrame;
-    Binarisation(cameraFrame, 'b', threshValue);
-    cameraFrame = cameraFrame(ROI);
-    visu = visu(ROI);
+
+        // Widgets
+        pathField->setDisabled(true);
+        numField->setDisabled(true);
+        nBackField->setDisabled(true);
+        saveField->setDisabled(true);
 
 
-    // Position computation
-    out = ObjectPosition(cameraFrame, MINAREA, MAXAREA);
+
+        if(im == 0){ // Initialization
 
 
-    if(im == 0){ // First frame initialization
+            timer->start(0);
+            UpdateParameters();
+            string folder = pathField->text().toStdString();
+            nBackground = nBackField->text().toInt();
+            NUMBER = numField->text().toInt(); //number of objects to track
 
-        if(out.at(0).size() <= NUMBER + 1 && out.at(0).size() != 0){
-            while((out.at(0).size() - NUMBER) > 0){
-                out.at(0).push_back(Point3f(0, 0, 0));
-                out.at(1).push_back(Point3f(0, 0, 0));
-                out.at(2).push_back(Point3f(0, 0, 0));
-                out.at(3).push_back(Point3f(0, 0, 0));
+            try{
+                glob(folder, files, false);
             }
+            catch (...){
+                timer->stop();
+                PauseButton ->setText("Play");
+                pause = false;
+                QMessageBox pathError;
+                pathError.setText("No files found");
+                pathError.exec();
+            }
+
+            sort(files.begin(), files.end());
+            a = files.begin();
+            string name = *a;
+            progressBar ->setRange(0, files.size());
+            background = BackgroundExtraction(files, nBackground);
+            vector<vector<Point> > tmp(NUMBER, vector<Point>());
+            memory = tmp;
+            colorMap = Color(NUMBER);
+            savePath = saveField->text().toStdString();
+
+            for(unsigned int ini = 0; ini < files.size(); ini++){
+                internalSaving.push_back(Point3f(0., 0., 0.));
+            }
+        }
+
+
+        string name = *a;
+        savefile.open(savePath);
+
+        Rect ROI(x1, y1, x2 - x1, y2 - y1);
+        imread(name, IMREAD_GRAYSCALE).copyTo(cameraFrame);
+        visu = imread(name);
+        subtract(background, cameraFrame, cameraFrame);
+        Binarisation(cameraFrame, 'b', threshValue);
+        cameraFrame = cameraFrame(ROI);
+        visu = visu(ROI);
+
+        // Position computation
+        out = ObjectPosition(cameraFrame.getMat(cv::ACCESS_READ), MINAREA, MAXAREA);
+
+
+        if(im == 0){ // First frame initialization
+
+            if(out.at(0).size() < NUMBER && out.at(0).size() != 0){
+                while((out.at(0).size() - NUMBER) > 0){
+                    out.at(0).push_back(Point3f(0, 0, 0));
+                    out.at(1).push_back(Point3f(0, 0, 0));
+                    out.at(2).push_back(Point3f(0, 0, 0));
+                    out.at(3).push_back(Point3f(0, 0, 0));
+                }
+                outPrev = out;
+            }
+
+            else if(out.at(0).empty()){ // Error message
+                timer->stop();
+                QMessageBox errorBox;
+                errorBox.setText("No fish detected! Change parameters!");
+                errorBox.exec();
+
+            }
+
+            else{
+                outPrev = out;
+            }
+        }
+
+
+
+        else if(im > 0){ // Matching fish identity with the previous frame
+            identity = CostFunc(outPrev.at(spot), out.at(spot), LENGTH, ANGLE, WEIGHT, LO);
+            out.at(0) = Reassignment(outPrev.at(0), out.at(0), identity);
+            out.at(1) = Reassignment(outPrev.at(1), out.at(1), identity);
+            out.at(2) = Reassignment(outPrev.at(2), out.at(2), identity);
+            out.at(3) = Reassignment(outPrev.at(3), out.at(3), identity);
+            out.at(spot) = Prevision(outPrev.at(spot), out.at(spot));
             outPrev = out;
         }
 
-        else if(out.at(0).empty()){ // Error message
-            timer->stop();
-            QMessageBox errorBox;
-            errorBox.setText("No fish detected! Change parameters!");
-            errorBox.exec();
+
+
+        // Visualization & saving
+       for(unsigned int l = 0; l < out.at(0).size(); l++){
+            Point3f coord;
+            coord = out.at(spot).at(l);
+            arrowedLine(visu, Point(coord.x, coord.y), Point(coord.x + 5*arrowSize*cos(coord.z), coord.y - 5*arrowSize*sin(coord.z)), Scalar(colorMap.at(l).x, colorMap.at(l).y, colorMap.at(l).z), arrowSize, 10*arrowSize, 0);
+
+            if((im > 5)){
+                polylines(visu, memory.at(l), false, Scalar(colorMap.at(l).x, colorMap.at(l).y, colorMap.at(l).z), arrowSize, 8, 0);
+                memory.at(l).push_back(Point((int)coord.x, (int)coord.y));
+                if(im>50){
+                    memory.at(l).erase(memory.at(l).begin());
+                    }
+            }
+
+
+
+            // Saving
+            coord.x += ROI.tl().x;
+            coord.y += ROI.tl().y;
+            internalSaving.at(im) = coord;
+            ofstream savefile;
+            savefile.open(savePath, ios::out | ios::app );
+            if(im == 0 && l == 0){
+                savefile << "xHead" << "   " << "yHead" << "   " << "tHead" << "   "  << "xTail" << "   " << "yTail" << "   " << "tTail"   <<  "   " << "xBody" << "   " << "yBody" << "   " << "tBody"   <<  "   " << "curvature" <<  "   " << "imageNumber" << "\n";
+            }
+
+            savefile << out.at(0).at(l).x + ROI.tl().x << "   " << out.at(0).at(l).y + ROI.tl().y << "   " << out.at(0).at(l).z << "   "  << out.at(1).at(l).x + ROI.tl().x << "   " << out.at(1).at(l).y + ROI.tl().y << "   " << out.at(1).at(l).z  <<  "   " << out.at(2).at(l).x + ROI.tl().y << "   " << out.at(2).at(l).y << "   " << out.at(2).at(l).z <<  "   " << out.at(3).at(l).x <<  "   " << im << "\n";
 
         }
+
+       emit grabFrame(visu, cameraFrame);
+
+
+       if(im < files.size() - 1){
+           a ++;
+           im ++;
+           progressBar->setValue(im);
+        }
+
+       else{
+           timer->stop();
+           ReplayButton->show();
+           PauseButton ->hide();
+           fps ->show();
+           fpsField ->show();
+           fpsSlider->show();
+           trackingSpot->hide();
+           trackingSpotLabel->hide();
+           im = 0;
+           QMessageBox msgBox;
+           msgBox.setText("The tracking is done, go to work now!!! \n You can replay the tracking by clicking the replay button.");
+           msgBox.exec();
+       }
+    }
+
+    catch (const Exception &exc){
+        timer->stop();
+        PauseButton ->setText("Play");
+        pause = false;
+        QMessageBox pathError;
+        pathError.setText("The ROI do not fit the image size or there is no object in the image. Please try changing the ROI and the minimal area of the object.");
+        pathError.exec();
+    }
+
+    catch(const std::out_of_range& oor)
+    {
+        timer->stop();
+        PauseButton ->setText("Play");
+        pause = false;
+        QMessageBox pathError;
+        pathError.setText("Too many objects in the image that indicated in parameters, try to increase the number of objects or to increase the minimal area of an object.");
+        pathError.exec();
     }
 
 
-
-    else if(im > 0){ // Matching fish identity with the previous frame
-        identity = CostFunc(outPrev.at(spot), out.at(spot), LENGTH, ANGLE, WEIGHT, LO);
-        out.at(0) = Reassignment(outPrev.at(0), out.at(0), identity);
-        out.at(1) = Reassignment(outPrev.at(1), out.at(1), identity);
-        out.at(2) = Reassignment(outPrev.at(2), out.at(2), identity);
-        out.at(3) = Reassignment(outPrev.at(3), out.at(3), identity);
-        //out.at(spot) = Prevision(outPrev.at(spot), out.at(spot));
-        outPrev = out;
+    catch (const exception &exc){
+        timer->stop();
+        PauseButton ->setText("Play");
+        pause = false;
+        QMessageBox pathError;
+        pathError.setText(exc.what());
+        pathError.exec();
     }
 
+}
 
 
-    // Visualization & saving
-   for(unsigned int l = 0; l < out.at(0).size(); l++){
-        Point3f coord;
-        coord = out.at(spot).at(l);
-        arrowedLine(visu, Point(coord.x, coord.y), Point(coord.x + 5*arrowSize*cos(coord.z), coord.y - 5*arrowSize*sin(coord.z)), Scalar(colorMap.at(l).x, colorMap.at(l).y, colorMap.at(l).z), arrowSize, 10*arrowSize, 0);
+void MainWindow::Display(Mat visu, UMat cameraFrame){
 
-        if((im > 5)){
-            polylines(visu, memory.at(l), false, Scalar(colorMap.at(l).x, colorMap.at(l).y, colorMap.at(l).z), arrowSize, 8, 0);
-            memory.at(l).push_back(Point((int)coord.x, (int)coord.y));
-            if(im>50){
-                memory.at(l).erase(memory.at(l).begin());
-                }
-        }
-
-
-
-        // Saving
-        internalSaving.push_back(coord);
-        ofstream savefile;
-        savefile.open(savePath, ios::out | ios::app );
-        if(im == 0 && l == 0){
-            savefile << "xHead" << "   " << "yHead" << "   " << "tHead" << "   "  << "xTail" << "   " << "yTail" << "   " << "tTail"   <<  "   " << "xBody" << "   " << "yBody" << "   " << "tBody"   <<  "   " << "curvature" <<  "   " << "imageNumber" << "\n";
-        }
-
-        savefile << out.at(0).at(l).x << "   " << out.at(0).at(l).y << "   " << out.at(0).at(l).z << "   "  << out.at(1).at(l).x << "   " << out.at(1).at(l).y << "   " << out.at(1).at(l).z  <<  "   " << out.at(2).at(l).x << "   " << out.at(2).at(l).y << "   " << out.at(2).at(l).z <<  "   " << out.at(3).at(l).x <<  "   " << im << "\n";
-
-
+    if (!normal->isChecked() && !binary->isChecked()){
+        display->clear();
+        display2->clear();
     }
 
-
-
-    if (normal->isChecked() && !binary->isChecked()){
+    else if (normal->isChecked() && !binary->isChecked()){
         cvtColor(visu,visu,CV_BGR2RGB);
         Size size = visu.size();
 
-        if(size.height > 600){
+        if(size.height > 600 & size.width < 1500){
             display->setFixedHeight(600);
-            display->setFixedWidth((size.width)/(600*size.height));
+            display->setFixedWidth((600*size.width)/(size.height));
         }
-        if(size.width > 1500){
+
+        else if(size.height < 600 & size.width > 1500){
             display->setFixedWidth(1500);
-            display->setFixedHeight((size.height)/(1500*size.width));
+            display->setFixedHeight((1500*size.height)/(size.width));
         }
+
+        else if(size.height > 600 & size.width > 1500){
+            double c = 600;
+            while((c*size.height)/(size.width) > 1500){
+                display->setFixedWidth((600*size.width)/(size.height));
+                c /= 2;
+            }
+            display->setFixedHeight(c);
+            display->setFixedWidth((c*size.width)/(size.height));
+        }
+
         else{
             display->setFixedHeight(size.height);
             display->setFixedWidth(size.width);
@@ -531,69 +662,77 @@ void MainWindow::Go(){
     else if (!normal->isChecked() && binary->isChecked()){
         Size size = cameraFrame.size();
 
-        if(size.height > 600){
+        if(size.height > 600 & size.width < 1500){
             display2->setFixedHeight(600);
-            display2->setFixedWidth((size.width)/(600*size.height));
+            display2->setFixedWidth((600*size.width)/(size.height));
         }
-        if(size.width > 1500){
+
+        else if(size.height < 600 & size.width > 1500){
             display2->setFixedWidth(1500);
-            display2->setFixedHeight((size.height)/(1500*size.width));
+            display2->setFixedHeight((1500*size.height)/(size.width));
         }
+
+        else if(size.height > 600 & size.width > 1500){
+            double c = 600;
+            while((c*size.height)/(size.width) > 1500){
+                display2->setFixedWidth((600*size.width)/(size.height));
+                c /= 2;
+            }
+            display2->setFixedHeight(c);
+            display2->setFixedWidth((c*size.width)/(size.height));
+        }
+
         else{
             display2->setFixedHeight(size.height);
             display2->setFixedWidth(size.width);
         }
         display2->move(50, 400);
-        display2->setPixmap(QPixmap::fromImage(QImage(cameraFrame.data, cameraFrame.cols, cameraFrame.rows, cameraFrame.step, QImage::Format_Grayscale8)));
+        display2->setPixmap(QPixmap::fromImage(QImage(cameraFrame.getMat(cv::ACCESS_READ).data, cameraFrame.cols, cameraFrame.rows, cameraFrame.step, QImage::Format_Grayscale8)));
         display->clear();
     }
 
     else if (normal->isChecked() && binary->isChecked()){
         Size size = cameraFrame.size();
+        cvtColor(visu,visu,CV_BGR2RGB);
 
-        if(size.width > 1500/2){
-            display->setFixedWidth(1500/2);
-            display->setFixedHeight((size.height*2)/(1500*size.width));
-        }
-        if(size.height > 600){
+        if(size.height > 600 & size.width < 750){
             display->setFixedHeight(600);
-            display->setFixedWidth((size.width)/(600*size.height));
+            display->setFixedWidth((600*size.width)/(size.height));
         }
+
+        else if(size.height < 600 & size.width > 750){
+            display->setFixedWidth(750);
+            display->setFixedHeight((750*size.height)/(size.width));
+        }
+
+        else if(size.height > 600 & size.width > 1500){
+            double c = 600;
+            while((c*size.height)/(size.width) > 1500){
+                display->setFixedWidth((600*size.width)/(size.height));
+                c /= 2;
+            }
+            display->setFixedHeight(c);
+            display->setFixedWidth((c*size.width)/(size.height));
+        }
+
         else{
-            display->setFixedHeight(size.height/2);
-            display->setFixedWidth(size.width/2);
+            display->setFixedHeight(size.height);
+            display->setFixedWidth(size.width);
         }
+
         display2->move(800, 400);
         display2->setFixedHeight(display->height());
         display2->setFixedWidth(display->width());
         display2->setPixmap(QPixmap::fromImage(QImage(visu.data, visu.cols, visu.rows, visu.step, QImage::Format_RGB888)));
-        display->setPixmap(QPixmap::fromImage(QImage(cameraFrame.data, cameraFrame.cols, cameraFrame.rows, cameraFrame.step, QImage::Format_Grayscale8)));
-    }
-
-
-
-
-    if(im < files.size() - 1){
-        a ++;
-        im ++;
-        progressBar->setValue(im);
-     }
-
-    else{
-        timer->stop();
-        ReplayButton->show();
-        fps ->show();
-        fpsField ->show();
-        fpsSlider->show();
-        trackingSpot->hide();
-        trackingSpotLabel->hide();
-        im = 0;
-        QMessageBox msgBox;
-        msgBox.setText("The tracking is done, go to work now!!! \n You can replay the tracking by clicking the replay button.");
-        msgBox.exec();
+        display->setPixmap(QPixmap::fromImage(QImage(cameraFrame.getMat(cv::ACCESS_READ).data, cameraFrame.cols, cameraFrame.rows, cameraFrame.step, QImage::Format_Grayscale8)));
     }
 
 }
+
+
+
+
+
 
 
 
@@ -609,12 +748,12 @@ void MainWindow::Replay(){
     QString x2ROI = x2ROIField->text();
     QString y1ROI = y1ROIField->text();
     QString y2ROI = y2ROIField->text();
-    Rect ROI(x1ROI.toInt(), y1ROI.toInt(), x2ROI.toInt() - x1ROI.toInt(), y2ROI.toInt() - y1ROI.toInt());
+
 
     pathField->setDisabled(true);
     numField->setDisabled(true);
     maxAreaField->setDisabled(true);
-     minAreaField->setDisabled(true);
+    minAreaField->setDisabled(true);
     lengthField->setDisabled(true);
     angleField->setDisabled(true);
     loField->setDisabled(true);
@@ -634,7 +773,7 @@ void MainWindow::Replay(){
     // Convert parameters
     unsigned int NUMBER = num.toInt(); //number of objects to track
     int FPS = fpsField->value();
-    FPS = int((100.)/(float(FPS)));
+    FPS = int((1000.)/(float(FPS)));
 
 
 
@@ -658,8 +797,6 @@ void MainWindow::Replay(){
 
     string name = *a;
     visu = imread(name);
-    cameraFrame.convertTo(cameraFrame, CV_8U);
-    visu = visu(ROI);
     timerReplay ->setInterval(FPS);
 
 
@@ -685,24 +822,37 @@ void MainWindow::Replay(){
 
 
 
-    cvtColor(visu,visu,CV_BGR2RGB);
-    Size size = visu.size();
+   cvtColor(visu,visu,CV_BGR2RGB);
+   Size size = visu.size();
 
-    if(size.height > 600){
-        display->setFixedHeight(600);
-        display->setFixedWidth((size.width)/(600*size.height));
-    }
-    if(size.width > 1500){
-        display->setFixedWidth(1500);
-        display->setFixedHeight((size.height)/(1500*size.width));
-    }
-    else{
-        display->setFixedHeight(size.height);
-        display->setFixedWidth(size.width);
-    }
+   if(size.height > 600 & size.width < 1500){
+       display->setFixedHeight(600);
+       display->setFixedWidth((600*size.width)/(size.height));
+   }
 
-    display->setPixmap(QPixmap::fromImage(QImage(visu.data, visu.cols, visu.rows, visu.step, QImage::Format_RGB888)));
-    display2->clear();
+   else if(size.height < 600 & size.width > 1500){
+       display->setFixedWidth(1500);
+       display->setFixedHeight((1500*size.height)/(size.width));
+   }
+
+   else if(size.height > 600 & size.width > 1500){
+       double c = 600;
+       while((c*size.height)/(size.width) > 1500){
+           display->setFixedWidth((600*size.width)/(size.height));
+           c /= 2;
+       }
+       display->setFixedHeight(c);
+       display->setFixedWidth((c*size.width)/(size.height));
+   }
+
+   else{
+       display->setFixedHeight(size.height);
+       display->setFixedWidth(size.width);
+   }
+
+   display->setPixmap(QPixmap::fromImage(QImage(visu.data, visu.cols, visu.rows, visu.step, QImage::Format_RGB888)));
+   display2->clear();
+
 
 
 
@@ -714,7 +864,7 @@ void MainWindow::Replay(){
     if(imr < files.size() - 1){
         a ++;
         imr ++;
-        progressBar->setValue(im);
+        progressBar->setValue(imr);
      }
 
     else{
