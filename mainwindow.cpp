@@ -366,6 +366,7 @@ MainWindow::MainWindow(QWidget *parent) :
     //QThread* thread = new QThread;
     im = 0;
     timer = new QTimer(this);
+    timer ->setInterval(1);
     //timer->moveToThread(this_thread);
     //thread->start();
     connect(timer, SIGNAL(timeout()), this, SLOT(Go())); // Tracking
@@ -444,7 +445,7 @@ void MainWindow::Go(){
         if(im == 0){ // Initialization
 
 
-            timer->start(0);
+            timer->start();
             UpdateParameters();
             string folder = pathField->text().toStdString();
             nBackground = nBackField->text().toInt();
