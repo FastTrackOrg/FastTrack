@@ -236,6 +236,7 @@ MainWindow::MainWindow(QWidget *parent) :
     saveField ->move(1200,50);
     saveField->setText(defParameters.at(10));
 
+    QObject::connect(pathField, SIGNAL(textChanged(QString)), saveField, SLOT(setText(QString)));
 
 
     x1ROI = new QLabel(this);
