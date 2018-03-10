@@ -18,6 +18,8 @@
 #include <QComboBox>
 #include <QThread>
 #include <QSpinBox>
+#include <QLayout>
+#include <QWidget>
 
 
 
@@ -52,9 +54,10 @@ private:
     QCheckBox *normal;
     QCheckBox *binary;
     QMessageBox *welcomeBox;
-    QString version = "v3.5.2";
+    QString version = "v3.6.0";
 
-
+    QWidget *central;
+    QLayout *layout;
     QLabel *refreshRateLabel;
     QLabel *path;
     QLabel *numLabel;
