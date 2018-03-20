@@ -505,7 +505,7 @@ void MainWindow::Go(){
         visu = visu(ROI);
 
         // Position computation
-        out = ObjectPosition(cameraFrame.getMat(cv::ACCESS_READ), MINAREA, MAXAREA);
+        out = ObjectPosition(cameraFrame, MINAREA, MAXAREA);
 
 
         if(im == 0){ // First frame initialization
