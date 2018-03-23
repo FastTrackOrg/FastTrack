@@ -498,7 +498,8 @@ void MainWindow::Go(){
 
         Rect ROI(x1, y1, x2 - x1, y2 - y1);
         imread(name, IMREAD_GRAYSCALE).copyTo(cameraFrame);
-        visu = imread(name);
+        visu = cameraFrame.getMat(ACCESS_FAST).clone();
+        cvtColor(visu,visu, CV_GRAY2RGB);
         subtract(background, cameraFrame, cameraFrame);
         Binarisation(cameraFrame, 'b', threshValue);
         cameraFrame = cameraFrame(ROI);
@@ -642,7 +643,6 @@ void MainWindow::Display(Mat visu, UMat cameraFrame){
     }
 
     else if (normal->isChecked() && !binary->isChecked()){
-        cvtColor(visu,visu,CV_BGR2RGB);
         Size size = visu.size();
 
         int w = display->width();
@@ -653,7 +653,6 @@ void MainWindow::Display(Mat visu, UMat cameraFrame){
     }
 
     else if (!normal->isChecked() && binary->isChecked()){
-        cvtColor(visu,visu,CV_BGR2RGB);
         Size size = cameraFrame.size();
         int w = display->width();
         int h = display->height();
@@ -663,7 +662,6 @@ void MainWindow::Display(Mat visu, UMat cameraFrame){
     }
 
     else if (normal->isChecked() && binary->isChecked()){
-        cvtColor(visu,visu,CV_BGR2RGB);
         Size size = cameraFrame.size();
         int w = display->width();
         int h = display->height();
