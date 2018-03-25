@@ -202,7 +202,7 @@ UMat BackgroundExtraction(vector<String> files, double n){
     imread(files[0], IMREAD_GRAYSCALE).copyTo(background);
     imread(files[0], IMREAD_GRAYSCALE).copyTo(img0);
     background.convertTo(background, CV_32F);
-    img0.convertTo(img0, CV_32FC1);
+    img0.convertTo(img0, CV_32F);
     Rect registrationFrame(0, 0, 200, 50);
     int step = files.size()/n;
     //Mat tmp = imread(files[0], IMREAD_GRAYSCALE);
@@ -214,7 +214,7 @@ UMat BackgroundExtraction(vector<String> files, double n){
 	for(unsigned int i = 1; i < files.size(); i += step){
         //tmp = imread(files[i], IMREAD_GRAYSCALE);
         imread(files[i], IMREAD_GRAYSCALE).copyTo(tmp);
-		tmp.convertTo(tmp, CV_32FC1);
+        tmp.convertTo(tmp, CV_32F);
         cameraFrameReg = tmp(registrationFrame);
 		img0 = img0(registrationFrame);
         Point2d shift = phaseCorrelate(cameraFrameReg, img0);
