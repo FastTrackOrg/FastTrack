@@ -111,6 +111,7 @@ MainWindow::MainWindow(QWidget *parent) :
     pathField = new QLineEdit(this);
     pathField->setText(defParameters.at(0));
     pathField->adjustSize();
+    QObject::connect(pathField, SIGNAL(textChanged(QString)), this, SLOT(checkPath(QString)));
 
 
     numLabel = new QLabel(this);
@@ -411,6 +412,8 @@ void MainWindow::PlayPause(){
 
     else if (pause == false){
         PauseButton ->setText("Pause");
+        x2ROIField->setStyleSheet("background-color: black;");
+        y2ROIField->setStyleSheet("background-color: black;");
         timer ->start();
         pause = true;
     }
@@ -616,6 +619,8 @@ void MainWindow::Go(){
         pause = false;
         QMessageBox pathError;
         pathError.setText("The ROI does not fit the image size or there is no object in the image. Please try changing the ROI and the minimal area of the object.");
+        x2ROIField->setStyleSheet("background-color: red;");
+        y2ROIField->setStyleSheet("background-color: red;");
         pathError.exec();
     }
 
@@ -830,6 +835,23 @@ void MainWindow::Reset()
 {
     qDebug() << "Performing application reboot...";
     qApp->exit(MainWindow::EXIT_CODE_REBOOT );
+}
+
+
+void MainWindow::checkPath(QString path){
+    string folder = path.toStdString();
+    vector<String> files;
+    try{
+        glob(folder, files, false);
+        Mat img = imread(files.at(0), IMREAD_GRAYSCALE);
+        pathField->setStyleSheet("background-color: green;");
+
+    }
+    catch(...){
+        pathField->setStyleSheet("background-color: red;");
+    }
+
+
 }
 
 

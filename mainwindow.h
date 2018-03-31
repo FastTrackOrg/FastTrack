@@ -148,6 +148,7 @@ public slots:
     void Replay();
     void UpdateParameters();
     void PlayPause();
+    void checkPath(QString);
 
 signals:
     void grabFrame(Mat visu, UMat cameraFrame);
