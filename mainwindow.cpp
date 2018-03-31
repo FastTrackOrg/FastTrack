@@ -411,7 +411,9 @@ MainWindow::MainWindow(QWidget *parent) :
 }
 
 
-
+/**
+    * @PlayPause: custom play/pause button that allow to stop restart the tracking, also in case of error.
+*/
 void MainWindow::PlayPause(){
     if (pause){ // Pause button pressed
         PauseButton ->setText("Play");
@@ -429,6 +431,10 @@ void MainWindow::PlayPause(){
 }
 
 
+
+/**
+    * @UpdateParameters: take the parameters from fields, cast them to right type.
+*/
 void MainWindow::UpdateParameters(){
 
     spot = trackingSpot->currentIndex();
@@ -447,6 +453,10 @@ void MainWindow::UpdateParameters(){
 
 }
 
+
+/**
+    * @Go: Main function for the tracking, take one image and track the object inside.
+*/
 void MainWindow::Go(){
 
         try{
@@ -622,7 +632,7 @@ void MainWindow::Go(){
        }
     }
 
-    catch (const Exception &exc){
+    catch (const Exception &exc){ // Out of image error
         timer->stop();
         PauseButton ->setText("Play");
         pause = false;
@@ -633,8 +643,7 @@ void MainWindow::Go(){
         pathError.exec();
     }
 
-    catch(const std::out_of_range& oor)
-    {
+    catch(const std::out_of_range& oor){ // Out of range error
         timer->stop();
         PauseButton ->setText("Play");
         pause = false;
@@ -644,7 +653,7 @@ void MainWindow::Go(){
     }
 
 
-    catch (const exception &exc){
+    catch (const exception &exc){ // Unknown error
         timer->stop();
         PauseButton ->setText("Play");
         pause = false;
@@ -656,14 +665,20 @@ void MainWindow::Go(){
 }
 
 
+
+/**
+    * @Display: display the originla image and/or the binary image in two Qlabels.
+    * @param Mat visu: original image.
+    * @param UMat cameraFrame: binary image.
+*/
 void MainWindow::Display(Mat visu, UMat cameraFrame){
 
-    if (!normal->isChecked() && !binary->isChecked()){
+    if (!normal->isChecked() && !binary->isChecked()){ // Display nothing
         display->clear();
         display2->clear();
     }
 
-    else if (normal->isChecked() && !binary->isChecked()){
+    else if (normal->isChecked() && !binary->isChecked()){ // Display just the original image
         Size size = visu.size();
 
         int w = display->width();
@@ -673,7 +688,7 @@ void MainWindow::Display(Mat visu, UMat cameraFrame){
         display2->clear();
     }
 
-    else if (!normal->isChecked() && binary->isChecked()){
+    else if (!normal->isChecked() && binary->isChecked()){ //Display just the binary mask
         Size size = cameraFrame.size();
         int w = display->width();
         int h = display->height();
@@ -682,7 +697,7 @@ void MainWindow::Display(Mat visu, UMat cameraFrame){
         display2->clear();
     }
 
-    else if (normal->isChecked() && binary->isChecked()){
+    else if (normal->isChecked() && binary->isChecked()){ // Display the original image and the binary mask
         Size size = cameraFrame.size();
         int w = display->width();
         int h = display->height();
@@ -694,13 +709,10 @@ void MainWindow::Display(Mat visu, UMat cameraFrame){
 }
 
 
-
-
-
-
-
-
-
+/**
+    * @Replay: replay the tracking.
+    * @To do: update with the new display.
+*/
 void MainWindow::Replay(){
 
     // Get parameters
@@ -791,14 +803,6 @@ void MainWindow::Replay(){
    display->setPixmap(QPixmap::fromImage(QImage(visu.data, visu.cols, visu.rows, visu.step, QImage::Format_RGB888)).scaled(w, h, Qt::KeepAspectRatio));
    display2->clear();
 
-
-
-
-
-
-
-
-
     if(imr < files.size() - 1){
         a ++;
         imr ++;
@@ -813,6 +817,9 @@ void MainWindow::Replay(){
 }
 
 
+/**
+    * @Write: write a text file with the parameters when clicking on "set as default" button.
+*/
 void MainWindow::Write(){
 
     QString filename = "conf.txt";
@@ -840,6 +847,9 @@ void MainWindow::Write(){
 
 
 
+/**
+    * @Reset: reset the program.
+*/
 void MainWindow::Reset()
 {
     qDebug() << "Performing application reboot...";
@@ -850,13 +860,13 @@ void MainWindow::Reset()
 void MainWindow::checkPath(QString path){
     string folder = path.toStdString();
     vector<String> files;
-    try{
+    try{ // Found images in the given path
         glob(folder, files, false);
         Mat img = imread(files.at(0), IMREAD_GRAYSCALE);
         pathField->setStyleSheet("background-color: green;");
 
     }
-    catch(...){
+    catch(...){ // No image in the given path
         pathField->setStyleSheet("background-color: red;");
     }
 
@@ -864,6 +874,9 @@ void MainWindow::checkPath(QString path){
 }
 
 
+/**
+    * @setSavePath: auto-writting the output txt file in path_of_images/tracking.txt
+*/
 void MainWindow::setSavePath(QString path){
     string folder = path.toStdString();
     size_t found = folder.find("/*");
