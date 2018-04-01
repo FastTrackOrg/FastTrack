@@ -39,7 +39,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // Welcome message
     welcomeBox = new QMessageBox;
-    welcomeBox ->setText("Check new versions at https://bgallois.github.io/FishyTracking/.\n © Benjamin GALLOIS benjamin.gallois@upmc.fr. \n Subscribe to the mailing list to be kept informed of new releases and new features: http://benjamin-gallois.fr/fishyTracking.html");
+    welcomeBox ->setText("Check new versions at https://github.com/bgallois/FishyTracking/releases.\n © Benjamin GALLOIS benjamin.gallois@upmc.fr. \n You can subscribe to the mailing list to be kept informed of new releases: http://benjamin-gallois.fr/fishyTracking.html");
 
 
     // Default parameters reading
@@ -75,20 +75,24 @@ MainWindow::MainWindow(QWidget *parent) :
     QuitButton = new QPushButton("Quit", this);
     QObject::connect(QuitButton, SIGNAL(clicked()), qApp, SLOT(quit()));
     QObject::connect(qApp, SIGNAL(aboutToQuit()), welcomeBox, SLOT(exec()));
+    QuitButton ->setToolTip(tr("Press to quit Fishy Tracking."));
 
 
     ResetButton = new QPushButton("Reset", this);
     QObject::connect(ResetButton, SIGNAL(clicked()), this, SLOT(Reset()));
-
+    ResetButton ->setToolTip(tr("Press to reset Fishy Tracking."));
 
     GoButton = new QPushButton("Go", this);
     QObject::connect(GoButton, SIGNAL(clicked()), this, SLOT(Go()));
+    GoButton ->setToolTip(tr("Press to begin the tracking."));
 
     PauseButton = new QPushButton("Pause", this);
+    PauseButton ->setToolTip(tr("Press to pause/play the tracking."));
     pause = true;
 
     DefaultButton = new QPushButton("Set as default", this);
     QObject::connect(DefaultButton, SIGNAL(clicked()), this, SLOT(Write()));
+    DefaultButton ->setToolTip(tr("Press to set the actual parameters by default at the next startup."));
 
     ReplayButton = new QPushButton("Replay", this);
     QObject::connect(ReplayButton, SIGNAL(clicked()), this, SLOT(Replay()));
@@ -96,22 +100,24 @@ MainWindow::MainWindow(QWidget *parent) :
     spRetain.setRetainSizeWhenHidden(true);
     ReplayButton->setSizePolicy(spRetain);
     ReplayButton ->hide();
+    ReplayButton ->setToolTip(tr("Press to replay the tracking."));
+    
 
 
     normal = new QCheckBox("Normal", this);
     normal ->setChecked(1);
     normal ->isChecked();
-    normal ->setToolTip(tr("Check this option to display the original image with trajectories of tracked objects."));
+    normal ->setToolTip(tr("Check to display the original image with trajectories of tracked objects."));
 
     binary = new QCheckBox("Binary", this);
-    binary ->setToolTip(tr("Check this option to display the binary image. Useful to ajust the binary threshold parameter."));
+    binary ->setToolTip(tr("Check to display the binary image. Useful to adjust the parameters."));
 
 
 
     path = new QLabel(this);
     path->setText("Path:");
     path->adjustSize();
-    path ->setToolTip(tr("Path to the folder that contains images. Have to add /*extension at the end."));
+    path ->setToolTip(tr("The path to the folder that contains images. The image extension must be precised with /*.extension at the end of the path. Example: '/home/experiments/*.png'."));
 
 
     pathField = new QLineEdit(this);
@@ -123,7 +129,7 @@ MainWindow::MainWindow(QWidget *parent) :
     numLabel = new QLabel(this);
     numLabel->setText("Number of objects:");
     numLabel->adjustSize();
-    numLabel->setToolTip(tr("Number of objects to track, can't be changed during the tracking phase."));
+    numLabel->setToolTip(tr("The number of objects to track, can't be changed during the tracking phase."));
 
 
     numField = new QLineEdit(this);
@@ -133,7 +139,7 @@ MainWindow::MainWindow(QWidget *parent) :
     maxArea = new QLabel(this);
     maxArea->setText("Maximal area:");
     maxArea->adjustSize();
-    maxArea->setToolTip(tr("Maximal area in px of objects to track."));
+    maxArea->setToolTip(tr("The maximal area in pixels of objects to track."));
 
     maxAreaField = new QLineEdit(this);
     maxAreaField->setText(defParameters.at(2));
@@ -142,7 +148,7 @@ MainWindow::MainWindow(QWidget *parent) :
     minArea = new QLabel(this);
     minArea->setText("Minimal area:");
     minArea->adjustSize();
-    minArea->setToolTip(tr("Minimal area in px of objects to track."));
+    minArea->setToolTip(tr("The minimal area in pixels of objects to track."));
 
 
     minAreaField = new QLineEdit(this);
@@ -152,7 +158,7 @@ MainWindow::MainWindow(QWidget *parent) :
     thresh = new QLabel(this);
     thresh->setText("Binary threshold:");
     thresh->adjustSize();
-    thresh->setToolTip(tr("Binary threshold, image[i,j] < thresh = 0, image[i,j] > thresh = 1."));
+    thresh->setToolTip(tr("Binary threshold, if image[i,j] > thresholdValue = 0, image[i,j] < thresholdValue = 255."));
 
 
     threshField = new QLineEdit(this);
@@ -161,9 +167,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
     length = new QLabel(this);
-    length->setText("Max displacement:");
+    length->setText("Maximal displacement:");
     length->adjustSize();
-    length->setToolTip(tr("Maximal displacement possible of an object between two frames in px."));
+    length->setToolTip(tr("The maximal displacement possible of an object between two consecutive images in pixels."));
 
 
 
@@ -172,9 +178,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
     angle = new QLabel(this);
-    angle->setText("Max angle:");
+    angle->setText("Maximal angle:");
     angle->adjustSize();
-    angle->setToolTip(tr("Maximal orientation change of an object between two frames in degree."));
+    angle->setToolTip(tr("The maximal change in the orientation of an object between two consecutive images."));
 
 
     angleField = new QLineEdit(this);
@@ -183,9 +189,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
     lo = new QLabel(this);
-    lo->setText("Max occlusion:");
+    lo->setText("Maximum occlusion:");
     lo->adjustSize();
-    lo->setToolTip(tr("Maximum distance in px that an object can move when it is occulted by another object."));
+    lo->setToolTip(tr("The maximum distance in pixels that an object can travel when it is occulted by another object."));
 
 
 
@@ -196,7 +202,7 @@ MainWindow::MainWindow(QWidget *parent) :
     w = new QLabel(this);
     w->setText("Weight:");
     w->adjustSize();
-    w->setToolTip(tr("Importance of orientation and distance for the tracking. Closer to 0 the tracking is more sensitive to the orientation of objects and closer to 1 is more sensitive to the distance."));
+    w->setToolTip(tr("Importance of orientation and distance for the tracking. Closer to 0 the tracking is more sensitive to the change in orientation and closer to 1 is more sensitive to the distance between objects."));
 
 
 
@@ -218,7 +224,7 @@ MainWindow::MainWindow(QWidget *parent) :
     save = new QLabel(this);
     save->setText("Save to:");
     save->adjustSize();
-    save->setToolTip(tr("Path to a .txt file where the result of the tracking will be saved. Saved in the reference frame of the croped image."));
+    save->setToolTip(tr("Path to an output.txt file where the result of the tracking will be saved."));
 
 
     saveField = new QLineEdit(this);
@@ -287,6 +293,7 @@ MainWindow::MainWindow(QWidget *parent) :
     fps = new QLabel(this);
     fps -> setText("FPS:");
     fps -> hide();
+    fps->setToolTip(tr("Set the framerate to replay the tracking."));
 
 
     fpsField = new QLCDNumber(this);
