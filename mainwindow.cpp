@@ -686,7 +686,6 @@ void MainWindow::Display(Mat visu, UMat cameraFrame){
     }
 
     else if (normal->isChecked() && !binary->isChecked()){ // Display just the original image
-        Size size = visu.size();
 
         int w = display->width();
         int h = display->height();
@@ -696,7 +695,7 @@ void MainWindow::Display(Mat visu, UMat cameraFrame){
     }
 
     else if (!normal->isChecked() && binary->isChecked()){ //Display just the binary mask
-        Size size = cameraFrame.size();
+
         int w = display->width();
         int h = display->height();
 
@@ -705,7 +704,7 @@ void MainWindow::Display(Mat visu, UMat cameraFrame){
     }
 
     else if (normal->isChecked() && binary->isChecked()){ // Display the original image and the binary mask
-        Size size = cameraFrame.size();
+
         int w = display->width();
         int h = display->height();
 
@@ -802,7 +801,6 @@ void MainWindow::Replay(){
 
 
    cvtColor(visu,visu,CV_BGR2RGB);
-   Size size = visu.size();
 
    int w = display->width();
    int h = display->height();

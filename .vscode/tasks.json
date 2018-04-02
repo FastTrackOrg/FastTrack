@@ -6,7 +6,7 @@
         {
             "label": "echo",
             "type": "shell",
-            "command": "qmake Fishy.pro -spec linux-g++ CON CONFIG+=qml_debug && /usr/bin/make qmake_all Fishy.pro; make; rm Makefile; rm ../Fishy_build/*.o; rm ../Fishy_build/moc_*; ../Fishy_build/./Fishy",
+            "command": "qmake Fishy.pro -spec linux-g++ CON CONFIG+=qml_debug && /usr/bin/make qmake_all Fishy.pro; make; rm Makefile; rm -R ../Fishy_build/.ui; rm -R ../Fishy_build/.qrc; rm -R ../Fishy_build/.obj; rm -R ../Fishy_build/.moc; ../Fishy_build/./Fishy",
             "group": {
                 "kind": "build",
                 "isDefault": true
