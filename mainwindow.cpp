@@ -520,6 +520,7 @@ void MainWindow::Go(){
             string name = *a;
             progressBar ->setRange(0, files.size());
             background = BackgroundExtraction(files, nBackground);
+            background.convertTo(background, CV_8U, 0.5, 128);
             vector<vector<Point> > tmp(NUMBER, vector<Point>());
             memory = tmp;
             colorMap = Color(NUMBER);
@@ -537,9 +538,12 @@ void MainWindow::Go(){
 
         Rect ROI(x1, y1, x2 - x1, y2 - y1);
         imread(name, IMREAD_GRAYSCALE).copyTo(cameraFrame);
+        cameraFrame.convertTo(cameraFrame, CV_8U, 0.5, 0);
         visu = cameraFrame.getMat(ACCESS_FAST).clone();
         cvtColor(visu,visu, CV_GRAY2RGB);
         subtract(background, cameraFrame, cameraFrame);
+
+        //subtract(background, cameraFrame, cameraFrame);
         Binarisation(cameraFrame, 'b', threshValue);
         cameraFrame = cameraFrame(ROI);
         visu = visu(ROI);
