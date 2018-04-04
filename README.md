@@ -13,7 +13,7 @@
 3. Open the folder FishyTracking and execute Fishy.exe
 
 ## Installation for Mac
-1. Not supported.
+1. The MacOS version will be release early April.
 
 
 # Quick start
@@ -91,9 +91,14 @@ The software shows an error message after clicking the Go button without showing
 
 # WIP
 
-##Parameters
+## Parameters
 
 1. Auto setting of maximal and minimal area of the object.
-2. Binary threshold: not tested and adjusted for white object on black background.
-3. Spot to track: automatically find head or tail for different type of animal.
+2. Spot to track: automatically find head or tail for different type of animals.
+
+
+# Recent updates
+
+1. White objects on black background are supported after the version 3.6.1.
+2. The ROI can be now auto set at the image size by setting its parameters at 0.
 
