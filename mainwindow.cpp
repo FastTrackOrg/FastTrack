@@ -693,6 +693,12 @@ void MainWindow::Go(){
 */
 void MainWindow::Display(Mat visu, UMat cameraFrame){
 
+    int w = display->width();
+    int h = display->height();
+    int w2 = display2->width();
+    int h2 = display2->height();
+
+
     if (!normal->isChecked() && !binary->isChecked()){ // Display nothing
         display->clear();
         display2->clear();
@@ -700,17 +706,11 @@ void MainWindow::Display(Mat visu, UMat cameraFrame){
 
     else if (normal->isChecked() && !binary->isChecked()){ // Display just the original image
 
-        int w = display->width();
-        int h = display->height();
-
         display->setPixmap(QPixmap::fromImage(QImage(visu.data, visu.cols, visu.rows, visu.step, QImage::Format_RGB888)).scaled(w, h, Qt::KeepAspectRatio));
         display2->clear();
     }
 
     else if (!normal->isChecked() && binary->isChecked()){ //Display just the binary mask
-
-        int w = display->width();
-        int h = display->height();
 
         display->setPixmap(QPixmap::fromImage(QImage(cameraFrame.getMat(cv::ACCESS_READ).data, cameraFrame.cols, cameraFrame.rows, cameraFrame.step, QImage::Format_Grayscale8)).scaled(w, h, Qt::KeepAspectRatio));
         display2->clear();
@@ -718,11 +718,8 @@ void MainWindow::Display(Mat visu, UMat cameraFrame){
 
     else if (normal->isChecked() && binary->isChecked()){ // Display the original image and the binary mask
 
-        int w = display->width();
-        int h = display->height();
-
         display->setPixmap(QPixmap::fromImage(QImage(visu.data, visu.cols, visu.rows, visu.step, QImage::Format_RGB888)).scaled(w, h, Qt::KeepAspectRatio));
-        display2->setPixmap(QPixmap::fromImage(QImage(cameraFrame.getMat(cv::ACCESS_READ).data, cameraFrame.cols, cameraFrame.rows, cameraFrame.step, QImage::Format_Grayscale8)).scaled(w, h, Qt::KeepAspectRatio));
+        display2->setPixmap(QPixmap::fromImage(QImage(cameraFrame.getMat(cv::ACCESS_READ).data, cameraFrame.cols, cameraFrame.rows, cameraFrame.step, QImage::Format_Grayscale8)).scaled(w2, h2, Qt::KeepAspectRatio));
     }
 
 }
