@@ -23,6 +23,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     setWindowState(Qt::WindowMaximized);
     setWindowTitle("Fishy Tracking");
+    statusBar()->showMessage(tr("Ready"));
+
 
     // Setup style
     QFile stylesheet(":/darkTheme.qss");
@@ -321,12 +323,13 @@ MainWindow::MainWindow(QWidget *parent) :
 
     display = new QLabel(this);
     display->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+    display->setObjectName("display");
 
 
 
     display2 = new QLabel(this);
     display2->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
-
+    display2->setObjectName("display2");
 
 
     progressBar = new QProgressBar(this);
@@ -489,6 +492,7 @@ void MainWindow::Go(){
         numField->setDisabled(true);
         nBackField->setDisabled(true);
         saveField->setDisabled(true);
+        statusBar()->showMessage(tr("Running"));
 
 
 
@@ -643,6 +647,7 @@ void MainWindow::Go(){
            trackingSpot->hide();
            trackingSpotLabel->hide();
            im = 0;
+           statusBar()->showMessage(tr("Done"));
            QMessageBox msgBox;
            msgBox.setText("The tracking is done!!! \n You can replay the tracking by clicking the replay button.");
            msgBox.exec();
