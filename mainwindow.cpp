@@ -538,7 +538,7 @@ void MainWindow::Go(){
 
 
         string name = *a;
-        savefile.open(savePath);
+        savefile.open(savePath); // Erase previous output file if exist
 
         Rect ROI(x1, y1, x2 - x1, y2 - y1);
         imread(name, IMREAD_GRAYSCALE).copyTo(cameraFrame);
