@@ -85,7 +85,9 @@ MainWindow::MainWindow(QWidget *parent) :
     ResetButton ->setToolTip(tr("Press to reset Fishy Tracking."));
 
     GoButton = new QPushButton("Go", this);
-    QObject::connect(GoButton, SIGNAL(clicked()), this, SLOT(Go()));
+    logConnection = new QMetaObject::Connection;
+    *logConnection = QObject::connect(GoButton, SIGNAL(clicked()), this, SLOT(logInit())); // Order of this two connects
+    QObject::connect(GoButton, SIGNAL(clicked()), this, SLOT(Go()));      // is crutial !!! this connection will be destroy after first execution to avoid erase the output file
     GoButton ->setToolTip(tr("Press to begin the tracking."));
 
     PauseButton = new QPushButton("Pause", this);
@@ -414,11 +416,24 @@ MainWindow::MainWindow(QWidget *parent) :
     imr = 0; // Internal counter for the replay
     timerReplay = new QTimer(this); 
     connect(timerReplay, SIGNAL(timeout()), this, SLOT(Replay())); // Replaying
-
-
     QObject::connect(PauseButton, SIGNAL(clicked()), this, SLOT(PlayPause()));
 
+
 }
+
+
+/**
+    * @logInit: open text file for output and log.
+*/
+void MainWindow::logInit(){
+    
+    savePath = saveField->text().toStdString();
+    savefile.open(savePath);
+    QObject::disconnect(*logConnection); // Delete the connection to avoid erasing the file by clicking another time on the GoButton
+
+}
+
+
 
 
 /**
@@ -505,6 +520,7 @@ void MainWindow::Go(){
             nBackground = nBackField->text().toInt();
             NUMBER = numField->text().toInt(); //number of objects to track
 
+
             try{
                 glob(folder, files, false);
                 checkPath(pathField->text());
@@ -527,9 +543,7 @@ void MainWindow::Go(){
             background.convertTo(background, CV_8U, 0.5, 128);
             vector<vector<Point> > tmp(NUMBER, vector<Point>());
             memory = tmp;
-            colorMap = Color(NUMBER);
-            savePath = saveField->text().toStdString();
-            
+            colorMap = Color(NUMBER);            
 
             for(unsigned int ini = 0; ini < files.size()*NUMBER; ini++){
                 internalSaving.push_back(Point3f(0., 0., 0.));
@@ -538,7 +552,7 @@ void MainWindow::Go(){
 
 
         string name = *a;
-        savefile.open(savePath); // Erase previous output file if exist
+
 
         Rect ROI(x1, y1, x2 - x1, y2 - y1);
         imread(name, IMREAD_GRAYSCALE).copyTo(cameraFrame);
@@ -546,8 +560,6 @@ void MainWindow::Go(){
         visu = cameraFrame.getMat(ACCESS_FAST).clone();
         cvtColor(visu,visu, CV_GRAY2RGB);
         subtract(background, cameraFrame, cameraFrame);
-
-        //subtract(background, cameraFrame, cameraFrame);
         Binarisation(cameraFrame, 'b', threshValue);
         cameraFrame = cameraFrame(ROI);
         visu = visu(ROI);
@@ -618,8 +630,6 @@ void MainWindow::Go(){
             coord.x += ROI.tl().x;
             coord.y += ROI.tl().y;
             internalSaving.at(im*NUMBER + l) = coord;
-            ofstream savefile;
-            savefile.open(savePath, ios::out | ios::app );
             if(im == 0 && l == 0){
                 savefile << "xHead" << "   " << "yHead" << "   " << "tHead" << "   "  << "xTail" << "   " << "yTail" << "   " << "tTail"   <<  "   " << "xBody" << "   " << "yBody" << "   " << "tBody"   <<  "   " << "curvature" <<  "   " << "imageNumber" << "\n";
             }
@@ -651,6 +661,7 @@ void MainWindow::Go(){
            QMessageBox msgBox;
            msgBox.setText("The tracking is done!!! \n You can replay the tracking by clicking the replay button.");
            msgBox.exec();
+           savefile.close();
        }
     }
 
