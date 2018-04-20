@@ -429,7 +429,18 @@ void MainWindow::logInit(){
     
     savePath = saveField->text().toStdString();
     savefile.open(savePath);
+
+    string folder = pathField->text().toStdString();
+    size_t found = folder.find("/*");
+    string logPath = folder.substr (0,found) + "/log.txt";
+
+    log.open(logPath);
+
+    log << "Log file of Fishy Tracking" << '\n' << "Software version: " << version.toStdString() << '\n';
+
     QObject::disconnect(*logConnection); // Delete the connection to avoid erasing the file by clicking another time on the GoButton
+ 
+    
 
 }
 
@@ -673,6 +684,7 @@ void MainWindow::Go(){
         pathError.setText("The ROI does not fit the image size or there is no object in the image. Please try changing the ROI and the minimal area of the object.");
         x2ROIField->setStyleSheet("background-color: red;");
         y2ROIField->setStyleSheet("background-color: red;");
+        log << "ROI error image: " << to_string(im) << '\n';
         pathError.exec();
     }
 
@@ -684,6 +696,7 @@ void MainWindow::Go(){
         pathError.setText("Too many objects in the image that indicated in parameters, try to increase the number of objects or to increase the minimal area of an object.");
         binary ->setChecked(1);
         binary ->isChecked();
+        log << "Out of range error image: " << to_string(im) << '\n';
         emit grabFrame(visu, cameraFrame);
         pathError.exec();
     }
@@ -695,6 +708,7 @@ void MainWindow::Go(){
         pause = false;
         QMessageBox pathError;
         pathError.setText(exc.what());
+        log << exc.what() << to_string(im) << '\n';
         pathError.exec();
     }
 

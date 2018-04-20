@@ -122,6 +122,7 @@ private:
     unsigned int im;
     unsigned int imr;
     ofstream savefile;
+    ofstream log;
     vector<Point3f> internalSaving;
     int spot;
     int arrowSize;
