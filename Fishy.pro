@@ -30,7 +30,7 @@ SOURCES += \
         functions.cpp \
         Hungarian.cpp
 
-QMAKE_CXXFLAGS += -std=c++11
+QMAKE_CXXFLAGS += -std=c++11 -O3
 
 
 INCLUDEPATH += /usr/include/opencv
