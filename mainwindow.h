@@ -58,6 +58,7 @@ private:
     QMetaObject::Connection *logConnection;
 
     QWidget *central;
+    QComboBox *theme;
     QLayout *layout;
     QLabel *refreshRateLabel;
     QLabel *path;
@@ -153,6 +154,8 @@ public slots:
     void checkPath(QString);
     void setSavePath(QString);
     void logInit();
+    void pathAquisition();
+    void changeTheme(int index);
 
 signals:
     void grabFrame(Mat visu, UMat cameraFrame);
