@@ -9,6 +9,7 @@
 #include <string>
 #include <functions.h>
 #include <opencv2/core/ocl.hpp>
+#include <ctime>
 
 
 
@@ -579,7 +580,7 @@ void MainWindow::Go(){
 
             timer->start();
             UpdateParameters();
-            string folder = pathField->text().toStdString();
+            folder = pathField->text().toStdString();
             nBackground = nBackField->text().toInt();
             NUMBER = numField->text().toInt(); //number of objects to track
 
@@ -697,6 +698,10 @@ void MainWindow::Go(){
             coord.y += ROI.tl().y;
             internalSaving.at(im*NUMBER + l) = coord;
             if(im == 0 && l == 0){
+                time_t now = time(0);
+                char* dt = ctime(&now);
+                dt[strlen(dt) - 1] = '\t';
+                savefile << dt << folder << '\n';
                 savefile << "xHead" << "   " << "yHead" << "   " << "tHead" << "   "  << "xTail" << "   " << "yTail" << "   " << "tTail"   <<  "   " << "xBody" << "   " << "yBody" << "   " << "tBody"   <<  "   " << "curvature" <<  "   " << "imageNumber" << "\n";
             }
 

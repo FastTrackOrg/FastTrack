@@ -142,6 +142,7 @@ private:
     int nBackground;
     int threshValue;
     string savePath;
+    string folder;
     bool pause;
 
 public slots:
