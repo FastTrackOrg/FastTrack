@@ -55,7 +55,7 @@ private:
     QCheckBox *binary;
     QCheckBox *registration;
     QMessageBox *welcomeBox;
-    QString version = "v3.6.3";
+    QString version = "v3.7.0";
     QMetaObject::Connection *logConnection;
 
     QWidget *central;

@@ -44,7 +44,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // Welcome message
     welcomeBox = new QMessageBox;
-    welcomeBox ->setText("Check new versions at https://github.com/bgallois/FishyTracking/releases.\n © Benjamin GALLOIS benjamin.gallois@upmc.fr. \n You can subscribe to the mailing list to be kept informed of new releases: http://benjamin-gallois.fr/fishyTracking.html");
+    welcomeBox ->setText("Check new versions at https://git.benjamin-gallois.fr/bgallois/FishyTracking.\n © Benjamin GALLOIS benjamin.gallois@upmc.fr. \n You can subscribe to the mailing list to be kept informed of new releases: http://fishytracking.benjamin-gallois.fr");
 
 
     // Default parameters reading
