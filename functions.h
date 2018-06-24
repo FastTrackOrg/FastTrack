@@ -60,10 +60,10 @@ vector<Point3f> Reassignment(vector<Point3f> inputPrev, vector<Point3f> input, v
 UMat BackgroundExtraction(vector<String> files, double n);
 
 
-void Registration(UMat imageReference, UMat frame);
+void Registration(UMat imageReference, UMat& frame);
 
 
-void Binarisation(UMat frame, char backgroundColor, int value);
+void Binarisation(UMat& frame, char backgroundColor, int value);
 
 
 vector<vector<Point3f> > ObjectPosition(UMat frame, int minSize, int maxSize);

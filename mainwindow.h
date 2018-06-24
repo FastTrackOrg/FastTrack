@@ -53,6 +53,7 @@ private:
     QPushButton *ReplayButton;
     QCheckBox *normal;
     QCheckBox *binary;
+    QCheckBox *registration;
     QMessageBox *welcomeBox;
     QString version = "v3.6.3";
     QMetaObject::Connection *logConnection;
@@ -154,7 +155,6 @@ public slots:
     void checkPath(QString);
     void setSavePath(QString);
     void logInit();
-    void pathAquisition();
     void changeTheme(int index);
 
 signals:

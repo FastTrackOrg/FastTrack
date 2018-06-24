@@ -330,6 +330,11 @@ MainWindow::MainWindow(QWidget *parent) :
     trackingSpot ->addItem(tr("Center of mass"));
     trackingSpot ->adjustSize();
 
+    registration = new QCheckBox("Registration", this);
+    registration ->setChecked(1);
+    registration ->isChecked();
+    registration ->setToolTip(tr("Register the image."));
+
 
 
     display = new QLabel(this);
@@ -378,6 +383,7 @@ MainWindow::MainWindow(QWidget *parent) :
     layout->addWidget(x2ROIField, 2, 7);
     layout->addWidget(y1ROIField, 3, 7);
     layout->addWidget(y2ROIField, 4, 7);
+    layout->addWidget(registration, 5, 7);
 
     layout->addWidget(arrow, 0, 9);
     layout->addWidget(arrowField, 0, 10);
@@ -598,6 +604,7 @@ void MainWindow::Go(){
             progressBar ->setRange(0, files.size());
             background = BackgroundExtraction(files, nBackground);
             background.convertTo(background, CV_8U, 0.5, 128);
+            imread(name, IMREAD_GRAYSCALE).copyTo(img0);
             vector<vector<Point> > tmp(NUMBER, vector<Point>());
             memory = tmp;
             colorMap = Color(NUMBER);            
@@ -613,6 +620,9 @@ void MainWindow::Go(){
 
         Rect ROI(x1, y1, x2 - x1, y2 - y1);
         imread(name, IMREAD_GRAYSCALE).copyTo(cameraFrame);
+        if(registration->isChecked()){
+            Registration(img0, cameraFrame);
+        }
         cameraFrame.convertTo(cameraFrame, CV_8U, 0.5, 0);
         visu = cameraFrame.getMat(ACCESS_FAST).clone();
         cvtColor(visu,visu, CV_GRAY2RGB);
@@ -638,13 +648,12 @@ void MainWindow::Go(){
             }
 
             else if(out.at(0).empty()){ // Error message
-                timer->stop();
-                QMessageBox errorBox;
-                errorBox.setText("No fish detected! Change parameters!");
-                binary ->setChecked(1);
-                binary ->isChecked();
-                emit grabFrame(visu, cameraFrame);
-                errorBox.exec();
+                for(int i = 0; i < NUMBER; i++){
+                    out.at(0).push_back(Point3f(0, 0, 0));
+                    out.at(1).push_back(Point3f(0, 0, 0));
+                    out.at(2).push_back(Point3f(0, 0, 0));
+                    out.at(3).push_back(Point3f(0, 0, 0));
+                }
 
             }
 

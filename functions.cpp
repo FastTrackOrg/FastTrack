@@ -6,7 +6,7 @@
 										@email benjamin.gallois@upmc.fr
 										@website benjamin-gallois.fr
 								    @version 2.0
-										@date 2017
+										@date 2018
 ###############################################################################################*/
 
 /*
@@ -44,8 +44,8 @@ Point2f CurvatureCenter(Point3f tail, Point3f head){
 
 	Point2f center;
 
-	Point p1 = Point(tail.x + 10*cos(tail.z + 0.5*M_PI), tail.y + 10*sin(tail.z + 0.5*M_PI)); 
-	Point p2 = Point(head.x + 10*cos(head.z + 0.5*M_PI), head.y + 10*sin(head.z + 0.5*M_PI)); 
+	Point p1 = Point(tail.x + 10*cos(tail.z + 0.5*M_PI), tail.y + 10*sin(tail.z + 0.5*M_PI));
+	Point p2 = Point(head.x + 10*cos(head.z + 0.5*M_PI), head.y + 10*sin(head.z + 0.5*M_PI));
 
 	double a = (tail.y - p1.y)/(tail.x - p1.x);
 	double c = (head.y - p2.y)/(head.x - p2.x);
@@ -129,33 +129,30 @@ vector<double> Orientation(UMat image, bool dir) {
 
 
 	if(dir == true){ // Orientation computation
-		//Two methods available here to compute the direction
 
-		//////////////////////With a rotation of image/////////////////////////////////////
-        UMat rotate;
+    UMat rotate;
 		Point center = Point(image.cols*0.5, image.rows*0.5);
-        Mat rotMatrix = getRotationMatrix2D(center, -orientationDeg, 1);
+    Mat rotMatrix = getRotationMatrix2D(center, -orientationDeg, 1);
 		Rect bbox = RotatedRect(center, image.size(), -orientationDeg).boundingRect();
 		rotMatrix.at<double>(0,2) += bbox.width*0.5 - center.x; //add an off set
-	    rotMatrix.at<double>(1,2) += bbox.height*0.5 - center.y;// to rotate without cropping the frame
+	  rotMatrix.at<double>(1,2) += bbox.height*0.5 - center.y;// to rotate without cropping the frame
 		warpAffine(image, rotate, rotMatrix, bbox.size());
 
 		vector<double> tmpMat;
 		vector<double> tmp;
 
-        reduce(rotate, tmpMat, 0, CV_REDUCE_SUM);
+    reduce(rotate, tmpMat, 0, CV_REDUCE_SUM);
 
 		double ccMax = *max_element(tmpMat.begin(), tmpMat.end())/100;
 		for (unsigned int it = 0; it < tmpMat.size(); ++it){
 			int cc = tmpMat.at(it);
 			for (int jt = 0; jt < cc/ccMax; ++jt){
-			  tmp.push_back((double)(it+1));
+				  tmp.push_back((double)(it+1));
 			}
 		}
 
 
-        double mean = accumulate(tmp.begin(), tmp.end(), 0)/(double)tmp.size();
-
+    double mean = accumulate(tmp.begin(), tmp.end(), 0)/(double)tmp.size();
 
 		double sd = 0 , skew = 0;
 
@@ -182,11 +179,11 @@ vector<double> Orientation(UMat image, bool dir) {
 
 
 
-/**	
+/**
   * @BackgroundExtraction extracts the background of a film with moving object by projection
   * @param vector<String> files: array with the path of images
-  @param double n: number of frames to average 
-  * @return Mat: background image of a movie
+  @param double n: number of frames to average
+  * @return UMat: background image of a movie
 */
 UMat BackgroundExtraction(vector<String> files, double n){
 
@@ -196,26 +193,23 @@ UMat BackgroundExtraction(vector<String> files, double n){
     imread(files[0], IMREAD_GRAYSCALE).copyTo(img0);
     background.convertTo(background, CV_32F);
     img0.convertTo(img0, CV_32F);
-    Rect registrationFrame(0, 0, 200, 50);
     int step = files.size()/n;
-    //Mat tmp = imread(files[0], IMREAD_GRAYSCALE);
     UMat tmp;
     UMat cameraFrameReg;
     Mat H;
     UMat identity = UMat::ones(background.rows, background.cols, CV_32F);
 
 	for(unsigned int i = 1; i < files.size(); i += step){
-        //tmp = imread(files[i], IMREAD_GRAYSCALE);
         imread(files[i], IMREAD_GRAYSCALE).copyTo(tmp);
         tmp.convertTo(tmp, CV_32F);
-        cameraFrameReg = tmp(registrationFrame);
-		img0 = img0(registrationFrame);
+        cameraFrameReg = tmp;
+				img0 = img0;
         Point2d shift = phaseCorrelate(cameraFrameReg, img0);
         H = (Mat_<float>(2, 3) << 1.0, 0.0, shift.x, 0.0, 1.0, shift.y);
-		warpAffine(tmp, tmp, H, tmp.size());
-		accumulate(tmp, background);
+				warpAffine(tmp, tmp, H, tmp.size());
+				accumulate(tmp, background);
 	}
-    //background /= (n-1);
+
     multiply(background, identity, background, 1/(n-1));
     background.convertTo(background, CV_8U);
 
@@ -227,20 +221,17 @@ UMat BackgroundExtraction(vector<String> files, double n){
 
 /**
   * @Registration makes the registration of a movie by phase correlation
-  * @param Mat imageReference: reference image for the registration, one channel
-	* @param Mat frame: image to register
+  * @param UMat imageReference: reference image for the registration, one channel
+	* @param UMat frame: image to register
 */
-void Registration(UMat imageReference, UMat frame){
+void Registration(UMat imageReference, UMat& frame){
 
-	//Rect registrationFrame(0, 0, 500, 500);
 	frame.convertTo(frame, CV_32FC1);
 	imageReference.convertTo(imageReference, CV_32FC1);
-	//imageReference = imageReference(registrationFrame);
-	//Mat frameReg = frame(registrationFrame);
-
 	Point2d shift = phaseCorrelate(frame, imageReference);
     Mat H = (Mat_<float>(2, 3) << 1.0, 0.0, shift.x, 0.0, 1.0, shift.y);
 	warpAffine(frame, frame, H, frame.size());
+    frame.convertTo(frame, CV_8U);
 }
 
 
@@ -248,15 +239,14 @@ void Registration(UMat imageReference, UMat frame){
 
 /**
   * @Binarisation binarizes the image by an Otsu threshold
-  * @param Mat frame: image to binarized
+  * @param UMat frame: image to binarized
 	* @param char backgroundColor: 'b' if the background is black, 'w' is the background is white
 */
-void Binarisation(UMat frame, char backgroundColor, int value){
+void Binarisation(UMat& frame, char backgroundColor, int value){
 
-    frame.convertTo(frame, CV_8U);
+  frame.convertTo(frame, CV_8U);
 
 	if(backgroundColor == 'b'){
-		//threshold(frame, frame, 0, 255, CV_THRESH_BINARY| CV_THRESH_OTSU);
         threshold(frame, frame, value, 255, CV_THRESH_BINARY);
 	}
 
@@ -270,7 +260,7 @@ void Binarisation(UMat frame, char backgroundColor, int value){
 
 /**
   * @ObjectPosition Computes positions of multiples objects of size between min and max size by finding contours
-  * @param Mat frame: binary image CV_8U
+  * @param UMat frame: binary image CV_8U
 	* @param int minSize: minimal size of the object
 	* @param int maxSize: maximal size of the object
   * @return vector<vector<Point3f>>: {head parameters, tail parameters, global parameter}, {head/tail parameters} = {x, y, orientation}, {global parameter} = {curvature, 0, 0}
@@ -280,16 +270,16 @@ vector<vector<Point3f>> ObjectPosition(UMat frame, int minSize, int maxSize){
 	vector<vector<Point> > contours;
 	vector<Point3f> positionHead;
 	vector<Point3f> positionTail;
-    vector<Point3f> positionFull;
+	vector<Point3f> positionFull;
 	vector<Point3f> globalParam;
-    UMat dst;
-    Rect roiFull, bbox;
-    UMat RoiFull, RoiHead, RoiTail, rotate;
-    Mat rotMatrix, p, pp;
-    vector<double> parameter;
-    vector<double> parameterHead;
-    vector<double> parameterTail;
-    Point2f radiusCurv;
+	UMat dst;
+	Rect roiFull, bbox;
+	UMat RoiFull, RoiHead, RoiTail, rotate;
+	Mat rotMatrix, p, pp;
+	vector<double> parameter;
+	vector<double> parameterHead;
+	vector<double> parameterTail;
+	Point2f radiusCurv;
 
 	findContours(frame, contours, CV_RETR_LIST, CV_CHAIN_APPROX_NONE);
 
@@ -298,85 +288,83 @@ vector<vector<Point3f>> ObjectPosition(UMat frame, int minSize, int maxSize){
 	for (unsigned int i = 0; i < contours.size(); i++){
 
 			if(contourArea(contours[i]) > minSize && contourArea(contours[i]) < maxSize){ // Only select objects minArea << objectArea <<maxArea
-				
-                dst = UMat::zeros(frame.size(), CV_8U);
-                drawContours(dst, contours, i, Scalar(255, 255, 255), CV_FILLED,8); // Draw the fish in a temporary black image,avoid select a part of another fish if two fish are very close
-				
-                roiFull = boundingRect(contours[i]);
-                RoiFull = dst(roiFull);
 
-				parameter = Orientation(RoiFull, true); // In RoiFull coordinates: x, y, orientation
-				double angleFull = parameter.at(2);
+						dst = UMat::zeros(frame.size(), CV_8U);
+						drawContours(dst, contours, i, Scalar(255, 255, 255), CV_FILLED,8); // Draw the fish in a temporary black image,avoid select a part of another fish if two fish are very close
 
+						roiFull = boundingRect(contours[i]);
+						RoiFull = dst(roiFull);
 
+						parameter = Orientation(RoiFull, true); // In RoiFull coordinates: x, y, orientation
+						double angleFull = parameter.at(2);
 
-				Point center = Point(0.5*RoiFull.cols, 0.5*RoiFull.rows);
-                rotMatrix = getRotationMatrix2D(center, -(parameter.at(2)*180)/M_PI, 1);              
-                bbox = RotatedRect(center, RoiFull.size(), -(parameter.at(2)*180)/M_PI).boundingRect();
-				rotMatrix.at<double>(0,2) += bbox.width*0.5 - center.x; //add an off set
-    			rotMatrix.at<double>(1,2) += bbox.height*0.5 - center.y;// to rotate without cropping the frame
-				warpAffine(RoiFull, rotate, rotMatrix, bbox.size());
+						Point center = Point(0.5*RoiFull.cols, 0.5*RoiFull.rows);
+						rotMatrix = getRotationMatrix2D(center, -(parameter.at(2)*180)/M_PI, 1);
+						bbox = RotatedRect(center, RoiFull.size(), -(parameter.at(2)*180)/M_PI).boundingRect();
+						rotMatrix.at<double>(0,2) += bbox.width*0.5 - center.x; //add an off set
+						rotMatrix.at<double>(1,2) += bbox.height*0.5 - center.y;// to rotate without cropping the frame
+						warpAffine(RoiFull, rotate, rotMatrix, bbox.size());
 
-                p = (Mat_<double>(3,1) << parameter.at(0), parameter.at(1), 1);
-				
-                pp = rotMatrix * p; // center of mass of fish in  the rotated coordinate system
+						p = (Mat_<double>(3,1) << parameter.at(0), parameter.at(1), 1);
+
+						pp = rotMatrix * p; // center of mass of fish in  the rotated coordinate system
 
 
-				// Head ellipse
-                Rect roiHead(pp.at<double>(0,0), 0, rotate.cols-pp.at<double>(0,0), rotate.rows);
-                RoiHead = rotate(roiHead);
-                parameterHead = Orientation(RoiHead, false); // In RoiHead coordinates: xHead, yHead, orientationHead
+						// Head ellipse
+						Rect roiHead(pp.at<double>(0,0), 0, rotate.cols-pp.at<double>(0,0), rotate.rows);
+						RoiHead = rotate(roiHead);
+						parameterHead = Orientation(RoiHead, false); // In RoiHead coordinates: xHead, yHead, orientationHead
 
-				// Tail ellipse
-                Rect roiTail(0, 0, pp.at<double>(0,0), rotate.rows);
-                RoiTail = rotate(roiTail);
-                parameterTail = Orientation(RoiTail, false); // In RoiHead coordinates: xHead, yHead, orientationHead
-
-
-				invertAffineTransform(rotMatrix, rotMatrix);
-
-				p = (Mat_<double>(3,1) << parameterHead.at(0) + roiHead.tl().x,parameterHead.at(1) + roiHead.tl().y, 1);
-
-				pp = rotMatrix * p;
-
-				double xHead = pp.at<double>(0,0) + roiFull.tl().x;
-				double yHead = pp.at<double>(1,0) + roiFull.tl().y;
-
-				double angleHead = parameterHead.at(2) - M_PI*(parameterHead.at(2) > M_PI);
-				angleHead = Modul(angleHead + angleFull + M_PI*(abs(angleHead) > 0.5*M_PI)); // Computes the direction
-				 
+						// Tail ellipse
+						Rect roiTail(0, 0, pp.at<double>(0,0), rotate.rows);
+						RoiTail = rotate(roiTail);
+						parameterTail = Orientation(RoiTail, false); // In RoiHead coordinates: xHead, yHead, orientationHead
 
 
-				p = (Mat_<double>(3,1) << parameterTail.at(0) + roiTail.tl().x, parameterTail.at(1) + roiTail.tl().y, 1);
+						invertAffineTransform(rotMatrix, rotMatrix);
 
-				pp = rotMatrix * p;
+						p = (Mat_<double>(3,1) << parameterHead.at(0) + roiHead.tl().x,parameterHead.at(1) + roiHead.tl().y, 1);
 
+						pp = rotMatrix * p;
 
-				double xTail = pp.at<double>(0,0) + roiFull.tl().x;
-				double yTail = pp.at<double>(1,0) + roiFull.tl().y;
+						double xHead = pp.at<double>(0,0) + roiFull.tl().x;
+						double yHead = pp.at<double>(1,0) + roiFull.tl().y;
 
-				double angleTail = parameterTail.at(2) - M_PI*(parameterTail.at(2) > M_PI);
-				angleTail = Modul(angleTail + angleFull + M_PI*(abs(angleTail) > 0.5*M_PI)); // Computes the direction
+						double angleHead = parameterHead.at(2) - M_PI*(parameterHead.at(2) > M_PI);
+						angleHead = Modul(angleHead + angleFull + M_PI*(abs(angleHead) > 0.5*M_PI)); // Computes the direction
 
 
 
-				//Curvature
-                double curv = 1./1e-16;
-                radiusCurv = CurvatureCenter(Point3f(xTail, yTail, angleTail), Point3f(xHead, yHead, angleHead));
-				if(radiusCurv.x != NAN){ // 
-                    curv = Curvature(radiusCurv, RoiFull.getMat(ACCESS_READ));
-				}
+						p = (Mat_<double>(3,1) << parameterTail.at(0) + roiTail.tl().x, parameterTail.at(1) + roiTail.tl().y, 1);
+
+						pp = rotMatrix * p;
 
 
-				positionHead.push_back(Point3f(xHead, yHead, angleHead));
-				positionTail.push_back(Point3f(xTail, yTail, angleTail));
-                positionFull.push_back(Point3f(parameter.at(0) + roiFull.tl().x, parameter.at(1) + roiFull.tl().y, parameter.at(2)));
-				globalParam.push_back(Point3f(curv, 0, 0));
-			}
-		}
+						double xTail = pp.at<double>(0,0) + roiFull.tl().x;
+						double yTail = pp.at<double>(1,0) + roiFull.tl().y;
 
-        vector<vector<Point3f>> out = {positionHead, positionTail, positionFull, globalParam};
-		return out;
+						double angleTail = parameterTail.at(2) - M_PI*(parameterTail.at(2) > M_PI);
+						angleTail = Modul(angleTail + angleFull + M_PI*(abs(angleTail) > 0.5*M_PI)); // Computes the direction
+
+
+
+						//Curvature
+						double curv = 1./1e-16;
+						radiusCurv = CurvatureCenter(Point3f(xTail, yTail, angleTail), Point3f(xHead, yHead, angleHead));
+						if(radiusCurv.x != NAN){ //
+						            curv = Curvature(radiusCurv, RoiFull.getMat(ACCESS_READ));
+						}
+
+
+						positionHead.push_back(Point3f(xHead, yHead, angleHead));
+						positionTail.push_back(Point3f(xTail, yTail, angleTail));
+						positionFull.push_back(Point3f(parameter.at(0) + roiFull.tl().x, parameter.at(1) + roiFull.tl().y, parameter.at(2)));
+						globalParam.push_back(Point3f(curv, 0, 0));
+						}
+   }
+
+	vector<vector<Point3f>> out = {positionHead, positionTail, positionFull, globalParam};
+	return out;
 }
 
 
@@ -415,7 +403,7 @@ vector<int> CostFunc(vector<Point3f> prevPos, vector<Point3f> pos, const double 
             else if (d > LO){
 				costMatrix[i][j] = 2e53;
 			}
-			
+
 		}
 	}
 
@@ -431,7 +419,7 @@ vector<int> CostFunc(vector<Point3f> prevPos, vector<Point3f> pos, const double 
 
 
 /**
-  * @Reassignment Resamples a vector accordingly to a new index.  
+  * @Reassignment Resamples a vector accordingly to a new index.
   * @param vector<Point3f> output: output vector of size n
   * @param vector<Point3f> input: input vector of size m <= n
   * @param vector<int> assignment: vector with the new index that will be used to resample the input vector
@@ -477,7 +465,7 @@ vector<Point3f> Reassignment(vector<Point3f> output, vector<Point3f> input, vect
 
 
 /**
-  * @Reassignment Resamples a vector accordingly to a new index.  
+  * @Reassignment Resamples a vector accordingly to a new index.
   * @param vector<Point3f> output: output vector of size n
   * @param vector<Point3f> input: input vector of size m <= n
   * @param vector<int> assignment: vector with the new index that will be used to resample the input vector
@@ -511,7 +499,7 @@ vector<Point3f> Prevision(vector<Point3f> past, vector<Point3f> present){
 /**
   * @Color computes a color map.
   * @param int number: number of colors
-	
+
   * @return vector<Point3f>: RGB color
 */
 vector<Point3f> Color(int number){
@@ -529,6 +517,3 @@ vector<Point3f> Color(int number){
 
 	return colorMap;
 }
-
-
-
