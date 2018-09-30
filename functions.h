@@ -40,40 +40,40 @@ using namespace cv;
 using namespace std;
 
 
+class Tracking{ 
+
+  Point2f CurvatureCenter(Point3f tail, Point3f head);
 
 
-Point2f CurvatureCenter(Point3f tail, Point3f head);
+  double Curvature(Point2f center , Mat image);
 
 
-double Curvature(Point2f center , Mat image);
+  double Modul(double angle);
 
 
-double Modul(double angle);
+  vector<double> Orientation(UMat image, bool dir);
 
 
-vector<double> Orientation(UMat image, bool dir);
+  vector<Point3f> Reassignment(vector<Point3f> inputPrev, vector<Point3f> input, vector<int> assignment);
 
 
-vector<Point3f> Reassignment(vector<Point3f> inputPrev, vector<Point3f> input, vector<int> assignment);
+  UMat BackgroundExtraction(vector<String> files, double n);
 
 
-UMat BackgroundExtraction(vector<String> files, double n);
+  void Registration(UMat imageReference, UMat& frame);
 
 
-void Registration(UMat imageReference, UMat& frame);
+  void Binarisation(UMat& frame, char backgroundColor, int value);
 
 
-void Binarisation(UMat& frame, char backgroundColor, int value);
+  vector<vector<Point3f> > ObjectPosition(UMat frame, int minSize, int maxSize);
 
 
-vector<vector<Point3f> > ObjectPosition(UMat frame, int minSize, int maxSize);
+  vector<int> CostFunc(vector<Point3f> prevPos, vector<Point3f> pos, const double LENGHT, const double ANGLE, const double WEIGHT, const double LO);
+
+  vector<Point3f> Prevision(vector<Point3f> past, vector<Point3f> present);
 
 
-vector<int> CostFunc(vector<Point3f> prevPos, vector<Point3f> pos, const double LENGHT, const double ANGLE, const double WEIGHT, const double LO);
-
-vector<Point3f> Prevision(vector<Point3f> past, vector<Point3f> present);
-
-
-vector<Point3f> Color(int number);
-
+  vector<Point3f> Color(int number);
+}
 #endif

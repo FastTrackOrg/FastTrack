@@ -520,6 +520,46 @@ void MainWindow::changeTheme(int index){
 }
 
 
+void MainWindow::Initialization(){
+
+          timer->start();
+          UpdateParameters();
+          folder = pathField->text().toStdString();
+          nBackground = nBackField->text().toInt();
+          NUMBER = numField->text().toInt(); //number of objects to track
+
+
+          try{
+              glob(folder, files, false);
+              checkPath(pathField->text());
+              UpdateParameters();
+          }
+          catch (...){
+              timer->stop();
+              PauseButton ->setText("Play");
+              pause = false;
+              QMessageBox pathError;
+              pathError.setText("No files found");
+              pathError.exec();
+          }
+
+          sort(files.begin(), files.end());
+          a = files.begin();
+          string name = *a;
+          progressBar ->setRange(0, files.size());
+          background = BackgroundExtraction(files, nBackground);
+          background.convertTo(background, CV_8U, 0.5, 128);
+          imread(name, IMREAD_GRAYSCALE).copyTo(img0);
+          vector<vector<Point> > tmp(NUMBER, vector<Point>());
+          memory = tmp;
+          colorMap = Color(NUMBER);            
+
+          for(unsigned int ini = 0; ini < files.size()*NUMBER; ini++){
+              internalSaving.push_back(Point3f(0., 0., 0.));
+          }
+}
+
+
 
 /**
     * @UpdateParameters: take the parameters from fields, cast them to right type.
@@ -550,6 +590,8 @@ void MainWindow::Go(){
 
         try{
 
+
+        // Update parameters
         connect(trackingSpot, SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateParameters()));
         connect(arrowSlider, SIGNAL(valueChanged(int)), this, SLOT(UpdateParameters()));
         connect(maxAreaField, SIGNAL(editingFinished()), this, SLOT(UpdateParameters()));
@@ -573,57 +615,18 @@ void MainWindow::Go(){
         saveField->setDisabled(true);
         statusBar()->showMessage(tr("Running"));
 
-
-
-        if(im == 0){ // Initialization
-
-
-            timer->start();
-            UpdateParameters();
-            folder = pathField->text().toStdString();
-            nBackground = nBackField->text().toInt();
-            NUMBER = numField->text().toInt(); //number of objects to track
-
-
-            try{
-                glob(folder, files, false);
-                checkPath(pathField->text());
-                UpdateParameters();
-            }
-            catch (...){
-                timer->stop();
-                PauseButton ->setText("Play");
-                pause = false;
-                QMessageBox pathError;
-                pathError.setText("No files found");
-                pathError.exec();
-            }
-
-            sort(files.begin(), files.end());
-            a = files.begin();
-            string name = *a;
-            progressBar ->setRange(0, files.size());
-            background = BackgroundExtraction(files, nBackground);
-            background.convertTo(background, CV_8U, 0.5, 128);
-            imread(name, IMREAD_GRAYSCALE).copyTo(img0);
-            vector<vector<Point> > tmp(NUMBER, vector<Point>());
-            memory = tmp;
-            colorMap = Color(NUMBER);            
-
-            for(unsigned int ini = 0; ini < files.size()*NUMBER; ini++){
-                internalSaving.push_back(Point3f(0., 0., 0.));
-            }
-        }
-
+        Initialization(); // Initialization, import files list and initialize Mat
 
         string name = *a;
 
+        Rect ROI(x1, y1, x2 - x1, y2 - y1); // ROI
 
-        Rect ROI(x1, y1, x2 - x1, y2 - y1);
         imread(name, IMREAD_GRAYSCALE).copyTo(cameraFrame);
+        
         if(registration->isChecked()){
             Registration(img0, cameraFrame);
         }
+
         cameraFrame.convertTo(cameraFrame, CV_8U, 0.5, 0);
         visu = cameraFrame.getMat(ACCESS_FAST).clone();
         cvtColor(visu,visu, CV_GRAY2RGB);

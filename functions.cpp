@@ -40,7 +40,7 @@ using namespace std;
 	* @param Point3f tail: parameter of the head x, y and angle of orientation
   * @return Point2f: coordinates of the center of the curvature
 */
-Point2f CurvatureCenter(Point3f tail, Point3f head){
+Point2f Tracking::curvatureCenter(Point3f tail, Point3f head){
 
 	Point2f center;
 
@@ -72,7 +72,7 @@ Point2f CurvatureCenter(Point3f tail, Point3f head){
 	* @param mat image: binary image CV_8U
   * @return double: radius of curvature
 */
-double Curvature(Point2f center , Mat image){
+double Tracking::curvature(Point2f center , Mat image){
 
 	double d = 0;
 	double count = 0;
@@ -109,7 +109,7 @@ double Modul(double angle)
   * @param bool dir: if true computes the orientation, if false the orientation is undetermined at +/- PI
   * @return vector<double>: [x, y, orientation]
 */
-vector<double> Orientation(UMat image, bool dir) {
+vector<double> Tracking::orientation(UMat image, bool dir) {
 
 
     Moments moment = moments(image);
@@ -185,7 +185,7 @@ vector<double> Orientation(UMat image, bool dir) {
   @param double n: number of frames to average
   * @return UMat: background image of a movie
 */
-UMat BackgroundExtraction(vector<String> files, double n){
+UMat Tracking::backgroundExtraction(vector<String> files, double n){
 
     UMat background;
     UMat img0;
@@ -224,7 +224,7 @@ UMat BackgroundExtraction(vector<String> files, double n){
   * @param UMat imageReference: reference image for the registration, one channel
 	* @param UMat frame: image to register
 */
-void Registration(UMat imageReference, UMat& frame){
+void Tracking::Registration(UMat imageReference, UMat& frame){
 
 	frame.convertTo(frame, CV_32FC1);
 	imageReference.convertTo(imageReference, CV_32FC1);
@@ -242,7 +242,7 @@ void Registration(UMat imageReference, UMat& frame){
   * @param UMat frame: image to binarized
 	* @param char backgroundColor: 'b' if the background is black, 'w' is the background is white
 */
-void Binarisation(UMat& frame, char backgroundColor, int value){
+void Tracking::binarisation(UMat& frame, char backgroundColor, int value){
 
   frame.convertTo(frame, CV_8U);
 
@@ -265,7 +265,7 @@ void Binarisation(UMat& frame, char backgroundColor, int value){
 	* @param int maxSize: maximal size of the object
   * @return vector<vector<Point3f>>: {head parameters, tail parameters, global parameter}, {head/tail parameters} = {x, y, orientation}, {global parameter} = {curvature, 0, 0}
 */
-vector<vector<Point3f>> ObjectPosition(UMat frame, int minSize, int maxSize){
+vector<vector<Point3f>> Tracking::objectPosition(UMat frame, int minSize, int maxSize){
 
 	vector<vector<Point> > contours;
 	vector<Point3f> positionHead;
@@ -373,7 +373,7 @@ vector<vector<Point3f>> ObjectPosition(UMat frame, int minSize, int maxSize){
 
 /**
   * @CostFunc computes the cost function and use a global optimization association to associate target between frame. Method adapted from: "An
-							effective and robust method for tracking multiple fish in video image based on fish head detection" YQ Chen et al.
+							effective and robust method for Tracking multiple fish in video image based on fish head detection" YQ Chen et al.
 							Use the Hungarian method implemented by Cong Ma, 2016 "https://github.com/mcximing/hungarian-algorithm-cpp" adapted from the matlab
 							implementation by Markus Buehren "https://fr.mathworks.com/matlabcentral/fileexchange/6543-functions-for-the-rectangular-assignment-problem".
   * @param vector<Point3f> prevPos: sorted vector of object parameters,vector of points (x, y, orientation).
@@ -382,7 +382,7 @@ vector<vector<Point3f>> ObjectPosition(UMat frame, int minSize, int maxSize){
 	* @param double angle: maximal difference angle of an object direction between two frames.
 	* @return vector<int>: the assignment vector of the new index position.
 */
-vector<int> CostFunc(vector<Point3f> prevPos, vector<Point3f> pos, const double LENGTH, const double ANGLE, const double WEIGHT, const double LO){
+vector<int> Tracking::CostFunc(vector<Point3f> prevPos, vector<Point3f> pos, const double LENGTH, const double ANGLE, const double WEIGHT, const double LO){
 
 
 	int n = prevPos.size();
@@ -425,7 +425,7 @@ vector<int> CostFunc(vector<Point3f> prevPos, vector<Point3f> pos, const double 
   * @param vector<int> assignment: vector with the new index that will be used to resample the input vector
   * @return vector<Point3f>: output vector of size n.
 */
-vector<Point3f> Reassignment(vector<Point3f> output, vector<Point3f> input, vector<int> assignment){
+vector<Point3f> Tracking::reassignment(vector<Point3f> output, vector<Point3f> input, vector<int> assignment){
 
 	vector<Point3f> tmp = output;
 	unsigned int n = output.size();
@@ -471,7 +471,7 @@ vector<Point3f> Reassignment(vector<Point3f> output, vector<Point3f> input, vect
   * @param vector<int> assignment: vector with the new index that will be used to resample the input vector
   * @return vector<Point3f>: output vector of size n.
 */
-vector<Point3f> Prevision(vector<Point3f> past, vector<Point3f> present){
+vector<Point3f> Tracking::prevision(vector<Point3f> past, vector<Point3f> present){
 
 	double l = 0;
 	for(unsigned int i = 0; i < past.size(); i++){
@@ -502,7 +502,7 @@ vector<Point3f> Prevision(vector<Point3f> past, vector<Point3f> present){
 
   * @return vector<Point3f>: RGB color
 */
-vector<Point3f> Color(int number){
+vector<Point3f> Tracking::color(int number){
 
 	double a, b, c;
 	vector<Point3f> colorMap;
@@ -516,4 +516,70 @@ vector<Point3f> Color(int number){
 	}
 
 	return colorMap;
+}
+
+
+
+void Tracking::setParameters(vector<string>){
+  
+
+}
+
+
+void Tracking::tracking(){
+
+    imread(m_i, IMREAD_GRAYSCALE).copyTo(m_visuFrame);
+    m_binaryFrame = m_visuFrame.getMat(ACCESS_FAST).clone();
+    
+    subtract(m_background, m_binaryFrame, m_binaryFrame);
+
+    if(statusRegistration){
+      registration(m_img0, m_visuFrame);
+    }
+
+    (statusBinarisation) ? (binarisation(m_binaryFrame, 'b', param_thresh)) : (binarisation(m_binaryFrame, 'w', param_thresh)); // If statusBinarisation == true the object is black on white background
+ 
+    m_binaryFrame = m_binaryFrame(m_ROI);
+
+    m_out = objectPosition(m_binaryframe, param_minArea, param_maxArea);
+
+    vector<int> identity = costFunc(m_outPrev.at(param_spot), m_out.at(param_spot), param_len, param_angle, param_weight, param_lo);
+    for (unsigned int i = 0; i < m_out.size(); i++) {
+      m_out.at(i) = reassignment(m_outPrev.at(i), m_out.at(i), identity);
+    }
+
+    // Visualisation
+
+    for(unsigned int l = 0; l < m_out.at(0).size(); l++){
+      Point3f coord = out.at(param_spot).at(l);
+      arrowedLine(m_visuFrame, Point(coord.x, coord.y), Point(coord.x + 5*param_arrowSize*cos(coord.z), coord.y - 5*param_arrowSize*sin(coord.z)), Scalar(m_colorMap.at(l).x, m_colorMap.at(l).y, m_colorMap.at(l).z), param_arrowSize, 10*param_arrowSize, 0);
+
+      if((im > 5)){ // Faudra refaire un buffer correct
+        polylines(m_visuFrame, m_memory.at(l), false, Scalar(m_colorMap.at(l).x, m_colorMap.at(l).y, m_colorMap.at(l).z), param_arrowSize, 8, 0);
+        m_memory.at(l).push_back(Point((int)coord.x, (int)coord.y));
+        if(im>50){
+          m_memory.at(l).erase(m_memory.at(l).begin());
+        }
+      }
+
+      // Saving
+    coord.x += ROI.tl().x;
+    coord.y += ROI.tl().y;
+    internalSaving.at(m_im*param_n + l) = coord;
+    if(im == 0 && l == 0){
+      time_t now = time(0);
+      char* dt = ctime(&now);
+      dt[strlen(dt) - 1] = '\t';
+      savefile << dt << folder << '\n';
+      savefile << "xHead" << "   " << "yHead" << "   " << "tHead" << "   "  << "xTail" << "   " << "yTail" << "   " << "tTail"   <<  "   " << "xBody" << "   " << "yBody" << "   " << "tBody"   <<  "   " << "curvature" <<  "   " << "imageNumber" << "\n";
+}
+
+savefile << out.at(0).at(l).x + ROI.tl().x << "   " << out.at(0).at(l).y + ROI.tl().y << "   " << out.at(0).at(l).z << "   "  << out.at(1).at(l).x + ROI.tl().x << "   " << out.at(1).at(l).y + ROI.tl().y << "   " << out.at(1).at(l).z  <<  "   " << out.at(2).at(l).x + ROI.tl().x << "   " << out.at(2).at(l).y  + ROI.tl().y << "   " << out.at(2).at(l).z <<  "   " << out.at(3).at(l).x <<  "   " << im << "\n";
+
+
+    } 
+
+  
+
+
 }

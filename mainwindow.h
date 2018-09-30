@@ -146,6 +146,7 @@ private:
     bool pause;
 
 public slots:
+    void Initialization();
     void Go();
     void Write();
     void Reset();
