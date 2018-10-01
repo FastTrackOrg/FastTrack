@@ -185,7 +185,7 @@ vector<double> Tracking::orientation(UMat image, bool dir) {
   @param double n: number of frames to average
   * @return UMat: background image of a movie
 */
-UMat Tracking::backgroundExtraction(vector<string> files, double n){
+UMat Tracking::backgroundExtraction(vector<String> files, double n){
 
     UMat background;
     UMat img0;
@@ -522,7 +522,7 @@ vector<Point3f> Tracking::color(int number){
 
 
 
-void Tracking::imageProcessing(string a, vector<vector<Point3f>>& out, vector<vector<Point3f>>& outPrev){
+void Tracking::imageProcessing(String a, vector<vector<Point3f>>& out, vector<vector<Point3f>>& outPrev){
 
     m_visuFrame = imread(a, IMREAD_GRAYSCALE);
     m_visuFrame.copyTo(m_binaryFrame);
@@ -530,7 +530,7 @@ void Tracking::imageProcessing(string a, vector<vector<Point3f>>& out, vector<ve
     subtract(m_background, m_binaryFrame, m_binaryFrame);
 
     if(statusRegistration){
-      registration(m_img0, m_visuFrame);
+      registration(m_img0, m_binaryFrame);
     }
 
     (statusBinarisation) ? (binarisation(m_binaryFrame, 'b', param_thresh)) : (binarisation(m_binaryFrame, 'w', param_thresh)); // If statusBinarisation == true the object is black on white background
@@ -561,7 +561,7 @@ void Tracking::imageProcessing(string a, vector<vector<Point3f>>& out, vector<ve
       // Saving
     coord.x += m_ROI.tl().x;
     coord.y += m_ROI.tl().y;
-    if(im == 0 && l == 0){
+    if(m_im == 0 && l == 0){
       time_t now = time(0);
       char* dt = ctime(&now);
       dt[strlen(dt) - 1] = '\t';
@@ -586,29 +586,31 @@ Tracking::Tracking(void){
   catch(...){
     statusPath = false;
   }
-  sort(m_files.begin, m_files.end());
+  sort(m_files.begin(), m_files.end());
+
 
   m_background = backgroundExtraction(m_files, param_nBackground);
-  m_colorMap = color(param_m);
+  m_colorMap = color(param_n);
 
   vector<vector<Point3f>> out;
   vector<vector<Point3f>> outPrev;
 
   // First frame
-  m_visuFrame = imread(m_files.begin(), IMREAD_GRAYSCALE);
+  m_visuFrame = imread(*m_files.begin(), IMREAD_GRAYSCALE);
+
+  if(statusRegistration){
+    registration(m_img0, m_binaryFrame);
+  }
+
   m_visuFrame.copyTo(m_binaryFrame);
   
   subtract(m_background, m_binaryFrame, m_binaryFrame);
-
-  if(statusRegistration){
-    registration(m_img0, m_visuFrame);
-  }
 
   (statusBinarisation) ? (binarisation(m_binaryFrame, 'b', param_thresh)) : (binarisation(m_binaryFrame, 'w', param_thresh)); // If statusBinarisation == true the object is black on white background
 
   m_binaryFrame = m_binaryFrame(m_ROI);
 
-  out = objectPosition(m_binaryframe, param_minArea, param_maxArea);
+  out = objectPosition(m_binaryFrame, param_minArea, param_maxArea);
   if( out.at(0).size() < param_n ){ // Less objects in frame as in param_n
     while( (out.at(0).size() - param_n) > 0 ){
       for(unsigned int i = 0; i < out.size(); i++){

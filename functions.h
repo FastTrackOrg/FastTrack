@@ -46,35 +46,20 @@ class Tracking{
 
   
 
-  UMat m_binaryFrame;
-  Mat m_visuFrame;
   UMat m_img0;
   UMat m_background;
-
-  int param_n;
-  int param_maxArea;
-  int param_minArea;
-  int param_spot;
-  double param_len;
-  double param_angle;
-  double param_weight;
-  double param_lo;
-  int param_arrowSize;
-  string param_folder;
-  int param_tresh;
   
   bool statusRegistration; 
   bool statusBinarisation;
   bool statusPath;
 
   int m_im;
-  rect m_ROI;
+  Rect m_ROI;
   ofstream m_savefile;
-  int m_nBackground;
-  vector<string> m_files;
+  vector<String> m_files; // OpenCV String class
   string m_path;
   vector<Point3f> m_colorMap;
-  vector<vector<Point3f>> m_memory;
+  vector<vector<Point>> m_memory;
 
   Point2f curvatureCenter(Point3f tail, Point3f head);
   double curvature(Point2f center , Mat image);
@@ -88,8 +73,31 @@ class Tracking{
   vector<int> costFunc(vector<Point3f> prevPos, vector<Point3f> pos, const double LENGHT, const double ANGLE, const double WEIGHT, const double LO);
   vector<Point3f> prevision(vector<Point3f> past, vector<Point3f> present);
   vector<Point3f> color(int number);
-  void Tracking::imageProcessing(string a, vector<vector<Point3f>>& out, vector<vector<Point3f>>& outPrev);
+  void imageProcessing(String a, vector<vector<Point3f>>& out, vector<vector<Point3f>>& outPrev);
+  Tracking();
 
+  public:
+
+  UMat m_binaryFrame;
+  Mat m_visuFrame;
+
+  int param_n;
+  int param_maxArea;
+  int param_minArea;
+  int param_spot;
+  double param_len;
+  double param_angle;
+  double param_weight;
+  double param_lo;
+  int param_arrowSize;
+  string param_folder;
+  int param_tresh;
+  double param_nBackground;
+  bool param_thresh;
+  int param_x1;
+  int param_y1;
+  int param_x2;
+  int param_y2;
 };  
 
 
