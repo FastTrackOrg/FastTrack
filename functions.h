@@ -41,39 +41,56 @@ using namespace std;
 
 
 class Tracking{ 
+  
+  // Member
 
-  Point2f CurvatureCenter(Point3f tail, Point3f head);
+  
+
+  UMat m_binaryFrame;
+  Mat m_visuFrame;
+  UMat m_img0;
+  UMat m_background;
+
+  int param_n;
+  int param_maxArea;
+  int param_minArea;
+  int param_spot;
+  double param_len;
+  double param_angle;
+  double param_weight;
+  double param_lo;
+  int param_arrowSize;
+  string param_folder;
+  int param_tresh;
+  
+  bool statusRegistration; 
+  bool statusBinarisation;
+  bool statusPath;
+
+  int m_im;
+  rect m_ROI;
+  ofstream m_savefile;
+  int m_nBackground;
+  vector<string> m_files;
+  string m_path;
+  vector<Point3f> m_colorMap;
+  vector<vector<Point3f>> m_memory;
+
+  Point2f curvatureCenter(Point3f tail, Point3f head);
+  double curvature(Point2f center , Mat image);
+  double modul(double angle);
+  vector<double> orientation(UMat image, bool dir);
+  vector<Point3f> reassignment(vector<Point3f> inputPrev, vector<Point3f> input, vector<int> assignment);
+  UMat backgroundExtraction(vector<String> files, double n);
+  void registration(UMat imageReference, UMat& frame);
+  void binarisation(UMat& frame, char backgroundColor, int value);
+  vector<vector<Point3f> > objectPosition(UMat frame, int minSize, int maxSize);
+  vector<int> costFunc(vector<Point3f> prevPos, vector<Point3f> pos, const double LENGHT, const double ANGLE, const double WEIGHT, const double LO);
+  vector<Point3f> prevision(vector<Point3f> past, vector<Point3f> present);
+  vector<Point3f> color(int number);
+  void Tracking::imageProcessing(string a, vector<vector<Point3f>>& out, vector<vector<Point3f>>& outPrev);
+
+};  
 
 
-  double Curvature(Point2f center , Mat image);
-
-
-  double Modul(double angle);
-
-
-  vector<double> Orientation(UMat image, bool dir);
-
-
-  vector<Point3f> Reassignment(vector<Point3f> inputPrev, vector<Point3f> input, vector<int> assignment);
-
-
-  UMat BackgroundExtraction(vector<String> files, double n);
-
-
-  void Registration(UMat imageReference, UMat& frame);
-
-
-  void Binarisation(UMat& frame, char backgroundColor, int value);
-
-
-  vector<vector<Point3f> > ObjectPosition(UMat frame, int minSize, int maxSize);
-
-
-  vector<int> CostFunc(vector<Point3f> prevPos, vector<Point3f> pos, const double LENGHT, const double ANGLE, const double WEIGHT, const double LO);
-
-  vector<Point3f> Prevision(vector<Point3f> past, vector<Point3f> present);
-
-
-  vector<Point3f> Color(int number);
-}
 #endif

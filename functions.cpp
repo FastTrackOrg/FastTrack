@@ -185,7 +185,7 @@ vector<double> Tracking::orientation(UMat image, bool dir) {
   @param double n: number of frames to average
   * @return UMat: background image of a movie
 */
-UMat Tracking::backgroundExtraction(vector<String> files, double n){
+UMat Tracking::backgroundExtraction(vector<string> files, double n){
 
     UMat background;
     UMat img0;
@@ -224,7 +224,7 @@ UMat Tracking::backgroundExtraction(vector<String> files, double n){
   * @param UMat imageReference: reference image for the registration, one channel
 	* @param UMat frame: image to register
 */
-void Tracking::Registration(UMat imageReference, UMat& frame){
+void Tracking::registration(UMat imageReference, UMat& frame){
 
 	frame.convertTo(frame, CV_32FC1);
 	imageReference.convertTo(imageReference, CV_32FC1);
@@ -295,7 +295,7 @@ vector<vector<Point3f>> Tracking::objectPosition(UMat frame, int minSize, int ma
 						roiFull = boundingRect(contours[i]);
 						RoiFull = dst(roiFull);
 
-						parameter = Orientation(RoiFull, true); // In RoiFull coordinates: x, y, orientation
+						parameter = orientation(RoiFull, true); // In RoiFull coordinates: x, y, orientation
 						double angleFull = parameter.at(2);
 
 						Point center = Point(0.5*RoiFull.cols, 0.5*RoiFull.rows);
@@ -313,12 +313,12 @@ vector<vector<Point3f>> Tracking::objectPosition(UMat frame, int minSize, int ma
 						// Head ellipse
 						Rect roiHead(pp.at<double>(0,0), 0, rotate.cols-pp.at<double>(0,0), rotate.rows);
 						RoiHead = rotate(roiHead);
-						parameterHead = Orientation(RoiHead, false); // In RoiHead coordinates: xHead, yHead, orientationHead
+						parameterHead = orientation(RoiHead, false); // In RoiHead coordinates: xHead, yHead, orientationHead
 
 						// Tail ellipse
 						Rect roiTail(0, 0, pp.at<double>(0,0), rotate.rows);
 						RoiTail = rotate(roiTail);
-						parameterTail = Orientation(RoiTail, false); // In RoiHead coordinates: xHead, yHead, orientationHead
+						parameterTail = orientation(RoiTail, false); // In RoiHead coordinates: xHead, yHead, orientationHead
 
 
 						invertAffineTransform(rotMatrix, rotMatrix);
@@ -350,9 +350,9 @@ vector<vector<Point3f>> Tracking::objectPosition(UMat frame, int minSize, int ma
 
 						//Curvature
 						double curv = 1./1e-16;
-						radiusCurv = CurvatureCenter(Point3f(xTail, yTail, angleTail), Point3f(xHead, yHead, angleHead));
+						radiusCurv = curvatureCenter(Point3f(xTail, yTail, angleTail), Point3f(xHead, yHead, angleHead));
 						if(radiusCurv.x != NAN){ //
-						            curv = Curvature(radiusCurv, RoiFull.getMat(ACCESS_READ));
+						            curv = curvature(radiusCurv, RoiFull.getMat(ACCESS_READ));
 						}
 
 
@@ -382,7 +382,7 @@ vector<vector<Point3f>> Tracking::objectPosition(UMat frame, int minSize, int ma
 	* @param double angle: maximal difference angle of an object direction between two frames.
 	* @return vector<int>: the assignment vector of the new index position.
 */
-vector<int> Tracking::CostFunc(vector<Point3f> prevPos, vector<Point3f> pos, const double LENGTH, const double ANGLE, const double WEIGHT, const double LO){
+vector<int> Tracking::costFunc(vector<Point3f> prevPos, vector<Point3f> pos, const double LENGTH, const double ANGLE, const double WEIGHT, const double LO){
 
 
 	int n = prevPos.size();
@@ -520,16 +520,12 @@ vector<Point3f> Tracking::color(int number){
 
 
 
-void Tracking::setParameters(vector<string>){
-  
-
-}
 
 
-void Tracking::tracking(){
+void Tracking::imageProcessing(string a, vector<vector<Point3f>>& out, vector<vector<Point3f>>& outPrev){
 
-    imread(m_i, IMREAD_GRAYSCALE).copyTo(m_visuFrame);
-    m_binaryFrame = m_visuFrame.getMat(ACCESS_FAST).clone();
+    m_visuFrame = imread(a, IMREAD_GRAYSCALE);
+    m_visuFrame.copyTo(m_binaryFrame);
     
     subtract(m_background, m_binaryFrame, m_binaryFrame);
 
@@ -541,45 +537,90 @@ void Tracking::tracking(){
  
     m_binaryFrame = m_binaryFrame(m_ROI);
 
-    m_out = objectPosition(m_binaryframe, param_minArea, param_maxArea);
+    out = objectPosition(m_binaryFrame, param_minArea, param_maxArea);
 
-    vector<int> identity = costFunc(m_outPrev.at(param_spot), m_out.at(param_spot), param_len, param_angle, param_weight, param_lo);
-    for (unsigned int i = 0; i < m_out.size(); i++) {
-      m_out.at(i) = reassignment(m_outPrev.at(i), m_out.at(i), identity);
+    vector<int> identity = costFunc(outPrev.at(param_spot), out.at(param_spot), param_len, param_angle, param_weight, param_lo);
+    for (unsigned int i = 0; i < out.size(); i++) {
+      out.at(i) = reassignment(outPrev.at(i), out.at(i), identity);
     }
 
     // Visualisation
 
-    for(unsigned int l = 0; l < m_out.at(0).size(); l++){
+    for(unsigned int l = 0; l < out.at(0).size(); l++){
       Point3f coord = out.at(param_spot).at(l);
       arrowedLine(m_visuFrame, Point(coord.x, coord.y), Point(coord.x + 5*param_arrowSize*cos(coord.z), coord.y - 5*param_arrowSize*sin(coord.z)), Scalar(m_colorMap.at(l).x, m_colorMap.at(l).y, m_colorMap.at(l).z), param_arrowSize, 10*param_arrowSize, 0);
 
-      if((im > 5)){ // Faudra refaire un buffer correct
+      if((m_im > 5)){ // Faudra refaire un buffer correct
         polylines(m_visuFrame, m_memory.at(l), false, Scalar(m_colorMap.at(l).x, m_colorMap.at(l).y, m_colorMap.at(l).z), param_arrowSize, 8, 0);
         m_memory.at(l).push_back(Point((int)coord.x, (int)coord.y));
-        if(im>50){
+        if(m_im>50){
           m_memory.at(l).erase(m_memory.at(l).begin());
         }
       }
 
       // Saving
-    coord.x += ROI.tl().x;
-    coord.y += ROI.tl().y;
-    internalSaving.at(m_im*param_n + l) = coord;
+    coord.x += m_ROI.tl().x;
+    coord.y += m_ROI.tl().y;
     if(im == 0 && l == 0){
       time_t now = time(0);
       char* dt = ctime(&now);
       dt[strlen(dt) - 1] = '\t';
-      savefile << dt << folder << '\n';
-      savefile << "xHead" << "   " << "yHead" << "   " << "tHead" << "   "  << "xTail" << "   " << "yTail" << "   " << "tTail"   <<  "   " << "xBody" << "   " << "yBody" << "   " << "tBody"   <<  "   " << "curvature" <<  "   " << "imageNumber" << "\n";
+      m_savefile << dt << param_folder << '\n';
+      m_savefile << "xHead" << "   " << "yHead" << "   " << "tHead" << "   "  << "xTail" << "   " << "yTail" << "   " << "tTail"   <<  "   " << "xBody" << "   " << "yBody" << "   " << "tBody"   <<  "   " << "curvature" <<  "   " << "imageNumber" << "\n";
 }
 
-savefile << out.at(0).at(l).x + ROI.tl().x << "   " << out.at(0).at(l).y + ROI.tl().y << "   " << out.at(0).at(l).z << "   "  << out.at(1).at(l).x + ROI.tl().x << "   " << out.at(1).at(l).y + ROI.tl().y << "   " << out.at(1).at(l).z  <<  "   " << out.at(2).at(l).x + ROI.tl().x << "   " << out.at(2).at(l).y  + ROI.tl().y << "   " << out.at(2).at(l).z <<  "   " << out.at(3).at(l).x <<  "   " << im << "\n";
-
+      m_savefile << out.at(0).at(l).x + m_ROI.tl().x << "   " << out.at(0).at(l).y + m_ROI.tl().y << "   " << out.at(0).at(l).z << "   "  << out.at(1).at(l).x + m_ROI.tl().x << "   " << out.at(1).at(l).y + m_ROI.tl().y << "   " << out.at(1).at(l).z  <<  "   " << out.at(2).at(l).x + m_ROI.tl().x << "   " << out.at(2).at(l).y  + m_ROI.tl().y << "   " << out.at(2).at(l).z <<  "   " << out.at(3).at(l).x <<  "   " << m_im << "\n";
 
     } 
+}
 
+
+
+
+Tracking::Tracking(void){
   
+  try{
+    glob(m_path, m_files, false); // Get all path to frames
+    statusPath = true;
+  }
+  catch(...){
+    statusPath = false;
+  }
+  sort(m_files.begin, m_files.end());
 
+  m_background = backgroundExtraction(m_files, param_nBackground);
+  m_colorMap = color(param_m);
 
+  vector<vector<Point3f>> out;
+  vector<vector<Point3f>> outPrev;
+
+  // First frame
+  m_visuFrame = imread(m_files.begin(), IMREAD_GRAYSCALE);
+  m_visuFrame.copyTo(m_binaryFrame);
+  
+  subtract(m_background, m_binaryFrame, m_binaryFrame);
+
+  if(statusRegistration){
+    registration(m_img0, m_visuFrame);
+  }
+
+  (statusBinarisation) ? (binarisation(m_binaryFrame, 'b', param_thresh)) : (binarisation(m_binaryFrame, 'w', param_thresh)); // If statusBinarisation == true the object is black on white background
+
+  m_binaryFrame = m_binaryFrame(m_ROI);
+
+  out = objectPosition(m_binaryframe, param_minArea, param_maxArea);
+  if( out.at(0).size() < param_n ){ // Less objects in frame as in param_n
+    while( (out.at(0).size() - param_n) > 0 ){
+      for(unsigned int i = 0; i < out.size(); i++){
+        out.at(i).push_back(Point3f(0,0,0));
+      }
+    }
+  }
+  outPrev = out;
+
+  m_im = 0;
+  for(auto const& a: m_files){
+    m_im ++;
+    imageProcessing(a, out, outPrev);
+  }
 }
