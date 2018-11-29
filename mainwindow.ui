@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1121</width>
-    <height>737</height>
+    <width>1123</width>
+    <height>714</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -21,7 +21,7 @@
        <enum>QTabWidget::West</enum>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="files">
        <attribute name="title">
@@ -88,6 +88,18 @@
        <layout class="QGridLayout" name="gridLayout_2">
         <item row="0" column="0">
          <widget class="QLabel" name="display">
+          <property name="minimumSize">
+           <size>
+            <width>524</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>524</width>
+            <height>650</height>
+           </size>
+          </property>
           <property name="text">
            <string/>
           </property>
@@ -95,6 +107,12 @@
         </item>
         <item row="0" column="1">
          <widget class="QLabel" name="display2">
+          <property name="maximumSize">
+           <size>
+            <width>524</width>
+            <height>650</height>
+           </size>
+          </property>
           <property name="text">
            <string/>
           </property>

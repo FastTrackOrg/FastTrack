@@ -37,6 +37,7 @@
 #include <stdlib.h>
 #include <QObject>
 #include <QMap>
+#include <QDebug>
 #include <QThread>
 #include <QString>
 
@@ -61,7 +62,7 @@ class Tracking : public QObject {
   int m_im;
   Rect m_ROI;
   ofstream m_savefile;
-  vector<String> m_files; // OpenCV String class
+  vector<cv::String> m_files; // OpenCV String class
   vector<Point3f> m_colorMap;
   vector<vector<Point>> m_memory;
 
@@ -70,7 +71,7 @@ class Tracking : public QObject {
   double modul(double angle);
   vector<double> orientation(UMat image, bool dir);
   vector<Point3f> reassignment(vector<Point3f> inputPrev, vector<Point3f> input, vector<int> assignment);
-  UMat backgroundExtraction(vector<String> files, double n);
+  UMat backgroundExtraction(const vector<String> &files, double n);
   void registration(UMat imageReference, UMat& frame);
   void binarisation(UMat& frame, char backgroundColor, int value);
   vector<vector<Point3f> > objectPosition(UMat frame, int minSize, int maxSize);
@@ -85,7 +86,7 @@ class Tracking : public QObject {
   Tracking(string path);
 
   UMat m_binaryFrame;
-  Mat m_visuFrame;
+  UMat m_visuFrame;
 
   int param_n;
   int param_maxArea;
@@ -106,11 +107,11 @@ class Tracking : public QObject {
 
   public slots:
   void startProcess();
-  void updatingParameters(QMap<QString, QString>);
+  void updatingParameters(const QMap<QString, QString> &);
   void imageProcessing();
   signals:
 
-  void newImageToDisplay(Mat, UMat);
+  void newImageToDisplay(UMat&, UMat&);
   void finishedProcessFrame();
   void finished();
 

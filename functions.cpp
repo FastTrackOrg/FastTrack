@@ -141,7 +141,7 @@ vector<double> Tracking::orientation(UMat image, bool dir) {
 		vector<double> tmpMat;
 		vector<double> tmp;
 
-    reduce(rotate, tmpMat, 0, CV_REDUCE_SUM);
+    reduce(rotate, tmpMat, 0, REDUCE_SUM);
 
 		double ccMax = *max_element(tmpMat.begin(), tmpMat.end())/100;
 		for (unsigned int it = 0; it < tmpMat.size(); ++it){
@@ -185,33 +185,30 @@ vector<double> Tracking::orientation(UMat image, bool dir) {
   @param double n: number of frames to average
   * @return UMat: background image of a movie
 */
-UMat Tracking::backgroundExtraction(vector<String> files, double n){
+UMat Tracking::backgroundExtraction(const vector<String> &files, double n){
 
     UMat background;
     UMat img0;
     imread(files[0], IMREAD_GRAYSCALE).copyTo(background);
+    background.setTo(0);
     imread(files[0], IMREAD_GRAYSCALE).copyTo(img0);
-    background.convertTo(background, CV_32F);
-    img0.convertTo(img0, CV_32F);
+    background.convertTo(background, CV_32FC1);
+    img0.convertTo(img0, CV_32FC1);
     int step = files.size()/n;
-    UMat tmp;
     UMat cameraFrameReg;
     Mat H;
-    UMat identity = UMat::ones(background.rows, background.cols, CV_32F);
+    int count = 0;
 
-	for(unsigned int i = 1; i < files.size(); i += step){
-        imread(files[i], IMREAD_GRAYSCALE).copyTo(tmp);
-        tmp.convertTo(tmp, CV_32F);
-        cameraFrameReg = tmp;
-				img0 = img0;
+	for(unsigned int i = 0; i < files.size(); i += step){
+        imread(files[i], IMREAD_GRAYSCALE).copyTo(cameraFrameReg);
+        cameraFrameReg.convertTo(cameraFrameReg, CV_32FC1);
         Point2d shift = phaseCorrelate(cameraFrameReg, img0);
         H = (Mat_<float>(2, 3) << 1.0, 0.0, shift.x, 0.0, 1.0, shift.y);
-				warpAffine(tmp, tmp, H, tmp.size());
-				accumulate(tmp, background);
+				warpAffine(cameraFrameReg, cameraFrameReg, H, cameraFrameReg.size());
+				accumulate(cameraFrameReg, background);
+        count ++;
 	}
-
-    multiply(background, identity, background, 1/(n-1));
-    background.convertTo(background, CV_8U);
+  background.convertTo(background, CV_8U, 1./count);
 
 	return background;
 }
@@ -224,14 +221,14 @@ UMat Tracking::backgroundExtraction(vector<String> files, double n){
   * @param UMat imageReference: reference image for the registration, one channel
 	* @param UMat frame: image to register
 */
-void Tracking::registration(UMat imageReference, UMat& frame){
+void Tracking::registration(UMat imageReference, UMat &frame){
 
 	frame.convertTo(frame, CV_32FC1);
 	imageReference.convertTo(imageReference, CV_32FC1);
 	Point2d shift = phaseCorrelate(frame, imageReference);
-    Mat H = (Mat_<float>(2, 3) << 1.0, 0.0, shift.x, 0.0, 1.0, shift.y);
+  Mat H = (Mat_<float>(2, 3) << 1.0, 0.0, shift.x, 0.0, 1.0, shift.y);
 	warpAffine(frame, frame, H, frame.size());
-    frame.convertTo(frame, CV_8U);
+  frame.convertTo(frame, CV_8U);
 }
 
 
@@ -247,11 +244,11 @@ void Tracking::binarisation(UMat& frame, char backgroundColor, int value){
   frame.convertTo(frame, CV_8U);
 
 	if(backgroundColor == 'b'){
-        threshold(frame, frame, value, 255, CV_THRESH_BINARY);
+        threshold(frame, frame, value, 255, THRESH_BINARY);
 	}
 
 	if(backgroundColor == 'w'){
-        threshold(frame, frame, value, 255, CV_THRESH_BINARY_INV);
+        threshold(frame, frame, value, 255, THRESH_BINARY_INV);
 	}
 }
 
@@ -281,7 +278,7 @@ vector<vector<Point3f>> Tracking::objectPosition(UMat frame, int minSize, int ma
 	vector<double> parameterTail;
 	Point2f radiusCurv;
 
-	findContours(frame, contours, CV_RETR_LIST, CV_CHAIN_APPROX_NONE);
+	findContours(frame, contours, RETR_LIST, CHAIN_APPROX_NONE);
 
 
 
@@ -290,7 +287,7 @@ vector<vector<Point3f>> Tracking::objectPosition(UMat frame, int minSize, int ma
 			if(contourArea(contours[i]) > minSize && contourArea(contours[i]) < maxSize){ // Only select objects minArea << objectArea <<maxArea
 
 						dst = UMat::zeros(frame.size(), CV_8U);
-						drawContours(dst, contours, i, Scalar(255, 255, 255), CV_FILLED,8); // Draw the fish in a temporary black image,avoid select a part of another fish if two fish are very close
+						drawContours(dst, contours, i, Scalar(255, 255, 255), FILLED,8); // Draw the fish in a temporary black image,avoid select a part of another fish if two fish are very close
 
 						roiFull = boundingRect(contours[i]);
 						RoiFull = dst(roiFull);
@@ -524,27 +521,26 @@ vector<Point3f> Tracking::color(int number){
 
 void Tracking::imageProcessing(){
 
-    m_visuFrame = imread(m_files.at(m_im), IMREAD_GRAYSCALE);
-    m_visuFrame.copyTo(m_binaryFrame);
+    imread(m_files.at(m_im), IMREAD_GRAYSCALE).copyTo(m_visuFrame);
     
-    subtract(m_background, m_binaryFrame, m_binaryFrame);
-
     if(statusRegistration){
-      registration(m_img0, m_binaryFrame);
+      registration(m_img0, m_visuFrame);
     }
+
+    subtract(m_background, m_visuFrame, m_binaryFrame);
 
     (statusBinarisation) ? (binarisation(m_binaryFrame, 'b', param_thresh)) : (binarisation(m_binaryFrame, 'w', param_thresh)); // If statusBinarisation == true the object is black on white background
  
     m_binaryFrame = m_binaryFrame(m_ROI);
+    m_visuFrame = m_visuFrame(m_ROI);
 
     m_out = objectPosition(m_binaryFrame, param_minArea, param_maxArea);
 
     vector<int> identity = costFunc(m_outPrev.at(param_spot), m_out.at(param_spot), param_len, param_angle, param_weight, param_lo);
-cout << m_out.size() << endl;
     for (unsigned int i = 0; i < m_out.size(); i++) {
       m_out.at(i) = reassignment(m_outPrev.at(i), m_out.at(i), identity);
     }
-
+    cvtColor(m_visuFrame, m_visuFrame, COLOR_GRAY2RGB);
     // Visualisation
 
     for(unsigned int l = 0; l < m_out.at(0).size(); l++){
@@ -554,29 +550,31 @@ cout << m_out.size() << endl;
       if((m_im > 5)){ // Faudra refaire un buffer correct
         polylines(m_visuFrame, m_memory.at(l), false, Scalar(m_colorMap.at(l).x, m_colorMap.at(l).y, m_colorMap.at(l).z), param_arrowSize, 8, 0);
         m_memory.at(l).push_back(Point((int)coord.x, (int)coord.y));
-        if(m_im>50){
+      if(m_im > 50){
           m_memory.at(l).erase(m_memory.at(l).begin());
         }
       }
 
       // Saving
-    coord.x += m_ROI.tl().x;
-    coord.y += m_ROI.tl().y;
-    if(m_im == 0 && l == 0){
-      time_t now = time(0);
-      char* dt = ctime(&now);
-      dt[strlen(dt) - 1] = '\t';
-      m_savefile << dt << param_folder << '\n';
-      m_savefile << "xHead" << "   " << "yHead" << "   " << "tHead" << "   "  << "xTail" << "   " << "yTail" << "   " << "tTail"   <<  "   " << "xBody" << "   " << "yBody" << "   " << "tBody"   <<  "   " << "curvature" <<  "   " << "imageNumber" << "\n";
-}
+      coord.x += m_ROI.tl().x;
+      coord.y += m_ROI.tl().y;
+      if(m_im == 0 && l == 0){
+        time_t now = time(0);
+        char* dt = ctime(&now);
+        dt[strlen(dt) - 1] = '\t';
+        m_savefile << dt << param_folder << '\n';
+        m_savefile << "xHead" << "   " << "yHead" << "   " << "tHead" << "   "  << "xTail" << "   " << "yTail" << "   " << "tTail"   <<  "   " << "xBody" << "   " << "yBody" << "   " << "tBody"   <<  "   " << "curvature" <<  "   " << "imageNumber" << "\n";
+      }
 
       m_savefile << m_out.at(0).at(l).x + m_ROI.tl().x << "   " << m_out.at(0).at(l).y + m_ROI.tl().y << "   " << m_out.at(0).at(l).z << "   "  << m_out.at(1).at(l).x + m_ROI.tl().x << "   " << m_out.at(1).at(l).y + m_ROI.tl().y << "   " << m_out.at(1).at(l).z  <<  "   " << m_out.at(2).at(l).x + m_ROI.tl().x << "   " << m_out.at(2).at(l).y  + m_ROI.tl().y << "   " << m_out.at(2).at(l).z <<  "   " << m_out.at(3).at(l).x <<  "   " << m_im << "\n";
 
     }
+
+    m_im ++;
+    m_outPrev = m_out;
     emit(newImageToDisplay(m_visuFrame, m_binaryFrame));
-    emit(finishedProcessFrame()); 
     if(m_im < m_files.size()){
-      m_im ++;
+      emit(finishedProcessFrame()); 
     }
     else{
       emit(finished());
@@ -604,43 +602,35 @@ void Tracking::startProcess(){
 
   m_background = backgroundExtraction(m_files, param_nBackground);
   m_colorMap = color(param_n);
+  vector<vector<Point> > tmp(param_n, vector<Point>());
+  m_memory = tmp;
 
-cout << "lol" << endl;
-  vector<vector<Point3f>> out;
-  vector<vector<Point3f>> outPrev;
 
   // First frame
-  m_visuFrame = imread(*m_files.begin(), IMREAD_GRAYSCALE);
-
-  if(statusRegistration){
-    registration(m_img0, m_binaryFrame);
-  }
-
-  m_visuFrame.copyTo(m_binaryFrame);
-  
-  subtract(m_background, m_binaryFrame, m_binaryFrame);
+  imread(*m_files.begin(), IMREAD_GRAYSCALE).copyTo(m_visuFrame);
+  m_visuFrame.copyTo(m_img0);
+  subtract(m_background, m_visuFrame, m_binaryFrame);
 
   (statusBinarisation) ? (binarisation(m_binaryFrame, 'b', param_thresh)) : (binarisation(m_binaryFrame, 'w', param_thresh)); // If statusBinarisation == true the object is black on white background
 
   m_binaryFrame = m_binaryFrame(m_ROI);
 
-  out = objectPosition(m_binaryFrame, param_minArea, param_maxArea);
-  if( out.at(0).size() < param_n ){ // Less objects in frame as in param_n
-    while( (out.at(0).size() - param_n) > 0 ){
-      for(unsigned int i = 0; i < out.size(); i++){
-        out.at(i).push_back(Point3f(0,0,0));
+  m_out= objectPosition(m_binaryFrame, param_minArea, param_maxArea);
+  if( m_out.at(0).size() < param_n ){ // Less objects in frame as in param_n
+    while( (m_out.at(0).size() - param_n) > 0 ){
+      for(unsigned int i = 0; i < m_out.size(); i++){
+        m_out.at(i).push_back(Point3f(0,0,0));
       }
     }
   }
-  outPrev = out;
-  m_im ++;
+  m_outPrev = m_out;
+  m_im = 1;
   connect(this, SIGNAL(finishedProcessFrame()), this, SLOT(imageProcessing()));
   emit(newImageToDisplay(m_visuFrame, m_binaryFrame));
   emit(finishedProcessFrame());
-  cout << "test" << endl;
 }
 
-void Tracking::updatingParameters(QMap<QString, QString> parameterList) {
+void Tracking::updatingParameters(const QMap<QString, QString> &parameterList) {
 
   param_n = parameterList.value("Object number").toInt();
   param_maxArea = parameterList.value("Maximal size").toInt();
@@ -658,7 +648,9 @@ void Tracking::updatingParameters(QMap<QString, QString> parameterList) {
   param_y1 = parameterList.value("ROI top y").toInt();
   param_x2 = parameterList.value("ROI bottom x").toInt();
   param_y2 = parameterList.value("ROI bottom y").toInt();
+  m_ROI = Rect(param_x1, param_y1, param_x2 - param_x1, param_y2 - param_y1);
   statusRegistration = (parameterList.value("Registration") == "yes") ? true : false;
   statusBinarisation = (parameterList.value("Light background") == "yes") ? true : false;
 
+  qInfo() << "Parameters updated" << endl;
 }

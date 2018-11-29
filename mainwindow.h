@@ -46,7 +46,7 @@ public:
 
 private:
     Ui::MainWindow *ui;
-    QMap<QString, QString>* parameterList;
+    QMap<QString, QString> parameterList;
 
     QThread* thread;
     Tracking* tracking;
@@ -60,9 +60,9 @@ public slots:
     void newAnalysis(string path);
     void startTracking();
     void addPath();
-    void display(Mat, UMat);
+    void display(UMat&, UMat&);
 signals:
-    void newParameterList(QMap<QString, QString>*);
+    void newParameterList(const QMap<QString, QString> &);
     void next();
 };
 
