@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>994</width>
-    <height>735</height>
+    <width>1121</width>
+    <height>737</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -21,28 +21,80 @@
        <enum>QTabWidget::West</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="files">
        <attribute name="title">
         <string>Files</string>
        </attribute>
-       <layout class="QHBoxLayout" name="horizontalLayout"/>
+       <widget class="QTableWidget" name="tablePath">
+        <property name="geometry">
+         <rect>
+          <x>30</x>
+          <y>20</y>
+          <width>751</width>
+          <height>401</height>
+         </rect>
+        </property>
+        <column>
+         <property name="text">
+          <string>Path</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Status</string>
+         </property>
+        </column>
+       </widget>
+       <widget class="QTextEdit" name="textPathAdd">
+        <property name="geometry">
+         <rect>
+          <x>40</x>
+          <y>430</y>
+          <width>721</width>
+          <height>31</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QSplitter" name="splitter">
+        <property name="geometry">
+         <rect>
+          <x>800</x>
+          <y>420</y>
+          <width>261</width>
+          <height>111</height>
+         </rect>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <widget class="QPushButton" name="addPath">
+         <property name="text">
+          <string>Add path</string>
+         </property>
+        </widget>
+        <widget class="QPushButton" name="startButton">
+         <property name="text">
+          <string>Start tracking</string>
+         </property>
+        </widget>
+       </widget>
       </widget>
-      <widget class="QWidget" name="display">
+      <widget class="QWidget" name="displayPanel">
        <attribute name="title">
         <string>Display</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_2">
         <item row="0" column="0">
-         <widget class="QLabel" name="binaryDisplay">
+         <widget class="QLabel" name="display">
           <property name="text">
            <string/>
           </property>
          </widget>
         </item>
         <item row="0" column="1">
-         <widget class="QLabel" name="visuDisplay">
+         <widget class="QLabel" name="display2">
           <property name="text">
            <string/>
           </property>
@@ -56,10 +108,13 @@
        </attribute>
        <layout class="QGridLayout" name="gridLayout_3">
         <item row="0" column="0">
-         <widget class="QTableWidget" name="tableWidget">
+         <widget class="QTableWidget" name="tableParameters">
+          <property name="sortingEnabled">
+           <bool>false</bool>
+          </property>
           <column>
            <property name="text">
-            <string>New Column</string>
+            <string>Parameter</string>
            </property>
           </column>
           <column>

@@ -20,11 +20,16 @@
 #include <QSpinBox>
 #include <QLayout>
 #include <QWidget>
-
+#include <QMap>
+#include <QString>
+#include <QDir>
+#include <QThread>
+#include <QDebug>
+#include <QTableWidgetItem>
+#include "functions.h"
 
 
 using namespace std;
-using namespace cv;
 
 namespace Ui {
 class MainWindow;
@@ -37,130 +42,28 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
-    static int const EXIT_CODE_REBOOT = -123456789;
-
 
 
 private:
-
     Ui::MainWindow *ui;
-    QThread *thread;
-    QPushButton *QuitButton;
-    QPushButton *GoButton;
-    QPushButton *PauseButton;
-    QPushButton *DefaultButton;
-    QPushButton *ResetButton;
-    QPushButton *ReplayButton;
-    QCheckBox *normal;
-    QCheckBox *binary;
-    QCheckBox *registration;
-    QMessageBox *welcomeBox;
-    QString version = "v3.7.0";
-    QMetaObject::Connection *logConnection;
+    QMap<QString, QString>* parameterList;
 
-    QWidget *central;
-    QComboBox *theme;
-    QLayout *layout;
-    QLabel *refreshRateLabel;
-    QLabel *path;
-    QLabel *numLabel;
-    QLabel *maxArea;
-    QLabel *minArea;
-    QLabel *length;
-    QLabel *lo;
-    QLabel *w;
-    QLabel *angle;
-    QLabel *nBack;
-    QLabel *thresh;
-    QLabel *save;
-    QLabel *x1ROI;
-    QLabel *y1ROI;
-    QLabel *x2ROI;
-    QLabel *y2ROI;
-    QLabel *arrow;
-    QLabel *fps;
-    QLabel *trackingSpotLabel;
+    QThread* thread;
+    Tracking* tracking;
 
-    QLineEdit *pathField;
-    QLineEdit *numField;
-    QLineEdit *maxAreaField;
-    QLineEdit *minAreaField;
-    QLineEdit *lengthField;
-    QLineEdit *loField;
-    QLineEdit *wField;
-    QLineEdit *angleField;
-    QLineEdit *nBackField;
-    QLineEdit *threshField;
-    QLineEdit *saveField;
-    QLineEdit *x1ROIField;
-    QLineEdit *y1ROIField;
-    QLineEdit *x2ROIField;
-    QLineEdit *y2ROIField;
-    QLCDNumber *arrowField;
-    QLCDNumber *fpsField;
+    QVector<QString> pathList;
+    int pathCounter;
 
-    QLabel *display;
-    QLabel *display2;
-    QTimer *timer;
-    QTimer *timerDisplay;
-    QTimer *timerReplay;
-    QProgressBar *progressBar;
-    QSlider *arrowSlider;
-    QSlider *fpsSlider;
-    QComboBox *trackingSpot;
-
-    vector<String> files;
-    vector <String>::iterator a;
-
-    UMat cameraFrame;
-    Mat visu;
-    UMat img0;
-    UMat background;
-    vector<vector<Point> > memory;
-    vector<Point3f> colorMap;
-    vector<vector<Point3f> > out;
-    vector<vector<Point3f> > outPrev;
-    vector<int> identity;
-    unsigned int im;
-    unsigned int imr;
-    ofstream savefile;
-    ofstream log;
-    vector<Point3f> internalSaving;
-    int spot;
-    int arrowSize;
-    int MAXAREA;
-    int MINAREA;
-    int x1;
-    int y1;
-    int x2;
-    int y2;
-    double LENGTH;
-    double ANGLE;
-    unsigned int NUMBER;
-    double WEIGHT;
-    double LO;
-    int nBackground;
-    int threshValue;
-    string savePath;
-    string folder;
-    bool pause;
 
 public slots:
-    void Initialization();
-    void Go();
-    void Write();
-    void Reset();
-    void Display(Mat visu, UMat cameraFrame);
-    void Replay();
-    void UpdateParameters();
-    void PlayPause();
-    void checkPath(QString);
-    void setSavePath(QString);
-    void logInit();
-    void changeTheme(int index);
-
+    void updateParameterList(QTableWidgetItem* item);
+    void newAnalysis(string path);
+    void startTracking();
+    void addPath();
+    void display(Mat, UMat);
 signals:
-    void grabFrame(Mat visu, UMat cameraFrame);
+    void newParameterList(QMap<QString, QString>*);
+    void next();
 };
 
 #endif // MAINWINDOW_H

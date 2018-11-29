@@ -6,7 +6,7 @@
 
 QT       += core gui
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets core
 
 TARGET = Fishy
 TEMPLATE = app
@@ -30,7 +30,7 @@ SOURCES += \
         functions.cpp \
         Hungarian.cpp
 
-QMAKE_CXXFLAGS += -std=c++11 -O3
+QMAKE_CXXFLAGS += -std=c++11 -O0
 
 
 INCLUDEPATH += /usr/include/opencv

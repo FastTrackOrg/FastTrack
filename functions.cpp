@@ -522,9 +522,9 @@ vector<Point3f> Tracking::color(int number){
 
 
 
-void Tracking::imageProcessing(String a, vector<vector<Point3f>>& out, vector<vector<Point3f>>& outPrev){
+void Tracking::imageProcessing(){
 
-    m_visuFrame = imread(a, IMREAD_GRAYSCALE);
+    m_visuFrame = imread(m_files.at(m_im), IMREAD_GRAYSCALE);
     m_visuFrame.copyTo(m_binaryFrame);
     
     subtract(m_background, m_binaryFrame, m_binaryFrame);
@@ -537,17 +537,18 @@ void Tracking::imageProcessing(String a, vector<vector<Point3f>>& out, vector<ve
  
     m_binaryFrame = m_binaryFrame(m_ROI);
 
-    out = objectPosition(m_binaryFrame, param_minArea, param_maxArea);
+    m_out = objectPosition(m_binaryFrame, param_minArea, param_maxArea);
 
-    vector<int> identity = costFunc(outPrev.at(param_spot), out.at(param_spot), param_len, param_angle, param_weight, param_lo);
-    for (unsigned int i = 0; i < out.size(); i++) {
-      out.at(i) = reassignment(outPrev.at(i), out.at(i), identity);
+    vector<int> identity = costFunc(m_outPrev.at(param_spot), m_out.at(param_spot), param_len, param_angle, param_weight, param_lo);
+cout << m_out.size() << endl;
+    for (unsigned int i = 0; i < m_out.size(); i++) {
+      m_out.at(i) = reassignment(m_outPrev.at(i), m_out.at(i), identity);
     }
 
     // Visualisation
 
-    for(unsigned int l = 0; l < out.at(0).size(); l++){
-      Point3f coord = out.at(param_spot).at(l);
+    for(unsigned int l = 0; l < m_out.at(0).size(); l++){
+      Point3f coord = m_out.at(param_spot).at(l);
       arrowedLine(m_visuFrame, Point(coord.x, coord.y), Point(coord.x + 5*param_arrowSize*cos(coord.z), coord.y - 5*param_arrowSize*sin(coord.z)), Scalar(m_colorMap.at(l).x, m_colorMap.at(l).y, m_colorMap.at(l).z), param_arrowSize, 10*param_arrowSize, 0);
 
       if((m_im > 5)){ // Faudra refaire un buffer correct
@@ -569,29 +570,42 @@ void Tracking::imageProcessing(String a, vector<vector<Point3f>>& out, vector<ve
       m_savefile << "xHead" << "   " << "yHead" << "   " << "tHead" << "   "  << "xTail" << "   " << "yTail" << "   " << "tTail"   <<  "   " << "xBody" << "   " << "yBody" << "   " << "tBody"   <<  "   " << "curvature" <<  "   " << "imageNumber" << "\n";
 }
 
-      m_savefile << out.at(0).at(l).x + m_ROI.tl().x << "   " << out.at(0).at(l).y + m_ROI.tl().y << "   " << out.at(0).at(l).z << "   "  << out.at(1).at(l).x + m_ROI.tl().x << "   " << out.at(1).at(l).y + m_ROI.tl().y << "   " << out.at(1).at(l).z  <<  "   " << out.at(2).at(l).x + m_ROI.tl().x << "   " << out.at(2).at(l).y  + m_ROI.tl().y << "   " << out.at(2).at(l).z <<  "   " << out.at(3).at(l).x <<  "   " << m_im << "\n";
+      m_savefile << m_out.at(0).at(l).x + m_ROI.tl().x << "   " << m_out.at(0).at(l).y + m_ROI.tl().y << "   " << m_out.at(0).at(l).z << "   "  << m_out.at(1).at(l).x + m_ROI.tl().x << "   " << m_out.at(1).at(l).y + m_ROI.tl().y << "   " << m_out.at(1).at(l).z  <<  "   " << m_out.at(2).at(l).x + m_ROI.tl().x << "   " << m_out.at(2).at(l).y  + m_ROI.tl().y << "   " << m_out.at(2).at(l).z <<  "   " << m_out.at(3).at(l).x <<  "   " << m_im << "\n";
 
-    } 
+    }
+    emit(newImageToDisplay(m_visuFrame, m_binaryFrame));
+    emit(finishedProcessFrame()); 
+    if(m_im < m_files.size()){
+      m_im ++;
+    }
+    else{
+      emit(finished());
+    }
 }
 
 
 
 
-Tracking::Tracking(void){
-  
+Tracking::Tracking(string path){
+  m_path = path;
+}
+
+
+void Tracking::startProcess(){
   try{
     glob(m_path, m_files, false); // Get all path to frames
     statusPath = true;
   }
   catch(...){
     statusPath = false;
+    emit(finished());
   }
   sort(m_files.begin(), m_files.end());
-
 
   m_background = backgroundExtraction(m_files, param_nBackground);
   m_colorMap = color(param_n);
 
+cout << "lol" << endl;
   vector<vector<Point3f>> out;
   vector<vector<Point3f>> outPrev;
 
@@ -619,10 +633,32 @@ Tracking::Tracking(void){
     }
   }
   outPrev = out;
+  m_im ++;
+  connect(this, SIGNAL(finishedProcessFrame()), this, SLOT(imageProcessing()));
+  emit(newImageToDisplay(m_visuFrame, m_binaryFrame));
+  emit(finishedProcessFrame());
+  cout << "test" << endl;
+}
 
-  m_im = 0;
-  for(auto const& a: m_files){
-    m_im ++;
-    imageProcessing(a, out, outPrev);
-  }
+void Tracking::updatingParameters(QMap<QString, QString> parameterList) {
+
+  param_n = parameterList.value("Object number").toInt();
+  param_maxArea = parameterList.value("Maximal size").toInt();
+  param_minArea = parameterList.value("Minimal size").toInt();
+  param_spot = parameterList.value("Spot to track").toInt();
+  param_len = parameterList.value("Maximal length").toDouble();
+  param_angle = parameterList.value("Maximal angle").toDouble();
+  param_weight = parameterList.value("Weight").toDouble();
+  param_lo = parameterList.value("Maximum occlusion").toInt();
+  param_arrowSize = parameterList.value("Arrow size").toInt();
+  param_folder = "";
+  param_thresh = parameterList.value("Binary threshold").toInt();
+  param_nBackground = parameterList.value("Number image background").toDouble();
+  param_x1 = parameterList.value("ROI top x").toInt();
+  param_y1 = parameterList.value("ROI top y").toInt();
+  param_x2 = parameterList.value("ROI bottom x").toInt();
+  param_y2 = parameterList.value("ROI bottom y").toInt();
+  statusRegistration = (parameterList.value("Registration") == "yes") ? true : false;
+  statusBinarisation = (parameterList.value("Light background") == "yes") ? true : false;
+
 }
