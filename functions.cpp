@@ -123,9 +123,9 @@ vector<double> Tracking::orientation(UMat image, bool dir) {
 
 
     double orientation = 0.5 * atan((2*j)/(i-k)) + (i<k)*(M_PI*0.5);
-	orientation += 2*M_PI*(orientation<0);
-	orientation = 2*M_PI - orientation;
-	double orientationDeg = (orientation*180)/M_PI;
+  	orientation += 2*M_PI*(orientation<0);
+	  orientation = 2*M_PI - orientation;
+	  double orientationDeg = (orientation*180)/M_PI;
 
 
 	if(dir == true){ // Orientation computation
@@ -136,13 +136,13 @@ vector<double> Tracking::orientation(UMat image, bool dir) {
 		Rect bbox = RotatedRect(center, image.size(), -orientationDeg).boundingRect();
 		rotMatrix.at<double>(0,2) += bbox.width*0.5 - center.x; //add an off set
 	  rotMatrix.at<double>(1,2) += bbox.height*0.5 - center.y;// to rotate without cropping the frame
+qInfo() << rotMatrix.at<double>(0,2) << endl;
 		warpAffine(image, rotate, rotMatrix, bbox.size());
 
 		vector<double> tmpMat;
 		vector<double> tmp;
 
     reduce(rotate, tmpMat, 0, REDUCE_SUM);
-
 		double ccMax = *max_element(tmpMat.begin(), tmpMat.end())/100;
 		for (unsigned int it = 0; it < tmpMat.size(); ++it){
 			int cc = tmpMat.at(it);
@@ -279,7 +279,6 @@ vector<vector<Point3f>> Tracking::objectPosition(UMat frame, int minSize, int ma
 	Point2f radiusCurv;
 
 	findContours(frame, contours, RETR_LIST, CHAIN_APPROX_NONE);
-
 
 
 	for (unsigned int i = 0; i < contours.size(); i++){
@@ -521,10 +520,11 @@ vector<Point3f> Tracking::color(int number){
 
 void Tracking::imageProcessing(){
 
+while (m_im < m_files.size()){
     imread(m_files.at(m_im), IMREAD_GRAYSCALE).copyTo(m_visuFrame);
-    
     if(statusRegistration){
-      registration(m_img0, m_visuFrame);
+     qInfo() << "reg"; 
+      registration(m_background, m_visuFrame);
     }
 
     subtract(m_background, m_visuFrame, m_binaryFrame);
@@ -569,27 +569,27 @@ void Tracking::imageProcessing(){
       m_savefile << m_out.at(0).at(l).x + m_ROI.tl().x << "   " << m_out.at(0).at(l).y + m_ROI.tl().y << "   " << m_out.at(0).at(l).z << "   "  << m_out.at(1).at(l).x + m_ROI.tl().x << "   " << m_out.at(1).at(l).y + m_ROI.tl().y << "   " << m_out.at(1).at(l).z  <<  "   " << m_out.at(2).at(l).x + m_ROI.tl().x << "   " << m_out.at(2).at(l).y  + m_ROI.tl().y << "   " << m_out.at(2).at(l).z <<  "   " << m_out.at(3).at(l).x <<  "   " << m_im << "\n";
 
     }
-
+  
     m_im ++;
     m_outPrev = m_out;
     emit(newImageToDisplay(m_visuFrame, m_binaryFrame));
-    if(m_im < m_files.size()){
-      emit(finishedProcessFrame()); 
-    }
-    else{
+    if(m_im + 1 > m_files.size()){
       emit(finished());
     }
+    qInfo() << m_im << "      " << m_files.size() << endl;
+  //  emit(finishedProcessFrame()); 
+}
 }
 
 
 
 
-Tracking::Tracking(string path){
+Tracking::Tracking(string path) {
   m_path = path;
 }
 
 
-void Tracking::startProcess(){
+void Tracking::startProcess() {
   try{
     glob(m_path, m_files, false); // Get all path to frames
     statusPath = true;
@@ -607,13 +607,13 @@ void Tracking::startProcess(){
 
 
   // First frame
-  imread(*m_files.begin(), IMREAD_GRAYSCALE).copyTo(m_visuFrame);
-  m_visuFrame.copyTo(m_img0);
+  imread(m_files.at(0), IMREAD_GRAYSCALE).copyTo(m_visuFrame);
   subtract(m_background, m_visuFrame, m_binaryFrame);
 
   (statusBinarisation) ? (binarisation(m_binaryFrame, 'b', param_thresh)) : (binarisation(m_binaryFrame, 'w', param_thresh)); // If statusBinarisation == true the object is black on white background
 
   m_binaryFrame = m_binaryFrame(m_ROI);
+  m_visuFrame = m_visuFrame(m_ROI);
 
   m_out= objectPosition(m_binaryFrame, param_minArea, param_maxArea);
   if( m_out.at(0).size() < param_n ){ // Less objects in frame as in param_n
@@ -623,6 +623,7 @@ void Tracking::startProcess(){
       }
     }
   }
+  cvtColor(m_visuFrame, m_visuFrame, COLOR_GRAY2RGB);
   m_outPrev = m_out;
   m_im = 1;
   connect(this, SIGNAL(finishedProcessFrame()), this, SLOT(imageProcessing()));

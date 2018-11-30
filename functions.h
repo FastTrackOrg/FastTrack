@@ -52,7 +52,6 @@ class Tracking : public QObject {
 
 
 
-  UMat m_img0;
   UMat m_background;
   
   bool statusRegistration; 
@@ -109,8 +108,8 @@ class Tracking : public QObject {
   void startProcess();
   void updatingParameters(const QMap<QString, QString> &);
   void imageProcessing();
-  signals:
 
+  signals:
   void newImageToDisplay(UMat&, UMat&);
   void finishedProcessFrame();
   void finished();

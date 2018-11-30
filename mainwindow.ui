@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1123</width>
-    <height>714</height>
+    <width>1095</width>
+    <height>753</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -21,65 +21,67 @@
        <enum>QTabWidget::West</enum>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="files">
        <attribute name="title">
         <string>Files</string>
        </attribute>
-       <widget class="QTableWidget" name="tablePath">
-        <property name="geometry">
-         <rect>
-          <x>30</x>
-          <y>20</y>
-          <width>751</width>
-          <height>401</height>
-         </rect>
-        </property>
-        <column>
-         <property name="text">
-          <string>Path</string>
-         </property>
-        </column>
-        <column>
-         <property name="text">
-          <string>Status</string>
-         </property>
-        </column>
-       </widget>
-       <widget class="QTextEdit" name="textPathAdd">
-        <property name="geometry">
-         <rect>
-          <x>40</x>
-          <y>430</y>
-          <width>721</width>
-          <height>31</height>
-         </rect>
-        </property>
-       </widget>
-       <widget class="QSplitter" name="splitter">
-        <property name="geometry">
-         <rect>
-          <x>800</x>
-          <y>420</y>
-          <width>261</width>
-          <height>111</height>
-         </rect>
-        </property>
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
-        </property>
-        <widget class="QPushButton" name="addPath">
-         <property name="text">
-          <string>Add path</string>
-         </property>
-        </widget>
-        <widget class="QPushButton" name="startButton">
-         <property name="text">
-          <string>Start tracking</string>
-         </property>
-        </widget>
-       </widget>
+       <layout class="QGridLayout" name="gridLayout_4">
+        <item row="0" column="0">
+         <widget class="QTableWidget" name="tablePath">
+          <column>
+           <property name="text">
+            <string>Path</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string>Status</string>
+           </property>
+          </column>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QTextEdit" name="textPathAdd">
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>31</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QSplitter" name="splitter">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <widget class="QPushButton" name="addPath">
+           <property name="maximumSize">
+            <size>
+             <width>151</width>
+             <height>34</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Add path</string>
+           </property>
+          </widget>
+          <widget class="QPushButton" name="startButton">
+           <property name="maximumSize">
+            <size>
+             <width>151</width>
+             <height>33</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Start tracking</string>
+           </property>
+          </widget>
+         </widget>
+        </item>
+       </layout>
       </widget>
       <widget class="QWidget" name="displayPanel">
        <attribute name="title">

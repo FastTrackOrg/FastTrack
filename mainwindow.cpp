@@ -28,9 +28,13 @@ MainWindow::MainWindow(QWidget *parent) :
     setWindowState(Qt::WindowMaximized);
     setWindowTitle("Fishy Tracking");
     statusBar()->showMessage(tr("Ready"));
+    ui->tableParameters->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    ui->tablePath->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+
+
 
     qRegisterMetaType<UMat>("UMat&");
-    //qRegisterMetaType<QMap<QString, QString>("QMap<QString, QString>");
+    qRegisterMetaType<QMap<QString, QString>>("QMap<QString, QString>");
     cv::ocl::setUseOpenCL(false);
     // Setup style
     QFile stylesheet(":/darkTheme.qss");
@@ -74,20 +78,7 @@ MainWindow::MainWindow(QWidget *parent) :
     parameterList.insert("Maximal size", "1000|Maximal size of the object to track in pixels.");
     parameterList.insert("Object number", "1|Number of moving object to track.");
 
-    // If config file exist load saved parameter values
-    // Note: will be changed with QT build in module for saving conf file
-    QFile file("conf.txt");
-    if(QFileInfo("conf.txt").exists() && file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        QTextStream in(&file);
-        while(!in.atEnd()) {
-            QStringList parameterNameValue = in.readLine().split('|');
-            QStringList parameterDescription = parameterList.value(parameterNameValue.at(0)).split('|');
-            QString valueDescription = QString(parameterNameValue.at(1) + "|" + parameterDescription.at(1)); 
-            parameterList.insert(parameterNameValue.at(0), valueDescription);
-        }
-        file.close();
-    }
-
+    loadSettings();
 
     // Fill the parameters table with the default names values and descriptions
     // and delete the description that are not used anymore
@@ -96,9 +87,11 @@ MainWindow::MainWindow(QWidget *parent) :
       ui->tableParameters->insertRow(i);
       QString parameterName = parameterList.keys().at(i);
       ui->tableParameters->setItem(i, 0, new QTableWidgetItem(parameterName));
+      ui->tableParameters->item(i, 0)->setFlags(ui->tableParameters->item(i, 0)->flags() & ~Qt::ItemIsEditable);
       QStringList parameterAttributs = parameterList.value(parameterName).split('|');
       ui->tableParameters->setItem(i, 1, new QTableWidgetItem(parameterAttributs.at(0)));
       ui->tableParameters->setItem(i, 2, new QTableWidgetItem(parameterAttributs.at(1)));
+      ui->tableParameters->item(i, 2)->setFlags(ui->tableParameters->item(i, 2)->flags() & ~Qt::ItemIsEditable);
       parameterList.insert(parameterName, parameterAttributs.at(0));
      }
 
@@ -121,6 +114,7 @@ void MainWindow::updateParameterList(QTableWidgetItem* item) {
     QString parameterName = ui->tableParameters->item(row, 0)->text();
     QString parameterValue = ui->tableParameters->item(row, 1)->text();
     parameterList.insert(parameterName, parameterValue);
+    qInfo() << "Send parameters" << endl;
     emit(newParameterList(parameterList));
 }
 
@@ -136,6 +130,7 @@ void MainWindow::addPath() {
 void MainWindow::newAnalysis(string path) {
 
     cout << "main QThreadID is " << QThread::currentThread()  << endl;
+    frameAnalyzed = 0;
     thread = new QThread;
     tracking = new Tracking(path);
     tracking->moveToThread(thread);
@@ -170,22 +165,38 @@ void MainWindow::display(UMat &visu, UMat &cameraFrame){
 
     ui->display->setPixmap(QPixmap::fromImage(QImage(cameraFrame.getMat(cv::ACCESS_READ).data, cameraFrame.cols, cameraFrame.rows, cameraFrame.step, QImage::Format_Grayscale8)).scaled(w, h, Qt::KeepAspectRatio));
     ui->display2->setPixmap(QPixmap::fromImage(QImage(visu.getMat(cv::ACCESS_READ).data, visu.cols, visu.rows, visu.step, QImage::Format_RGB888)).scaled(w2, h2, Qt::KeepAspectRatio));
+  frameAnalyzed ++;
+  statusBar()->showMessage(QString::number(frameAnalyzed));
 }
 
 
+
+
+/*******************************************************************************************\
+                                    Settings
+\*******************************************************************************************/
+
+void MainWindow::loadSettings() {
+    settingsFile = new QSettings("settings.ini", QSettings::NativeFormat, this);
+    QStringList keyList = settingsFile->allKeys(); 
+
+    for(auto a: keyList) {
+      QStringList parameterDescription = parameterList.value(a).split('|');
+      QString valueDescription = QString( settingsFile->value(a).toString()+ "|" + parameterDescription.at(1)); 
+      parameterList.insert(a, valueDescription);
+    }    
+}
+
+void MainWindow::saveSettings() {
+      QList<QString> keyList = parameterList.keys();
+      for(auto a: keyList) {
+        settingsFile->setValue(QString(a), parameterList.value(a));
+      }
+}
+
 MainWindow::~MainWindow()
 {
-    // Save parameters in a file that will be reload at the next strat up of the application
-    QFile file("conf.txt");
-
-    if(file.open(QIODevice::ReadWrite | QIODevice::Text)) {
-      QList<QString> keyList = parameterList.keys();
-      QTextStream stream( &file );
-      for(auto a: keyList) {
-        stream << a << "|" << parameterList.value(a) << endl;
-    }
-        file.close();
-    }
+    saveSettings();
     delete ui;
 }
 

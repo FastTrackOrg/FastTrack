@@ -22,6 +22,7 @@
 #include <QWidget>
 #include <QMap>
 #include <QString>
+#include <QSettings>
 #include <QDir>
 #include <QThread>
 #include <QDebug>
@@ -54,6 +55,12 @@ private:
     QVector<QString> pathList;
     int pathCounter;
 
+    int frameAnalyzed;
+
+
+    void loadSettings();
+    void saveSettings();
+    QSettings *settingsFile;
 
 public slots:
     void updateParameterList(QTableWidgetItem* item);

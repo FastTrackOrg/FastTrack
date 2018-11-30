@@ -14,6 +14,8 @@ TEMPLATE = app
 DESTDIR=build
 OBJECTS_DIR=build
 MOC_DIR=build
+UI_DIR=build
+RCC_DIR=build
 
 
 QMAKE_LFLAGS_RELEASE += -O0
