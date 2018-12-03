@@ -136,7 +136,6 @@ vector<double> Tracking::orientation(UMat image, bool dir) {
 		Rect bbox = RotatedRect(center, image.size(), -orientationDeg).boundingRect();
 		rotMatrix.at<double>(0,2) += bbox.width*0.5 - center.x; //add an off set
 	  rotMatrix.at<double>(1,2) += bbox.height*0.5 - center.y;// to rotate without cropping the frame
-qInfo() << rotMatrix.at<double>(0,2) << endl;
 		warpAffine(image, rotate, rotMatrix, bbox.size());
 
 		vector<double> tmpMat;
@@ -520,11 +519,11 @@ vector<Point3f> Tracking::color(int number){
 
 void Tracking::imageProcessing(){
 
-while (m_im < m_files.size()){
+//while (m_im < m_files.size()){
     imread(m_files.at(m_im), IMREAD_GRAYSCALE).copyTo(m_visuFrame);
     if(statusRegistration){
-     qInfo() << "reg"; 
-      registration(m_background, m_visuFrame);
+//      registration(m_background, m_visuFrame);
+qInfo() << "ref";
     }
 
     subtract(m_background, m_visuFrame, m_binaryFrame);
@@ -558,13 +557,6 @@ while (m_im < m_files.size()){
       // Saving
       coord.x += m_ROI.tl().x;
       coord.y += m_ROI.tl().y;
-      if(m_im == 0 && l == 0){
-        time_t now = time(0);
-        char* dt = ctime(&now);
-        dt[strlen(dt) - 1] = '\t';
-        m_savefile << dt << param_folder << '\n';
-        m_savefile << "xHead" << "   " << "yHead" << "   " << "tHead" << "   "  << "xTail" << "   " << "yTail" << "   " << "tTail"   <<  "   " << "xBody" << "   " << "yBody" << "   " << "tBody"   <<  "   " << "curvature" <<  "   " << "imageNumber" << "\n";
-      }
 
       m_savefile << m_out.at(0).at(l).x + m_ROI.tl().x << "   " << m_out.at(0).at(l).y + m_ROI.tl().y << "   " << m_out.at(0).at(l).z << "   "  << m_out.at(1).at(l).x + m_ROI.tl().x << "   " << m_out.at(1).at(l).y + m_ROI.tl().y << "   " << m_out.at(1).at(l).z  <<  "   " << m_out.at(2).at(l).x + m_ROI.tl().x << "   " << m_out.at(2).at(l).y  + m_ROI.tl().y << "   " << m_out.at(2).at(l).z <<  "   " << m_out.at(3).at(l).x <<  "   " << m_im << "\n";
 
@@ -574,11 +566,14 @@ while (m_im < m_files.size()){
     m_outPrev = m_out;
     emit(newImageToDisplay(m_visuFrame, m_binaryFrame));
     if(m_im + 1 > m_files.size()){
+      m_savefile.flush();
+      m_outputFile.close();
       emit(finished());
+    qInfo() << timer->elapsed() << endl;
     }
-    qInfo() << m_im << "      " << m_files.size() << endl;
-  //  emit(finishedProcessFrame()); 
-}
+    else {
+    QTimer::singleShot(0, this, SLOT(imageProcessing()));
+    }
 }
 
 
@@ -591,8 +586,10 @@ Tracking::Tracking(string path) {
 
 void Tracking::startProcess() {
   try{
+    m_path += "/*pgm";
     glob(m_path, m_files, false); // Get all path to frames
     statusPath = true;
+    m_im = 0;
   }
   catch(...){
     statusPath = false;
@@ -624,9 +621,41 @@ void Tracking::startProcess() {
     }
   }
   cvtColor(m_visuFrame, m_visuFrame, COLOR_GRAY2RGB);
+  
+  // Initialize output file and stream
+  m_outputFile.setFileName(QString::fromStdString(m_path).section("*",0,0) + "Tracking_Result" + QDir::separator() + "tracking.txt" );
+  if(!m_outputFile.open(QFile::WriteOnly | QFile::Text)){
+    qInfo() << "Error opening folder";
+  }
+  m_savefile.setDevice(&m_outputFile);
+
+  // Saving
+  m_savefile << "xHead" << '\t' << "yHead" << '\t' << "tHead" << '\t'  << "xTail" << '\t' << "yTail" << '\t' << "tTail"   << '\t'  << "xBody" << '\t' << "yBody" << '\t' << "tBody"   << '\t'  << "curvature" << '\t'  << "imageNumber" << "\n";
+  for(unsigned int l = 0; l < m_out.at(0).size(); l++){
+    Point3f coord = m_out.at(param_spot).at(l);      arrowedLine(m_visuFrame, Point(coord.x, coord.y), Point(coord.x + 5*param_arrowSize*cos(coord.z), coord.y - 5*param_arrowSize*sin(coord.z)), Scalar(m_colorMap.at(l).x, m_colorMap.at(l).y, m_colorMap.at(l).z), param_arrowSize, 10*param_arrowSize, 0);
+
+    if((m_im > 5)){ // Faudra refaire un buffer correct
+      polylines(m_visuFrame, m_memory.at(l), false, Scalar(m_colorMap.at(l).x, m_colorMap.at(l).y, m_colorMap.at(l).z), param_arrowSize, 8, 0);
+      m_memory.at(l).push_back(Point((int)coord.x, (int)coord.y));
+    if(m_im > 50){
+        m_memory.at(l).erase(m_memory.at(l).begin());
+      }
+    }
+
+    // Saving
+    coord.x += m_ROI.tl().x;
+    coord.y += m_ROI.tl().y;
+
+    m_savefile << m_out.at(0).at(l).x + m_ROI.tl().x << "   " << m_out.at(0).at(l).y + m_ROI.tl().y << "   " << m_out.at(0).at(l).z << "   "  << m_out.at(1).at(l).x + m_ROI.tl().x << "   " << m_out.at(1).at(l).y + m_ROI.tl().y << "   " << m_out.at(1).at(l).z  <<  "   " << m_out.at(2).at(l).x + m_ROI.tl().x << "   " << m_out.at(2).at(l).y  + m_ROI.tl().y << "   " << m_out.at(2).at(l).z <<  "   " << m_out.at(3).at(l).x <<  "   " << m_im << "\n";
+
+  }
   m_outPrev = m_out;
-  m_im = 1;
+  m_im ++;
   connect(this, SIGNAL(finishedProcessFrame()), this, SLOT(imageProcessing()));
+  timer = new QElapsedTimer();
+
+
+  timer->start();
   emit(newImageToDisplay(m_visuFrame, m_binaryFrame));
   emit(finishedProcessFrame());
 }
@@ -642,7 +671,7 @@ void Tracking::updatingParameters(const QMap<QString, QString> &parameterList) {
   param_weight = parameterList.value("Weight").toDouble();
   param_lo = parameterList.value("Maximum occlusion").toInt();
   param_arrowSize = parameterList.value("Arrow size").toInt();
-  param_folder = "";
+
   param_thresh = parameterList.value("Binary threshold").toInt();
   param_nBackground = parameterList.value("Number image background").toDouble();
   param_x1 = parameterList.value("ROI top x").toInt();
@@ -654,4 +683,8 @@ void Tracking::updatingParameters(const QMap<QString, QString> &parameterList) {
   statusBinarisation = (parameterList.value("Light background") == "yes") ? true : false;
 
   qInfo() << "Parameters updated" << endl;
+}
+
+
+Tracking::~Tracking() {
 }

@@ -40,6 +40,11 @@
 #include <QDebug>
 #include <QThread>
 #include <QString>
+#include <QTimer>
+#include <QFile>
+#include <QDir>
+#include <QTextStream>
+#include <QElapsedTimer>
 
 using namespace cv;
 using namespace std;
@@ -52,6 +57,8 @@ class Tracking : public QObject {
 
 
 
+  QElapsedTimer *timer;
+
   UMat m_background;
   
   bool statusRegistration; 
@@ -60,7 +67,8 @@ class Tracking : public QObject {
 
   int m_im;
   Rect m_ROI;
-  ofstream m_savefile;
+  QTextStream m_savefile;
+  QFile m_outputFile;
   vector<cv::String> m_files; // OpenCV String class
   vector<Point3f> m_colorMap;
   vector<vector<Point>> m_memory;
@@ -83,6 +91,7 @@ class Tracking : public QObject {
 
   public:
   Tracking(string path);
+  ~Tracking();
 
   UMat m_binaryFrame;
   UMat m_visuFrame;
@@ -96,7 +105,6 @@ class Tracking : public QObject {
   double param_weight;
   double param_lo;
   int param_arrowSize;
-  string param_folder;
   int param_thresh;
   double param_nBackground;
   int param_x1;
