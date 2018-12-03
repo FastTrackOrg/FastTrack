@@ -21,6 +21,7 @@
 #include <QLayout>
 #include <QWidget>
 #include <QMap>
+#include <QDir>
 #include <QString>
 #include <QSettings>
 #include <QDir>
@@ -64,9 +65,9 @@ private:
 
 public slots:
     void updateParameterList(QTableWidgetItem* item);
-    void newAnalysis(string path);
     void startTracking();
     void addPath();
+    void removePath();
     void display(UMat&, UMat&);
 signals:
     void newParameterList(const QMap<QString, QString> &);

@@ -102,9 +102,10 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tablePath->horizontalHeader()->setStretchLastSection(true);
     ui->tablePath->setSortingEnabled(false);
     pathCounter = 0;
-    connect(ui->addPath, SIGNAL(clicked()), this, SLOT(addPath()));
-    connect(ui->startButton, SIGNAL(clicked()), this, SLOT(startTracking()));
-    connect(this, SIGNAL(next()), this, SLOT(startTracking()));
+    connect(ui->addPath, &QPushButton::clicked, this, &MainWindow::addPath);
+    connect(ui->removePath, &QPushButton::clicked, this, &MainWindow::removePath);
+    connect(ui->startButton, &QPushButton::clicked, this, &MainWindow::startTracking);
+    connect(this, &MainWindow::next, this, &MainWindow::startTracking);
 
 }
 
@@ -127,28 +128,51 @@ void MainWindow::addPath() {
     ui->textPathAdd->clear();
 }
 
-void MainWindow::newAnalysis(string path) {
+void MainWindow::removePath() {
+    int row = ui->tablePath->currentRow();
+    if ( row != -1) { 
+      pathList.remove(row);
+      ui->tablePath->removeRow(row);
+    }
+}
 
-    cout << "main QThreadID is " << QThread::currentThread()  << endl;
+void MainWindow::startTracking() {
+    
+
+    if(!pathList.isEmpty()) {
+      string path = pathList.at(0).toStdString();
+  
+      // Save parameters
+
+      QDir().mkdir( QString::fromStdString(path) + QDir::separator() + "Tracking_Result" );
+      QFile parameterFile(QString::fromStdString(path) + QDir::separator() +  "Tracking_Result" + QDir::separator() + "parameter.txt" );
+    if(!parameterFile.open(QFile::WriteOnly | QFile::Text)){
+      qInfo() << "Error opening folder";
+    }
+    QTextStream out(&parameterFile);
+    QList<QString> keyList = parameterList.keys();
+    for(auto a: keyList) {
+      out << a << " = " << parameterList.value(a) << endl; ;
+    }
     frameAnalyzed = 0;
     thread = new QThread;
     tracking = new Tracking(path);
     tracking->moveToThread(thread);
     connect(thread, SIGNAL(started()), tracking, SLOT(startProcess()));
     connect(this, SIGNAL(newParameterList(QMap<QString, QString>)), tracking, SLOT(updatingParameters(QMap<QString, QString>)));
-    //connect(tracking, SIGNAL(finished()), this, SIGNAL(next()));
+    connect(tracking, &Tracking::finished, [this]() {
+      pathList.removeFirst();
+      ui->tablePath->removeRow(0);
+    });
+
+    connect(tracking, SIGNAL(finished()), this, SIGNAL(next()));
     connect(tracking, SIGNAL(newImageToDisplay(UMat&, UMat&)), this, SLOT(display(UMat&, UMat&)));
     connect(tracking, SIGNAL(finished()), thread, SLOT(quit()));
     connect(tracking, SIGNAL(finished()), tracking, SLOT(deleteLater()));
     connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
-    pathCounter ++;
     thread->start();
     tracking->updatingParameters(parameterList);
-}
-
-void MainWindow::startTracking() {
-    string path = pathList.at(pathCounter).toStdString();
-    newAnalysis(path);
+  }
 }
 
 /**

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1095</width>
-    <height>753</height>
+    <width>1092</width>
+    <height>762</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -35,14 +35,22 @@
             <string>Path</string>
            </property>
           </column>
-          <column>
-           <property name="text">
-            <string>Status</string>
-           </property>
-          </column>
          </widget>
         </item>
-        <item row="1" column="0">
+        <item row="1" column="1">
+         <widget class="QPushButton" name="removePath">
+          <property name="maximumSize">
+           <size>
+            <width>151</width>
+            <height>34</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Remove</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
          <widget class="QTextEdit" name="textPathAdd">
           <property name="maximumSize">
            <size>
@@ -52,33 +60,30 @@
           </property>
          </widget>
         </item>
-        <item row="1" column="1">
-         <widget class="QSplitter" name="splitter">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
+        <item row="2" column="1">
+         <widget class="QPushButton" name="addPath">
+          <property name="maximumSize">
+           <size>
+            <width>151</width>
+            <height>34</height>
+           </size>
           </property>
-          <widget class="QPushButton" name="addPath">
-           <property name="maximumSize">
-            <size>
-             <width>151</width>
-             <height>34</height>
-            </size>
-           </property>
-           <property name="text">
-            <string>Add path</string>
-           </property>
-          </widget>
-          <widget class="QPushButton" name="startButton">
-           <property name="maximumSize">
-            <size>
-             <width>151</width>
-             <height>33</height>
-            </size>
-           </property>
-           <property name="text">
-            <string>Start tracking</string>
-           </property>
-          </widget>
+          <property name="text">
+           <string>Add path</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <widget class="QPushButton" name="startButton">
+          <property name="maximumSize">
+           <size>
+            <width>151</width>
+            <height>33</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Start tracking</string>
+          </property>
          </widget>
         </item>
        </layout>
