@@ -522,16 +522,17 @@ void Tracking::imageProcessing(){
 //while (m_im < m_files.size()){
     imread(m_files.at(m_im), IMREAD_GRAYSCALE).copyTo(m_visuFrame);
     if(statusRegistration){
-//      registration(m_background, m_visuFrame);
-qInfo() << "ref";
+      registration(m_background, m_visuFrame);
     }
 
     subtract(m_background, m_visuFrame, m_binaryFrame);
 
     (statusBinarisation) ? (binarisation(m_binaryFrame, 'b', param_thresh)) : (binarisation(m_binaryFrame, 'w', param_thresh)); // If statusBinarisation == true the object is black on white background
- 
-    m_binaryFrame = m_binaryFrame(m_ROI);
-    m_visuFrame = m_visuFrame(m_ROI);
+
+    if(m_ROI.width != 0 ) {
+      m_binaryFrame = m_binaryFrame(m_ROI);
+      m_visuFrame = m_visuFrame(m_ROI);
+    }
 
     m_out = objectPosition(m_binaryFrame, param_minArea, param_maxArea);
 
@@ -619,8 +620,10 @@ void Tracking::startProcess() {
 
   (statusBinarisation) ? (binarisation(m_binaryFrame, 'b', param_thresh)) : (binarisation(m_binaryFrame, 'w', param_thresh)); // If statusBinarisation == true the object is black on white background
 
-  m_binaryFrame = m_binaryFrame(m_ROI);
-  m_visuFrame = m_visuFrame(m_ROI);
+  if (m_ROI.width != 0){
+    m_binaryFrame = m_binaryFrame(m_ROI);
+    m_visuFrame = m_visuFrame(m_ROI);
+  }
 
   m_out= objectPosition(m_binaryFrame, param_minArea, param_maxArea);
   if( m_out.at(0).size() < param_n ){ // Less objects in frame as in param_n

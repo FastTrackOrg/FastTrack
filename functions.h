@@ -43,6 +43,9 @@
 #include <QTimer>
 #include <QFile>
 #include <QDir>
+#include <QList>
+#include <QDirIterator>
+#include <QFileInfo>
 #include <QTextStream>
 #include <QElapsedTimer>
 
