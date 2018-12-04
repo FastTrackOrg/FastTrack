@@ -585,8 +585,18 @@ Tracking::Tracking(string path) {
 
 
 void Tracking::startProcess() {
+  
+  // Find image format
+  QList<QString> extensions = { "pgm", "png", "jpeg", "jpg", "tiff", "tif", "bmp", "dib", "jpe", "jp2", "webp", "pbm", "ppm", "sr", "ras", "tif" };
+  QDirIterator it(QString::fromStdString(m_path), QStringList(), QDir::NoFilter);
+  QString extension;
+  while (it.hasNext()) {
+    extension = it.next().section('.', -1);
+    if( extensions.contains(extension) ) break;
+  }
+  
   try{
-    m_path += "/*pgm";
+    m_path += + "*." + extension.toStdString();
     glob(m_path, m_files, false); // Get all path to frames
     statusPath = true;
     m_im = 0;
