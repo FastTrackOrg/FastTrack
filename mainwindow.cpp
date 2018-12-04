@@ -27,7 +27,6 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     setWindowState(Qt::WindowMaximized);
     setWindowTitle("Fishy Tracking");
-    statusBar()->showMessage(tr("Ready"));
     ui->tableParameters->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     ui->tablePath->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
@@ -37,19 +36,12 @@ MainWindow::MainWindow(QWidget *parent) :
     qRegisterMetaType<QMap<QString, QString>>("QMap<QString, QString>");
     cv::ocl::setUseOpenCL(false);
     // Setup style
-    QFile stylesheet(":/darkTheme.qss");
+    QFile stylesheet(":/theme.qss");
 
     if(stylesheet.open(QIODevice::ReadOnly | QIODevice::Text)) { // Read the theme file
         qApp->setStyleSheet(stylesheet.readAll());
         stylesheet.close();
     }
-
-    else{ // If the theme is not found print an error (for dev purpose)
-        cout << "Theme not found" << '\n';
-    }
-
-
-
 
 ////////////////////////////Parameters panel/////////////////////////////////////////////
     
@@ -60,23 +52,23 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tableParameters->horizontalHeader()->setStretchLastSection(true);
 
     // Default Name, value|description
-    parameterList.insert("Registration", "yes|Yes if darks object on light background. No if light objects on dark background. ");
-    parameterList.insert("Light background", "yes|Yes if darks object on light background. No if light objects on dark background. ");
-    parameterList.insert("ROI bottom y", "0|");
-    parameterList.insert("ROI bottom x", "0|");
-    parameterList.insert("ROI top y", "0|");
-    parameterList.insert("ROI top x", "0|");
-    parameterList.insert("Number image background", "0|");
-    parameterList.insert("Arrow size", "0|");
-    parameterList.insert("Maximal occlusion", "0|");
-    parameterList.insert("Weight", "0|");
-    parameterList.insert("Maximal angle", "0|");
-    parameterList.insert("Maximal length", "0|");
+    parameterList.insert("Registration", "yes|Yes to activate registration.");
+    parameterList.insert("Light background", "yes|Yes if dark objects on light background. No if light objects on dark background. ");
+    parameterList.insert("ROI bottom y", "0|Defines region of interest bottom corner.");
+    parameterList.insert("ROI bottom x", "0|Defines region of interest bottom corner.");
+    parameterList.insert("ROI top y", "0|Defines region of interest top corner.");
+    parameterList.insert("ROI top x", "0|Defines region of interest top corner.");
+    parameterList.insert("Number of images background", "0|Number of images to average for computing the background.");
+    parameterList.insert("Arrow size", "2|Display arrow on fish in the tracking display.");
+    parameterList.insert("Maximal occlusion", "100|Maximum distance in pixel that a fish can travel when occluded.");
+    parameterList.insert("Weight", "0.5|Relative importance between angle and distance. 0: only angle, 1: only distance. ");
+    parameterList.insert("Maximal angle", "90|Maximal angular difference between two frames.");
+    parameterList.insert("Maximal length", "100|Maximal distance travelled between two frames");
     parameterList.insert("Spot to track", "0|What spot to track. 0: head, 1: tail, 2: center");
-    parameterList.insert("Binary threshold", "124|Threshold to separate background and object. Range from 0 to 255.");
-    parameterList.insert("Minimal size", "1000|Minimal size of the object to track in pixels.");
-    parameterList.insert("Maximal size", "1000|Maximal size of the object to track in pixels.");
-    parameterList.insert("Object number", "1|Number of moving object to track.");
+    parameterList.insert("Binary threshold", "70|Threshold to separate background and object. Range from 0 to 255.");
+    parameterList.insert("Minimal size", "5000|Minimal size of the object to track in pixels.");
+    parameterList.insert("Maximal size", "50|Maximal size of the object to track in pixels.");
+    parameterList.insert("Object number", "1|Number of moving objects to track.");
 
     loadSettings();
 
