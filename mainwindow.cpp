@@ -109,7 +109,14 @@ MainWindow::MainWindow(QWidget *parent) :
 
 }
 
+/*!
+  \fn void &MainWindow::updateParameterList(QTableWidget* item)
 
+  Updates parameters from the \a item, if an element it is modified.
+
+  If a parameter is modifyed, this method emit a signal with a new QMap
+  containing new parameters.
+*/
 void MainWindow::updateParameterList(QTableWidgetItem* item) {
     int row = item->row();
     QString parameterName = ui->tableParameters->item(row, 0)->text();
@@ -119,6 +126,15 @@ void MainWindow::updateParameterList(QTableWidgetItem* item) {
     emit(newParameterList(parameterList));
 }
 
+/*!
+  \fn void &MainWindow::addPath()
+
+  Inserts the content of the textPathAdd inside the tablePath and clears the textPathAdd in the UI.
+  Inserts the content of the textPathAdd of the Ui inside the QList pathList that contains all path
+  inserted by the user.
+
+  AddPath is triggered when the button addPath of the UI is pressed.
+*/
 void MainWindow::addPath() {
     int row = ui->tablePath->rowCount();
     QString path = ui->textPathAdd->toPlainText();
@@ -128,6 +144,15 @@ void MainWindow::addPath() {
     ui->textPathAdd->clear();
 }
 
+/*!
+  \fn void &MainWindow::removePath()
+
+  Removes the content of the focused row of the pathTable of the UI.
+  Removes the content of the focused row of the pathTable of the UI in
+  the QList pathList that contains all path inserted by the user.
+
+  RemovePath is triggered when the button removePath of the UI is pressed.
+*/
 void MainWindow::removePath() {
     int row = ui->tablePath->currentRow();
     if ( row != -1) { 
@@ -138,40 +163,53 @@ void MainWindow::removePath() {
 
 void MainWindow::startTracking() {
     
-
+    // If the list that contains all the path path to process is not empty
+    // Creates a folder "Tracking_Result" inside the path and save the parameters file.
+    // Start the tracking analysis in a new thread and manage creation and destruction
+    // of the tracking object.
     if(!pathList.isEmpty()) {
+      
       string path = pathList.at(0).toStdString();
-  
-      // Save parameters
-
       QDir().mkdir( QString::fromStdString(path) + QDir::separator() + "Tracking_Result" );
-      QFile parameterFile(QString::fromStdString(path) + QDir::separator() +  "Tracking_Result" + QDir::separator() + "parameter.txt" );
-    if(!parameterFile.open(QFile::WriteOnly | QFile::Text)){
-      qInfo() << "Error opening folder";
-    }
-    QTextStream out(&parameterFile);
-    QList<QString> keyList = parameterList.keys();
-    for(auto a: keyList) {
-      out << a << " = " << parameterList.value(a) << endl; ;
-    }
-    frameAnalyzed = 0;
-    thread = new QThread;
-    tracking = new Tracking(path);
-    tracking->moveToThread(thread);
-    connect(thread, SIGNAL(started()), tracking, SLOT(startProcess()));
-    connect(this, SIGNAL(newParameterList(QMap<QString, QString>)), tracking, SLOT(updatingParameters(QMap<QString, QString>)));
-    connect(tracking, &Tracking::finished, [this]() {
-      pathList.removeFirst();
-      ui->tablePath->removeRow(0);
-    });
+      
 
-    connect(tracking, SIGNAL(finished()), this, SIGNAL(next()));
-    connect(tracking, SIGNAL(newImageToDisplay(UMat&, UMat&)), this, SLOT(display(UMat&, UMat&)));
-    connect(tracking, SIGNAL(finished()), thread, SLOT(quit()));
-    connect(tracking, SIGNAL(finished()), tracking, SLOT(deleteLater()));
-    connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
-    thread->start();
-    tracking->updatingParameters(parameterList);
+      // Saves parameters in a file named "parameter.txt"
+      QFile parameterFile(QString::fromStdString(path) + QDir::separator() +  "Tracking_Result" + QDir::separator() + "parameter.txt" );
+      if(!parameterFile.open(QFile::WriteOnly | QFile::Text)){
+        QMessageBox errorBox;
+        errorBox.setText("You don't have the right to write in the selected folder!");
+        errorBox.exec();
+      }
+      QTextStream out(&parameterFile);
+      QList<QString> keyList = parameterList.keys();
+      for(auto a: keyList) {
+        out << a << " = " << parameterList.value(a) << endl; ;
+      }
+   
+      // Member variables to display statistic in the ui 
+      frameAnalyzed = 0;
+    
+    
+      thread = new QThread;
+      tracking = new Tracking(path);
+      tracking->moveToThread(thread);
+    
+      connect(thread, &QThread::started, tracking, &Tracking::startProcess);
+      connect(this, &MainWindow::newParameterList, tracking, &Tracking::updatingParameters);
+      // When tha analysis is finished, clears the path in the Ui and removes it from the pathList
+      connect(tracking, &Tracking::finished, [this]() {
+        pathList.removeFirst();
+        ui->tablePath->removeRow(0);
+      });
+
+      connect(tracking, &Tracking::finished, this, &MainWindow::next);
+      connect(tracking, &Tracking::newImageToDisplay, this, &MainWindow::display);
+      connect(tracking, &Tracking::finished, thread, &QThread::quit);
+      connect(tracking, &Tracking::finished, tracking, &Tracking::deleteLater);
+      connect(thread, &QThread::finished, thread, &QThread::deleteLater);
+      
+      thread->start();
+      tracking->updatingParameters(parameterList);
   }
 }
 
