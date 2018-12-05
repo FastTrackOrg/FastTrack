@@ -52,6 +52,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tableParameters->horizontalHeader()->setStretchLastSection(true);
 
     // Default Name, value|description
+    parameterList.insert("Dilatation", "0|Dilate the image. Range 0 to inf.");
     parameterList.insert("Registration", "yes|Yes to activate registration.");
     parameterList.insert("Light background", "yes|Yes if dark objects on light background. No if light objects on dark background. ");
     parameterList.insert("ROI bottom y", "0|Defines region of interest bottom corner.");
@@ -66,8 +67,8 @@ MainWindow::MainWindow(QWidget *parent) :
     parameterList.insert("Maximal length", "100|Maximal distance travelled between two frames");
     parameterList.insert("Spot to track", "0|What spot to track. 0: head, 1: tail, 2: center");
     parameterList.insert("Binary threshold", "70|Threshold to separate background and object. Range from 0 to 255.");
-    parameterList.insert("Minimal size", "5000|Minimal size of the object to track in pixels.");
-    parameterList.insert("Maximal size", "50|Maximal size of the object to track in pixels.");
+    parameterList.insert("Minimal size", "50|Minimal size of the object to track in pixels.");
+    parameterList.insert("Maximal size", "5000|Maximal size of the object to track in pixels.");
     parameterList.insert("Object number", "1|Number of moving objects to track.");
 
     loadSettings();
@@ -98,6 +99,14 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->removePath, &QPushButton::clicked, this, &MainWindow::removePath);
     connect(ui->startButton, &QPushButton::clicked, this, &MainWindow::startTracking);
     connect(this, &MainWindow::next, this, &MainWindow::startTracking);
+
+
+
+
+////////////////////////////Replay panel/////////////////////////////////////////////
+    isReplayable = false;
+    connect(ui->replayOpen, &QPushButton::clicked, this, &MainWindow::loadReplayFolder);
+    connect(ui->replaySlider, &QSlider::valueChanged, this, &MainWindow::loadFrame);
 
 }
 
@@ -219,8 +228,8 @@ void MainWindow::display(UMat &visu, UMat &cameraFrame){
 
     ui->display->setPixmap(QPixmap::fromImage(QImage(cameraFrame.getMat(cv::ACCESS_READ).data, cameraFrame.cols, cameraFrame.rows, cameraFrame.step, QImage::Format_Grayscale8)).scaled(w, h, Qt::KeepAspectRatio));
     ui->display2->setPixmap(QPixmap::fromImage(QImage(visu.getMat(cv::ACCESS_READ).data, visu.cols, visu.rows, visu.step, QImage::Format_RGB888)).scaled(w2, h2, Qt::KeepAspectRatio));
-  frameAnalyzed ++;
-  statusBar()->showMessage(QString::number(frameAnalyzed));
+    frameAnalyzed ++;
+    statusBar()->showMessage(QString::number(frameAnalyzed));
 }
 
 
@@ -247,6 +256,89 @@ void MainWindow::saveSettings() {
         settingsFile->setValue(QString(a), parameterList.value(a));
       }
 }
+
+/*******************************************************************************************\
+                                  Replay panel
+\*******************************************************************************************/
+
+void MainWindow::loadReplayFolder() {
+    QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"), "/home", QFileDialog::ShowDirsOnly);
+    if (dir.length()) {
+        ui->replayPath->setText(dir + QDir::separator());
+
+        // Find image format
+        QList<QString> extensions = { "pgm", "png", "jpeg", "jpg", "tiff", "tif", "bmp", "dib", "jpe", "jp2", "webp", "pbm", "ppm", "sr", "ras", "tif" };
+        QDirIterator it(dir, QStringList(), QDir::NoFilter);
+        QString extension;
+        while (it.hasNext()) {
+          extension = it.next().section('.', -1);
+          if( extensions.contains(extension) ) break;
+        }
+  
+        try{
+
+          // Get path to all the frames in the folder a,d put it in a vector.
+          // Setup the ui by setting maximum and minimum of the slider bar.
+          string path = (dir + QDir::separator() + "*." + extension).toStdString();
+          glob(path, replayFrames, false); // Get all path to frames
+          ui->replaySlider->setMinimum(0);
+          ui->replaySlider->setMaximum(replayFrames.size() - 1);
+          isReplayable = true;
+
+          // If tracking data are available, load data in a vector and find number of object in the frame.
+          if( QDir().exists(dir + QDir::separator() + "Tracking_Result") ) {
+            QFile trackingFile( dir + QDir::separator() + "Tracking_Result" + QDir::separator() + "tracking.txt");
+            if (trackingFile.open(QIODevice::ReadOnly)) {
+              QTextStream input(&trackingFile);
+              QString line;
+              while (input.readLineInto(&line)) {
+                replayTracking.append(line);
+              }
+            }
+            replayTracking.removeFirst(); // Delete header line
+
+            QFile parameterFile( dir + QDir::separator() + "Tracking_Result" + QDir::separator() + "parameter.txt");
+            if (parameterFile.open(QIODevice::ReadOnly)) {
+              QTextStream input(&parameterFile);
+              QString line;
+              while (input.readLineInto(&line)) {
+                if ( line.split(" = ", QString::SkipEmptyParts).at(0) == "Object number" ) {
+                  replayNumberObject = line.split(" = ", QString::SkipEmptyParts).at(1).toInt();
+                  break;
+                }
+              }
+            }
+          }
+        }
+        catch(...){
+          isReplayable = false;
+        }
+    }
+}
+
+
+
+void MainWindow::loadFrame(int frameIndex) {
+
+    if ( isReplayable ) {
+
+      Mat cameraFrame = imread(replayFrames.at(frameIndex));
+     
+      // Takes the tracking data corresponding to the replayed frame and parse data to display
+      // arrow on tracked objects. 
+      for (int i = frameIndex; i < frameIndex + replayNumberObject; i++) {
+        QStringList coordinate = replayTracking.at(frameIndex).split('\t', QString::SkipEmptyParts);
+        cv::arrowedLine(cameraFrame, Point(coordinate.at(0).toDouble(), coordinate.at(1).toDouble()), Point(coordinate.at(0).toDouble() + 10*cos(coordinate.at(2).toDouble()), coordinate.at(1).toDouble() - 10*sin(coordinate.at(2).toDouble())), Scalar( ( 255./double(replayNumberObject) ) * i, ( 255./double(replayNumberObject) ) * i, ( 255./double(replayNumberObject) ) * i), 2, 20, 0);
+      }
+      
+      int w = ui->replayDisplay->width();
+      int h = ui->replayDisplay->height();
+      ui->replayDisplay->setPixmap(QPixmap::fromImage(QImage(cameraFrame.data, cameraFrame.cols, cameraFrame.rows, cameraFrame.step, QImage::Format_RGB888)).scaled(w, h, Qt::KeepAspectRatio));
+    }
+}
+
+
+
 
 MainWindow::~MainWindow()
 {

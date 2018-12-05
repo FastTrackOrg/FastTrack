@@ -53,7 +53,7 @@ Point2f Tracking::curvatureCenter(Point3f tail, Point3f head){
 	double d = head.y - c*head.x;
 
 	if(a*b == 0){ // Determinant == 0, no unique solution
-		center = Point(NAN, NAN);
+		center = Point(0, 0); // TO CHECK
 	}
 
 	else{ // Unique solution
@@ -529,6 +529,11 @@ void Tracking::imageProcessing(){
 
     (statusBinarisation) ? (binarisation(m_binaryFrame, 'b', param_thresh)) : (binarisation(m_binaryFrame, 'w', param_thresh)); // If statusBinarisation == true the object is black on white background
 
+    if (param_dilatation != 0) {
+      Mat element = getStructuringElement( MORPH_ELLIPSE, Size( 2*param_dilatation + 1, 2*param_dilatation + 1 ), Point( param_dilatation, param_dilatation ) );
+      dilate(m_binaryFrame, m_binaryFrame, element);
+    }
+
     if(m_ROI.width != 0 ) {
       m_binaryFrame = m_binaryFrame(m_ROI);
       m_visuFrame = m_visuFrame(m_ROI);
@@ -559,14 +564,14 @@ void Tracking::imageProcessing(){
       coord.x += m_ROI.tl().x;
       coord.y += m_ROI.tl().y;
 
-      m_savefile << m_out.at(0).at(l).x + m_ROI.tl().x << "   " << m_out.at(0).at(l).y + m_ROI.tl().y << "   " << m_out.at(0).at(l).z << "   "  << m_out.at(1).at(l).x + m_ROI.tl().x << "   " << m_out.at(1).at(l).y + m_ROI.tl().y << "   " << m_out.at(1).at(l).z  <<  "   " << m_out.at(2).at(l).x + m_ROI.tl().x << "   " << m_out.at(2).at(l).y  + m_ROI.tl().y << "   " << m_out.at(2).at(l).z <<  "   " << m_out.at(3).at(l).x <<  "   " << m_im << "\n";
+      m_savefile << m_out.at(0).at(l).x + m_ROI.tl().x << '	' << m_out.at(0).at(l).y + m_ROI.tl().y << '	' << m_out.at(0).at(l).z << '	'  << m_out.at(1).at(l).x + m_ROI.tl().x << '	' << m_out.at(1).at(l).y + m_ROI.tl().y << '	' << m_out.at(1).at(l).z  <<  '	' << m_out.at(2).at(l).x + m_ROI.tl().x << '	' << m_out.at(2).at(l).y  + m_ROI.tl().y << '	' << m_out.at(2).at(l).z <<  '	' << m_out.at(3).at(l).x <<  '	' << m_im << "\n";
 
     }
   
     m_im ++;
     m_outPrev = m_out;
     emit(newImageToDisplay(m_visuFrame, m_binaryFrame));
-    if(m_im + 1 > m_files.size()){
+    if(m_im + 1 > int(m_files.size())){
       m_savefile.flush();
       m_outputFile.close();
       emit(finished());
@@ -620,13 +625,18 @@ void Tracking::startProcess() {
 
   (statusBinarisation) ? (binarisation(m_binaryFrame, 'b', param_thresh)) : (binarisation(m_binaryFrame, 'w', param_thresh)); // If statusBinarisation == true the object is black on white background
 
+  if (param_dilatation != 0) {
+    Mat element = getStructuringElement( MORPH_ELLIPSE, Size( 2*param_dilatation + 1, 2*param_dilatation + 1 ), Point( param_dilatation, param_dilatation ) );
+    dilate(m_binaryFrame, m_binaryFrame, element);
+  }
+
   if (m_ROI.width != 0){
     m_binaryFrame = m_binaryFrame(m_ROI);
     m_visuFrame = m_visuFrame(m_ROI);
   }
 
   m_out= objectPosition(m_binaryFrame, param_minArea, param_maxArea);
-  if( m_out.at(0).size() < param_n ){ // Less objects in frame as in param_n
+  if( int(m_out.at(0).size()) < param_n ){ // Less objects in frame as in param_n
     while( (m_out.at(0).size() - param_n) > 0 ){
       for(unsigned int i = 0; i < m_out.size(); i++){
         m_out.at(i).push_back(Point3f(0,0,0));
@@ -645,7 +655,8 @@ void Tracking::startProcess() {
   // Saving
   m_savefile << "xHead" << '\t' << "yHead" << '\t' << "tHead" << '\t'  << "xTail" << '\t' << "yTail" << '\t' << "tTail"   << '\t'  << "xBody" << '\t' << "yBody" << '\t' << "tBody"   << '\t'  << "curvature" << '\t'  << "imageNumber" << "\n";
   for(unsigned int l = 0; l < m_out.at(0).size(); l++){
-    Point3f coord = m_out.at(param_spot).at(l);      arrowedLine(m_visuFrame, Point(coord.x, coord.y), Point(coord.x + 5*param_arrowSize*cos(coord.z), coord.y - 5*param_arrowSize*sin(coord.z)), Scalar(m_colorMap.at(l).x, m_colorMap.at(l).y, m_colorMap.at(l).z), param_arrowSize, 10*param_arrowSize, 0);
+    Point3f coord = m_out.at(param_spot).at(l);      
+    arrowedLine(m_visuFrame, Point(coord.x, coord.y), Point(coord.x + 5*param_arrowSize*cos(coord.z), coord.y - 5*param_arrowSize*sin(coord.z)), Scalar(m_colorMap.at(l).x, m_colorMap.at(l).y, m_colorMap.at(l).z), param_arrowSize, 10*param_arrowSize, 0);
 
     if((m_im > 5)){ // Faudra refaire un buffer correct
       polylines(m_visuFrame, m_memory.at(l), false, Scalar(m_colorMap.at(l).x, m_colorMap.at(l).y, m_colorMap.at(l).z), param_arrowSize, 8, 0);
@@ -659,7 +670,7 @@ void Tracking::startProcess() {
     coord.x += m_ROI.tl().x;
     coord.y += m_ROI.tl().y;
 
-    m_savefile << m_out.at(0).at(l).x + m_ROI.tl().x << "   " << m_out.at(0).at(l).y + m_ROI.tl().y << "   " << m_out.at(0).at(l).z << "   "  << m_out.at(1).at(l).x + m_ROI.tl().x << "   " << m_out.at(1).at(l).y + m_ROI.tl().y << "   " << m_out.at(1).at(l).z  <<  "   " << m_out.at(2).at(l).x + m_ROI.tl().x << "   " << m_out.at(2).at(l).y  + m_ROI.tl().y << "   " << m_out.at(2).at(l).z <<  "   " << m_out.at(3).at(l).x <<  "   " << m_im << "\n";
+    m_savefile << m_out.at(0).at(l).x + m_ROI.tl().x << '	' << m_out.at(0).at(l).y + m_ROI.tl().y << '	' << m_out.at(0).at(l).z << '	'  << m_out.at(1).at(l).x + m_ROI.tl().x << '	' << m_out.at(1).at(l).y + m_ROI.tl().y << '	' << m_out.at(1).at(l).z  <<  '	' << m_out.at(2).at(l).x + m_ROI.tl().x << '	' << m_out.at(2).at(l).y  + m_ROI.tl().y << '	' << m_out.at(2).at(l).z <<  '	' << m_out.at(3).at(l).x <<  '	' << m_im << "\n";
 
   }
   m_outPrev = m_out;
@@ -686,7 +697,7 @@ void Tracking::updatingParameters(const QMap<QString, QString> &parameterList) {
   param_arrowSize = parameterList.value("Arrow size").toInt();
 
   param_thresh = parameterList.value("Binary threshold").toInt();
-  param_nBackground = parameterList.value("Number image background").toDouble();
+  param_nBackground = parameterList.value("Number of images background").toDouble();
   param_x1 = parameterList.value("ROI top x").toInt();
   param_y1 = parameterList.value("ROI top y").toInt();
   param_x2 = parameterList.value("ROI bottom x").toInt();
@@ -694,6 +705,7 @@ void Tracking::updatingParameters(const QMap<QString, QString> &parameterList) {
   m_ROI = Rect(param_x1, param_y1, param_x2 - param_x1, param_y2 - param_y1);
   statusRegistration = (parameterList.value("Registration") == "yes") ? true : false;
   statusBinarisation = (parameterList.value("Light background") == "yes") ? true : false;
+  param_dilatation = parameterList.value("Dilatation").toInt();
 
   qInfo() << "Parameters updated" << endl;
 }

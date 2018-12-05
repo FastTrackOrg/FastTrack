@@ -114,6 +114,7 @@ class Tracking : public QObject {
   int param_y1;
   int param_x2;
   int param_y2;
+  int param_dilatation;
 
   public slots:
   void startProcess();

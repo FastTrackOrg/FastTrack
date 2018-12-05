@@ -7,6 +7,7 @@
 #include <QLineEdit>
 #include <QProgressBar>
 #include <QImage>
+#include <QFileDialog>
 #include <QMessageBox>
 #include <string>
 #include "opencv2/imgproc/imgproc.hpp"
@@ -63,12 +64,20 @@ private:
     void saveSettings();
     QSettings *settingsFile;
 
+    // Replay panel
+    vector<cv::String> replayFrames;                      // Path to frame to replay
+    QVector<QString> replayTracking;                      // Tracking data to replay
+    int replayNumberObject;                               // Number of object tracked to replay
+    bool isReplayable;
+
 public slots:
     void updateParameterList(QTableWidgetItem* item);
     void startTracking();
     void addPath();
     void removePath();
     void display(UMat&, UMat&);
+    void loadReplayFolder();
+    void loadFrame(int frameIndex);
 signals:
     void newParameterList(const QMap<QString, QString> &);
     void next();
