@@ -1,0 +1,61 @@
+#centralwidget{
+  background-color: #0D0D0D;
+}
+
+#statusbar{
+  background-color: #0D0D0D;
+}
+
+QTabWidget::pane{
+  background-color: #333333;
+  border: 1px solid #262626;
+}
+
+QTabBar::tab {
+  background: #212121;
+  border: 1px solid black;
+  color: white;
+  padding: 10px;
+}
+
+QLabel {
+  border: 1px solid black;
+}
+
+QTabBar::tab::selected {
+  background: #333333;
+  border: 1px solid black;
+  color: white;
+  padding: 10px;
+}
+
+QPushButton {
+  color: black;
+  background-color: #e6e6e6;
+}
+
+QTextEdit {
+  color: black;
+  background-color: #e6e6e6;
+}
+
+QTableWidget {
+  background-color: #333333;
+  gridline-color: #262626;
+  color: white;
+  border: 1px solid white;
+}
+
+QHeaderView::section {
+    background: #262626;
+    border: solid #e6e6e6;
+    height: 32px;
+    color: white;
+    border: 1px solid white;
+}
+
+QTableWidget::item {
+    background: #e6e6e6;
+    color: #262626;
+    selection-background-color: blue;
+}
