@@ -170,7 +170,7 @@ void MainWindow::startTracking() {
     // of the tracking object.
     if(!pathList.isEmpty()) {
       
-      string path = pathList.at(0).toStdString();
+      string path = (pathList.at(0) + QDir::separator()).toStdString();
       QDir().mkdir( QString::fromStdString(path) + QDir::separator() + "Tracking_Result" );
       
 
