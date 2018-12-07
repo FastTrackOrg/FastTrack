@@ -525,9 +525,9 @@ void Tracking::imageProcessing(){
       registration(m_background, m_visuFrame);
     }
 
-    subtract(m_background, m_visuFrame, m_binaryFrame);
+    (statusBinarisation) ? (subtract(m_background, m_visuFrame, m_binaryFrame)) : (subtract(m_visuFrame, m_background, m_binaryFrame));
 
-    (statusBinarisation) ? (binarisation(m_binaryFrame, 'b', param_thresh)) : (binarisation(m_binaryFrame, 'w', param_thresh)); // If statusBinarisation == true the object is black on white background
+    binarisation(m_binaryFrame, 'b', param_thresh);
 
     if (param_dilatation != 0) {
       Mat element = getStructuringElement( MORPH_ELLIPSE, Size( 2*param_dilatation + 1, 2*param_dilatation + 1 ), Point( param_dilatation, param_dilatation ) );
@@ -621,9 +621,10 @@ void Tracking::startProcess() {
 
   // First frame
   imread(m_files.at(0), IMREAD_GRAYSCALE).copyTo(m_visuFrame);
-  subtract(m_background, m_visuFrame, m_binaryFrame);
+  
+  (statusBinarisation) ? (subtract(m_background, m_visuFrame, m_binaryFrame)) : (subtract(m_visuFrame, m_background, m_binaryFrame));
 
-  (statusBinarisation) ? (binarisation(m_binaryFrame, 'b', param_thresh)) : (binarisation(m_binaryFrame, 'w', param_thresh)); // If statusBinarisation == true the object is black on white background
+  binarisation(m_binaryFrame, 'b', param_thresh);
 
   if (param_dilatation != 0) {
     Mat element = getStructuringElement( MORPH_ELLIPSE, Size( 2*param_dilatation + 1, 2*param_dilatation + 1 ), Point( param_dilatation, param_dilatation ) );
