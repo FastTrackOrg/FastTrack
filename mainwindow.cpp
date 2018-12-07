@@ -165,52 +165,62 @@ void MainWindow::removePath() {
 void MainWindow::startTracking() {
     
     // If the list that contains all the path path to process is not empty
+    // And if the path exist.
     // Creates a folder "Tracking_Result" inside the path and save the parameters file.
     // Start the tracking analysis in a new thread and manage creation and destruction
     // of the tracking object.
     if(!pathList.isEmpty()) {
-      
-      string path = (pathList.at(0) + QDir::separator()).toStdString();
-      QDir().mkdir( QString::fromStdString(path) + QDir::separator() + "Tracking_Result" );
-      
 
-      // Saves parameters in a file named "parameter.txt"
-      QFile parameterFile(QString::fromStdString(path) + QDir::separator() +  "Tracking_Result" + QDir::separator() + "parameter.txt" );
-      if(!parameterFile.open(QFile::WriteOnly | QFile::Text)){
-        QMessageBox errorBox;
-        errorBox.setText("You don't have the right to write in the selected folder!");
-        errorBox.exec();
-      }
-      QTextStream out(&parameterFile);
-      QList<QString> keyList = parameterList.keys();
-      for(auto a: keyList) {
-        out << a << " = " << parameterList.value(a) << endl; ;
-      }
-   
-      // Member variables to display statistic in the ui 
-      frameAnalyzed = 0;
-    
-    
-      thread = new QThread;
-      tracking = new Tracking(path);
-      tracking->moveToThread(thread);
-    
-      connect(thread, &QThread::started, tracking, &Tracking::startProcess);
-      connect(this, &MainWindow::newParameterList, tracking, &Tracking::updatingParameters);
-      // When tha analysis is finished, clears the path in the Ui and removes it from the pathList
-      connect(tracking, &Tracking::finished, [this]() {
+      if (QDir(pathList.at(0)).exists()) {      
+        string path = (pathList.at(0) + QDir::separator()).toStdString();
+        QDir().mkdir( QString::fromStdString(path) + QDir::separator() + "Tracking_Result" );
+        
+
+        // Saves parameters in a file named "parameter.txt"
+        QFile parameterFile(QString::fromStdString(path) + QDir::separator() +  "Tracking_Result" + QDir::separator() + "parameter.txt" );
+        if(!parameterFile.open(QFile::WriteOnly | QFile::Text)){
+          QMessageBox errorBox;
+          errorBox.setText("You don't have the right to write in the selected folder!");
+          errorBox.exec();
+        }
+        QTextStream out(&parameterFile);
+        QList<QString> keyList = parameterList.keys();
+        for(auto a: keyList) {
+          out << a << " = " << parameterList.value(a) << endl; ;
+        }
+     
+        // Member variables to display statistic in the ui 
+        frameAnalyzed = 0;
+      
+      
+        thread = new QThread;
+        tracking = new Tracking(path);
+        tracking->moveToThread(thread);
+      
+        connect(thread, &QThread::started, tracking, &Tracking::startProcess);
+        connect(this, &MainWindow::newParameterList, tracking, &Tracking::updatingParameters);
+        // When tha analysis is finished, clears the path in the Ui and removes it from the pathList
+        connect(tracking, &Tracking::finished, [this]() {
+          pathList.removeFirst();
+          ui->tablePath->removeRow(0);
+        });
+
+        connect(tracking, &Tracking::finished, this, &MainWindow::next);
+        connect(tracking, &Tracking::newImageToDisplay, this, &MainWindow::display);
+        connect(tracking, &Tracking::finished, thread, &QThread::quit);
+        connect(tracking, &Tracking::finished, tracking, &Tracking::deleteLater);
+        connect(thread, &QThread::finished, thread, &QThread::deleteLater);
+        
+        thread->start();
+        tracking->updatingParameters(parameterList);
+    }
+    else {
         pathList.removeFirst();
         ui->tablePath->removeRow(0);
-      });
-
-      connect(tracking, &Tracking::finished, this, &MainWindow::next);
-      connect(tracking, &Tracking::newImageToDisplay, this, &MainWindow::display);
-      connect(tracking, &Tracking::finished, thread, &QThread::quit);
-      connect(tracking, &Tracking::finished, tracking, &Tracking::deleteLater);
-      connect(thread, &QThread::finished, thread, &QThread::deleteLater);
-      
-      thread->start();
-      tracking->updatingParameters(parameterList);
+        QMessageBox errorBox;
+        errorBox.setText("Wrong path");
+        errorBox.exec();
+    }
   }
 }
 
@@ -336,7 +346,6 @@ void MainWindow::loadFrame(int frameIndex) {
       ui->replayDisplay->setPixmap(QPixmap::fromImage(QImage(cameraFrame.data, cameraFrame.cols, cameraFrame.rows, cameraFrame.step, QImage::Format_RGB888)).scaled(w, h, Qt::KeepAspectRatio));
     }
 }
-
 
 
 
