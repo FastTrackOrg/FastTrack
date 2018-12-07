@@ -644,6 +644,14 @@ void Tracking::startProcess() {
       }
     }
   }
+  else if ( int(m_out.at(0).size()) > param_n) { // More objects detected than specified
+    while( (m_out.at(0).size() - param_n) != 0 ){
+      for(unsigned int i = 0; i < m_out.size(); i++){
+        m_out.at(i).pop_back();
+      }
+    }
+  }
+    
   cvtColor(m_visuFrame, m_visuFrame, COLOR_GRAY2RGB);
   
   // Initialize output file and stream
