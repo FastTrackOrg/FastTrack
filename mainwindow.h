@@ -78,6 +78,8 @@ public slots:
     void display(UMat&, UMat&);
     void loadReplayFolder();
     void loadFrame(int frameIndex);
+    void swapTrackingData(int firstObject, int secondObject, int from);
+    void correctTracking();
 signals:
     void newParameterList(const QMap<QString, QString> &);
     void next();

@@ -328,27 +328,83 @@ void MainWindow::loadReplayFolder() {
 
 
 
+/*!
+  \fn void &MainWindow::loadFrame(int frameIndex)
+  
+  Displays the image and the tracking in the ui->displayReplay. The image is selected
+  when the slider ui->replaySlider is moved.
+
+  Triggered when ui->replaySlider value changed.
+*/
 void MainWindow::loadFrame(int frameIndex) {
 
     if ( isReplayable ) {
 
-      Mat cameraFrame = imread(replayFrames.at(frameIndex));
+      Mat frame = imread(replayFrames.at(frameIndex), IMREAD_COLOR);
      
       // Takes the tracking data corresponding to the replayed frame and parse data to display
-      // arrow on tracked objects. 
-      for (int i = frameIndex; i < frameIndex + replayNumberObject; i++) {
-        QStringList coordinate = replayTracking.at(frameIndex).split('\t', QString::SkipEmptyParts);
-        cv::arrowedLine(cameraFrame, Point(coordinate.at(0).toDouble(), coordinate.at(1).toDouble()), Point(coordinate.at(0).toDouble() + 10*cos(coordinate.at(2).toDouble()), coordinate.at(1).toDouble() - 10*sin(coordinate.at(2).toDouble())), Scalar( ( 255./double(replayNumberObject) ) * i, ( 255./double(replayNumberObject) ) * i, ( 255./double(replayNumberObject) ) * i), 2, 20, 0);
+      // arrow on tracked objects.
+      for (int i = frameIndex*replayNumberObject; i < frameIndex*replayNumberObject + replayNumberObject; i++) {
+        QStringList coordinate = replayTracking.at(i).split('\t', QString::SkipEmptyParts);
+        cv::arrowedLine(frame, Point(coordinate.at(0).toDouble(), coordinate.at(1).toDouble()), Point(coordinate.at(0).toDouble() + 10*cos(coordinate.at(2).toDouble()), coordinate.at(1).toDouble() - 10*sin(coordinate.at(2).toDouble())), Scalar(colorMap.at(i - frameIndex*replayNumberObject).x, colorMap.at(i - frameIndex*replayNumberObject).y, colorMap.at(i - frameIndex*replayNumberObject).z), 2, 20, 0);
+        cv::putText(frame, to_string(i - frameIndex*replayNumberObject), Point(coordinate.at(0).toDouble(), coordinate.at(1).toDouble()), cv::FONT_HERSHEY_SIMPLEX, 1.8, Scalar(colorMap.at(i - frameIndex*replayNumberObject).x, colorMap.at(i - frameIndex*replayNumberObject).y, colorMap.at(i - frameIndex*replayNumberObject).z), 5);
       }
       
       int w = ui->replayDisplay->width();
       int h = ui->replayDisplay->height();
-      ui->replayDisplay->setPixmap(QPixmap::fromImage(QImage(cameraFrame.data, cameraFrame.cols, cameraFrame.rows, cameraFrame.step, QImage::Format_RGB888)).scaled(w, h, Qt::KeepAspectRatio));
+      ui->replayDisplay->setPixmap(QPixmap::fromImage(QImage(frame.data, frame.cols, frame.rows, frame.step, QImage::Format_RGB888)).scaled(w, h, Qt::KeepAspectRatio));
     }
 }
 
 
+/*!
+  \fn void &MainWindow::swapTrackingData(int firstObject, int secondObject, int from)
+    
+  Swaps \a firstObject and \a secondObject tracking data from \a from to the end.  
+*/
+void MainWindow::swapTrackingData(int firstObject, int secondObject, int from) {
+    for ( unsigned int i = from; i < replayFrames.size(); i += replayNumberObject ) {
+       QString tmp = replayTracking[i + secondObject];
+       replayTracking.replace(i + secondObject, replayTracking.at(i + firstObject));
+       replayTracking.replace(i + firstObject, tmp);
+    }
+}
 
+/*!
+  \fn void &MainWindow::correctTracking()
+
+  Gets the index from ui->object{1,2}Replay QComboBox and the index of the
+  ui->replaySlider and swaps the data and saves in tracking.txt the result.
+  
+  Triggered when ui->swapButton is pressed.
+*/
+void MainWindow::correctTracking() {
+
+    // Swaps the data
+    int firstObject = ui->object1Replay->currentIndex();
+    int secondObject = ui->object2Replay->currentIndex();
+    int start = ui->replaySlider->value();
+    swapTrackingData(firstObject, secondObject, start);
+
+    // Saves new tracking data
+    QFile file(ui->replayPath->text()+ QDir::separator() + "Tracking_Result" + QDir::separator() + "tracking.txt");
+    if (file.open(QFile::WriteOnly | QFile::Text)) {
+      QTextStream out(&file);
+      out << "xHead" << '\t' << "yHead" << '\t' << "tHead" << '\t'  << "xTail" << '\t' << "yTail      " << '\t' << "tTail"   << '\t'  << "xBody" << '\t' << "yBody" << '\t' << "tBody"   << '\t'  << "cur      vature" << '\t'  << "imageNumber" << endl; 
+      for(auto& a: replayTracking) {
+        out << a << endl;
+      }
+    }
+    file.close();
+
+}
+
+
+/*!
+  \fn void &MainWindow::~MainWindow()
+
+  Destructs the MainWindow object.  
+*/
 MainWindow::~MainWindow()
 {
     saveSettings();
