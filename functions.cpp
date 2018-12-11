@@ -80,7 +80,7 @@ double Tracking::curvature(Point2f center , Mat image){
 	for(int row = 0; row<image.rows; ++row){
 		for(int col = 0; col<image.cols; ++col){
 			if(image.at<uchar>(row,col) == 255){ // if inside object
-				d += pow(pow(center.x - float(col), 2) + pow(center.y - float(row), 2), 0.5);
+        d += pow(pow(center.x - float(col), 2) + pow(center.y - float(row), 2), 0.5);
 				count += 1;
 			}
 		}
@@ -136,33 +136,12 @@ vector<double> Tracking::orientation(UMat image, bool dir) {
 		Rect bbox = RotatedRect(center, image.size(), -orientationDeg).boundingRect();
 		rotMatrix.at<double>(0,2) += bbox.width*0.5 - center.x; //add an off set
 	  rotMatrix.at<double>(1,2) += bbox.height*0.5 - center.y;// to rotate without cropping the frame
-		warpAffine(image, rotate, rotMatrix, bbox.size());
+		warpAffine(image, rotate, rotMatrix, bbox.size(), INTER_NEAREST);
 
 		vector<double> tmpMat;
-		vector<double> tmp;
 
     reduce(rotate, tmpMat, 0, REDUCE_SUM);
-		double ccMax = *max_element(tmpMat.begin(), tmpMat.end())/100;
-		for (unsigned int it = 0; it < tmpMat.size(); ++it){
-			int cc = tmpMat.at(it);
-			for (int jt = 0; jt < cc/ccMax; ++jt){
-				  tmp.push_back((double)(it+1));
-			}
-		}
-
-
-    double mean = accumulate(tmp.begin(), tmp.end(), 0)/(double)tmp.size();
-
-		double sd = 0 , skew = 0;
-
-		for(unsigned int it = 0; it < tmp.size(); ++it){
-	        sd += pow(tmp.at(it) - mean, 2);
-					skew += pow(tmp.at(it) - mean, 3);
-		}
-
-		sd = pow(sd/((double)tmp.size()-1), 0.5);
-		skew *= (1/(((double)tmp.size() - 1)*pow(sd, 3)));
-
+   double skew = accumulate(tmpMat.begin(), tmpMat.begin() + int(center.x), 0) - accumulate(tmpMat.begin() + int(center.x), tmpMat.end(), 0);
 
 		if(skew > 0){
 			orientation -= M_PI;
@@ -279,7 +258,6 @@ vector<vector<Point3f>> Tracking::objectPosition(UMat frame, int minSize, int ma
 
 	findContours(frame, contours, RETR_LIST, CHAIN_APPROX_NONE);
 
-
 	for (unsigned int i = 0; i < contours.size(); i++){
 
 			if(contourArea(contours[i]) > minSize && contourArea(contours[i]) < maxSize){ // Only select objects minArea << objectArea <<maxArea
@@ -298,12 +276,11 @@ vector<vector<Point3f>> Tracking::objectPosition(UMat frame, int minSize, int ma
 						bbox = RotatedRect(center, RoiFull.size(), -(parameter.at(2)*180)/M_PI).boundingRect();
 						rotMatrix.at<double>(0,2) += bbox.width*0.5 - center.x; //add an off set
 						rotMatrix.at<double>(1,2) += bbox.height*0.5 - center.y;// to rotate without cropping the frame
-						warpAffine(RoiFull, rotate, rotMatrix, bbox.size());
+						warpAffine(RoiFull, rotate, rotMatrix, bbox.size(), INTER_NEAREST);
 
 						p = (Mat_<double>(3,1) << parameter.at(0), parameter.at(1), 1);
 
 						pp = rotMatrix * p; // center of mass of fish in  the rotated coordinate system
-
 
 						// Head ellipse
 						Rect roiHead(pp.at<double>(0,0), 0, rotate.cols-pp.at<double>(0,0), rotate.rows);
@@ -354,6 +331,7 @@ vector<vector<Point3f>> Tracking::objectPosition(UMat frame, int minSize, int ma
 						positionHead.push_back(Point3f(xHead, yHead, angleHead));
 						positionTail.push_back(Point3f(xTail, yTail, angleTail));
 						positionFull.push_back(Point3f(parameter.at(0) + roiFull.tl().x, parameter.at(1) + roiFull.tl().y, parameter.at(2)));
+
 						globalParam.push_back(Point3f(curv, 0, 0));
 						}
    }
@@ -518,6 +496,7 @@ vector<Point3f> Tracking::color(int number){
 
 
 void Tracking::imageProcessing(){
+
     imread(m_files.at(m_im), IMREAD_GRAYSCALE).copyTo(m_visuFrame);
     if(statusRegistration){
       registration(m_background, m_visuFrame);
@@ -568,7 +547,12 @@ void Tracking::imageProcessing(){
   
     m_im ++;
     m_outPrev = m_out;
-    emit(newImageToDisplay(m_visuFrame, m_binaryFrame));
+    
+    // Sending rate of images
+    if ( (timer->elapsed() - m_displayTime) > 40) {
+      emit(newImageToDisplay(m_visuFrame, m_binaryFrame));
+      m_displayTime = timer->elapsed();
+    }
     if(m_im + 1 > int(m_files.size())){
       m_savefile.flush();
       m_outputFile.close();
@@ -637,14 +621,14 @@ void Tracking::startProcess() {
   m_out= objectPosition(m_binaryFrame, param_minArea, param_maxArea);
   
   // if less objects detected than indicated
-  while( (m_out.at(0).size() - param_n) > 0 ){
+  while( (int(m_out.at(0).size()) - param_n) < 0 ){
       for(unsigned int i = 0; i < m_out.size(); i++){
         m_out.at(i).push_back(Point3f(0,0,0));
       }
   }
 
   // if more objects detected than indicated
-  while( (m_out.at(0).size() - param_n) != 0 ){
+  while( (m_out.at(0).size() - param_n) > 0 ){
       for(unsigned int i = 0; i < m_out.size(); i++){
         m_out.at(i).pop_back();
       }
@@ -687,6 +671,7 @@ void Tracking::startProcess() {
 
 
   timer->start();
+  m_displayTime = 0;
   emit(newImageToDisplay(m_visuFrame, m_binaryFrame));
   emit(finishedProcessFrame());
 }

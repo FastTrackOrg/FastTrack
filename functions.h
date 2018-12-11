@@ -91,6 +91,7 @@ class Tracking : public QObject {
   vector<vector<Point3f>> m_out;
   vector<vector<Point3f>> m_outPrev;
   string m_path;
+  int m_displayTime;
 
   public:
   Tracking(string path);
