@@ -1,6 +1,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <vector>
 #include <QMainWindow>
 #include <QPushButton>
 #include <QLabel>
@@ -19,6 +20,7 @@
 #include <QComboBox>
 #include <QThread>
 #include <QSpinBox>
+#include <stdlib.h>
 #include <QLayout>
 #include <QWidget>
 #include <QMap>
@@ -66,6 +68,7 @@ private:
 
     // Replay panel
     vector<cv::String> replayFrames;                      // Path to frame to replay
+      vector<Point3f> colorMap; 
     QVector<QString> replayTracking;                      // Tracking data to replay
     int replayNumberObject;                               // Number of object tracked to replay
     bool isReplayable;

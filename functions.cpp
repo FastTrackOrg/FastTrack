@@ -518,8 +518,6 @@ vector<Point3f> Tracking::color(int number){
 
 
 void Tracking::imageProcessing(){
-
-//while (m_im < m_files.size()){
     imread(m_files.at(m_im), IMREAD_GRAYSCALE).copyTo(m_visuFrame);
     if(statusRegistration){
       registration(m_background, m_visuFrame);
@@ -637,19 +635,19 @@ void Tracking::startProcess() {
   }
 
   m_out= objectPosition(m_binaryFrame, param_minArea, param_maxArea);
-  if( int(m_out.at(0).size()) < param_n ){ // Less objects in frame as in param_n
-    while( (m_out.at(0).size() - param_n) > 0 ){
+  
+  // if less objects detected than indicated
+  while( (m_out.at(0).size() - param_n) > 0 ){
       for(unsigned int i = 0; i < m_out.size(); i++){
         m_out.at(i).push_back(Point3f(0,0,0));
       }
-    }
   }
-  else if ( int(m_out.at(0).size()) > param_n) { // More objects detected than specified
-    while( (m_out.at(0).size() - param_n) != 0 ){
+
+  // if more objects detected than indicated
+  while( (m_out.at(0).size() - param_n) != 0 ){
       for(unsigned int i = 0; i < m_out.size(); i++){
         m_out.at(i).pop_back();
       }
-    }
   }
     
   cvtColor(m_visuFrame, m_visuFrame, COLOR_GRAY2RGB);

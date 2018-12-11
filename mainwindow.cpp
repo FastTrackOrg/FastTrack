@@ -1,3 +1,23 @@
+/*
+This file is part of Fishy Tracking.
+
+    FishyTracking is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Foobar is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Foobar.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
+
+
+
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QDebug>
@@ -16,7 +36,21 @@
 using namespace cv;
 using namespace std;
 
+/*!
+    \class MainWindow
+    \brief The MainWindow class is a widget displaying the UI if the program
+            Fishy Tracking.
 
+*/
+
+
+
+
+/*!
+  \fn void &MainWindow::MainWindow(QWidget)
+
+  Constructs the MainWindow and setup the UI.
+*/
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -107,34 +141,39 @@ MainWindow::MainWindow(QWidget *parent) :
     isReplayable = false;
     connect(ui->replayOpen, &QPushButton::clicked, this, &MainWindow::loadReplayFolder);
     connect(ui->replaySlider, &QSlider::valueChanged, this, &MainWindow::loadFrame);
+    connect(ui->swapReplay, &QPushButton::clicked, this, &MainWindow::correctTracking);
 
 }
 
+
+
+/*******************************************************************************************\
+                                    Path panel
+\*******************************************************************************************/
+
 /*!
-  \fn void &MainWindow::updateParameterList(QTableWidget* item)
+  \fn void &MainWindow::updateParameterList(QTableWidgetItem* item)
 
-  Updates parameters from the \a item, if an element it is modified.
+  Updates a QMap when an \a item of a QTableWidget is modyfied.
 
-  If a parameter is modifyed, this method emit a signal with a new QMap
-  containing new parameters.
+  Triggered when a change is made in a QTableWidget.
+  Emit the updated QMap.
 */
 void MainWindow::updateParameterList(QTableWidgetItem* item) {
     int row = item->row();
     QString parameterName = ui->tableParameters->item(row, 0)->text();
     QString parameterValue = ui->tableParameters->item(row, 1)->text();
     parameterList.insert(parameterName, parameterValue);
-    qInfo() << "Send parameters" << endl;
     emit(newParameterList(parameterList));
 }
+
 
 /*!
   \fn void &MainWindow::addPath()
 
-  Inserts the content of the textPathAdd inside the tablePath and clears the textPathAdd in the UI.
-  Inserts the content of the textPathAdd of the Ui inside the QList pathList that contains all path
-  inserted by the user.
+  Takes a QString from ui->textPathAdd, inserts it in a QVector pathList and updates the ui.
 
-  AddPath is triggered when the button addPath of the UI is pressed.
+  Triggered when the button ui->addPath.
 */
 void MainWindow::addPath() {
     int row = ui->tablePath->rowCount();
@@ -145,14 +184,14 @@ void MainWindow::addPath() {
     ui->textPathAdd->clear();
 }
 
+
 /*!
   \fn void &MainWindow::removePath()
 
-  Removes the content of the focused row of the pathTable of the UI.
-  Removes the content of the focused row of the pathTable of the UI in
-  the QList pathList that contains all path inserted by the user.
+  Removes the content of the focused row of the ui->pathTable and
+  updates the ui and the QVector pathList.
 
-  RemovePath is triggered when the button removePath of the UI is pressed.
+  Triggered when the button removePath of the UI is pressed.
 */
 void MainWindow::removePath() {
     int row = ui->tablePath->currentRow();
@@ -162,6 +201,18 @@ void MainWindow::removePath() {
     }
 }
 
+
+/*!
+  \fn void &MainWindow::startTracking()
+  Starts a new tracking analysis. First it get the path to the folder containing the
+  images sequence. It creates a folder named Tracking_Result in this folder and a file
+  parameters.txt containing the parameterList. It creates a new Tracking object that 
+  have to be run in a separate thread. When the analysis is finished, the Tracking 
+  object is destroyed and a new analysis is started.
+
+  Trigerred when the start analysis button is clicked or when the
+  signal finishedAnalysis() is emitted.
+*/
 void MainWindow::startTracking() {
     
     // If the list that contains all the path path to process is not empty
@@ -186,7 +237,7 @@ void MainWindow::startTracking() {
         QTextStream out(&parameterFile);
         QList<QString> keyList = parameterList.keys();
         for(auto a: keyList) {
-          out << a << " = " << parameterList.value(a) << endl; ;
+          out << a << " = " << parameterList.value(a) << endl;
         }
      
         // Member variables to display statistic in the ui 
@@ -224,10 +275,12 @@ void MainWindow::startTracking() {
   }
 }
 
-/**
-    * @Display: display the originla image and/or the binary image in two Qlabels.
-    * @param Mat visu: original image.
-    * @param UMat cameraFrame: binary image.
+/*!
+  \fn void &MainWindow::display(Umat &visu, UMat &cameraFrame)
+  
+  Displays \a visu and \a cameraFrame image in the UI.
+  
+  Triggered when the signal newImageToDisplay is trigerred.
 */
 void MainWindow::display(UMat &visu, UMat &cameraFrame){
 
@@ -249,6 +302,12 @@ void MainWindow::display(UMat &visu, UMat &cameraFrame){
                                     Settings
 \*******************************************************************************************/
 
+/*!
+  \fn void &MainWindow::loadSettings()
+  
+  Loads a settings file settings.ini at the start up of the program.
+  Updates the ui parameter QWidgetTable with the new parameters.
+*/
 void MainWindow::loadSettings() {
     settingsFile = new QSettings("settings.ini", QSettings::NativeFormat, this);
     QStringList keyList = settingsFile->allKeys(); 
@@ -260,6 +319,12 @@ void MainWindow::loadSettings() {
     }    
 }
 
+
+/*!
+  \fn void &MainWindow::saveSettings()
+  
+  Saves all parameters from ui QTableWidget in a settings file named settings.in.  
+*/
 void MainWindow::saveSettings() {
       QList<QString> keyList = parameterList.keys();
       for(auto a: keyList) {
@@ -267,11 +332,27 @@ void MainWindow::saveSettings() {
       }
 }
 
+
 /*******************************************************************************************\
                                   Replay panel
 \*******************************************************************************************/
 
+/*!
+  \fn void &MainWindow::loadReplayFolder()
+  
+  Loads a folder containing an image sequences and detect the image format.
+  Loads tracking data if it exist.
+
+  Trigerred when ui->pathButton is pressed.
+*/
 void MainWindow::loadReplayFolder() {
+
+    // Delete existing data
+    replayTracking.clear();
+    replayFrames.clear();
+    ui->object1Replay->clear();
+    ui->object2Replay->clear();
+
     QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"), "/home", QFileDialog::ShowDirsOnly);
     if (dir.length()) {
         ui->replayPath->setText(dir + QDir::separator());
@@ -319,6 +400,24 @@ void MainWindow::loadReplayFolder() {
               }
             }
           }
+
+          QStringList range;
+          for(int i = 0; i < replayNumberObject; i++) { 
+            range.append(QString::number(i));
+          }
+          ui->object1Replay->addItems(range);
+          ui->object2Replay->addItems(range);
+      
+          // Generates a color map.
+          double a,b,c;
+          srand (time(NULL));
+          for (int j = 0; j < replayNumberObject ; ++j)  {
+            a = rand() % 255;
+            b = rand() % 255;
+            c = rand() % 255;
+            colorMap.push_back(Point3f(a, b, c));
+          }
+
         }
         catch(...){
           isReplayable = false;
