@@ -76,15 +76,17 @@ double Tracking::curvature(Point2f center , Mat image){
 
 	double d = 0;
 	double count = 0;
-
-	for(int row = 0; row<image.rows; ++row){
-		for(int col = 0; col<image.cols; ++col){
-			if(image.at<uchar>(row,col) == 255){ // if inside object
-        d += pow(pow(center.x - float(col), 2) + pow(center.y - float(row), 2), 0.5);
-				count += 1;
-			}
-		}
-	}
+  
+  image.forEach<uchar>
+(
+  [&d, &count, center](uchar &pixel, const int position[]) -> void
+  {
+			if(pixel == 255){ // if inside object
+        d += pow(pow(center.x - float(position[0]), 2) + pow(center.y - float(position[1]), 2), 0.5);
+          count += 1;
+    }
+  }
+); 
 	return count/d;
 }
 
@@ -104,12 +106,12 @@ double Modul(double angle)
 
 
 /**
-  * @Orientation computes the equivalente ellipse of an object and it direction
+  * @objectInformation computes the equivalente ellipse of an object and it direction
   * @param Mat image: binary image CV_8U
-  * @param bool dir: if true computes the orientation, if false the orientation is undetermined at +/- PI
   * @return vector<double>: [x, y, orientation]
+  * @note Computes the orientation but not the direction.
 */
-vector<double> Tracking::orientation(UMat image, bool dir) {
+vector<double> Tracking::objectInformation(UMat image) {
 
 
     Moments moment = moments(image);
@@ -125,34 +127,36 @@ vector<double> Tracking::orientation(UMat image, bool dir) {
     double orientation = 0.5 * atan((2*j)/(i-k)) + (i<k)*(M_PI*0.5);
   	orientation += 2*M_PI*(orientation<0);
 	  orientation = 2*M_PI - orientation;
-	  double orientationDeg = (orientation*180)/M_PI;
+	
+    vector<double> param {x, y, orientation};
 
-
-	if(dir == true){ // Orientation computation
-
-    UMat rotate;
-		Point center = Point(image.cols*0.5, image.rows*0.5);
-    Mat rotMatrix = getRotationMatrix2D(center, -orientationDeg, 1);
-		Rect bbox = RotatedRect(center, image.size(), -orientationDeg).boundingRect();
-		rotMatrix.at<double>(0,2) += bbox.width*0.5 - center.x; //add an off set
-	  rotMatrix.at<double>(1,2) += bbox.height*0.5 - center.y;// to rotate without cropping the frame
-		warpAffine(image, rotate, rotMatrix, bbox.size(), INTER_NEAREST);
-
-		vector<double> tmpMat;
-
-    reduce(rotate, tmpMat, 0, REDUCE_SUM);
-   double skew = accumulate(tmpMat.begin(), tmpMat.begin() + int(center.x), 0) - accumulate(tmpMat.begin() + int(center.x), tmpMat.end(), 0);
-
-		if(skew > 0){
-			orientation -= M_PI;
-			orientation = Modul(orientation);
-		}
-	}
-
-	vector<double> param {x, y, orientation};
-
-	return param;
+  	return param;
 }
+
+
+
+
+/**
+  * @objectDirection computes the direction of the object from the object and the orientation.
+  * @param Mat image: binary image CV_8U
+  * @information vector<double>: &[x, y, orientation]
+  * @center Point: barycenter of the object.
+  * @return true if the direction is orientation + pi.
+*/
+bool Tracking::objectDirection(UMat image, Point center, vector<double> &information) {
+    
+    vector<double> tmpMat;
+    reduce(image, tmpMat, 0, REDUCE_SUM);
+    
+    double skew = accumulate(tmpMat.begin(), tmpMat.begin() + int(center.x), 0) - accumulate(tmpMat.begin() + int(center.x), tmpMat.end(), 0);
+		
+    if(skew > 0){
+			information.at(2) -= M_PI;
+			information.at(2) = Modul(information.at(2));
+      return true;
+		}
+    return false;
+	}
 
 
 
@@ -262,65 +266,82 @@ vector<vector<Point3f>> Tracking::objectPosition(UMat frame, int minSize, int ma
 
 			if(contourArea(contours[i]) > minSize && contourArea(contours[i]) < maxSize){ // Only select objects minArea << objectArea <<maxArea
 
+            // Draw the object in a temporary black image avoiding to select a 
+            // part of another object if two objects are very close.
 						dst = UMat::zeros(frame.size(), CV_8U);
-						drawContours(dst, contours, i, Scalar(255, 255, 255), FILLED,8); // Draw the fish in a temporary black image,avoid select a part of another fish if two fish are very close
-
-						roiFull = boundingRect(contours[i]);
+						drawContours(dst, contours, i, Scalar(255, 255, 255), FILLED,8); 
+					
+          	
+            // Computes the x, y and orientation of the object, in the
+            // frame of reference of ROIFull image.
+            roiFull = boundingRect(contours[i]);
 						RoiFull = dst(roiFull);
+						parameter = objectInformation(RoiFull);
+            
 
-						parameter = orientation(RoiFull, true); // In RoiFull coordinates: x, y, orientation
-						double angleFull = parameter.at(2);
-
-						Point center = Point(0.5*RoiFull.cols, 0.5*RoiFull.rows);
-						rotMatrix = getRotationMatrix2D(center, -(parameter.at(2)*180)/M_PI, 1);
-						bbox = RotatedRect(center, RoiFull.size(), -(parameter.at(2)*180)/M_PI).boundingRect();
-						rotMatrix.at<double>(0,2) += bbox.width*0.5 - center.x; //add an off set
-						rotMatrix.at<double>(1,2) += bbox.height*0.5 - center.y;// to rotate without cropping the frame
-						warpAffine(RoiFull, rotate, rotMatrix, bbox.size(), INTER_NEAREST);
-
-						p = (Mat_<double>(3,1) << parameter.at(0), parameter.at(1), 1);
-
-						pp = rotMatrix * p; // center of mass of fish in  the rotated coordinate system
-
-						// Head ellipse
-						Rect roiHead(pp.at<double>(0,0), 0, rotate.cols-pp.at<double>(0,0), rotate.rows);
-						RoiHead = rotate(roiHead);
-						parameterHead = orientation(RoiHead, false); // In RoiHead coordinates: xHead, yHead, orientationHead
-
-						// Tail ellipse
-						Rect roiTail(0, 0, pp.at<double>(0,0), rotate.rows);
-						RoiTail = rotate(roiTail);
-						parameterTail = orientation(RoiTail, false); // In RoiHead coordinates: xHead, yHead, orientationHead
+            // Rotates the image without croping and computes the direction of the object.
+            Point center = Point(0.5*RoiFull.cols, 0.5*RoiFull.rows);
+            rotMatrix = getRotationMatrix2D(center, -(parameter.at(2)*180)/M_PI, 1);
+            bbox = RotatedRect(center, RoiFull.size(), -(parameter.at(2)*180)/M_PI).boundingRect();
+            rotMatrix.at<double>(0,2) += bbox.width*0.5 - center.x;
+            rotMatrix.at<double>(1,2) += bbox.height*0.5 - center.y;
+            warpAffine(RoiFull, rotate, rotMatrix, bbox.size());
 
 
+           // Computes the coordinate of the center of mass of the fish in the rotated
+           // image frame of reference.
+            p = (Mat_<double>(3,1) << parameter.at(0), parameter.at(1), 1);
+            pp = rotMatrix * p;
+
+					
+            // Computes the direction of the object. If objectDirection return true, the
+            // head is at the left and the tail at the right.
+            Rect roiHead, roiTail;   	
+            if ( objectDirection(rotate, Point(pp.at<double>(0,0), pp.at<double>(1,0)), parameter) ) {
+
+              // Head ellipse. Parameters in the frame of reference of the RoiHead image.
+              roiHead = Rect(0, 0, pp.at<double>(0,0), rotate.rows);
+              RoiHead = rotate(roiHead);
+              parameterHead = objectInformation(RoiHead);
+
+              // Tail ellipse. Parameters in the frame of reference of ROITail image.
+              roiTail = Rect(pp.at<double>(0,0), 0, rotate.cols-pp.at<double>(0,0), rotate.rows);
+              RoiTail = rotate(roiTail);
+              parameterTail = objectInformation(RoiTail);
+
+            }
+            else {
+              // Head ellipse. Parameters in the frame of reference of the RoiHead image.
+              roiHead = Rect(pp.at<double>(0,0), 0, rotate.cols-pp.at<double>(0,0), rotate.rows);
+              RoiHead = rotate(roiHead);
+              parameterHead = objectInformation(RoiHead);
+
+              // Tail ellipse. Parameters in the frame of reference of RoiTail image.
+              roiTail = Rect(0, 0, pp.at<double>(0,0), rotate.rows);
+              RoiTail = rotate(roiTail);
+              parameterTail = objectInformation(RoiTail);
+            }
+
+
+            // Gets all the parameter in the frame of reference of RoiFull image.
 						invertAffineTransform(rotMatrix, rotMatrix);
-
 						p = (Mat_<double>(3,1) << parameterHead.at(0) + roiHead.tl().x,parameterHead.at(1) + roiHead.tl().y, 1);
-
 						pp = rotMatrix * p;
 
 						double xHead = pp.at<double>(0,0) + roiFull.tl().x;
 						double yHead = pp.at<double>(1,0) + roiFull.tl().y;
-
 						double angleHead = parameterHead.at(2) - M_PI*(parameterHead.at(2) > M_PI);
-						angleHead = Modul(angleHead + angleFull + M_PI*(abs(angleHead) > 0.5*M_PI)); // Computes the direction
-
-
+						angleHead = Modul(angleHead + parameter.at(2) + M_PI*(abs(angleHead) > 0.5*M_PI)); // Computes the direction
 
 						p = (Mat_<double>(3,1) << parameterTail.at(0) + roiTail.tl().x, parameterTail.at(1) + roiTail.tl().y, 1);
-
 						pp = rotMatrix * p;
-
-
 						double xTail = pp.at<double>(0,0) + roiFull.tl().x;
 						double yTail = pp.at<double>(1,0) + roiFull.tl().y;
-
 						double angleTail = parameterTail.at(2) - M_PI*(parameterTail.at(2) > M_PI);
-						angleTail = Modul(angleTail + angleFull + M_PI*(abs(angleTail) > 0.5*M_PI)); // Computes the direction
+						angleTail = Modul(angleTail + parameter.at(2) + M_PI*(abs(angleTail) > 0.5*M_PI)); // Computes the direction
 
-
-
-						//Curvature
+						// Computes the curvature of the object as the invert of all distances from each
+            // pixels of the fish and the intersection of the minor axis off tail and head ellipse.
 						double curv = 1./1e-16;
 						radiusCurv = curvatureCenter(Point3f(xTail, yTail, angleTail), Point3f(xHead, yHead, angleHead));
 						if(radiusCurv.x != NAN){ //
@@ -685,7 +706,7 @@ void Tracking::updatingParameters(const QMap<QString, QString> &parameterList) {
   param_len = parameterList.value("Maximal length").toDouble();
   param_angle = parameterList.value("Maximal angle").toDouble();
   param_weight = parameterList.value("Weight").toDouble();
-  param_lo = parameterList.value("Maximum occlusion").toInt();
+  param_lo = parameterList.value("Maximum occlusion").toDouble();
   param_arrowSize = parameterList.value("Arrow size").toInt();
 
   param_thresh = parameterList.value("Binary threshold").toInt();

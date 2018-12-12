@@ -79,7 +79,8 @@ class Tracking : public QObject {
   Point2f curvatureCenter(Point3f tail, Point3f head);
   double curvature(Point2f center , Mat image);
   double modul(double angle);
-  vector<double> orientation(UMat image, bool dir);
+  bool objectDirection(UMat image, Point center, vector<double> &information);
+  vector<double> objectInformation(UMat image);
   vector<Point3f> reassignment(vector<Point3f> inputPrev, vector<Point3f> input, vector<int> assignment);
   UMat backgroundExtraction(const vector<String> &files, double n);
   void registration(UMat imageReference, UMat& frame);
