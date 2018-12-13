@@ -60,72 +60,92 @@ class Tracking : public QObject {
 
 
 
-  QElapsedTimer *timer;
+  QElapsedTimer *timer;   /*!< Timer that measured the time during the analysis execution. */
 
-  UMat m_background;
+  UMat m_background;   /*!< Background image CV_8U. */
   
-  bool statusRegistration; 
-  bool statusBinarisation;
-  bool statusPath;
+  bool statusRegistration;    /*!< Enable registration. */
+  bool statusBinarisation;   /*!< True if wite objects on dark background, flase otherwise. */
+  bool statusPath;   /*!< True if the path is correct, ie the path folder contains an images sequence. */
 
-  int m_im;
-  Rect m_ROI;
-  QTextStream m_savefile;
-  QFile m_outputFile;
-  vector<cv::String> m_files; // OpenCV String class
-  vector<Point3f> m_colorMap;
-  vector<vector<Point>> m_memory;
+  int m_im;   /*!< Index of the next image to process in the m_files list. */
+  Rect m_ROI;   /*!< Rectangular region of interrest. */
+  QTextStream m_savefile;   /*!< Stream to output tracking data. */
+  QFile m_outputFile;   /*!< Path to the file where to save tracking data. */
+  vector<cv::String> m_files;   /*!< Vector containing the path for each image in the images sequence. */
+  vector<Point3f> m_colorMap;   /*!< Vector containing RBG color. */
+  vector<vector<Point>> m_memory;   /*!< Vector containing the last 50 tracking data. */
 
-  Point2f curvatureCenter(Point3f tail, Point3f head);
-  double curvature(Point2f center , Mat image);
+  vector<vector<Point3f>> m_out;   /*!< Binary image CV_8U */
+  vector<vector<Point3f>> m_outPrev;   /*!< Binary image CV_8U */
+  string m_path;   /*!< Binary image CV_8U */
+  int m_displayTime;   /*!< Binary image CV_8U */
+
+
+  Point2f curvatureCenter(const Point3f &tail, const Point3f &head);
+  double curvature(Point2f center , const Mat &image);
   double modul(double angle);
-  bool objectDirection(UMat image, Point center, vector<double> &information);
-  vector<double> objectInformation(UMat image);
-  vector<Point3f> reassignment(vector<Point3f> inputPrev, vector<Point3f> input, vector<int> assignment);
+  bool objectDirection(const UMat &image, Point center, vector<double> &information);
+  vector<double> objectInformation(const UMat &image);
+  vector<Point3f> reassignment(const vector<Point3f> &past, const vector<Point3f> &input, const vector<int> &assignment);
   UMat backgroundExtraction(const vector<String> &files, double n);
   void registration(UMat imageReference, UMat& frame);
   void binarisation(UMat& frame, char backgroundColor, int value);
-  vector<vector<Point3f> > objectPosition(UMat frame, int minSize, int maxSize);
-  vector<int> costFunc(vector<Point3f> prevPos, vector<Point3f> pos, double LENGHT, double ANGLE, double WEIGHT, double LO);
+  vector<vector<Point3f> > objectPosition(const UMat &frame, int minSize, int maxSize);
+  vector<int> costFunc(const vector<Point3f> &prevPos, const vector<Point3f> &pos, double LENGHT, double ANGLE, double WEIGHT, double LO);
   vector<Point3f> prevision(vector<Point3f> past, vector<Point3f> present);
   vector<Point3f> color(int number);
-  vector<vector<Point3f>> m_out;
-  vector<vector<Point3f>> m_outPrev;
-  string m_path;
-  int m_displayTime;
 
   public:
   Tracking(string path);
   ~Tracking();
 
-  UMat m_binaryFrame;
-  UMat m_visuFrame;
+  UMat m_binaryFrame;   /*!< Binary image CV_8U */
+  UMat m_visuFrame;   /*!< Image 8 bit CV_8U */
 
-  int param_n;
-  int param_maxArea;
-  int param_minArea;
-  int param_spot;
-  double param_len;
-  double param_angle;
-  double param_weight;
-  double param_lo;
-  int param_arrowSize;
-  int param_thresh;
-  double param_nBackground;
-  int param_x1;
-  int param_y1;
-  int param_x2;
-  int param_y2;
-  int param_dilatation;
+
+  int param_n;   /*!< Number of objects. */
+  int param_maxArea;   /*!< Maximal area of an object. */
+  int param_minArea;   /*!< Minimal area of an object. */
+  int param_spot;   /*!< Which spot parameters are used to computes the cost function. 0: head, 1: tail, 2: body. */
+  double param_len;   /*!< Maximal length travelled by an object between two images. */
+  double param_angle;   /*!< Maximal change in direction of an object between two images. */
+  double param_weight;   /*!< Weight between distance and direction in the cost function.  */
+  double param_lo;   /*!< Maximal distance allowed by an object to travel during an occlusion event. */
+  int param_arrowSize;   /*!< Size of the arrow in the displayed image. */
+  int param_thresh;   /*!< Value of the threshold to binarize the image. */
+  double param_nBackground;   /*!< Number of images to average to compute the background. */
+  int param_x1;   /*!< Top x corner of the region of interest. */
+  int param_y1;   /*!< Top y corner of the region of interest. */
+  int param_x2;   /*!< Bottom x corner of the region of interest. */
+  int param_y2;   /*!< Bottom y corner of the region of interest. */
+  int param_dilatation;   /*!< Dilatation coefficient to dilate binary image. */
 
   public slots:
   void startProcess();
   void updatingParameters(const QMap<QString, QString> &);
+
+  private slots:
   void imageProcessing();
 
   signals:
-  void newImageToDisplay(UMat&, UMat&);
+  /**
+  * @brief Emitted when images are available to display. The framerate can't be more than 20 fps.
+  * @param m_binaryFrame Binary image CV_8U.
+  * @param m_visuFrame Image CV_8UC3 containing the tracking visualisation.
+  */
+  void newImageToDisplay(UMat& m_binaryFrame, UMat& m_visuFrame);
+  
+  
+  /**
+  * @brief Emitted when the first image has been processed to trigger the starting of the analysis.
+  */
   void finishedProcessFrame();
+  
+  
+  /**
+  * @brief Emitted when all images have been processed.
+  */
   void finished();
 
 };  
