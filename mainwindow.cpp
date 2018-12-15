@@ -38,7 +38,7 @@ using namespace std;
 
 /*!
     \class MainWindow
-    \brief The MainWindow class is a widget displaying the UI if the program
+    \brief The MainWindow class is a widget displaying the main window of the program. It contains all the method to open an images sequences, sets parameters and begin a tracking analysis.
             Fishy Tracking.
 
 */
@@ -235,7 +235,7 @@ void MainWindow::startTracking() {
         // Saves parameters in a file named "parameter.txt"
         QFile parameterFile(QString::fromStdString(path) + QDir::separator() +  "Tracking_Result" + QDir::separator() + "parameter.txt" );
         if(!parameterFile.open(QFile::WriteOnly | QFile::Text)){
-          QMessageBox errorBox;
+          QMessageBox errorBox(this);
           errorBox.setText("You don't have the right to write in the selected folder!");
           errorBox.exec();
         }

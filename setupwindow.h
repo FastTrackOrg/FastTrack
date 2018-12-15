@@ -1,3 +1,19 @@
+/*
+This file is part of Fishy Tracking.
+
+    FishyTracking is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    FishyTracking is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Foobar.  If not, see <https://www.gnu.org/licenses/>.
+*/
 #ifndef SETUPWINDOW_H
 #define SETUPWINDOW_H
 
@@ -28,11 +44,11 @@ public:
     explicit SetupWindow(QWidget *parent = nullptr);
     ~SetupWindow();
 private:
-    QString imagePath;
-    QPixmap image;
-    cv::Mat binary;
-    QPainter paint;
-    int xTop, yTop, xBottom, yBottom;
+    QString imagePath;    /*!< Path to the image to open. */
+    QPixmap image;    /*!< Image to display */
+    cv::Mat binary;    /*!< Binary image after thresholding */
+    QPainter paint;    /*!< QPainter to draw on top of the Pixmap. */
+    int xTop, yTop, xBottom, yBottom;    /*!< Region of interest top left and bottom right corners coordinates. */
     Ui::SetupWindow *ui;
 
 private slots:
