@@ -736,7 +736,7 @@ void Tracking::updatingParameters(const QMap<QString, QString> &parameterList) {
   param_len = parameterList.value("Maximal length").toDouble();
   param_angle = parameterList.value("Maximal angle").toDouble();
   param_weight = parameterList.value("Weight").toDouble();
-  param_lo = parameterList.value("Maximum occlusion").toDouble();
+  param_lo = parameterList.value("Maximal occlusion").toDouble();
   param_arrowSize = parameterList.value("Arrow size").toInt();
 
   param_thresh = parameterList.value("Binary threshold").toInt();
