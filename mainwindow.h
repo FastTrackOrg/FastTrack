@@ -32,6 +32,7 @@
 #include <QDebug>
 #include <QTableWidgetItem>
 #include "functions.h"
+#include "setupwindow.h"
 
 
 using namespace std;
@@ -61,6 +62,8 @@ private:
 
     int frameAnalyzed;
 
+
+    SetupWindow *setupWindow;
 
     void loadSettings();
     void saveSettings();

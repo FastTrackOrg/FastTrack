@@ -21,7 +21,7 @@
        <enum>QTabWidget::West</enum>
       </property>
       <property name="currentIndex">
-       <number>3</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="files">
        <attribute name="title">
@@ -151,6 +151,13 @@
             </font>
            </property>
           </column>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QPushButton" name="setupWindow">
+          <property name="text">
+           <string>Setup help</string>
+          </property>
          </widget>
         </item>
        </layout>

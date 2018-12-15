@@ -64,6 +64,11 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tableParameters->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     ui->tablePath->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
+    setupWindow = new SetupWindow(this);
+    connect(ui->setupWindow, &QPushButton::clicked, [this]() {
+      setupWindow->show();
+    });
+
 
 
     qRegisterMetaType<UMat>("UMat&");

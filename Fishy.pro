@@ -36,6 +36,7 @@ SOURCES += \
         main.cpp \
         mainwindow.cpp \
         functions.cpp \
+        setupwindow.cpp \
         Hungarian.cpp
 
 QMAKE_CXXFLAGS += -std=c++11 -O3 -fopenmp -g
@@ -45,11 +46,12 @@ LIBS += -L /usr/local/lib64/  -lopencv_core -lopencv_imgproc -lopencv_highgui -l
 HEADERS += \
         mainwindow.h\
         functions.h \
+        setupwindow.h \
         Hungarian.h
 
 
-FORMS += \
-        mainwindow.ui
+FORMS += mainwindow.ui \
+        setupwindow.ui 
 
 RESOURCES += resources.qrc
 
