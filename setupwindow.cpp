@@ -114,7 +114,13 @@ void SetupWindow::thresholdImage(int value) {
     imageMat = imageMat(roi);
   }
 
-  cv::threshold(imageMat, binary, value, 255, cv::THRESH_BINARY);
+  // Binarizes and invert white <-> black if necessary
+  if (ui->invert->isChecked()) {
+    cv::threshold(imageMat, binary, value, 255, cv::THRESH_BINARY);
+  }
+  else {
+    cv::threshold(imageMat, binary, value, 255, cv::THRESH_BINARY_INV);
+  }
   image = QPixmap::fromImage(QImage(binary.data, binary.cols, binary.rows, binary.step, QImage::Format_Grayscale8));
   ui->display->setPixmap(image);
 }

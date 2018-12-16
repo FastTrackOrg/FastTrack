@@ -20,6 +20,10 @@ QTabWidget::pane{
   border: 1px solid #262626;
 }
 
+QCheckBox{
+  color: white;
+}
+
 QTabBar::tab {
   background: #212121;
   border: 1px solid black;
