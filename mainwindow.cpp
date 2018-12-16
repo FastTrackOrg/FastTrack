@@ -19,17 +19,6 @@ This file is part of Fishy Tracking.
 
 
 #include "mainwindow.h"
-#include "ui_mainwindow.h"
-#include <QDebug>
-#include <QTimer>
-#include <QFile>
-#include <QFileInfo>
-#include "opencv2/imgproc/imgproc.hpp"
-#include "opencv2/highgui/highgui.hpp"
-#include <string>
-#include <functions.h>
-#include <opencv2/core/ocl.hpp>
-#include <ctime>
 
 
 
@@ -481,6 +470,7 @@ void MainWindow::swapTrackingData(int firstObject, int secondObject, int from) {
   ui->replaySlider and swaps the data and saves in tracking.txt the result.
   
   Triggered when ui->swapButton is pressed.
+  i//Not  working properly to fix
 */
 void MainWindow::correctTracking() {
 

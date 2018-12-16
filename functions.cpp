@@ -27,7 +27,7 @@ using namespace std;
 /**
  * @class Tracking
  *
- * @brief This class is intented to execute a tracking analysis on an images sequence. It is initialized with the path where the image are stored. This class can be used inside an application by creating a new thread and calling the method startProcess. The tracking workflow can be reimplemented by changing reimplementing the method startProcess and image processing.
+ * @brief This class is intented to execute a tracking analysis on an images sequence. It is initialized with the path where images are stored. This class can be used inside an application by creating a new thread and calling the method startProcess. The tracking workflow can be reimplemented by reimplementing the method startProcess and imageProcessing. This class can also be used as a library by constructing Tracking tracking("") to access public class members and build a new workflow before reimplementing it in imageProcessing public slot.
  *
  * @author Benjamin Gallois
  *
@@ -403,13 +403,13 @@ vector<int> Tracking::costFunc(const vector<Point3f> &prevPos, const vector<Poin
 		Point3f prevCoord = prevPos.at(i);
 		for(int j = 0; j < m; ++j){
 			Point3f coord = pos.at(j);
-            double d = pow(pow(prevCoord.x - coord.x, 2) + pow(prevCoord.y - coord.y, 2), 0.5);
-            if(d < LO){
-                c = WEIGHT*(d/LENGTH) + (1 - WEIGHT)*((abs(modul(prevCoord.z - coord.z + M_PI) - M_PI))/(ANGLE)); //cost function
+      double d = pow(pow(prevCoord.x - coord.x, 2) + pow(prevCoord.y - coord.y, 2), 0.5);
+      if(d < LO){
+        c = WEIGHT*(d/LENGTH) + (1 - WEIGHT)*((abs(modul(prevCoord.z - coord.z + M_PI) - M_PI))/(ANGLE)); //cost function
 				costMatrix[i][j] = c;
 			}
-            else if (d > LO){
-				costMatrix[i][j] = 2e53;
+      else if (d > LO){
+				costMatrix[i][j] = 2e307;
 			}
 
 		}
@@ -750,7 +750,6 @@ void Tracking::updatingParameters(const QMap<QString, QString> &parameterList) {
   statusBinarisation = (parameterList.value("Light background") == "yes") ? true : false;
   param_dilatation = parameterList.value("Dilatation").toInt();
 
-  qInfo() << "Parameters updated" << endl;
 }
 
 

@@ -58,8 +58,6 @@ class Tracking : public QObject {
 
     Q_OBJECT
 
-
-
   QElapsedTimer *timer;   /*!< Timer that measured the time during the analysis execution. */
 
   UMat m_background;   /*!< Background image CV_8U. */
@@ -76,34 +74,9 @@ class Tracking : public QObject {
   vector<Point3f> m_colorMap;   /*!< Vector containing RBG color. */
   vector<vector<Point>> m_memory;   /*!< Vector containing the last 50 tracking data. */
 
-  vector<vector<Point3f>> m_out;   /*!< Binary image CV_8U */
-  vector<vector<Point3f>> m_outPrev;   /*!< Binary image CV_8U */
   string m_path;   /*!< Binary image CV_8U */
   int m_displayTime;   /*!< Binary image CV_8U */
-
-
-  Point2f curvatureCenter(const Point3f &tail, const Point3f &head);
-  double curvature(Point2f center , const Mat &image);
-  double modul(double angle);
-  bool objectDirection(const UMat &image, Point center, vector<double> &information);
-  vector<double> objectInformation(const UMat &image);
-  vector<Point3f> reassignment(const vector<Point3f> &past, const vector<Point3f> &input, const vector<int> &assignment);
-  UMat backgroundExtraction(const vector<String> &files, double n);
-  void registration(UMat imageReference, UMat& frame);
-  void binarisation(UMat& frame, char backgroundColor, int value);
-  vector<vector<Point3f> > objectPosition(const UMat &frame, int minSize, int maxSize);
-  vector<int> costFunc(const vector<Point3f> &prevPos, const vector<Point3f> &pos, double LENGHT, double ANGLE, double WEIGHT, double LO);
-  vector<Point3f> prevision(vector<Point3f> past, vector<Point3f> present);
-  vector<Point3f> color(int number);
-
-  public:
-  Tracking(string path);
-  ~Tracking();
-
-  UMat m_binaryFrame;   /*!< Binary image CV_8U */
-  UMat m_visuFrame;   /*!< Image 8 bit CV_8U */
-
-
+  
   int param_n;   /*!< Number of objects. */
   int param_maxArea;   /*!< Maximal area of an object. */
   int param_minArea;   /*!< Minimal area of an object. */
@@ -121,6 +94,33 @@ class Tracking : public QObject {
   int param_y2;   /*!< Bottom y corner of the region of interest. */
   int param_dilatation;   /*!< Dilatation coefficient to dilate binary image. */
 
+
+
+
+  public:
+  Tracking(string path);
+  ~Tracking();
+
+  Point2f curvatureCenter(const Point3f &tail, const Point3f &head);
+  double curvature(Point2f center , const Mat &image);
+  double modul(double angle);
+  bool objectDirection(const UMat &image, Point center, vector<double> &information);
+  vector<double> objectInformation(const UMat &image);
+  vector<Point3f> reassignment(const vector<Point3f> &past, const vector<Point3f> &input, const vector<int> &assignment);
+  UMat backgroundExtraction(const vector<String> &files, double n);
+  void registration(UMat imageReference, UMat& frame);
+  void binarisation(UMat& frame, char backgroundColor, int value);
+  vector<vector<Point3f> > objectPosition(const UMat &frame, int minSize, int maxSize);
+  vector<int> costFunc(const vector<Point3f> &prevPos, const vector<Point3f> &pos, double LENGHT, double ANGLE, double WEIGHT, double LO);
+  vector<Point3f> prevision(vector<Point3f> past, vector<Point3f> present);
+  vector<Point3f> color(int number);
+
+  UMat m_binaryFrame;   /*!< Binary image CV_8U */
+  UMat m_visuFrame;   /*!< Image 8 bit CV_8U */
+  vector<vector<Point3f>> m_out;   /*!< Objects information at iteration minus one */
+  vector<vector<Point3f>> m_outPrev;   /*!< Objects information at current iteration */
+  
+  
   public slots:
   void startProcess();
   void updatingParameters(const QMap<QString, QString> &);

@@ -33,6 +33,16 @@
 #include <QTableWidgetItem>
 #include "functions.h"
 #include "setupwindow.h"
+#include "ui_mainwindow.h"
+#include <QDebug>
+#include <QTimer>
+#include <QFile>
+#include <QFileInfo>
+#include "opencv2/imgproc/imgproc.hpp"
+#include "opencv2/highgui/highgui.hpp"
+#include <string>
+#include <opencv2/core/ocl.hpp>
+#include <ctime>
 
 
 using namespace std;
