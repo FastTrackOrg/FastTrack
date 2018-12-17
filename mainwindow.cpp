@@ -456,7 +456,7 @@ void MainWindow::loadFrame(int frameIndex) {
   Swaps \a firstObject and \a secondObject tracking data from \a from to the end.  
 */
 void MainWindow::swapTrackingData(int firstObject, int secondObject, int from) {
-    for ( unsigned int i = from; i < replayFrames.size(); i += replayNumberObject ) {
+    for ( int i = from*replayNumberObject; i < int(replayFrames.size()*replayNumberObject); i += replayNumberObject ) {
        QString tmp = replayTracking[i + secondObject];
        replayTracking.replace(i + secondObject, replayTracking.at(i + firstObject));
        replayTracking.replace(i + firstObject, tmp);
