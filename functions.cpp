@@ -106,12 +106,23 @@ double Tracking::curvature(Point2f center , const Mat &image){
   * @param[in] angle Input angle.
   * @return Output angle.
 */
-double Tracking::modul(double angle)
-{
+double Tracking::modul(double angle) {
     return angle - 2*M_PI * floor(angle/(2*M_PI));
 }
 
 
+/**
+  * @brief Computes least difference between two angles, alpha - beta. The difference is oriented in trigonometric convention.
+  * @param[in] alpha Input angle.
+  * @param[in] beta Input angle.
+  * @return Least difference.
+*/
+double Tracking::angleDifference(double alpha, double beta) {
+  
+  alpha = modul(alpha);
+  beta = modul(beta);
+  return -(modul(alpha - beta + M_PI) - M_PI);
+}
 
 
 /**
@@ -384,10 +395,10 @@ vector<vector<Point3f>> Tracking::objectPosition(const UMat &frame, int minSize,
   * @details Method adapted from: "An effective and robust method for Tracking multiple fish in video image based on fish head detection" YQ Chen et al. Use the Hungarian method implemented by Cong Ma, 2016 "https://github.com/mcximing/hungarian-algorithm-cpp" adapted from the matlab implementation by Markus Buehren "https://fr.mathworks.com/matlabcentral/fileexchange/6543-functions-for-the-rectangular-assignment-problem".
   * @param[in] prevPos Vector of objects at t minus one.
 	* @param[in] pos Vector of objects parameters at t that we want to reorder in order to conserve the objects identity.
-	* @param[in] length Maximal displacement of an object between two frames.
-	* @param[in] angle Maximal difference in orientation an object between two frames.
+	* @param[in] length Maximal displacement of an object between two frames in pixels.
+	* @param[in] angle Maximal difference in orientation an object between two frames in radians.
 	* @param[in] weight Weight between distance and direction in the computation of the cost function. Close to 0 the cost function used the distance, close to one it will used the direction. 
-	* @param[in] lo Maximal occlusion distance of objects between two frames.
+	* @param[in] lo Maximal occlusion distance of objects between two frames in pixels.
 	* @return The assignment vector containing the new index position to sort the pos vector. 
 */
 vector<int> Tracking::costFunc(const vector<Point3f> &prevPos, const vector<Point3f> &pos, double LENGTH, double ANGLE, double WEIGHT, double LO){
@@ -405,10 +416,10 @@ vector<int> Tracking::costFunc(const vector<Point3f> &prevPos, const vector<Poin
 			Point3f coord = pos.at(j);
       double d = pow(pow(prevCoord.x - coord.x, 2) + pow(prevCoord.y - coord.y, 2), 0.5);
       if(d < LO){
-        c = WEIGHT*(d/LENGTH) + (1 - WEIGHT)*((abs(modul(prevCoord.z - coord.z + M_PI) - M_PI))/(ANGLE)); //cost function
+        c = WEIGHT*(d/LENGTH) + (1 - WEIGHT)*abs(angleDifference(prevCoord.z, coord.z)/ANGLE); //cost function
 				costMatrix[i][j] = c;
 			}
-      else if (d > LO){
+      else {
 				costMatrix[i][j] = 2e307;
 			}
 
@@ -427,7 +438,7 @@ vector<int> Tracking::costFunc(const vector<Point3f> &prevPos, const vector<Poin
 
 
 /**
-  * @brief Sorts a vector accordingly to a new index.
+  * @brief Sorts a vector accordingly to a new index. The sorted vector at index i is the input at index assignment at index i.
   * @param[in] past Vector at t minus one.
   * @param[in] input Vector at t of size m <= n to be sorted.
   * @param[in] assignment Vector with the new index that will be used to sort the input vector.
@@ -585,7 +596,7 @@ void Tracking::imageProcessing(){
     // Sending rate of images
     if ( (timer->elapsed() - m_displayTime) > 40) {
       emit(newImageToDisplay(m_visuFrame, m_binaryFrame));
-      m_displayTime = timer->elapsed();
+     m_displayTime = timer->elapsed();
     }
     if(m_im + 1 > int(m_files.size())){
       m_savefile.flush();
