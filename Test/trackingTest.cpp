@@ -59,12 +59,39 @@ TEST_F(TrackingTest, Registration) {
 TEST_F(TrackingTest, Module) {
   Tracking tracking("test");
   EXPECT_EQ(tracking.modul(0), 0);
+  EXPECT_EQ(tracking.modul(M_PI), M_PI);
+  EXPECT_EQ(tracking.modul(M_PI*0.5 + 2*M_PI), M_PI*0.5);
+  EXPECT_EQ(tracking.modul(M_PI*0.5 - 2*M_PI), M_PI*0.5);
+  EXPECT_EQ(tracking.modul(-M_PI*0.5 + 2*M_PI), 3*M_PI*0.5);
+  EXPECT_EQ(tracking.modul(-M_PI*0.5 - 2*M_PI), 3*M_PI*0.5);
   EXPECT_EQ(tracking.modul(-M_PI), M_PI);
   EXPECT_EQ(tracking.modul(4*M_PI), 0);
   EXPECT_EQ(tracking.modul(3*M_PI), M_PI);
   EXPECT_EQ(tracking.modul(-0.5*M_PI), 0.5*3*M_PI);
   EXPECT_EQ(tracking.modul(-0.5*M_PI), 0.5*3*M_PI);
 }
+
+
+TEST_F(TrackingTest, AngleDifferrence) {
+  Tracking tracking("test");
+  EXPECT_EQ(tracking.angleDifference(M_PI, 0.5*M_PI), -0.5*M_PI);
+  EXPECT_EQ(tracking.angleDifference(0.5*M_PI, M_PI), 0.5*M_PI);
+  EXPECT_EQ(tracking.angleDifference(-0.5*M_PI, -M_PI), -0.5*M_PI);
+  EXPECT_EQ(tracking.angleDifference(-M_PI, -0.5*M_PI), +0.5*M_PI);
+  EXPECT_EQ(tracking.angleDifference(4*M_PI + M_PI, 4*M_PI + 0.5*M_PI), -0.5*M_PI);
+  EXPECT_EQ(tracking.angleDifference(4*M_PI + 0.5*M_PI, 4*M_PI + M_PI), 0.5*M_PI);
+  EXPECT_EQ(tracking.angleDifference(-4*M_PI + 0.5*M_PI, -4*M_PI + M_PI), +0.5*M_PI);
+  EXPECT_EQ(tracking.angleDifference(-4*M_PI + M_PI, 4*M_PI + -0.5*M_PI), +0.5*M_PI);
+  EXPECT_EQ(tracking.angleDifference(4*M_PI + M_PI, 0.5*M_PI), -0.5*M_PI);
+  EXPECT_EQ(tracking.angleDifference(4*M_PI + 0.5*M_PI, M_PI), 0.5*M_PI);
+  EXPECT_EQ(tracking.angleDifference(-4*M_PI + 0.5*M_PI, -M_PI), 0.5*M_PI);
+  EXPECT_EQ(tracking.angleDifference(-4*M_PI + M_PI, -0.5*M_PI), +0.5*M_PI);
+  EXPECT_EQ(tracking.angleDifference(M_PI, 4*M_PI + 0.5*M_PI), -0.5*M_PI);
+  EXPECT_EQ(tracking.angleDifference(0.5*M_PI, 4*M_PI + M_PI), 0.5*M_PI);
+  EXPECT_EQ(tracking.angleDifference(-0.5*M_PI, -4*M_PI + M_PI), -0.5*M_PI);
+  EXPECT_EQ(tracking.angleDifference(-M_PI, 4*M_PI + -0.5*M_PI), +0.5*M_PI);
+}
+
 
 TEST_F(TrackingTest, Reassignement) {
   Tracking tracking("test");
@@ -120,6 +147,72 @@ TEST_F(TrackingTest, InformationOrientation) {
   test = tracking.objectInformation(imageReference);
   tracking.objectDirection(imageReference, Point(test.at(0), test.at(1)), test);
   EXPECT_EQ(round(test.at(2)*1000), round(1000*(M_PI)));
+}
+
+
+TEST_F(TrackingTest, costFunction) {
+  Tracking tracking("test");
+  
+  vector<Point3f> past, current;
+  vector<int> order, test;
+
+  // Only translation
+  past = { Point3f(10, 10, 0), Point3f(30, 40, 0), Point3f(50, 60, 0) };
+  current = { Point3f(50, 60, 0), Point3f(10, 10, 0), Point3f(30, 40, 0) };
+  order = tracking.costFunc(past, current, 10, 90, 1, 20);
+  test = {1, 2, 0};
+  EXPECT_EQ(order, test);
+  EXPECT_EQ(tracking.reassignment(past, current, order), past);
+
+  // Only translation
+  past = { Point3f(10, 10, 0), Point3f(30, 40, 0), Point3f(50, 60, 0) };
+  current = { Point3f(50, 50, 0), Point3f(10, 20, 0), Point3f(30, 30, 0) };
+  order = tracking.costFunc(past, current, 10, 90, 1, 1);
+  test = {1, 2, 0};
+  EXPECT_NE(order, test);
+
+  // Only angle no movement
+  past = { Point3f(10, 10, 90), Point3f(30, 40, 180), Point3f(50, 60, 0) };
+  current = { Point3f(50, 60, 0), Point3f(10, 10, 90), Point3f(30, 40, 180) };
+  order = tracking.costFunc(past, current, 10, 90, 0, 20);
+  test = {1, 2, 0};
+  EXPECT_EQ(order, test);
+  EXPECT_EQ(tracking.reassignment(past, current, order), past);
+  
+  // Only translation
+  past = { Point3f(10, 10, 0), Point3f(30, 40, 0), Point3f(50, 60, 0) };
+  current = { Point3f(60, 60, 0), Point3f(10, 0, 0), Point3f(30, 50, 0) };
+  order = tracking.costFunc(past, current, 15, 90, 0.5, 20);
+  test = {1, 2, 0};
+  EXPECT_EQ(order, test);
+
+  // Rotation and translation
+  past = { Point3f(10, 10, 0), Point3f(30, 40, 3*0.5*M_PI), Point3f(50, 60, 0.5*M_PI) };
+  current = { Point3f(60, 60, 0), Point3f(10, 0, 0.5*M_PI), Point3f(30, 50, 0) };
+  order = tracking.costFunc(past, current, 15, 90, 0.5, 20);
+  test = {1, 2, 0};
+  EXPECT_EQ(order, test);
+
+  // Only translation
+  past = { Point3f(10, 10, 0), Point3f(30, 40, 0), Point3f(50, 60, 0) };
+  current = { Point3f(60, 60, 0), Point3f(10, 0, 0), Point3f(30, 50, 0), Point3f(30, 150, 0)};
+  order = tracking.costFunc(past, current, 15, 90, 0.5, 20);
+  test = {1, 2, 0};
+  EXPECT_EQ(order, test);
+
+  // Rotation and translation
+  past = { Point3f(10, 10, 0), Point3f(30, 40, 3*0.5*M_PI), Point3f(50, 60, 0.5*M_PI) };
+  current = { Point3f(60, 60, 0), Point3f(10, 0, 0.5*M_PI) };
+  order = tracking.costFunc(past, current, 15, 90, 0.5, 20);
+  test = {1, -1, 0};
+  EXPECT_EQ(order, test);
+
+  // Only rotation
+  past = { Point3f(10, 10, 0), Point3f(30, 40, 3*0.5*M_PI), Point3f(50, 60, 0.5*M_PI) };
+  current = { Point3f(50, 60, 0), Point3f(10, 10, 0.5*M_PI), Point3f(30, 40, 0) };
+  order = tracking.costFunc(past, current, 15, 90, 0.5, 20);
+  test = {1, 2, 0};
+  EXPECT_EQ(order, test);
 }
 }
 
