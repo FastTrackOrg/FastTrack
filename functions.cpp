@@ -288,8 +288,8 @@ vector<vector<Point3f>> Tracking::objectPosition(const UMat &frame, int minSize,
 	findContours(frame, contours, RETR_LIST, CHAIN_APPROX_NONE);
 
 	for (unsigned int i = 0; i < contours.size(); i++){
-
-			if(contourArea(contours[i]) > minSize && contourArea(contours[i]) < maxSize){ // Only select objects minArea << objectArea <<maxArea
+			
+      if(contourArea(contours[i]) > minSize && contourArea(contours[i]) < maxSize){ // Only select objects minArea << objectArea <<maxArea
 
             // Draw the object in a temporary black image avoiding to select a 
             // part of another object if two objects are very close.
@@ -380,6 +380,92 @@ vector<vector<Point3f>> Tracking::objectPosition(const UMat &frame, int minSize,
 
 						globalParam.push_back(Point3f(curv, 0, 0));
 						}
+      else if(contourArea(contours[i]) >= maxSize && contourArea(contours[i]) < 3*maxSize) {
+        qInfo() << "TEST";
+            // Draw the object in a temporary black image avoiding to select a 
+            // part of another object if two objects are very close.
+						dst = UMat::zeros(frame.size(), CV_8U);
+						drawContours(dst, contours, i, Scalar(255, 255, 255), FILLED,8); 
+					
+          	
+            // Computes the x, y and orientation of the object, in the
+            // frame of reference of ROIFull image.
+            roiFull = boundingRect(contours[i]);
+						RoiFull = dst(roiFull);
+						parameter = objectInformation(RoiFull);
+            
+
+            // Rotates the image without croping and computes the direction of the object.
+            Point center = Point(0.5*RoiFull.cols, 0.5*RoiFull.rows);
+            rotMatrix = getRotationMatrix2D(center, -(parameter.at(2)*180)/M_PI, 1);
+            bbox = RotatedRect(center, RoiFull.size(), -(parameter.at(2)*180)/M_PI).boundingRect();
+            rotMatrix.at<double>(0,2) += bbox.width*0.5 - center.x;
+            rotMatrix.at<double>(1,2) += bbox.height*0.5 - center.y;
+            warpAffine(RoiFull, rotate, rotMatrix, bbox.size());
+
+
+           // Computes the coordinate of the center of mass of the fish in the rotated
+           // image frame of reference.
+            p = (Mat_<double>(3,1) << parameter.at(0), parameter.at(1), 1);
+            pp = rotMatrix * p;
+
+					
+            // Computes the direction of the object. If objectDirection return true, the
+            // head is at the left and the tail at the right.
+            Rect roiObjectA, roiObjectB;
+            UMat RoiObjectA, RoiObjectB;
+            vector<double> parameterObjectA, parameterObjectB;
+
+              // Head ellipse. Parameters in the frame of reference of the RoiHead image.
+              roiObjectA = Rect(0, 0, pp.at<double>(0,0), rotate.rows);
+              RoiObjectA = rotate(roiObjectA);
+              parameterObjectA = objectInformation(RoiObjectA);
+
+              // Tail ellipse. Parameters in the frame of reference of ROITail image.
+              roiObjectB = Rect(0, 0, pp.at<double>(0,0), rotate.rows);
+              RoiObjectB = rotate(roiObjectB);
+              parameterObjectB = objectInformation(RoiObjectB);
+
+
+
+            // Gets all the parameter in the frame of reference of RoiFull image.
+						invertAffineTransform(rotMatrix, rotMatrix);
+						p = (Mat_<double>(3,1) << parameterObjectA.at(0) + roiObjectA.tl().x,parameterObjectA.at(1) + roiObjectA.tl().y, 1);
+						pp = rotMatrix * p;
+
+						double xObjectA = pp.at<double>(0,0) + roiFull.tl().x;
+						double yObjectA = pp.at<double>(1,0) + roiFull.tl().y;
+						double angleObjectA = parameterObjectA.at(2);// - M_PI*(parameterHead.at(2) > M_PI);
+						angleObjectA = modul(angleObjectA + parameter.at(2));// + M_PI*(abs(angleHead) > 0.5*M_PI)); // Computes the direction
+
+						p = (Mat_<double>(3,1) << parameterObjectB.at(0) + roiObjectB.tl().x, parameterObjectB.at(1) + roiObjectB.tl().y, 1);
+						pp = rotMatrix * p;
+						double xObjectB = pp.at<double>(0,0) + roiFull.tl().x;
+						double yObjectB = pp.at<double>(1,0) + roiFull.tl().y;
+						double angleObjectB = parameterObjectB.at(2);// - M_PI*(parameterTail.at(2) > M_PI);
+						angleObjectB = modul(angleObjectB + parameter.at(2));// + M_PI*(abs(angleTail) > 0.5*M_PI)); // Computes the direction
+
+						// Computes the curvature of the object as the invert of all distances from each
+            // pixels of the fish and the intersection of the minor axis off tail and head ellipse.
+						/*double curv = 1./1e-16;
+						radiusCurv = curvatureCenter(Point3f(xTail, yTail, angleTail), Point3f(xHead, yHead, angleHead));
+						if(radiusCurv.x != NAN){ //
+						            curv = curvature(radiusCurv, RoiFull.getMat(ACCESS_READ));
+						}
+*/
+            // To assign at position to track parameter
+						positionHead.push_back(Point3f(xObjectA, yObjectA, angleObjectA));
+						positionTail.push_back(Point3f(xObjectA, yObjectA, angleObjectA));
+						positionFull.push_back(Point3f(xObjectA, yObjectA, angleObjectA));
+						globalParam.push_back(Point3f(xObjectA, yObjectA, angleObjectA));
+						positionHead.push_back(Point3f(xObjectB, yObjectB, angleObjectB));
+						positionTail.push_back(Point3f(xObjectA, yObjectA, angleObjectA));
+						positionFull.push_back(Point3f(xObjectA, yObjectA, angleObjectA));
+						globalParam.push_back(Point3f(xObjectA, yObjectA, angleObjectA));
+						//positionFull.push_back(Point3f(parameter.at(0) + roiFull.tl().x, parameter.at(1) + roiFull.tl().y, parameter.at(2)));
+
+						//globalParam.push_back(Point3f(curv, 0, 0));
+      }
    }
 
 	vector<vector<Point3f>> out = {positionHead, positionTail, positionFull, globalParam};
