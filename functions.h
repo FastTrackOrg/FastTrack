@@ -71,7 +71,7 @@ class Tracking : public QObject {
   QTextStream m_savefile;   /*!< Stream to output tracking data. */
   QFile m_outputFile;   /*!< Path to the file where to save tracking data. */
   vector<cv::String> m_files;   /*!< Vector containing the path for each image in the images sequence. */
-  vector<Point3f> m_colorMap;   /*!< Vector containing RBG color. */
+  vector<Point3d> m_colorMap;   /*!< Vector containing RBG color. */
   vector<vector<Point>> m_memory;   /*!< Vector containing the last 50 tracking data. */
 
   string m_path;   /*!< Binary image CV_8U */
@@ -101,25 +101,25 @@ class Tracking : public QObject {
   Tracking(string path);
   ~Tracking();
 
-  Point2f curvatureCenter(const Point3f &tail, const Point3f &head);
-  double curvature(Point2f center , const Mat &image);
+  Point2d curvatureCenter(const Point3d &tail, const Point3d &head);
+  double curvature(Point2d center , const Mat &image);
   double modul(double angle);
   double angleDifference(double alpha, double beta);
   bool objectDirection(const UMat &image, Point center, vector<double> &information);
   vector<double> objectInformation(const UMat &image);
-  vector<Point3f> reassignment(const vector<Point3f> &past, const vector<Point3f> &input, const vector<int> &assignment);
+  vector<Point3d> reassignment(const vector<Point3d> &past, const vector<Point3d> &input, const vector<int> &assignment);
   UMat backgroundExtraction(const vector<String> &files, double n);
   void registration(UMat imageReference, UMat& frame);
   void binarisation(UMat& frame, char backgroundColor, int value);
-  vector<vector<Point3f> > objectPosition(const UMat &frame, int minSize, int maxSize);
-  vector<int> costFunc(const vector<Point3f> &prevPos, const vector<Point3f> &pos, double LENGHT, double ANGLE, double WEIGHT, double LO);
-  vector<Point3f> prevision(vector<Point3f> past, vector<Point3f> present);
-  vector<Point3f> color(int number);
+  vector<vector<Point3d> > objectPosition(const UMat &frame, int minSize, int maxSize);
+  vector<int> costFunc(const vector<Point3d> &prevPos, const vector<Point3d> &pos, double LENGHT, double ANGLE, double WEIGHT, double LO);
+  vector<Point3d> prevision(vector<Point3d> past, vector<Point3d> present);
+  vector<Point3d> color(int number);
 
   UMat m_binaryFrame;   /*!< Binary image CV_8U */
   UMat m_visuFrame;   /*!< Image 8 bit CV_8U */
-  vector<vector<Point3f>> m_out;   /*!< Objects information at iteration minus one */
-  vector<vector<Point3f>> m_outPrev;   /*!< Objects information at current iteration */
+  vector<vector<Point3d>> m_out;   /*!< Objects information at iteration minus one */
+  vector<vector<Point3d>> m_outPrev;   /*!< Objects information at current iteration */
   
   
   public slots:

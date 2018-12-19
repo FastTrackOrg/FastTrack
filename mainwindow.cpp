@@ -440,6 +440,7 @@ void MainWindow::loadFrame(int frameIndex) {
       for (int i = frameIndex*replayNumberObject; i < frameIndex*replayNumberObject + replayNumberObject; i++) {
         QStringList coordinate = replayTracking.at(i).split('\t', QString::SkipEmptyParts);
         cv::arrowedLine(frame, Point(coordinate.at(0).toDouble(), coordinate.at(1).toDouble()), Point(coordinate.at(0).toDouble() + 10*cos(coordinate.at(2).toDouble()), coordinate.at(1).toDouble() - 10*sin(coordinate.at(2).toDouble())), Scalar(colorMap.at(i - frameIndex*replayNumberObject).x, colorMap.at(i - frameIndex*replayNumberObject).y, colorMap.at(i - frameIndex*replayNumberObject).z), 2, 20, 0);
+        //cv::(frame, Point(coordinate.at(0).toDouble(), coordinate.at(1).toDouble()), Point(coordinate.at(0).toDouble() + 10*cos(coordinate.at(2).toDouble()), coordinate.at(1).toDouble() - 10*sin(coordinate.at(2).toDouble())), Scalar(colorMap.at(i - frameIndex*replayNumberObject).x, colorMap.at(i - frameIndex*replayNumberObject).y, colorMap.at(i - frameIndex*replayNumberObject).z), 2, 20, 0);
         cv::putText(frame, to_string(i - frameIndex*replayNumberObject), Point(coordinate.at(0).toDouble(), coordinate.at(1).toDouble()), cv::FONT_HERSHEY_SIMPLEX, 1.8, Scalar(colorMap.at(i - frameIndex*replayNumberObject).x, colorMap.at(i - frameIndex*replayNumberObject).y, colorMap.at(i - frameIndex*replayNumberObject).z), 5);
       }
       
@@ -484,7 +485,7 @@ void MainWindow::correctTracking() {
     QFile file(ui->replayPath->text()+ QDir::separator() + "Tracking_Result" + QDir::separator() + "tracking.txt");
     if (file.open(QFile::WriteOnly | QFile::Text)) {
       QTextStream out(&file);
-      out << "xHead" << '\t' << "yHead" << '\t' << "tHead" << '\t'  << "xTail" << '\t' << "yTail      " << '\t' << "tTail"   << '\t'  << "xBody" << '\t' << "yBody" << '\t' << "tBody"   << '\t'  << "cur      vature" << '\t'  << "imageNumber" << endl; 
+      out << "xHead" << '\t' << "yHead" << '\t' << "tHead" << '\t'  << "xTail" << '\t' << "yTail      " << '\t' << "tTail"   << '\t'  << "xBody" << '\t' << "yBody" << '\t' << "tBody"   << '\t'  << "cur      vature" << '\t' << "headMajorAxisLength" << '\t' << "headMinorAxisLength" << '\t' << "tailMajorAxis" << '\t' << "tailMinorAxis" << '\t'  << "imageNumber" << endl; 
       for(auto& a: replayTracking) {
         out << a << endl;
       }

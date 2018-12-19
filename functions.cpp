@@ -46,9 +46,9 @@ using namespace std;
   * @param[in] head Parameters of the tail ellipse: coordinate and direction of the major axis.
   * @return Coordinate of the curvature center.
 */
-Point2f Tracking::curvatureCenter(const Point3f &tail, const Point3f &head){
+Point2d Tracking::curvatureCenter(const Point3d &tail, const Point3d &head){
 
-	Point2f center;
+	Point2d center;
   
   // Computes the equation of the slope of the two minors axis of each ellipses
   // from the coordinate and direction of each ellipse.
@@ -81,7 +81,7 @@ Point2f Tracking::curvatureCenter(const Point3f &tail, const Point3f &head){
 	* @param[in] image Binary image CV_8U.
   * @return Radius of curvature.
 */
-double Tracking::curvature(Point2f center , const Mat &image){
+double Tracking::curvature(Point2d center , const Mat &image){
 
 	double d = 0;
 	double count = 0;
@@ -146,8 +146,11 @@ vector<double> Tracking::objectInformation(const UMat &image) {
     double orientation = 0.5 * atan((2*j)/(i-k)) + (i<k)*(M_PI*0.5);
   	orientation += 2*M_PI*(orientation<0);
 	  orientation = 2*M_PI - orientation;
-	
-    vector<double> param {x, y, orientation};
+
+    double majAxis = 2*pow( (((i + k) + pow( (i - k)*(i - k) + 4*j*j,0.5))*0.5) / moment.m00 ,0.5);
+    double minAxis = 2*pow( (((i + k) - pow( (i - k)*(i - k) + 4*j*j,0.5))*0.5) / moment.m00 ,0.5);
+    	
+    vector<double> param {x, y, orientation, majAxis, minAxis};
 
   	return param;
 }
@@ -165,17 +168,34 @@ vector<double> Tracking::objectInformation(const UMat &image) {
 */
 bool Tracking::objectDirection(const UMat &image, Point center, vector<double> &information) {
     
-    // Computes the projection of the image on the horinzontal axis.
+    // Computes the distribution of the image on the horizontal axis.
+    
     vector<double> projection;
     reduce(image, projection, 0, REDUCE_SUM);
+
+    vector<double> distribution; //tmp
+    double ccMax = *max_element(projection.begin(), projection.end()) / 100;
+    for (size_t it = 0; it < projection.size(); ++it){
+      int cc = projection.at(it);
+      for (int jt = 0; jt < cc/ccMax; ++jt){
+        distribution.push_back((double)(it+1));
+      }
+    }
     
-    // Computes the assymetry of the object by looking at the number of pixel before and after
-    // the center of mass x coordinate.
-    double skew = accumulate(projection.begin(), projection.begin() + int(center.x), 0) - accumulate(projection.begin() + int(center.x), projection.end(), 0);
-		
+    double mean = accumulate(distribution.begin(), distribution.end(), 0) / double(distribution.size());
+
+    double sd = 0 , skew = 0;
+
+    for(size_t it = 0; it < distribution.size(); ++it){
+      sd += pow(distribution.at(it) - mean, 2);
+      skew += pow(distribution.at(it) - mean, 3);
+    }
+
+    sd = pow(sd/((double)distribution.size()-1), 0.5);
+    skew *= (1/(((double)distribution.size() - 1)*pow(sd, 3)));
+
     if(skew > 0){
-			information.at(2) -= M_PI;
-			information.at(2) = modul(information.at(2));
+			information.at(2) = modul(information.at(2) - M_PI);
       return true;
 		}
     return false;
@@ -204,7 +224,7 @@ UMat Tracking::backgroundExtraction(const vector<String> &files, double n){
     Mat H;
     int count = 0;
 
-	for(unsigned int i = 0; i < files.size(); i += step){
+	for(size_t i = 0; i < files.size(); i += step){
         imread(files[i], IMREAD_GRAYSCALE).copyTo(cameraFrameReg);
         cameraFrameReg.convertTo(cameraFrameReg, CV_32FC1);
         Point2d shift = phaseCorrelate(cameraFrameReg, img0);
@@ -269,13 +289,15 @@ void Tracking::binarisation(UMat& frame, char backgroundColor, int value){
 	* @param[in] maxSize: Maximal size of an object.
   * @return All parameters of all objects formated as follow. One vector, inside of this vector, four vectors for parameters of the head, tail, body and features with number of object size. {  { Point(xHead, yHead, thetaHead), ...}, Point({xTail, yTail, thetaHead), ...}, {Point(xBody, yBody, thetaBody), ...}, {Point(curvature, 0, 0), ...}}
 */
-vector<vector<Point3f>> Tracking::objectPosition(const UMat &frame, int minSize, int maxSize){
+vector<vector<Point3d>> Tracking::objectPosition(const UMat &frame, int minSize, int maxSize){
 
 	vector<vector<Point> > contours;
-	vector<Point3f> positionHead;
-	vector<Point3f> positionTail;
-	vector<Point3f> positionFull;
-	vector<Point3f> globalParam;
+	vector<Point3d> positionHead;
+	vector<Point3d> positionTail;
+	vector<Point3d> positionFull;
+	vector<Point3d> ellipseHead;
+	vector<Point3d> ellipseTail;
+	vector<Point3d> globalParam;
 	UMat dst;
 	Rect roiFull, bbox;
 	UMat RoiFull, RoiHead, RoiTail, rotate;
@@ -283,11 +305,11 @@ vector<vector<Point3f>> Tracking::objectPosition(const UMat &frame, int minSize,
 	vector<double> parameter;
 	vector<double> parameterHead;
 	vector<double> parameterTail;
-	Point2f radiusCurv;
+	Point2d radiusCurv;
 
 	findContours(frame, contours, RETR_LIST, CHAIN_APPROX_NONE);
 
-	for (unsigned int i = 0; i < contours.size(); i++){
+	for (size_t i = 0; i < contours.size(); i++){
 			
       if(contourArea(contours[i]) > minSize && contourArea(contours[i]) < maxSize){ // Only select objects minArea << objectArea <<maxArea
 
@@ -368,107 +390,27 @@ vector<vector<Point3f>> Tracking::objectPosition(const UMat &frame, int minSize,
 						// Computes the curvature of the object as the invert of all distances from each
             // pixels of the fish and the intersection of the minor axis off tail and head ellipse.
 						double curv = 1./1e-16;
-						radiusCurv = curvatureCenter(Point3f(xTail, yTail, angleTail), Point3f(xHead, yHead, angleHead));
+						radiusCurv = curvatureCenter(Point3d(xTail, yTail, angleTail), Point3d(xHead, yHead, angleHead));
 						if(radiusCurv.x != NAN){ //
 						            curv = curvature(radiusCurv, RoiFull.getMat(ACCESS_READ));
 						}
 
 
-						positionHead.push_back(Point3f(xHead, yHead, angleHead));
-						positionTail.push_back(Point3f(xTail, yTail, angleTail));
-						positionFull.push_back(Point3f(parameter.at(0) + roiFull.tl().x, parameter.at(1) + roiFull.tl().y, parameter.at(2)));
+						positionHead.push_back(Point3d(xHead, yHead, angleHead));
+						positionTail.push_back(Point3d(xTail, yTail, angleTail));
+						positionFull.push_back(Point3d(parameter.at(0) + roiFull.tl().x, parameter.at(1) + roiFull.tl().y, parameter.at(2)));
+            ellipseHead.push_back(Point3d(parameterHead.at(3), parameterHead.at(4), 0));
+            ellipseTail.push_back(Point3d(parameterTail.at(3), parameterTail.at(4), 0));
 
-						globalParam.push_back(Point3f(curv, 0, 0));
+						globalParam.push_back(Point3d(curv, 0, 0));
 						}
+      
       else if(contourArea(contours[i]) >= maxSize && contourArea(contours[i]) < 3*maxSize) {
-        qInfo() << "TEST";
-            // Draw the object in a temporary black image avoiding to select a 
-            // part of another object if two objects are very close.
-						dst = UMat::zeros(frame.size(), CV_8U);
-						drawContours(dst, contours, i, Scalar(255, 255, 255), FILLED,8); 
-					
-          	
-            // Computes the x, y and orientation of the object, in the
-            // frame of reference of ROIFull image.
-            roiFull = boundingRect(contours[i]);
-						RoiFull = dst(roiFull);
-						parameter = objectInformation(RoiFull);
             
-
-            // Rotates the image without croping and computes the direction of the object.
-            Point center = Point(0.5*RoiFull.cols, 0.5*RoiFull.rows);
-            rotMatrix = getRotationMatrix2D(center, -(parameter.at(2)*180)/M_PI, 1);
-            bbox = RotatedRect(center, RoiFull.size(), -(parameter.at(2)*180)/M_PI).boundingRect();
-            rotMatrix.at<double>(0,2) += bbox.width*0.5 - center.x;
-            rotMatrix.at<double>(1,2) += bbox.height*0.5 - center.y;
-            warpAffine(RoiFull, rotate, rotMatrix, bbox.size());
-
-
-           // Computes the coordinate of the center of mass of the fish in the rotated
-           // image frame of reference.
-            p = (Mat_<double>(3,1) << parameter.at(0), parameter.at(1), 1);
-            pp = rotMatrix * p;
-
-					
-            // Computes the direction of the object. If objectDirection return true, the
-            // head is at the left and the tail at the right.
-            Rect roiObjectA, roiObjectB;
-            UMat RoiObjectA, RoiObjectB;
-            vector<double> parameterObjectA, parameterObjectB;
-
-              // Head ellipse. Parameters in the frame of reference of the RoiHead image.
-              roiObjectA = Rect(0, 0, pp.at<double>(0,0), rotate.rows);
-              RoiObjectA = rotate(roiObjectA);
-              parameterObjectA = objectInformation(RoiObjectA);
-
-              // Tail ellipse. Parameters in the frame of reference of ROITail image.
-              roiObjectB = Rect(0, 0, pp.at<double>(0,0), rotate.rows);
-              RoiObjectB = rotate(roiObjectB);
-              parameterObjectB = objectInformation(RoiObjectB);
-
-
-
-            // Gets all the parameter in the frame of reference of RoiFull image.
-						invertAffineTransform(rotMatrix, rotMatrix);
-						p = (Mat_<double>(3,1) << parameterObjectA.at(0) + roiObjectA.tl().x,parameterObjectA.at(1) + roiObjectA.tl().y, 1);
-						pp = rotMatrix * p;
-
-						double xObjectA = pp.at<double>(0,0) + roiFull.tl().x;
-						double yObjectA = pp.at<double>(1,0) + roiFull.tl().y;
-						double angleObjectA = parameterObjectA.at(2);// - M_PI*(parameterHead.at(2) > M_PI);
-						angleObjectA = modul(angleObjectA + parameter.at(2));// + M_PI*(abs(angleHead) > 0.5*M_PI)); // Computes the direction
-
-						p = (Mat_<double>(3,1) << parameterObjectB.at(0) + roiObjectB.tl().x, parameterObjectB.at(1) + roiObjectB.tl().y, 1);
-						pp = rotMatrix * p;
-						double xObjectB = pp.at<double>(0,0) + roiFull.tl().x;
-						double yObjectB = pp.at<double>(1,0) + roiFull.tl().y;
-						double angleObjectB = parameterObjectB.at(2);// - M_PI*(parameterTail.at(2) > M_PI);
-						angleObjectB = modul(angleObjectB + parameter.at(2));// + M_PI*(abs(angleTail) > 0.5*M_PI)); // Computes the direction
-
-						// Computes the curvature of the object as the invert of all distances from each
-            // pixels of the fish and the intersection of the minor axis off tail and head ellipse.
-						/*double curv = 1./1e-16;
-						radiusCurv = curvatureCenter(Point3f(xTail, yTail, angleTail), Point3f(xHead, yHead, angleHead));
-						if(radiusCurv.x != NAN){ //
-						            curv = curvature(radiusCurv, RoiFull.getMat(ACCESS_READ));
-						}
-*/
-            // To assign at position to track parameter
-						positionHead.push_back(Point3f(xObjectA, yObjectA, angleObjectA));
-						positionTail.push_back(Point3f(xObjectA, yObjectA, angleObjectA));
-						positionFull.push_back(Point3f(xObjectA, yObjectA, angleObjectA));
-						globalParam.push_back(Point3f(xObjectA, yObjectA, angleObjectA));
-						positionHead.push_back(Point3f(xObjectB, yObjectB, angleObjectB));
-						positionTail.push_back(Point3f(xObjectA, yObjectA, angleObjectA));
-						positionFull.push_back(Point3f(xObjectA, yObjectA, angleObjectA));
-						globalParam.push_back(Point3f(xObjectA, yObjectA, angleObjectA));
-						//positionFull.push_back(Point3f(parameter.at(0) + roiFull.tl().x, parameter.at(1) + roiFull.tl().y, parameter.at(2)));
-
-						//globalParam.push_back(Point3f(curv, 0, 0));
       }
    }
 
-	vector<vector<Point3f>> out = {positionHead, positionTail, positionFull, globalParam};
+	vector<vector<Point3d>> out = {positionHead, positionTail, positionFull, globalParam, ellipseHead, ellipseTail};
 	return out;
 }
 
@@ -487,7 +429,7 @@ vector<vector<Point3f>> Tracking::objectPosition(const UMat &frame, int minSize,
 	* @param[in] lo Maximal occlusion distance of objects between two frames in pixels.
 	* @return The assignment vector containing the new index position to sort the pos vector. 
 */
-vector<int> Tracking::costFunc(const vector<Point3f> &prevPos, const vector<Point3f> &pos, double LENGTH, double ANGLE, double WEIGHT, double LO){
+vector<int> Tracking::costFunc(const vector<Point3d> &prevPos, const vector<Point3d> &pos, double LENGTH, double ANGLE, double WEIGHT, double LO){
 
 
 	int n = prevPos.size();
@@ -497,9 +439,9 @@ vector<int> Tracking::costFunc(const vector<Point3f> &prevPos, const vector<Poin
 
 	for(int i = 0; i < n; ++i){
 
-		Point3f prevCoord = prevPos.at(i);
+		Point3d prevCoord = prevPos.at(i);
 		for(int j = 0; j < m; ++j){
-			Point3f coord = pos.at(j);
+			Point3d coord = pos.at(j);
       double d = pow(pow(prevCoord.x - coord.x, 2) + pow(prevCoord.y - coord.y, 2), 0.5);
       if(d < LO){
         c = WEIGHT*(d/LENGTH) + (1 - WEIGHT)*abs(angleDifference(prevCoord.z, coord.z)/ANGLE); //cost function
@@ -530,9 +472,9 @@ vector<int> Tracking::costFunc(const vector<Point3f> &prevPos, const vector<Poin
   * @param[in] assignment Vector with the new index that will be used to sort the input vector.
   * @return The sorted vector.
 */
-vector<Point3f> Tracking::reassignment(const vector<Point3f> &past, const vector<Point3f> &input, const vector<int> &assignment){
+vector<Point3d> Tracking::reassignment(const vector<Point3d> &past, const vector<Point3d> &input, const vector<int> &assignment){
 
-	vector<Point3f> tmp = past;
+	vector<Point3d> tmp = past;
 	unsigned int n = past.size();
 	unsigned int m = input.size();
 
@@ -558,7 +500,7 @@ vector<Point3f> Tracking::reassignment(const vector<Point3f> &past, const vector
 	}
 
 	else{
-		cout << "association error" << '\n';
+		qInfo() << "association error" << endl;
 	}
 
 
@@ -570,12 +512,12 @@ vector<Point3f> Tracking::reassignment(const vector<Point3f> &past, const vector
 
 /**
   * @Reassignment Resamples a vector accordingly to a new index.
-  * @param vector<Point3f> output: output vector of size n
-  * @param vector<Point3f> input: input vector of size m <= n
+  * @param vector<Point3d> output: output vector of size n
+  * @param vector<Point3d> input: input vector of size m <= n
   * @param vector<int> assignment: vector with the new index that will be used to resample the input vector
-  * @return vector<Point3f>: output vector of size n.
+  * @return vector<Point3d>: output vector of size n.
 */
-vector<Point3f> Tracking::prevision(vector<Point3f> past, vector<Point3f> present){
+vector<Point3d> Tracking::prevision(vector<Point3d> past, vector<Point3d> present){
 
 	double l = 0;
 	for(unsigned int i = 0; i < past.size(); i++){
@@ -605,17 +547,17 @@ vector<Point3f> Tracking::prevision(vector<Point3f> past, vector<Point3f> presen
   * @param[in] number Number of color to generate.
   * @return The vector contaning n colors in RGB.
 */
-vector<Point3f> Tracking::color(int number){
+vector<Point3d> Tracking::color(int number){
 
 	double a, b, c;
-	vector<Point3f> colorMap;
+	vector<Point3d> colorMap;
 	srand (time(NULL));
 	for (int j = 0; j<number; ++j){
 		a = rand() % 255;
 		b = rand() % 255;
 		c = rand() % 255;
 
-		colorMap.push_back(Point3f(a, b, c));
+		colorMap.push_back(Point3d(a, b, c));
 	}
 
 	return colorMap;
@@ -653,14 +595,14 @@ void Tracking::imageProcessing(){
     m_out = objectPosition(m_binaryFrame, param_minArea, param_maxArea);
 
     vector<int> identity = costFunc(m_outPrev.at(param_spot), m_out.at(param_spot), param_len, param_angle, param_weight, param_lo);
-    for (unsigned int i = 0; i < m_out.size(); i++) {
+    for (size_t i = 0; i < m_out.size(); i++) {
       m_out.at(i) = reassignment(m_outPrev.at(i), m_out.at(i), identity);
     }
     cvtColor(m_visuFrame, m_visuFrame, COLOR_GRAY2RGB);
     // Visualisation
 
-    for(unsigned int l = 0; l < m_out.at(0).size(); l++){
-      Point3f coord = m_out.at(param_spot).at(l);
+    for(size_t l = 0; l < m_out.at(0).size(); l++){
+      Point3d coord = m_out.at(param_spot).at(l);
       arrowedLine(m_visuFrame, Point(coord.x, coord.y), Point(coord.x + 5*param_arrowSize*cos(coord.z), coord.y - 5*param_arrowSize*sin(coord.z)), Scalar(m_colorMap.at(l).x, m_colorMap.at(l).y, m_colorMap.at(l).z), param_arrowSize, 10*param_arrowSize, 0);
 
       if((m_im > 5)){ // Faudra refaire un buffer correct
@@ -672,7 +614,7 @@ void Tracking::imageProcessing(){
       }
 
 
-      m_savefile << m_out.at(0).at(l).x + m_ROI.tl().x << '\t' << m_out.at(0).at(l).y + m_ROI.tl().y << '\t' << m_out.at(0).at(l).z << '\t'  << m_out.at(1).at(l).x + m_ROI.tl().x << '\t' << m_out.at(1).at(l).y + m_ROI.tl().y << '\t' << m_out.at(1).at(l).z  <<  '\t' << m_out.at(2).at(l).x + m_ROI.tl().x << '\t' << m_out.at(2).at(l).y  + m_ROI.tl().y << '\t' << m_out.at(2).at(l).z <<  '\t' << m_out.at(3).at(l).x << '\t' << m_im << '\n';
+      m_savefile << m_out.at(0).at(l).x + m_ROI.tl().x << '\t' << m_out.at(0).at(l).y + m_ROI.tl().y << '\t' << m_out.at(0).at(l).z << '\t'  << m_out.at(1).at(l).x + m_ROI.tl().x << '\t' << m_out.at(1).at(l).y + m_ROI.tl().y << '\t' << m_out.at(1).at(l).z  <<  '\t' << m_out.at(2).at(l).x + m_ROI.tl().x << '\t' << m_out.at(2).at(l).y  + m_ROI.tl().y << '\t' << m_out.at(2).at(l).z <<  '\t' << m_out.at(3).at(l).x << '\t' << m_out.at(4).at(l).x << '\t' << m_out.at(4).at(l).y << '\t' << m_out.at(5).at(l).x << '\t' << m_out.at(5).at(l).y << '\t' << m_im << '\n';
 
     }
   
@@ -764,7 +706,7 @@ void Tracking::startProcess() {
   // if less objects detected than indicated
   while( (int(m_out.at(0).size()) - param_n) < 0 ){
       for(unsigned int i = 0; i < m_out.size(); i++){
-        m_out.at(i).push_back(Point3f(0,0,0));
+        m_out.at(i).push_back(Point3d(0,0,0));
       }
   }
 
@@ -785,9 +727,9 @@ void Tracking::startProcess() {
   m_savefile.setDevice(&m_outputFile);
 
   // Saving
-  m_savefile << "xHead" << '\t' << "yHead" << '\t' << "tHead" << '\t'  << "xTail" << '\t' << "yTail" << '\t' << "tTail"   << '\t'  << "xBody" << '\t' << "yBody" << '\t' << "tBody"   << '\t'  << "curvature" << '\t'  << "imageNumber" << "\n";
-  for(unsigned int l = 0; l < m_out.at(0).size(); l++){
-    Point3f coord = m_out.at(param_spot).at(l);      
+  m_savefile << "xHead" << '\t' << "yHead" << '\t' << "tHead" << '\t'  << "xTail" << '\t' << "yTail" << '\t' << "tTail"   << '\t'  << "xBody" << '\t' << "yBody" << '\t' << "tBody"   << '\t'  << "curvature" << '\t'<< "headMajorAxisLength" << '\t' << "headMinorAxisLength" << '\t' << "tailMajorAxisLength" << '\t' << "tailMinorAxisLength" << '\t'  << "imageNumber" << "\n";
+  for(size_t l = 0; l < m_out.at(0).size(); l++){
+    Point3d coord = m_out.at(param_spot).at(l);      
     arrowedLine(m_visuFrame, Point(coord.x, coord.y), Point(coord.x + 5*param_arrowSize*cos(coord.z), coord.y - 5*param_arrowSize*sin(coord.z)), Scalar(m_colorMap.at(l).x, m_colorMap.at(l).y, m_colorMap.at(l).z), param_arrowSize, 10*param_arrowSize, 0);
 
     if((m_im > 5)){ // Faudra refaire un buffer correct
@@ -802,7 +744,7 @@ void Tracking::startProcess() {
     coord.x += m_ROI.tl().x;
     coord.y += m_ROI.tl().y;
 
-    m_savefile << m_out.at(0).at(l).x + m_ROI.tl().x << '\t' << m_out.at(0).at(l).y + m_ROI.tl().y << '\t' << m_out.at(0).at(l).z << '\t'  << m_out.at(1).at(l).x + m_ROI.tl().x << '\t' << m_out.at(1).at(l).y + m_ROI.tl().y << '\t' << m_out.at(1).at(l).z  <<  '\t' << m_out.at(2).at(l).x + m_ROI.tl().x << '\t' << m_out.at(2).at(l).y  + m_ROI.tl().y << '\t' << m_out.at(2).at(l).z <<  '\t' << m_out.at(3).at(l).x << '\t' << m_im << '\n';
+    m_savefile << m_out.at(0).at(l).x + m_ROI.tl().x << '\t' << m_out.at(0).at(l).y + m_ROI.tl().y << '\t' << m_out.at(0).at(l).z << '\t'  << m_out.at(1).at(l).x + m_ROI.tl().x << '\t' << m_out.at(1).at(l).y + m_ROI.tl().y << '\t' << m_out.at(1).at(l).z  <<  '\t' << m_out.at(2).at(l).x + m_ROI.tl().x << '\t' << m_out.at(2).at(l).y  + m_ROI.tl().y << '\t' << m_out.at(2).at(l).z <<  '\t' << m_out.at(3).at(l).x << '\t' << m_out.at(4).at(l).x << '\t' << m_out.at(4).at(l).y << '\t' << m_out.at(5).at(l).x << '\t' << m_out.at(5).at(l).y << '\t' << m_im << '\n';
 
   }
   m_outPrev = m_out;
