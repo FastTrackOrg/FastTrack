@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>973</width>
-    <height>837</height>
+    <width>965</width>
+    <height>677</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -21,7 +21,7 @@
        <enum>QTabWidget::West</enum>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>3</number>
       </property>
       <widget class="QWidget" name="files">
        <attribute name="title">
@@ -177,7 +177,7 @@
           </property>
          </widget>
         </item>
-        <item row="1" column="0">
+        <item row="1" column="0" rowspan="8">
          <widget class="QLabel" name="replayDisplay">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
@@ -190,20 +190,67 @@
           </property>
          </widget>
         </item>
+        <item row="1" column="1">
+         <spacer name="verticalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>174</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
         <item row="2" column="1">
-         <widget class="QComboBox" name="object1Replay"/>
+         <widget class="QCheckBox" name="replayEllipses">
+          <property name="text">
+           <string>Ellipses</string>
+          </property>
+         </widget>
         </item>
         <item row="3" column="1">
-         <widget class="QComboBox" name="object2Replay"/>
+         <widget class="QCheckBox" name="replayArrows">
+          <property name="text">
+           <string>Arrows</string>
+          </property>
+         </widget>
         </item>
         <item row="4" column="1">
+         <widget class="QCheckBox" name="replayNumbers">
+          <property name="text">
+           <string>Numbers</string>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="1">
+         <spacer name="verticalSpacer">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>173</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="6" column="1">
+         <widget class="QComboBox" name="object1Replay"/>
+        </item>
+        <item row="7" column="1">
+         <widget class="QComboBox" name="object2Replay"/>
+        </item>
+        <item row="8" column="1">
          <widget class="QPushButton" name="swapReplay">
           <property name="text">
            <string>Swap</string>
           </property>
          </widget>
         </item>
-        <item row="5" column="0">
+        <item row="9" column="0">
          <widget class="QSlider" name="replaySlider">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
@@ -218,8 +265,6 @@
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
- <resources>
-  <include location="resources.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>
