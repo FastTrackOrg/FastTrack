@@ -81,10 +81,12 @@ private:
 
     // Replay panel
     vector<cv::String> replayFrames;                      // Path to frame to replay
-      vector<Point3f> colorMap; 
+    vector<Point3f> colorMap; 
     QVector<QString> replayTracking;                      // Tracking data to replay
-    int replayNumberObject;                               // Number of object tracked to replay
+    int replayNumberObject;                              // Number of object tracked to replay
     bool isReplayable;
+    QTimer *framerate;
+    int autoPlayerIndex;
 
 public slots:
     void updateParameterList(QTableWidgetItem* item);
@@ -94,6 +96,7 @@ public slots:
     void display(UMat&, UMat&);
     void loadReplayFolder();
     void loadFrame(int frameIndex);
+    void toggleReplayPlay();
     void swapTrackingData(int firstObject, int secondObject, int from);
     void correctTracking();
 signals:

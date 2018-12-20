@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>965</width>
-    <height>677</height>
+    <width>978</width>
+    <height>736</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -167,64 +167,28 @@
         <string>Replay</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_5">
-        <item row="0" column="0">
-         <widget class="QLineEdit" name="replayPath"/>
+        <item row="9" column="1" colspan="2">
+         <widget class="QPushButton" name="swapReplay">
+          <property name="text">
+           <string>Swap</string>
+          </property>
+         </widget>
         </item>
-        <item row="0" column="1">
+        <item row="0" column="1" colspan="2">
          <widget class="QPushButton" name="replayOpen">
           <property name="text">
            <string>Open</string>
           </property>
          </widget>
         </item>
-        <item row="1" column="0" rowspan="8">
-         <widget class="QLabel" name="replayDisplay">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="1">
-         <spacer name="verticalSpacer_2">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>174</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item row="2" column="1">
+        <item row="2" column="1" colspan="2">
          <widget class="QCheckBox" name="replayEllipses">
           <property name="text">
            <string>Ellipses</string>
           </property>
          </widget>
         </item>
-        <item row="3" column="1">
-         <widget class="QCheckBox" name="replayArrows">
-          <property name="text">
-           <string>Arrows</string>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="1">
-         <widget class="QCheckBox" name="replayNumbers">
-          <property name="text">
-           <string>Numbers</string>
-          </property>
-         </widget>
-        </item>
-        <item row="5" column="1">
+        <item row="6" column="2">
          <spacer name="verticalSpacer">
           <property name="orientation">
            <enum>Qt::Vertical</enum>
@@ -237,25 +201,100 @@
           </property>
          </spacer>
         </item>
-        <item row="6" column="1">
-         <widget class="QComboBox" name="object1Replay"/>
-        </item>
-        <item row="7" column="1">
-         <widget class="QComboBox" name="object2Replay"/>
-        </item>
-        <item row="8" column="1">
-         <widget class="QPushButton" name="swapReplay">
+        <item row="4" column="1" colspan="2">
+         <widget class="QCheckBox" name="replayNumbers">
           <property name="text">
-           <string>Swap</string>
+           <string>Numbers</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
           </property>
          </widget>
         </item>
-        <item row="9" column="0">
+        <item row="11" column="0">
          <widget class="QSlider" name="replaySlider">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
           </property>
          </widget>
+        </item>
+        <item row="10" column="1" rowspan="2" colspan="2">
+         <widget class="QPushButton" name="playReplay">
+          <property name="text">
+           <string>Play</string>
+          </property>
+          <property name="checkable">
+           <bool>true</bool>
+          </property>
+          <property name="checked">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="1">
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string>Size</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0" rowspan="10">
+         <widget class="QLabel" name="replayDisplay">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item row="8" column="1" colspan="2">
+         <widget class="QComboBox" name="object2Replay"/>
+        </item>
+        <item row="7" column="1" colspan="2">
+         <widget class="QComboBox" name="object1Replay"/>
+        </item>
+        <item row="0" column="0">
+         <widget class="QLineEdit" name="replayPath"/>
+        </item>
+        <item row="3" column="1" colspan="2">
+         <widget class="QCheckBox" name="replayArrows">
+          <property name="text">
+           <string>Arrows</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="2">
+         <widget class="QSpinBox" name="replaySize">
+          <property name="minimum">
+           <number>1</number>
+          </property>
+          <property name="maximum">
+           <number>150</number>
+          </property>
+          <property name="value">
+           <number>2</number>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="2">
+         <spacer name="verticalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>174</height>
+           </size>
+          </property>
+         </spacer>
         </item>
        </layout>
       </widget>

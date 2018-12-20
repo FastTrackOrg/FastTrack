@@ -133,9 +133,19 @@ MainWindow::MainWindow(QWidget *parent) :
 
 ////////////////////////////Replay panel/////////////////////////////////////////////
     isReplayable = false;
+    framerate = new QTimer();
     connect(ui->replayOpen, &QPushButton::clicked, this, &MainWindow::loadReplayFolder);
     connect(ui->replaySlider, &QSlider::valueChanged, this, &MainWindow::loadFrame);
     connect(ui->swapReplay, &QPushButton::clicked, this, &MainWindow::correctTracking);
+    connect(framerate, &QTimer::timeout, [this]() {
+      loadFrame(autoPlayerIndex);
+      ui->replaySlider->setValue(autoPlayerIndex);
+      autoPlayerIndex++;
+      if (autoPlayerIndex % int(replayFrames.size()) != autoPlayerIndex) {
+        autoPlayerIndex = 0;
+      }
+    });
+    connect(ui->playReplay, &QPushButton::clicked, this, &MainWindow::toggleReplayPlay);
 
 }
 
@@ -461,6 +471,20 @@ void MainWindow::loadFrame(int frameIndex) {
     }
 }
 
+/**
+  * \brief Toggles the autoplay of the replay.
+  * \detail When user click ui->playreplay the automatic playing of the replay is trigerred.
+*/
+void MainWindow::toggleReplayPlay() {
+  
+    if (isReplayable && ui->playReplay->isChecked()) {
+      framerate->start(40);
+      autoPlayerIndex = ui->replaySlider->value();
+    }
+    else if (isReplayable && !ui->playReplay->isChecked()) {
+      framerate->stop();
+    }
+}
 
 /*!
   \fn void &MainWindow::swapTrackingData(int firstObject, int secondObject, int from)
