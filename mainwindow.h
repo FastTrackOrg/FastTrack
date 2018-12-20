@@ -87,6 +87,10 @@ private:
     bool isReplayable;
     QTimer *framerate;
     int autoPlayerIndex;
+    bool object;
+    QSize replayDisplaySize;
+    QSize resizedFrame;
+    QSize originalImageSize;
 
 public slots:
     void updateParameterList(QTableWidgetItem* item);
@@ -97,6 +101,7 @@ public slots:
     void loadReplayFolder();
     void loadFrame(int frameIndex);
     void toggleReplayPlay();
+    void mousePressEvent(QMouseEvent* event);
     void swapTrackingData(int firstObject, int secondObject, int from);
     void correctTracking();
 signals:

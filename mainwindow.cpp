@@ -357,6 +357,7 @@ void MainWindow::loadReplayFolder() {
     ui->object1Replay->clear();
     ui->object2Replay->clear();
     framerate->stop();
+    object = true;
     QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"), "/home", QFileDialog::ShowDirsOnly);
     if (dir.length()) {
         ui->replayPath->setText(dir + QDir::separator());
@@ -378,6 +379,9 @@ void MainWindow::loadReplayFolder() {
           glob(path, replayFrames, false); // Get all path to frames
           ui->replaySlider->setMinimum(0);
           ui->replaySlider->setMaximum(replayFrames.size() - 1);
+          Mat frame = imread(replayFrames.at(0), IMREAD_COLOR);
+          originalImageSize.setWidth(frame.cols);
+          originalImageSize.setHeight(frame.rows);
           isReplayable = true;
 
           // If tracking data are available, load data in a vector and find number of object in the frame.
@@ -465,9 +469,12 @@ void MainWindow::loadFrame(int frameIndex) {
         }
       }
       
-      int w = ui->replayDisplay->width();
-      int h = ui->replayDisplay->height();
-      ui->replayDisplay->setPixmap(QPixmap::fromImage(QImage(frame.data, frame.cols, frame.rows, frame.step, QImage::Format_RGB888)).scaled(w, h, Qt::KeepAspectRatio));
+      double w = ui->replayDisplay->width();
+      double h = ui->replayDisplay->height();
+      QPixmap resizedPix = (QPixmap::fromImage(QImage(frame.data, frame.cols, frame.rows, frame.step, QImage::Format_RGB888)).scaled(w, h, Qt::KeepAspectRatio));
+      ui->replayDisplay->setPixmap(resizedPix);
+      resizedFrame.setWidth(resizedPix.width());
+      resizedFrame.setHeight(resizedPix.height());
     }
 }
 
@@ -499,6 +506,46 @@ void MainWindow::swapTrackingData(int firstObject, int secondObject, int from) {
     }
 }
 
+/**
+  * @brief Gets the mouse coordinate in the frame of reference of the widget where user have clicked.
+  * @param[in] event Describes the mouse event.
+*/
+void MainWindow::mousePressEvent(QMouseEvent* event) {
+
+    // Gets the mouse coordinate in the frame of reference of the original image from the resized pixmap
+    if (event->buttons() == Qt::LeftButton) {
+
+      double xTop = ((double(ui->replayDisplay->mapFrom(this, event->pos()).x())- 0.5*( ui->replayDisplay->width() - resizedFrame.width()))*double(originalImageSize.width()))/double(resizedFrame.width()) ; 
+      double yTop = ((double(ui->replayDisplay->mapFrom(this, event->pos()).y()) - 0.5*( ui->replayDisplay->height() - resizedFrame.height()))*double(originalImageSize.height()))/double(resizedFrame.height()) ; 
+
+      if (!replayTracking.isEmpty()) {
+        int frameIndex = ui->replaySlider->value();
+        QVector<double> distance;
+        for (int i = frameIndex*replayNumberObject; i < frameIndex*replayNumberObject + replayNumberObject; i++) {
+        QStringList coordinate = replayTracking.at(i).split('\t', QString::SkipEmptyParts);
+        distance.append( pow( coordinate.at(0).toDouble() - xTop, 2 ) + pow( coordinate.at(1).toDouble() - yTop, 2) );
+      }
+      int min = std::min_element(distance.begin(), distance.end()) - distance.begin();
+      if (object) {
+        ui->object1Replay->setCurrentIndex(min);
+        ui->object1Replay->setStyleSheet("QComboBox { background-color: rgb(" + QString::number(colorMap.at(min).x) + "," + QString::number(colorMap.at(min).y) + "," + QString::number(colorMap.at(min).z) + "); }");
+        object = false;
+      }
+      else {
+        ui->object2Replay->setCurrentIndex(min);
+        ui->object2Replay->setStyleSheet("QComboBox { background-color: rgb(" + QString::number(colorMap.at(min).x) + "," + QString::number(colorMap.at(min).y) + "," + QString::number(colorMap.at(min).z) + "); }");
+        object = true;
+      }
+    }
+  }
+  else if (event->buttons() == Qt::RightButton) {
+    correctTracking();
+    ui->object1Replay->setStyleSheet("QComboBox { background-color: white; }");
+    ui->object2Replay->setStyleSheet("QComboBox { background-color: white; }");
+  }
+}
+
+
 /*!
   \fn void &MainWindow::correctTracking()
 
@@ -526,7 +573,7 @@ void MainWindow::correctTracking() {
       }
     }
     file.close();
-
+    loadFrame(ui->replaySlider->value());
 }
 
 
