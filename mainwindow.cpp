@@ -356,7 +356,7 @@ void MainWindow::loadReplayFolder() {
     replayFrames.clear();
     ui->object1Replay->clear();
     ui->object2Replay->clear();
-
+    framerate->stop();
     QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"), "/home", QFileDialog::ShowDirsOnly);
     if (dir.length()) {
         ui->replayPath->setText(dir + QDir::separator());
