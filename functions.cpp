@@ -637,7 +637,7 @@ void Tracking::imageProcessing(){
       }
       else {
 
-        m_savefile << '\n';
+        m_savefile << "NaN" << '\n';
       }
     }
   

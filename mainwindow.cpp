@@ -462,7 +462,7 @@ void MainWindow::loadFrame(int frameIndex) {
       // arrow on tracked objects.
       for (int i = frameIndex*replayNumberObject; i < frameIndex*replayNumberObject + replayNumberObject; i++) {
         
-        if (replayTracking.at(i).isEmpty()) {
+        if (replayTracking.at(i) == "NaN") {
           continue;
         }
 
@@ -531,19 +531,40 @@ void MainWindow::swapTrackingData(int firstObject, int secondObject, int from) {
 */
 void MainWindow::mousePressEvent(QMouseEvent* event) {
 
-    // Gets the mouse coordinate in the frame of reference of the original image from the resized pixmap
+    // Left click event
     if (event->buttons() == Qt::LeftButton) {
 
       double xTop = ((double(ui->replayDisplay->mapFrom(this, event->pos()).x())- 0.5*( ui->replayDisplay->width() - resizedFrame.width()))*double(originalImageSize.width()))/double(resizedFrame.width()) ; 
       double yTop = ((double(ui->replayDisplay->mapFrom(this, event->pos()).y()) - 0.5*( ui->replayDisplay->height() - resizedFrame.height()))*double(originalImageSize.height()))/double(resizedFrame.height()) ; 
 
+      // If the replay tracking is available, computes the distance between the user click and the
+      // objects to determinate on whick object the user has clicked
       if (!replayTracking.isEmpty()) {
+
         int frameIndex = ui->replaySlider->value();
         QVector<double> distance;
+
+        // Computes the distance between the user click and all the objects
+        // If the coordinate are not available due to occlusion, the distance is computed 
+        // with the previous know coordinate
         for (int i = frameIndex*replayNumberObject; i < frameIndex*replayNumberObject + replayNumberObject; i++) {
-        QStringList coordinate = replayTracking.at(i).split('\t', QString::SkipEmptyParts);
-        distance.append( pow( coordinate.at(0).toDouble() - xTop, 2 ) + pow( coordinate.at(1).toDouble() - yTop, 2) );
-      }
+          QStringList coordinate = replayTracking.at(i).split('\t', QString::SkipEmptyParts);
+          if (coordinate.at(0) != "NaN") {
+            distance.append( pow( coordinate.at(0).toDouble() - xTop, 2 ) + pow( coordinate.at(1).toDouble() - yTop, 2) );
+          }
+          else {
+            QStringList previousCoordinate = replayTracking.at(i - replayNumberObject).split('\t', QString::SkipEmptyParts);
+            int count = 0;
+            // Find last know position of the occluded object
+            while (previousCoordinate.at(0) == "NaN") {
+              count++;
+              previousCoordinate = replayTracking.at(i - replayNumberObject*count).split('\t', QString::SkipEmptyParts);
+            }  
+            distance.append( pow( previousCoordinate.at(0).toDouble() - xTop, 2 ) + pow( previousCoordinate.at(1).toDouble() - yTop, 2) );
+          }
+        }
+
+      // Find the minimal distance and update the UI  
       int min = std::min_element(distance.begin(), distance.end()) - distance.begin();
       if (object) {
         ui->object1Replay->setCurrentIndex(min);
@@ -557,6 +578,8 @@ void MainWindow::mousePressEvent(QMouseEvent* event) {
       }
     }
   }
+
+  // Right click event
   else if (event->buttons() == Qt::RightButton) {
     correctTracking();
     ui->object1Replay->setStyleSheet("QComboBox { background-color: white; }");
