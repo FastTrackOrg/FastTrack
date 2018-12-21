@@ -453,6 +453,11 @@ void MainWindow::loadFrame(int frameIndex) {
       // Takes the tracking data corresponding to the replayed frame and parse data to display
       // arrow on tracked objects.
       for (int i = frameIndex*replayNumberObject; i < frameIndex*replayNumberObject + replayNumberObject; i++) {
+        
+        if (replayTracking.at(i).isEmpty()) {
+          continue;
+        }
+
         QStringList coordinate = replayTracking.at(i).split('\t', QString::SkipEmptyParts);
 
         if (ui->replayEllipses->isChecked()) {

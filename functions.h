@@ -115,6 +115,7 @@ class Tracking : public QObject {
   vector<int> costFunc(const vector<Point3d> &prevPos, const vector<Point3d> &pos, double LENGHT, double ANGLE, double WEIGHT, double LO);
   vector<Point3d> prevision(vector<Point3d> past, vector<Point3d> present);
   vector<Point3d> color(int number);
+  vector<int> findOcclusion(vector<int> assignment); 
 
   UMat m_binaryFrame;   /*!< Binary image CV_8U */
   UMat m_visuFrame;   /*!< Image 8 bit CV_8U */

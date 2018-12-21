@@ -464,6 +464,24 @@ vector<int> Tracking::costFunc(const vector<Point3d> &prevPos, const vector<Poin
 
 
 
+/**
+  * @brief Finds the identity of the object that are occluded during the tracking.
+  * @param[in] assignment Vector with the new index that will be used to sort the input vector.
+  * @return The vector with the index of occluded objects.
+*/
+vector<int> Tracking::findOcclusion(vector<int> assignment) { 
+  
+  vector<int> occlusion;
+  vector<int>::iterator index = find(assignment.begin(), assignment.end(), - 1);
+  while ( index != assignment.end() ) {
+    occlusion.push_back(index - assignment.begin());
+    assignment.at(index - assignment.begin()) = -2;
+    index = find(assignment.begin(), assignment.end(), - 1);
+  }
+  return occlusion;
+}
+
+
 
 /**
   * @brief Sorts a vector accordingly to a new index. The sorted vector at index i is the input at index assignment at index i.
@@ -595,6 +613,7 @@ void Tracking::imageProcessing(){
     m_out = objectPosition(m_binaryFrame, param_minArea, param_maxArea);
 
     vector<int> identity = costFunc(m_outPrev.at(param_spot), m_out.at(param_spot), param_len, param_angle, param_weight, param_lo);
+    vector<int> occluded = findOcclusion(identity);
     for (size_t i = 0; i < m_out.size(); i++) {
       m_out.at(i) = reassignment(m_outPrev.at(i), m_out.at(i), identity);
     }
@@ -613,15 +632,19 @@ void Tracking::imageProcessing(){
         }
       }
 
+      if ( find(occluded.begin(), occluded.end(), int(l)) == occluded.end() ) {
+        m_savefile << m_out.at(0).at(l).x + m_ROI.tl().x << '\t' << m_out.at(0).at(l).y + m_ROI.tl().y << '\t' << m_out.at(0).at(l).z << '\t'  << m_out.at(1).at(l).x + m_ROI.tl().x << '\t' << m_out.at(1).at(l).y + m_ROI.tl().y << '\t' << m_out.at(1).at(l).z  <<  '\t' << m_out.at(2).at(l).x + m_ROI.tl().x << '\t' << m_out.at(2).at(l).y  + m_ROI.tl().y << '\t' << m_out.at(2).at(l).z <<  '\t' << m_out.at(3).at(l).x << '\t' << m_out.at(4).at(l).x << '\t' << m_out.at(4).at(l).y << '\t' << m_out.at(5).at(l).x << '\t' << m_out.at(5).at(l).y << '\t' << m_im << '\n';
+      }
+      else {
 
-      m_savefile << m_out.at(0).at(l).x + m_ROI.tl().x << '\t' << m_out.at(0).at(l).y + m_ROI.tl().y << '\t' << m_out.at(0).at(l).z << '\t'  << m_out.at(1).at(l).x + m_ROI.tl().x << '\t' << m_out.at(1).at(l).y + m_ROI.tl().y << '\t' << m_out.at(1).at(l).z  <<  '\t' << m_out.at(2).at(l).x + m_ROI.tl().x << '\t' << m_out.at(2).at(l).y  + m_ROI.tl().y << '\t' << m_out.at(2).at(l).z <<  '\t' << m_out.at(3).at(l).x << '\t' << m_out.at(4).at(l).x << '\t' << m_out.at(4).at(l).y << '\t' << m_out.at(5).at(l).x << '\t' << m_out.at(5).at(l).y << '\t' << m_im << '\n';
-
+        m_savefile << '\n';
+      }
     }
   
     m_im ++;
     m_outPrev = m_out;
     
-    // Sending rate of images
+    // Sending rate of images to display
     if ( (timer->elapsed() - m_displayTime) > 40) {
       emit(newImageToDisplay(m_visuFrame, m_binaryFrame));
      m_displayTime = timer->elapsed();
