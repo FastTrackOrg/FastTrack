@@ -2,5 +2,9 @@
     <qresource prefix='/'>
         <file>theme.qss</file>
         <file>icon.png</file>
+        <file>buttons/play.png</file>
+        <file>buttons/pause.png</file>
+        <file>buttons/resume.png</file>
+        <file>buttons/open.png</file>
     </qresource>
 </RCC>

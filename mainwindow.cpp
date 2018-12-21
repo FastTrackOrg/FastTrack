@@ -52,7 +52,15 @@ MainWindow::MainWindow(QWidget *parent) :
     setWindowTitle("Fishy Tracking");
     ui->tableParameters->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     ui->tablePath->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-
+    
+    QIcon img(":/buttons/play.png");
+    ui->playReplay->setIcon(img);
+    ui->playReplay->setIconSize(QSize(ui->playReplay->width(), ui->playReplay->height()));
+    
+    img = QIcon(":/buttons/open.png");
+    ui->replayOpen->setIcon(img);
+    ui->replayOpen->setIconSize(QSize(ui->replayOpen->width(), ui->replayOpen->height()));
+    
     setupWindow = new SetupWindow(this);
     connect(ui->setupWindow, &QPushButton::clicked, [this]() {
       setupWindow->show();
@@ -490,10 +498,16 @@ void MainWindow::loadFrame(int frameIndex) {
 void MainWindow::toggleReplayPlay() {
   
     if (isReplayable && ui->playReplay->isChecked()) {
+      QIcon img(":/buttons/pause.png");
+      ui->playReplay->setIcon(img);
+      ui->playReplay->setIconSize(QSize(ui->playReplay->width(), ui->playReplay->height()));
       framerate->start(40);
       autoPlayerIndex = ui->replaySlider->value();
     }
     else if (isReplayable && !ui->playReplay->isChecked()) {
+      QIcon img(":/buttons/resume.png");
+      ui->playReplay->setIcon(img);
+      ui->playReplay->setIconSize(QSize(ui->playReplay->width(), ui->playReplay->height()));
       framerate->stop();
     }
 }

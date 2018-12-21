@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>978</width>
-    <height>736</height>
+    <height>731</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -170,28 +170,36 @@
         <item row="0" column="0">
          <widget class="QLineEdit" name="replayPath"/>
         </item>
-        <item row="0" column="1">
+        <item row="0" column="1" colspan="2">
          <widget class="QPushButton" name="replayOpen">
+          <property name="minimumSize">
+           <size>
+            <width>61</width>
+            <height>31</height>
+           </size>
+          </property>
           <property name="text">
-           <string>Open</string>
+           <string/>
           </property>
          </widget>
         </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="label_2">
-          <property name="font">
-           <font>
-            <weight>75</weight>
-            <bold>true</bold>
-           </font>
+        <item row="1" column="0" rowspan="10">
+         <widget class="QLabel" name="replayDisplay">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
           </property>
           <property name="text">
-           <string>Left click to select objects.
-Right click to swap two objects.</string>
+           <string/>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
           </property>
          </widget>
         </item>
-        <item row="1" column="1" rowspan="2">
+        <item row="1" column="2">
          <spacer name="verticalSpacer_2">
           <property name="orientation">
            <enum>Qt::Vertical</enum>
@@ -204,30 +212,14 @@ Right click to swap two objects.</string>
           </property>
          </spacer>
         </item>
-        <item row="2" column="0" rowspan="11">
-         <widget class="QLabel" name="replayDisplay">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="1">
+        <item row="2" column="1" colspan="2">
          <widget class="QCheckBox" name="replayEllipses">
           <property name="text">
            <string>Ellipses</string>
           </property>
          </widget>
         </item>
-        <item row="4" column="1">
+        <item row="3" column="1" colspan="2">
          <widget class="QCheckBox" name="replayArrows">
           <property name="text">
            <string>Arrows</string>
@@ -237,7 +229,7 @@ Right click to swap two objects.</string>
           </property>
          </widget>
         </item>
-        <item row="5" column="1">
+        <item row="4" column="1" colspan="2">
          <widget class="QCheckBox" name="replayNumbers">
           <property name="text">
            <string>Numbers</string>
@@ -247,31 +239,27 @@ Right click to swap two objects.</string>
           </property>
          </widget>
         </item>
-        <item row="6" column="1">
-         <layout class="QHBoxLayout" name="horizontalLayout">
-          <item>
-           <widget class="QLabel" name="label">
-            <property name="text">
-             <string>Size</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QSpinBox" name="replaySize">
-            <property name="minimum">
-             <number>1</number>
-            </property>
-            <property name="maximum">
-             <number>150</number>
-            </property>
-            <property name="value">
-             <number>2</number>
-            </property>
-           </widget>
-          </item>
-         </layout>
+        <item row="5" column="1">
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string>Size</string>
+          </property>
+         </widget>
         </item>
-        <item row="7" column="1">
+        <item row="5" column="2">
+         <widget class="QSpinBox" name="replaySize">
+          <property name="minimum">
+           <number>1</number>
+          </property>
+          <property name="maximum">
+           <number>150</number>
+          </property>
+          <property name="value">
+           <number>2</number>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="2">
          <spacer name="verticalSpacer">
           <property name="orientation">
            <enum>Qt::Vertical</enum>
@@ -284,36 +272,41 @@ Right click to swap two objects.</string>
           </property>
          </spacer>
         </item>
-        <item row="8" column="1">
+        <item row="7" column="1" colspan="2">
          <widget class="QComboBox" name="object1Replay"/>
         </item>
-        <item row="9" column="1">
+        <item row="8" column="1" colspan="2">
          <widget class="QComboBox" name="object2Replay"/>
         </item>
-        <item row="10" column="1">
+        <item row="9" column="1" colspan="2">
          <widget class="QPushButton" name="swapReplay">
           <property name="text">
            <string>Swap</string>
           </property>
          </widget>
         </item>
-        <item row="11" column="1">
-         <spacer name="verticalSpacer_3">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
+        <item row="10" column="1" colspan="2">
+         <widget class="QPushButton" name="playReplay">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
           </property>
-          <property name="sizeHint" stdset="0">
+          <property name="minimumSize">
            <size>
-            <width>20</width>
-            <height>45</height>
+            <width>79</width>
+            <height>25</height>
            </size>
           </property>
-         </spacer>
-        </item>
-        <item row="12" column="1" rowspan="2">
-         <widget class="QPushButton" name="playReplay">
           <property name="text">
-           <string>Play</string>
+           <string/>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>16</width>
+            <height>16</height>
+           </size>
           </property>
           <property name="checkable">
            <bool>true</bool>
@@ -323,7 +316,7 @@ Right click to swap two objects.</string>
           </property>
          </widget>
         </item>
-        <item row="13" column="0">
+        <item row="11" column="0">
          <widget class="QSlider" name="replaySlider">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
