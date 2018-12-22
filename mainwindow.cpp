@@ -61,6 +61,18 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->replayOpen->setIcon(img);
     ui->replayOpen->setIconSize(QSize(ui->replayOpen->width(), ui->replayOpen->height()));
     
+    img = QIcon(":/buttons/next.png");
+    ui->replayNext->setIcon(img);
+    ui->replayNext->setIconSize(QSize(ui->replayNext->width(), ui->replayNext->height()));
+
+    img = QIcon(":/buttons/previous.png");
+    ui->replayPrevious->setIcon(img);
+    ui->replayPrevious->setIconSize(QSize(ui->replayPrevious->width(), ui->replayPrevious->height()));
+    
+    img = QIcon(":/buttons/help.png");
+    ui->replayHelp->setIcon(img);
+    ui->replayHelp->setIconSize(QSize(ui->replayHelp->width(), ui->replayHelp->height()));
+    
     setupWindow = new SetupWindow(this);
     connect(ui->setupWindow, &QPushButton::clicked, [this]() {
       setupWindow->show();
@@ -144,9 +156,11 @@ MainWindow::MainWindow(QWidget *parent) :
     framerate = new QTimer();
     connect(ui->replayOpen, &QPushButton::clicked, this, &MainWindow::loadReplayFolder);
     connect(ui->replaySlider, &QSlider::valueChanged, this, &MainWindow::loadFrame);
+    connect(ui->replaySlider, &QSlider::valueChanged, [this](const int &newValue) {
+      ui->replayNumber->setText(QString::number(newValue));
+    });
     connect(ui->swapReplay, &QPushButton::clicked, this, &MainWindow::correctTracking);
     connect(framerate, &QTimer::timeout, [this]() {
-      loadFrame(autoPlayerIndex);
       ui->replaySlider->setValue(autoPlayerIndex);
       autoPlayerIndex++;
       if (autoPlayerIndex % int(replayFrames.size()) != autoPlayerIndex) {
@@ -154,8 +168,19 @@ MainWindow::MainWindow(QWidget *parent) :
       }
     });
     connect(ui->playReplay, &QPushButton::clicked, this, &MainWindow::toggleReplayPlay);
+    connect(ui->replayNext, &QPushButton::clicked, [this]() {
+      int current = ui->replaySlider->value();
+      int nextOcclusion = *std::upper_bound(occlusionEvents.begin(), occlusionEvents.end(), current);
+      ui->replaySlider->setValue(nextOcclusion);
+    });
+    connect(ui->replayPrevious, &QPushButton::clicked, [this]() {
+      int current = ui->replaySlider->value();
+      int previousOcclusion = occlusionEvents.at(std::upper_bound(occlusionEvents.begin(), occlusionEvents.end(), current) - occlusionEvents.begin() - 2);
+      ui->replaySlider->setValue(previousOcclusion);
+    });
 
-}
+
+} // Constructor
 
 
 
@@ -404,6 +429,15 @@ void MainWindow::loadReplayFolder() {
             }
             replayTracking.removeFirst(); // Delete header line
 
+            // Finds occlusion events, ie line where value is equal to "NaN"
+            int occlusionEventIndex = replayTracking.indexOf("NaN");
+            while ( occlusionEventIndex != -1 ) {
+              occlusionEvents.append(occlusionEventIndex / replayNumberObject);
+              occlusionEventIndex = replayTracking.indexOf("NaN", occlusionEventIndex + 1);
+            }
+            auto last = std::unique(occlusionEvents.begin(), occlusionEvents.end());
+            occlusionEvents.erase(last, occlusionEvents.end());
+
             QFile parameterFile( dir + QDir::separator() + "Tracking_Result" + QDir::separator() + "parameter.txt");
             if (parameterFile.open(QIODevice::ReadOnly)) {
               QTextStream input(&parameterFile);
@@ -617,6 +651,7 @@ void MainWindow::correctTracking() {
     file.close();
     loadFrame(ui->replaySlider->value());
 }
+
 
 
 /*!

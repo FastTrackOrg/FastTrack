@@ -6,5 +6,8 @@
         <file>buttons/pause.png</file>
         <file>buttons/resume.png</file>
         <file>buttons/open.png</file>
+        <file>buttons/previous.png</file>
+        <file>buttons/next.png</file>
+        <file>buttons/help.png</file>
     </qresource>
 </RCC>

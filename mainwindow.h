@@ -83,6 +83,7 @@ private:
     vector<cv::String> replayFrames;                      // Path to frame to replay
     vector<Point3f> colorMap; 
     QVector<QString> replayTracking;                      // Tracking data to replay
+    QVector<int> occlusionEvents;
     int replayNumberObject;                              // Number of object tracked to replay
     bool isReplayable;
     QTimer *framerate;
