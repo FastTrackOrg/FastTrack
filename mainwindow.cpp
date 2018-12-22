@@ -25,20 +25,24 @@ This file is part of Fishy Tracking.
 using namespace cv;
 using namespace std;
 
-/*!
-    \class MainWindow
-    \brief The MainWindow class is a widget displaying the main window of the program. It contains all the method to open an images sequences, sets parameters and begin a tracking analysis.
-            Fishy Tracking.
-
+/**
+ * @class MainWindow
+ * 
+ * @brief The MainWindow class is derived from a QMainWindow widget. It displays the main window of the program.
+ *
+ * @author Benjamin Gallois
+ *
+ * @version $Revision: 4.0 $
+ *
+ * Contact: gallois.benjamin08@gmail.com
+ *
 */
 
 
 
 
-/*!
-  \fn void &MainWindow::MainWindow(QWidget)
-
-  Constructs the MainWindow and setup the UI.
+/**
+ * @brief Constructs the MainWindow QObject and initializes the UI. 
 */
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -79,10 +83,11 @@ MainWindow::MainWindow(QWidget *parent) :
     });
 
 
-
+    // Registers QMetaType
     qRegisterMetaType<UMat>("UMat&");
     qRegisterMetaType<QMap<QString, QString>>("QMap<QString, QString>");
     cv::ocl::setUseOpenCL(false);
+    
     // Setup style
     QFile stylesheet(":/theme.qss");
 
@@ -142,7 +147,6 @@ MainWindow::MainWindow(QWidget *parent) :
 ////////////////////////////Path panel/////////////////////////////////////////////
     ui->tablePath->horizontalHeader()->setStretchLastSection(true);
     ui->tablePath->setSortingEnabled(false);
-    pathCounter = 0;
     connect(ui->addPath, &QPushButton::clicked, this, &MainWindow::addPath);
     connect(ui->removePath, &QPushButton::clicked, this, &MainWindow::removePath);
     connect(ui->startButton, &QPushButton::clicked, this, &MainWindow::startTracking);
@@ -188,13 +192,10 @@ MainWindow::MainWindow(QWidget *parent) :
                                     Path panel
 \*******************************************************************************************/
 
-/*!
-  \fn void &MainWindow::updateParameterList(QTableWidgetItem* item)
-
-  Updates a QMap when an \a item of a QTableWidget is modyfied.
-
-  Triggered when a change is made in a QTableWidget.
-  Emit the updated QMap.
+/**
+  * @brief Updates the parameterList vector with the new parameter when user changes a parameter in the QTableWidget of parameters.
+  * @detailed Triggered when ui->tableParameters is modified. Emits the updated parameters QMap.
+  * @param[in] item QTableWidgetItem from a QTableWidget.
 */
 void MainWindow::updateParameterList(QTableWidgetItem* item) {
     int row = item->row();
@@ -205,12 +206,8 @@ void MainWindow::updateParameterList(QTableWidgetItem* item) {
 }
 
 
-/*!
-  \fn void &MainWindow::addPath()
-
-  Takes a QString from ui->textPathAdd, inserts it in a QVector pathList and updates the ui.
-
-  Triggered when the button ui->addPath.
+/**
+  * @brief Takes the value of ui->textPathAdd and add it in the ui->tablePath and in the pathList vector.
 */
 void MainWindow::addPath() {
     int row = ui->tablePath->rowCount();
@@ -222,13 +219,9 @@ void MainWindow::addPath() {
 }
 
 
-/*!
-  \fn void &MainWindow::removePath()
-
-  Removes the content of the focused row of the ui->pathTable and
-  updates the ui and the QVector pathList.
-
-  Triggered when the button removePath of the UI is pressed.
+/**
+  * @brief Deletes the selected line in the ui->tablePath and the corresponding path in the pathList. 
+  * @detailed Triggered when the ui->removePath button is clicked.
 */
 void MainWindow::removePath() {
     int row = ui->tablePath->currentRow();
@@ -239,7 +232,7 @@ void MainWindow::removePath() {
 }
 
 
-/*!
+/**
   \fn void &MainWindow::startTracking()
   Starts a new tracking analysis. First it get the path to the folder containing the
   images sequence. It creates a folder named Tracking_Result in this folder and a file
@@ -277,8 +270,6 @@ void MainWindow::startTracking() {
           out << a << " = " << parameterList.value(a) << endl;
         }
      
-        // Member variables to display statistic in the ui 
-        frameAnalyzed = 0;
       
       
         thread = new QThread;
@@ -312,12 +303,10 @@ void MainWindow::startTracking() {
   }
 }
 
-/*!
-  \fn void &MainWindow::display(Umat &visu, UMat &cameraFrame)
-  
-  Displays \a visu and \a cameraFrame image in the UI.
-  
-  Triggered when the signal newImageToDisplay is trigerred.
+
+/**
+  * @brief Displays images received from the Tracking object.
+  * @detailed Triggered when the signal newImageToDisplay is emitted.
 */
 void MainWindow::display(UMat &visu, UMat &cameraFrame){
 
@@ -328,8 +317,6 @@ void MainWindow::display(UMat &visu, UMat &cameraFrame){
 
     ui->display->setPixmap(QPixmap::fromImage(QImage(cameraFrame.getMat(cv::ACCESS_READ).data, cameraFrame.cols, cameraFrame.rows, cameraFrame.step, QImage::Format_Grayscale8)).scaled(w, h, Qt::KeepAspectRatio));
     ui->display2->setPixmap(QPixmap::fromImage(QImage(visu.getMat(cv::ACCESS_READ).data, visu.cols, visu.rows, visu.step, QImage::Format_RGB888)).scaled(w2, h2, Qt::KeepAspectRatio));
-    frameAnalyzed ++;
-    statusBar()->showMessage(QString::number(frameAnalyzed));
 }
 
 
@@ -339,11 +326,8 @@ void MainWindow::display(UMat &visu, UMat &cameraFrame){
                                     Settings
 \*******************************************************************************************/
 
-/*!
-  \fn void &MainWindow::loadSettings()
-  
-  Loads a settings file settings.ini at the start up of the program.
-  Updates the ui parameter QWidgetTable with the new parameters.
+/**
+  * @brief Loads a settings file settings.ini at the start up of the program and updates the ui->parameterTable with the new parameters.
 */
 void MainWindow::loadSettings() {
     settingsFile = new QSettings("settings.ini", QSettings::NativeFormat, this);
@@ -357,10 +341,8 @@ void MainWindow::loadSettings() {
 }
 
 
-/*!
-  \fn void &MainWindow::saveSettings()
-  
-  Saves all parameters from ui QTableWidget in a settings file named settings.in.  
+/**
+  * @brief Saves all parameters in a settings file named settings.in.
 */
 void MainWindow::saveSettings() {
       QList<QString> keyList = parameterList.keys();
@@ -477,13 +459,9 @@ void MainWindow::loadReplayFolder() {
 
 
 
-/*!
-  \fn void &MainWindow::loadFrame(int frameIndex)
-  
-  Displays the image and the tracking in the ui->displayReplay. The image is selected
-  when the slider ui->replaySlider is moved.
-
-  Triggered when ui->replaySlider value changed.
+/**
+  * @brief Displays the image and the tracking data in the ui->displayReplay.
+  * @detailed Triggered when the ui->replaySlider value is changed.
 */
 void MainWindow::loadFrame(int frameIndex) {
 
@@ -526,8 +504,8 @@ void MainWindow::loadFrame(int frameIndex) {
 }
 
 /**
-  * \brief Toggles the autoplay of the replay.
-  * \detail When user click ui->playreplay the automatic playing of the replay is trigerred.
+  * @brief Start the autoplay of the replay.
+  * @detail Triggered when ui->playreplay is clicked.
 */
 void MainWindow::toggleReplayPlay() {
   
@@ -546,10 +524,11 @@ void MainWindow::toggleReplayPlay() {
     }
 }
 
-/*!
-  \fn void &MainWindow::swapTrackingData(int firstObject, int secondObject, int from)
-    
-  Swaps \a firstObject and \a secondObject tracking data from \a from to the end.  
+/**
+  * @brief In the tracking data, swaps two objects from a selected index to the end.
+  * @arg[in] firstObject First object to swap.
+  * @arg[in] secondObject Second object to swap.
+  * @arg[in] from Start index from which the data will be swapped.
 */
 void MainWindow::swapTrackingData(int firstObject, int secondObject, int from) {
     for ( int i = from*replayNumberObject; i < int(replayFrames.size()*replayNumberObject); i += replayNumberObject ) {
@@ -622,14 +601,9 @@ void MainWindow::mousePressEvent(QMouseEvent* event) {
 }
 
 
-/*!
-  \fn void &MainWindow::correctTracking()
-
-  Gets the index from ui->object{1,2}Replay QComboBox and the index of the
-  ui->replaySlider and swaps the data and saves in tracking.txt the result.
-  
-  Triggered when ui->swapButton is pressed.
-  i//Not  working properly to fix
+/**
+  * @brief Gets the index of two selected object and a start index and swaps the data from the start index to the end and saves the new tracking data.
+  * @detailed Triggered when ui->swapButton is pressed or right click in the replayDisplay.
 */
 void MainWindow::correctTracking() {
 
@@ -654,10 +628,8 @@ void MainWindow::correctTracking() {
 
 
 
-/*!
-  \fn void &MainWindow::~MainWindow()
-
-  Destructs the MainWindow object.  
+/**
+  * @brief Destructs the MainWindow object and saves previous set of parameters.  
 */
 MainWindow::~MainWindow()
 {

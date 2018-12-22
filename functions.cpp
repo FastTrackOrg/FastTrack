@@ -50,7 +50,7 @@ Point2d Tracking::curvatureCenter(const Point3d &tail, const Point3d &head){
 
 	Point2d center;
   
-  // Computes the equation of the slope of the two minors axis of each ellipses
+  // Computes the equation of the slope of the two minors axis of each ellipse
   // from the coordinate and direction of each ellipse.
 	Point p1 = Point(tail.x + 10*cos(tail.z + 0.5*M_PI), tail.y + 10*sin(tail.z + 0.5*M_PI));
 	Point p2 = Point(head.x + 10*cos(head.z + 0.5*M_PI), head.y + 10*sin(head.z + 0.5*M_PI));
@@ -112,7 +112,7 @@ double Tracking::modul(double angle) {
 
 
 /**
-  * @brief Computes least difference between two angles, alpha - beta. The difference is oriented in trigonometric convention.
+  * @brief Computes the least difference between two angles, alpha - beta. The difference is oriented in trigonometric convention.
   * @param[in] alpha Input angle.
   * @param[in] beta Input angle.
   * @return Least difference.
@@ -160,11 +160,11 @@ vector<double> Tracking::objectInformation(const UMat &image) {
 
 /**
   * @brief Computes the direction of the object from the object parameter (coordinate of the center of mass and orientation).
-  * @details To used this function, the object major axis as to be the the horizontal axis of the image. Therefore it is necessary to rotate the image before calling objectDirection.
+  * @details To use this function, the object major axis as to be the horizontal axis of the image. Therefore, it is necessary to rotate the image before calling objectDirection.
   * @param[in] image Binary image CV_8U.
   * @information[in, out] Parameters of the object (x coordinate, y coordinate, orientation).
   * @center[in] Center of mass of the object.
-  * @return True if the direction angle is the orientation angle. false if the direction angle is the orientation angle plus pi.
+  * @return True if the direction angle is the orientation angle. False if the direction angle is the orientation angle plus pi.
 */
 bool Tracking::objectDirection(const UMat &image, Point center, vector<double> &information) {
     
@@ -287,7 +287,7 @@ void Tracking::binarisation(UMat& frame, char backgroundColor, int value){
   * @param[in] frame: binary image CV_8U.
 	* @param[in] minSize Minimal size of an object.
 	* @param[in] maxSize: Maximal size of an object.
-  * @return All parameters of all objects formated as follow. One vector, inside of this vector, four vectors for parameters of the head, tail, body and features with number of object size. {  { Point(xHead, yHead, thetaHead), ...}, Point({xTail, yTail, thetaHead), ...}, {Point(xBody, yBody, thetaBody), ...}, {Point(curvature, 0, 0), ...}}
+  * @return All parameters of all objects formated as follows. One vector, inside of this vector, four vectors for parameters of the head, tail, body and features with number of object size. {  { Point(xHead, yHead, thetaHead), ...}, Point({xTail, yTail, thetaHead), ...}, {Point(xBody, yBody, thetaBody), ...}, {Point(curvature, 0, 0), ...}}
 */
 vector<vector<Point3d>> Tracking::objectPosition(const UMat &frame, int minSize, int maxSize){
 
@@ -313,7 +313,7 @@ vector<vector<Point3d>> Tracking::objectPosition(const UMat &frame, int minSize,
 			
       if(contourArea(contours[i]) > minSize && contourArea(contours[i]) < maxSize){ // Only select objects minArea << objectArea <<maxArea
 
-            // Draw the object in a temporary black image avoiding to select a 
+            // Draw the object in a temporary black image avoiding selecting a 
             // part of another object if two objects are very close.
 						dst = UMat::zeros(frame.size(), CV_8U);
 						drawContours(dst, contours, i, Scalar(255, 255, 255), FILLED,8); 
@@ -326,7 +326,7 @@ vector<vector<Point3d>> Tracking::objectPosition(const UMat &frame, int minSize,
 						parameter = objectInformation(RoiFull);
             
 
-            // Rotates the image without croping and computes the direction of the object.
+            // Rotates the image without cropping and computes the direction of the object.
             Point center = Point(0.5*RoiFull.cols, 0.5*RoiFull.rows);
             rotMatrix = getRotationMatrix2D(center, -(parameter.at(2)*180)/M_PI, 1);
             bbox = RotatedRect(center, RoiFull.size(), -(parameter.at(2)*180)/M_PI).boundingRect();
@@ -422,10 +422,10 @@ vector<vector<Point3d>> Tracking::objectPosition(const UMat &frame, int minSize,
   * @brief Computes a cost function and use a global optimization association to associate targets between frame. 
   * @details Method adapted from: "An effective and robust method for Tracking multiple fish in video image based on fish head detection" YQ Chen et al. Use the Hungarian method implemented by Cong Ma, 2016 "https://github.com/mcximing/hungarian-algorithm-cpp" adapted from the matlab implementation by Markus Buehren "https://fr.mathworks.com/matlabcentral/fileexchange/6543-functions-for-the-rectangular-assignment-problem".
   * @param[in] prevPos Vector of objects at t minus one.
-	* @param[in] pos Vector of objects parameters at t that we want to reorder in order to conserve the objects identity.
+	* @param[in] pos Vector of objects parameters at t that we want to reorder in order to conserve objects identity.
 	* @param[in] length Maximal displacement of an object between two frames in pixels.
 	* @param[in] angle Maximal difference in orientation an object between two frames in radians.
-	* @param[in] weight Weight between distance and direction in the computation of the cost function. Close to 0 the cost function used the distance, close to one it will used the direction. 
+	* @param[in] weight Weight between distance and direction in the computation of the cost function. Close to 0 the cost function used the distance, close to one it will be used the direction. 
 	* @param[in] lo Maximal occlusion distance of objects between two frames in pixels.
 	* @return The assignment vector containing the new index position to sort the pos vector. 
 */
@@ -563,7 +563,7 @@ vector<Point3d> Tracking::prevision(vector<Point3d> past, vector<Point3d> presen
 /**
   * @brief Computes a random set of colors.
   * @param[in] number Number of color to generate.
-  * @return The vector contaning n colors in RGB.
+  * @return The vector containing n colors in RGB.
 */
 vector<Point3d> Tracking::color(int number){
 

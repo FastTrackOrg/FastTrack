@@ -62,36 +62,35 @@ public:
 
 private:
     Ui::MainWindow *ui;
-    QMap<QString, QString> parameterList;
+    QMap<QString, QString> parameterList;   /*!< All the parameters necessary for the tracking analysis. */
 
-    QThread* thread;
-    Tracking* tracking;
-
-    QVector<QString> pathList;
-    int pathCounter;
-
-    int frameAnalyzed;
+    QThread* thread;   /*!< Thread where lives the Tracking object. */
+    Tracking* tracking;   /*!< Objects that track images sequence. */
 
 
-    SetupWindow *setupWindow;
+    QVector<QString> pathList;   /*!< Paths to images sequences to analyze. */
+
+    SetupWindow *setupWindow;   /*!< QMainWindow to display interactive setting of parameters. */
+
 
     void loadSettings();
     void saveSettings();
-    QSettings *settingsFile;
+    QSettings *settingsFile;   /*!< Saves parameters in a settings.ini file.*/
+
 
     // Replay panel
-    vector<cv::String> replayFrames;                      // Path to frame to replay
-    vector<Point3f> colorMap; 
-    QVector<QString> replayTracking;                      // Tracking data to replay
-    QVector<int> occlusionEvents;
-    int replayNumberObject;                              // Number of object tracked to replay
-    bool isReplayable;
-    QTimer *framerate;
-    int autoPlayerIndex;
-    bool object;
-    QSize replayDisplaySize;
-    QSize resizedFrame;
-    QSize originalImageSize;
+    vector<cv::String> replayFrames;   /*!< Paths to each image of the images sequences to replay. */
+    vector<Point3f> colorMap;   /*!< RGB color map to display each object in one color. */
+    QVector<QString> replayTracking;   /*!< Tracking data of the replayed images sequence. */
+    QVector<int> occlusionEvents;   /*!< Index of each occlusion event in the replayed images sequence. */
+    int replayNumberObject;   /*!< Number of objects tracked in the replayed images sequence. */
+    bool isReplayable;   /*!< True if user input is an images sequences that can be played. */
+    QTimer *framerate;   /*!< Sets the time at which a new image is displayed in autoplay mode in the replay. */
+    int replayFps;   /*!< Frame rate value at which a new image is displayed in autoplay mode in the replay. */
+    int autoPlayerIndex;   /*!< Index of the image displayed in autoplay mode in the replay. */
+    bool object;   /*!< Alternatively true or false to associate either object A or object B at each click of the user in the ui->replayDisplay. */
+    QSize resizedFrame;   /*!< Width and height of displayed QPixmap to accomodate window size changment. */
+    QSize originalImageSize;   /*!< Width and height of the original image in the images sequence. */
 
 public slots:
     void updateParameterList(QTableWidgetItem* item);
@@ -106,7 +105,15 @@ public slots:
     void swapTrackingData(int firstObject, int secondObject, int from);
     void correctTracking();
 signals:
-    void newParameterList(const QMap<QString, QString> &);
+  /**
+  * @brief Emitted when a parameter is changed.
+  * @param parameterList All parameters necessary to the tracking analysis.
+  */
+    void newParameterList(const QMap<QString, QString> &parameterList);
+  
+  /**
+  * @brief Emitted when a tracking analysis is finished.
+  */
     void next();
 };
 
