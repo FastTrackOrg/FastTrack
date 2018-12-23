@@ -7,6 +7,11 @@
   color: white;
 }
 
+#startButton{
+  background-color: red;
+  color: black;
+}
+
 QMessageBox{
   background-color: #333333;
   border: 1px solid #262626;

@@ -64,6 +64,8 @@ MainWindow::MainWindow(QWidget *parent) :
     img = QIcon(":/buttons/open.png");
     ui->replayOpen->setIcon(img);
     ui->replayOpen->setIconSize(QSize(ui->replayOpen->width(), ui->replayOpen->height()));
+    ui->openPath->setIcon(img);
+    ui->openPath->setIconSize(QSize(ui->openPath->width(), ui->openPath->height()));
     
     img = QIcon(":/buttons/next.png");
     ui->replayNext->setIcon(img);
@@ -82,6 +84,19 @@ MainWindow::MainWindow(QWidget *parent) :
       setupWindow->show();
     });
 
+    // Keyboard shorcut
+    // AZERTY keyboard shorcuts are set in the ui
+    wShortcut = new QShortcut(QKeySequence("w"), this);
+    connect(wShortcut, &QShortcut::activated, [this](){ ui->replayNext->animateClick(); });
+
+    qShortcut = new QShortcut(QKeySequence("q"), this);
+    connect(qShortcut, &QShortcut::activated, [this](){ ui->replaySlider->setValue(ui->replaySlider->value() - 1); });
+
+    aShortcut = new QShortcut(QKeySequence("a"), this);
+    connect(aShortcut, &QShortcut::activated, [this](){ ui->replaySlider->setValue(ui->replaySlider->value() - 1); });
+
+    dShortcut = new QShortcut(QKeySequence("d"), this);
+    connect(dShortcut, &QShortcut::activated, [this](){ ui->replaySlider->setValue(ui->replaySlider->value() + 1); });
 
     // Registers QMetaType
     qRegisterMetaType<UMat>("UMat&");
@@ -147,6 +162,7 @@ MainWindow::MainWindow(QWidget *parent) :
 ////////////////////////////Path panel/////////////////////////////////////////////
     ui->tablePath->horizontalHeader()->setStretchLastSection(true);
     ui->tablePath->setSortingEnabled(false);
+    connect(ui->openPath, &QPushButton::clicked, this, &MainWindow::openPathFolder);
     connect(ui->addPath, &QPushButton::clicked, this, &MainWindow::addPath);
     connect(ui->removePath, &QPushButton::clicked, this, &MainWindow::removePath);
     connect(ui->startButton, &QPushButton::clicked, this, &MainWindow::startTracking);
@@ -172,17 +188,14 @@ MainWindow::MainWindow(QWidget *parent) :
       }
     });
     connect(ui->playReplay, &QPushButton::clicked, this, &MainWindow::toggleReplayPlay);
-    connect(ui->replayNext, &QPushButton::clicked, [this]() {
-      int current = ui->replaySlider->value();
-      int nextOcclusion = *std::upper_bound(occlusionEvents.begin(), occlusionEvents.end(), current);
-      ui->replaySlider->setValue(nextOcclusion);
-    });
-    connect(ui->replayPrevious, &QPushButton::clicked, [this]() {
-      int current = ui->replaySlider->value();
-      int previousOcclusion = occlusionEvents.at(std::upper_bound(occlusionEvents.begin(), occlusionEvents.end(), current) - occlusionEvents.begin() - 2);
-      ui->replaySlider->setValue(previousOcclusion);
-    });
+    connect(ui->replayNext, &QPushButton::clicked, this, &MainWindow::nextOcclusionEvent);
+    connect(ui->replayPrevious, &QPushButton::clicked, this, &MainWindow::previousOcclusionEvent);
 
+    connect(ui->replayHelp, &QPushButton::clicked, [this]() {
+          QMessageBox helpBox(this);
+          helpBox.setIconPixmap(QPixmap(":/buttons/helpImg.png"));
+          helpBox.exec();
+    });
 
 } // Constructor
 
@@ -205,6 +218,16 @@ void MainWindow::updateParameterList(QTableWidgetItem* item) {
     emit(newParameterList(parameterList));
 }
 
+/**
+  * @brief Opens a dialogue window to select a folder and updates ui->textPathAdd.
+  * @detailed Triggered when ui->openPath is clicked.
+*/
+void MainWindow::openPathFolder() {
+    QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"), "/home", QFileDialog::ShowDirsOnly);
+    if (dir.length()) {
+        ui->textPathAdd->setText(dir);
+    }
+}
 
 /**
   * @brief Takes the value of ui->textPathAdd and add it in the ui->tablePath and in the pathList vector.
@@ -233,15 +256,8 @@ void MainWindow::removePath() {
 
 
 /**
-  \fn void &MainWindow::startTracking()
-  Starts a new tracking analysis. First it get the path to the folder containing the
-  images sequence. It creates a folder named Tracking_Result in this folder and a file
-  parameters.txt containing the parameterList. It creates a new Tracking object that 
-  have to be run in a separate thread. When the analysis is finished, the Tracking 
-  object is destroyed and a new analysis is started.
-
-  Trigerred when the start analysis button is clicked or when the
-  signal finishedAnalysis() is emitted.
+  * @brief Starts a new tracking analysis. First it get the path to the folder containing the images sequence. It creates a folder named Tracking_Result in this folder and a file parameters.txt containing the parameterList. It creates a new Tracking object that has to be run in a separate thread. When the analysis is finished, the Tracking object is destroyed and a new analysis is started.
+  * @detailed Trigerred when the start analysis button is clicked or when the signal finishedAnalysis() is emitted.
 */
 void MainWindow::startTracking() {
     
@@ -251,6 +267,8 @@ void MainWindow::startTracking() {
     // Start the tracking analysis in a new thread and manage creation and destruction
     // of the tracking object.
     if(!pathList.isEmpty()) {
+      
+      ui->startButton->setDisabled(true);
 
       if (QDir(pathList.at(0)).exists()) {      
         string path = (pathList.at(0) + QDir::separator()).toStdString();
@@ -300,6 +318,9 @@ void MainWindow::startTracking() {
         errorBox.setText("Wrong path");
         errorBox.exec();
     }
+  }
+  else {
+    ui->startButton->setDisabled(false);
   }
 }
 
@@ -369,6 +390,7 @@ void MainWindow::loadReplayFolder() {
     // Delete existing data
     replayTracking.clear();
     replayFrames.clear();
+    occlusionEvents.clear();
     ui->object1Replay->clear();
     ui->object2Replay->clear();
     framerate->stop();
@@ -431,7 +453,6 @@ void MainWindow::loadReplayFolder() {
             }
             auto last = std::unique(occlusionEvents.begin(), occlusionEvents.end());
             occlusionEvents.erase(last, occlusionEvents.end());
-            qInfo() << occlusionEvents;
           }
 
           QStringList range;
@@ -595,7 +616,7 @@ void MainWindow::mousePressEvent(QMouseEvent* event) {
 
   // Right click event
   else if (event->buttons() == Qt::RightButton) {
-    correctTracking();
+    ui->swapReplay->animateClick();
     ui->object1Replay->setStyleSheet("QComboBox { background-color: white; }");
     ui->object2Replay->setStyleSheet("QComboBox { background-color: white; }");
   }
@@ -627,6 +648,27 @@ void MainWindow::correctTracking() {
     loadFrame(ui->replaySlider->value());
 }
 
+
+/**
+  * @brief Finds and displays the next occlusion event on the ui->replayDisplay.
+  * @detailed Triggered when ui->nextReplay is pressed.
+*/
+void MainWindow::nextOcclusionEvent() {
+      int current = ui->replaySlider->value();
+      int nextOcclusion = *std::upper_bound(occlusionEvents.begin(), occlusionEvents.end(), current);
+      ui->replaySlider->setValue(nextOcclusion);
+}
+      
+
+/**
+  * @brief Finds and displays the previous occlusion event on the ui->replayDisplay.
+  * @detailed Triggered when ui->previousReplay is pressed.
+*/
+void MainWindow::previousOcclusionEvent() {
+      int current = ui->replaySlider->value();
+      int previousOcclusion = occlusionEvents.at(std::upper_bound(occlusionEvents.begin(), occlusionEvents.end(), current) - occlusionEvents.begin() - 2);
+      ui->replaySlider->setValue(previousOcclusion);
+}
 
 
 /**

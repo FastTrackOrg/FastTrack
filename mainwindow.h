@@ -17,6 +17,7 @@
 #include <QCheckBox>
 #include <QSlider>
 #include <QLCDNumber>
+#include <QKeySequence>
 #include <QComboBox>
 #include <QThread>
 #include <QSpinBox>
@@ -26,6 +27,7 @@
 #include <QMap>
 #include <QDir>
 #include <QString>
+#include <QShortcut>
 #include <QSettings>
 #include <QDir>
 #include <QThread>
@@ -63,10 +65,14 @@ public:
 private:
     Ui::MainWindow *ui;
     QMap<QString, QString> parameterList;   /*!< All the parameters necessary for the tracking analysis. */
-
+    
     QThread* thread;   /*!< Thread where lives the Tracking object. */
     Tracking* tracking;   /*!< Objects that track images sequence. */
 
+    QShortcut *wShortcut;
+    QShortcut *qShortcut;
+    QShortcut *aShortcut;
+    QShortcut *dShortcut;
 
     QVector<QString> pathList;   /*!< Paths to images sequences to analyze. */
 
@@ -95,6 +101,7 @@ private:
 public slots:
     void updateParameterList(QTableWidgetItem* item);
     void startTracking();
+    void openPathFolder();
     void addPath();
     void removePath();
     void display(UMat&, UMat&);
@@ -104,6 +111,8 @@ public slots:
     void mousePressEvent(QMouseEvent* event);
     void swapTrackingData(int firstObject, int secondObject, int from);
     void correctTracking();
+    void nextOcclusionEvent();
+    void previousOcclusionEvent();
 signals:
   /**
   * @brief Emitted when a parameter is changed.

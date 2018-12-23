@@ -21,7 +21,7 @@
        <enum>QTabWidget::West</enum>
       </property>
       <property name="currentIndex">
-       <number>3</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="files">
        <attribute name="title">
@@ -29,15 +29,45 @@
        </attribute>
        <layout class="QGridLayout" name="gridLayout_4">
         <item row="0" column="0">
+         <widget class="QTextEdit" name="textPathAdd">
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>31</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QPushButton" name="openPath">
+          <property name="maximumSize">
+           <size>
+            <width>151</width>
+            <height>34</height>
+           </size>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0" colspan="2">
+         <widget class="Line" name="line_6">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0" rowspan="3">
          <widget class="QTableWidget" name="tablePath">
           <column>
            <property name="text">
-            <string>Path</string>
+            <string>Movie to track</string>
            </property>
           </column>
          </widget>
         </item>
-        <item row="1" column="1">
+        <item row="2" column="1">
          <widget class="QPushButton" name="removePath">
           <property name="maximumSize">
            <size>
@@ -50,17 +80,7 @@
           </property>
          </widget>
         </item>
-        <item row="2" column="0">
-         <widget class="QTextEdit" name="textPathAdd">
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>31</height>
-           </size>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="1">
+        <item row="3" column="1">
          <widget class="QPushButton" name="addPath">
           <property name="maximumSize">
            <size>
@@ -69,18 +89,32 @@
            </size>
           </property>
           <property name="text">
-           <string>Add path</string>
+           <string>Add</string>
           </property>
          </widget>
         </item>
-        <item row="3" column="1">
-         <widget class="QPushButton" name="startButton">
-          <property name="maximumSize">
+        <item row="4" column="1">
+         <spacer name="verticalSpacer_3">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
            <size>
-            <width>151</width>
-            <height>33</height>
+            <width>20</width>
+            <height>506</height>
            </size>
           </property>
+         </spacer>
+        </item>
+        <item row="5" column="0" colspan="2">
+         <widget class="Line" name="line_5">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="0" colspan="2">
+         <widget class="QPushButton" name="startButton">
           <property name="text">
            <string>Start tracking</string>
           </property>
@@ -168,7 +202,11 @@
        </attribute>
        <layout class="QGridLayout" name="gridLayout_5">
         <item row="0" column="0" colspan="6">
-         <widget class="QLineEdit" name="replayPath"/>
+         <widget class="QLineEdit" name="replayPath">
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+         </widget>
         </item>
         <item row="10" column="7" colspan="4">
          <widget class="QCheckBox" name="replayNumbers">
@@ -211,6 +249,9 @@
           <property name="text">
            <string>Swap</string>
           </property>
+          <property name="shortcut">
+           <string>Return</string>
+          </property>
          </widget>
         </item>
         <item row="3" column="5">
@@ -228,6 +269,9 @@
            <property name="text">
             <string/>
            </property>
+           <property name="shortcut">
+            <string>S</string>
+           </property>
           </widget>
           <widget class="QPushButton" name="replayNext">
            <property name="maximumSize">
@@ -238,6 +282,9 @@
            </property>
            <property name="text">
             <string/>
+           </property>
+           <property name="shortcut">
+            <string>Z</string>
            </property>
           </widget>
          </widget>
@@ -343,6 +390,9 @@
             <height>16</height>
            </size>
           </property>
+          <property name="shortcut">
+           <string>Space</string>
+          </property>
           <property name="checkable">
            <bool>true</bool>
           </property>
@@ -356,6 +406,12 @@
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
           </property>
+          <property name="invertedAppearance">
+           <bool>false</bool>
+          </property>
+          <property name="invertedControls">
+           <bool>false</bool>
+          </property>
          </widget>
         </item>
         <item row="0" column="7" colspan="4">
@@ -368,6 +424,9 @@
           </property>
           <property name="text">
            <string/>
+          </property>
+          <property name="shortcut">
+           <string>O</string>
           </property>
          </widget>
         </item>
@@ -424,6 +483,9 @@
          <widget class="QPushButton" name="replayHelp">
           <property name="text">
            <string/>
+          </property>
+          <property name="shortcut">
+           <string>H</string>
           </property>
          </widget>
         </item>
