@@ -411,14 +411,6 @@ void MainWindow::loadReplayFolder() {
             }
             replayTracking.removeFirst(); // Delete header line
 
-            // Finds occlusion events, ie line where value is equal to "NaN"
-            int occlusionEventIndex = replayTracking.indexOf("NaN");
-            while ( occlusionEventIndex != -1 ) {
-              occlusionEvents.append(occlusionEventIndex / replayNumberObject);
-              occlusionEventIndex = replayTracking.indexOf("NaN", occlusionEventIndex + 1);
-            }
-            auto last = std::unique(occlusionEvents.begin(), occlusionEvents.end());
-            occlusionEvents.erase(last, occlusionEvents.end());
 
             QFile parameterFile( dir + QDir::separator() + "Tracking_Result" + QDir::separator() + "parameter.txt");
             if (parameterFile.open(QIODevice::ReadOnly)) {
@@ -431,6 +423,15 @@ void MainWindow::loadReplayFolder() {
                 }
               }
             }
+            // Finds occlusion events, ie line where value is equal to "NaN"
+            int occlusionEventIndex = replayTracking.indexOf("NaN");
+            while ( occlusionEventIndex != -1 ) {
+              occlusionEvents.append(occlusionEventIndex / replayNumberObject);
+              occlusionEventIndex = replayTracking.indexOf("NaN", occlusionEventIndex + 1);
+            }
+            auto last = std::unique(occlusionEvents.begin(), occlusionEvents.end());
+            occlusionEvents.erase(last, occlusionEvents.end());
+            qInfo() << occlusionEvents;
           }
 
           QStringList range;
