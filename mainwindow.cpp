@@ -654,9 +654,11 @@ void MainWindow::correctTracking() {
   * @detailed Triggered when ui->nextReplay is pressed.
 */
 void MainWindow::nextOcclusionEvent() {
+    if( !occlusionEvents.isEmpty() ){
       int current = ui->replaySlider->value();
       int nextOcclusion = *std::upper_bound(occlusionEvents.begin(), occlusionEvents.end(), current);
       ui->replaySlider->setValue(nextOcclusion);
+    }
 }
       
 
@@ -665,9 +667,11 @@ void MainWindow::nextOcclusionEvent() {
   * @detailed Triggered when ui->previousReplay is pressed.
 */
 void MainWindow::previousOcclusionEvent() {
+    if( !occlusionEvents.isEmpty() ){
       int current = ui->replaySlider->value();
       int previousOcclusion = occlusionEvents.at(std::upper_bound(occlusionEvents.begin(), occlusionEvents.end(), current) - occlusionEvents.begin() - 2);
       ui->replaySlider->setValue(previousOcclusion);
+    }
 }
 
 
