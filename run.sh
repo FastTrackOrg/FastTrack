@@ -2,7 +2,7 @@
 
 if [ "$1" = "full" ]; then
   set -e
-  qmake CONFIG+=released Fishy.pro
+  qmake CONFIG+=released src/Fishy.pro
   make clean
   make
   cd build
@@ -13,7 +13,7 @@ fi
 
 if [ "$1" = "partial" ]; then
   set -e
-  qmake CONFIG+=released Fishy.pro
+  qmake CONFIG+=released src/Fishy.pro
   make
   cd build
   ./Fishy
@@ -22,7 +22,7 @@ fi
 
 if [ "$1" = "debug" ]; then
   set -e
-  qmake CONFIG+=debug Fishy.pro
+  qmake CONFIG+=debug src/Fishy.pro
   make
   cd build
   ./Fishy
@@ -32,7 +32,7 @@ fi
 
 if [ "$1" = "profile" ]; then
   set -e
-  qmake QMAKE_CXXFLAGS+=-pg QMAKE_LFLAGS+=-pg CONFIG+=debug
+  qmake QMAKE_CXXFLAGS+=-pg QMAKE_LFLAGS+=-pg CONFIG+=debug src/Fishy.pro
   make
   cd build
   ./Fishy

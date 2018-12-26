@@ -20,33 +20,38 @@ Stable versions of Fishy Tracking are released for Linux (installer or AppImage)
    - Install OpenCV 4 on your system by following instructions at https://docs.opencv.org/4.0.0/df/d65/tutorial_table_of_content_introduction.html.
    - Install Qt5 on your system by following instructions at http://doc.qt.io/qt-5/gettingstarted.html#offline-installation.
    - Download Fishy Tracking code source at https://git.benjamin-gallois.fr/bgallois/FishyTracking.
-   - Referred to the developer user guide.
+   - Referred to the developer user guide to compile the project.
 
 ### Installation
 
-1. With Fishy Tracking installer
+1. With Fishy Tracking installer:
 
    - Executes the installer and follows instructions.
 
-2. With Linux AppImage
+2. With Linux AppImage:
 
    Allows FishyTracking.appimage to be executed:
 
    - Right click on the AppImage file.
    - Click on properties.
    - Click on permissions.
-   - Check allow executing the file as a program.
+   - Check "allow executing the file as a program".
 
 ##  Software overview
 
 ### Files panel
 
-The files panel allows the user to add several paths to folders where the images sequence to analyze are stored. Multiple paths can be added to analyze data in a bunch.
+The files panel allows the user to add paths to folders where the images sequence to analyze are stored. Multiple paths can be added to analyze data in a bunch.
 
-1. Add the path in the text bar.
-2. Click on the button add path.
-3. Remove a path if necessary by selecting it in the path table and by clicking on the button delete path.
-4. Start the analysis by clicking on start analysis. 
+How to add movies to analyze?
+
+1. Add the path to the folder where the images sequence is stored:
+   - Click on the (1) button to select a folder or copy the folder path to (2) the path bar.
+2. Click on the (3) button to add the path to the list of movie to analyze.
+3. Remove a path if necessary by selecting it in the (5) path table list and by clicking on the (4) button to remove the path.
+4. Start the analysis by clicking on the (6) button start. 
+
+![Files_Panel](/home/benjamin/Codes/FishyTracking/UserManual/Files_Panel.png)
 
 ### Display panel
 

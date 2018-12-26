@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
-#include "../functions.cpp"
-#include "../mainwindow.cpp"
+#include "../src/functions.cpp"
+#include "../src/mainwindow.cpp"
 #include <string>
 
 using namespace std;

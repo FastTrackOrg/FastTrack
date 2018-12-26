@@ -34,24 +34,24 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
         TrackingTest.cpp \
-        ../functions.cpp \
-        ../mainwindow.cpp\
-        ../Hungarian.cpp \
-        ../setupwindow.cpp \
+        ../src/functions.cpp \
+        ../src/mainwindow.cpp\
+        ../src/Hungarian.cpp \
+        ../src/setupwindow.cpp \
 
 QMAKE_CXXFLAGS += -std=c++11 -O3 -fopenmp -g
 
 INCLUDEPATH += /usr/local/include/opencv4/ /usr/include/gtest
 LIBS += -L /usr/local/lib64/  -lopencv_core -lopencv_imgproc -lopencv_highgui -lopencv_imgcodecs -lopencv_videoio -lopencv_video -lopencv_photo -fopenmp -lgtest -lgtest_main
 HEADERS += \
-        ../mainwindow.h\
-        ../functions.h \
-        ../Hungarian.h \
-        ../setupwindow.h \
+        ../src/mainwindow.h\
+        ../src/functions.h \
+        ../src/Hungarian.h \
+        ../src/setupwindow.h \
         /usr/include/gtest/gtest.h \
 
-FORMS += ../mainwindow.ui \
-        ../setupwindow.ui \
+FORMS += ../src/mainwindow.ui \
+        ../src/setupwindow.ui \
 
-RESOURCES += ../resources.qrc
+RESOURCES += ../src/resources.qrc
 
