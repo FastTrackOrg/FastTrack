@@ -1,0 +1,253 @@
+<!doctype html>
+<html>
+<head>
+<meta charset='UTF-8'><meta name='viewport' content='width=device-width initial-scale=1'>
+<title>readme</title><link href='https://fonts.loli.net/css?family=Merriweather:900,900italic,300,300italic&subset=latin-ext' rel='stylesheet' type='text/css' />
+<link href='https://fonts.loli.net/css?family=Lato:900,300&subset=latin-ext' rel='stylesheet' type='text/css' /><style type='text/css'>html {overflow-x: initial !important;}:root { --bg-color:#ffffff; --text-color:#333333; --select-text-bg-color:#B5D6FC; --select-text-font-color:auto; --monospace:"Lucida Console",Consolas,"Courier",monospace; }
+html { font-size: 14px; background-color: var(--bg-color); color: var(--text-color); font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased; }
+body { margin: 0px; padding: 0px; height: auto; bottom: 0px; top: 0px; left: 0px; right: 0px; font-size: 1rem; line-height: 1.42857; overflow-x: hidden; background: inherit; }
+iframe { margin: auto; }
+a.url { word-break: break-all; }
+a:active, a:hover { outline: 0px; }
+.in-text-selection, ::selection { text-shadow: none; background: var(--select-text-bg-color); color: var(--select-text-font-color); }
+#write { margin: 0px auto; height: auto; width: inherit; word-break: normal; word-wrap: break-word; position: relative; white-space: normal; overflow-x: visible; }
+#write.first-line-indent p { text-indent: 2em; }
+#write.first-line-indent li p, #write.first-line-indent p * { text-indent: 0px; }
+#write.first-line-indent li { margin-left: 2em; }
+.for-image #write { padding-left: 8px; padding-right: 8px; }
+body.typora-export { padding-left: 30px; padding-right: 30px; }
+.typora-export .footnote-line, .typora-export p { white-space: pre-wrap; }
+@media screen and (max-width: 500px) {
+  body.typora-export { padding-left: 0px; padding-right: 0px; }
+  .CodeMirror-sizer { margin-left: 0px !important; }
+  .CodeMirror-gutters { display: none !important; }
+}
+#write li > figure:first-child { margin-top: -20px; }
+#write ol, #write ul { position: relative; }
+img { max-width: 100%; vertical-align: middle; }
+button, input, select, textarea { color: inherit; font-style: inherit; font-variant: inherit; font-weight: inherit; font-stretch: inherit; font-size: inherit; line-height: inherit; font-family: inherit; }
+input[type="checkbox"], input[type="radio"] { line-height: normal; padding: 0px; }
+*, ::after, ::before { box-sizing: border-box; }
+#write h1, #write h2, #write h3, #write h4, #write h5, #write h6, #write p, #write pre { width: inherit; }
+#write h1, #write h2, #write h3, #write h4, #write h5, #write h6, #write p { position: relative; }
+h1, h2, h3, h4, h5, h6 { break-after: avoid-page; break-inside: avoid; orphans: 2; }
+p { orphans: 4; }
+h1 { font-size: 2rem; }
+h2 { font-size: 1.8rem; }
+h3 { font-size: 1.6rem; }
+h4 { font-size: 1.4rem; }
+h5 { font-size: 1.2rem; }
+h6 { font-size: 1rem; }
+.md-math-block, .md-rawblock, h1, h2, h3, h4, h5, h6, p { margin-top: 1rem; margin-bottom: 1rem; }
+.hidden { display: none; }
+.md-blockmeta { color: rgb(204, 204, 204); font-weight: 700; font-style: italic; }
+a { cursor: pointer; }
+sup.md-footnote { padding: 2px 4px; background-color: rgba(238, 238, 238, 0.7); color: rgb(85, 85, 85); border-radius: 4px; cursor: pointer; }
+sup.md-footnote a, sup.md-footnote a:hover { color: inherit; text-transform: inherit; text-decoration: inherit; }
+#write input[type="checkbox"] { cursor: pointer; width: inherit; height: inherit; }
+figure { overflow-x: auto; margin: 1.2em 0px; max-width: calc(100% + 16px); padding: 0px; }
+figure > table { margin: 0px !important; }
+tr { break-inside: avoid; break-after: auto; }
+thead { display: table-header-group; }
+table { border-collapse: collapse; border-spacing: 0px; width: 100%; overflow: auto; break-inside: auto; text-align: left; }
+table.md-table td { min-width: 80px; }
+.CodeMirror-gutters { border-right: 0px; background-color: inherit; }
+.CodeMirror { text-align: left; }
+.CodeMirror-placeholder { opacity: 0.3; }
+.CodeMirror pre { padding: 0px 4px; }
+.CodeMirror-lines { padding: 0px; }
+div.hr:focus { cursor: none; }
+#write pre { white-space: pre-wrap; }
+#write.fences-no-line-wrapping pre { white-space: pre; }
+#write pre.ty-contain-cm { white-space: normal; }
+.CodeMirror-gutters { margin-right: 4px; }
+.md-fences { font-size: 0.9rem; display: block; break-inside: avoid; text-align: left; overflow: visible; white-space: pre; background: inherit; position: relative !important; }
+.md-diagram-panel { width: 100%; margin-top: 10px; text-align: center; padding-top: 0px; padding-bottom: 8px; overflow-x: auto; }
+#write .md-fences.mock-cm { white-space: pre-wrap; }
+.md-fences.md-fences-with-lineno { padding-left: 0px; }
+#write.fences-no-line-wrapping .md-fences.mock-cm { white-space: pre; overflow-x: auto; }
+.md-fences.mock-cm.md-fences-with-lineno { padding-left: 8px; }
+.CodeMirror-line, twitterwidget { break-inside: avoid; }
+.footnotes { opacity: 0.8; font-size: 0.9rem; margin-top: 1em; margin-bottom: 1em; }
+.footnotes + .footnotes { margin-top: 0px; }
+.md-reset { margin: 0px; padding: 0px; border: 0px; outline: 0px; vertical-align: top; background: 0px 0px; text-decoration: none; text-shadow: none; float: none; position: static; width: auto; height: auto; white-space: nowrap; cursor: inherit; -webkit-tap-highlight-color: transparent; line-height: normal; font-weight: 400; text-align: left; box-sizing: content-box; direction: ltr; }
+li div { padding-top: 0px; }
+blockquote { margin: 1rem 0px; }
+li .mathjax-block, li p { margin: 0.5rem 0px; }
+li { margin: 0px; position: relative; }
+blockquote > :last-child { margin-bottom: 0px; }
+blockquote > :first-child, li > :first-child { margin-top: 0px; }
+.footnotes-area { color: rgb(136, 136, 136); margin-top: 0.714rem; padding-bottom: 0.143rem; white-space: normal; }
+#write .footnote-line { white-space: pre-wrap; }
+@media print {
+  body, html { border: 1px solid transparent; height: 99%; break-after: avoid; break-before: avoid; }
+  #write { margin-top: 0px; border-color: transparent !important; }
+  .typora-export * { -webkit-print-color-adjust: exact; }
+  html.blink-to-pdf { font-size: 13px; }
+  .typora-export #write { padding-left: 1cm; padding-right: 1cm; padding-bottom: 0px; break-after: avoid; }
+  .typora-export #write::after { height: 0px; }
+  @page { margin: 20mm 0px; }
+}
+.footnote-line { margin-top: 0.714em; font-size: 0.7em; }
+a img, img a { cursor: pointer; }
+pre.md-meta-block { font-size: 0.8rem; min-height: 0.8rem; white-space: pre-wrap; background: rgb(204, 204, 204); display: block; overflow-x: hidden; }
+p > img:only-child { display: block; margin: auto; }
+p > .md-image:only-child { display: inline-block; width: 100%; text-align: center; }
+#write .MathJax_Display { margin: 0.8em 0px 0px; }
+.md-math-block { width: 100%; }
+.md-math-block:not(:empty)::after { display: none; }
+[contenteditable="true"]:active, [contenteditable="true"]:focus { outline: 0px; box-shadow: none; }
+.md-task-list-item { position: relative; list-style-type: none; }
+.task-list-item.md-task-list-item { padding-left: 0px; }
+.md-task-list-item > input { position: absolute; top: 0px; left: 0px; margin-left: -1.2em; margin-top: calc(1em - 10px); }
+.math { font-size: 1rem; }
+.md-toc { min-height: 3.58rem; position: relative; font-size: 0.9rem; border-radius: 10px; }
+.md-toc-content { position: relative; margin-left: 0px; }
+.md-toc-content::after, .md-toc::after { display: none; }
+.md-toc-item { display: block; color: rgb(65, 131, 196); }
+.md-toc-item a { text-decoration: none; }
+.md-toc-inner:hover { text-decoration: underline; }
+.md-toc-inner { display: inline-block; cursor: pointer; }
+.md-toc-h1 .md-toc-inner { margin-left: 0px; font-weight: 700; }
+.md-toc-h2 .md-toc-inner { margin-left: 2em; }
+.md-toc-h3 .md-toc-inner { margin-left: 4em; }
+.md-toc-h4 .md-toc-inner { margin-left: 6em; }
+.md-toc-h5 .md-toc-inner { margin-left: 8em; }
+.md-toc-h6 .md-toc-inner { margin-left: 10em; }
+@media screen and (max-width: 48em) {
+  .md-toc-h3 .md-toc-inner { margin-left: 3.5em; }
+  .md-toc-h4 .md-toc-inner { margin-left: 5em; }
+  .md-toc-h5 .md-toc-inner { margin-left: 6.5em; }
+  .md-toc-h6 .md-toc-inner { margin-left: 8em; }
+}
+a.md-toc-inner { font-size: inherit; font-style: inherit; font-weight: inherit; line-height: inherit; }
+.footnote-line a:not(.reversefootnote) { color: inherit; }
+.md-attr { display: none; }
+.md-fn-count::after { content: "."; }
+code, pre, samp, tt { font-family: var(--monospace); }
+kbd { margin: 0px 0.1em; padding: 0.1em 0.6em; font-size: 0.8em; color: rgb(36, 39, 41); background: rgb(255, 255, 255); border: 1px solid rgb(173, 179, 185); border-radius: 3px; box-shadow: rgba(12, 13, 14, 0.2) 0px 1px 0px, rgb(255, 255, 255) 0px 0px 0px 2px inset; white-space: nowrap; vertical-align: middle; }
+.md-comment { color: rgb(162, 127, 3); opacity: 0.8; font-family: var(--monospace); }
+code { text-align: left; vertical-align: initial; }
+a.md-print-anchor { white-space: pre !important; border-width: initial !important; border-style: none !important; border-color: initial !important; display: inline-block !important; position: absolute !important; width: 1px !important; right: 0px !important; outline: 0px !important; background: 0px 0px !important; text-decoration: initial !important; text-shadow: initial !important; }
+.md-inline-math .MathJax_SVG .noError { display: none !important; }
+.md-math-block .MathJax_SVG_Display { text-align: center; margin: 0px; position: relative; text-indent: 0px; max-width: none; max-height: none; min-height: 0px; min-width: 100%; width: auto; overflow-y: hidden; display: block !important; }
+.MathJax_SVG_Display, .md-inline-math .MathJax_SVG_Display { width: auto; margin: inherit; display: inline-block !important; }
+.MathJax_SVG .MJX-monospace { font-family: var(--monospace); }
+.MathJax_SVG .MJX-sans-serif { font-family: sans-serif; }
+.MathJax_SVG { display: inline; font-style: normal; font-weight: 400; line-height: normal; zoom: 90%; text-indent: 0px; text-align: left; text-transform: none; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; direction: ltr; max-width: none; max-height: none; min-width: 0px; min-height: 0px; border: 0px; padding: 0px; margin: 0px; }
+.MathJax_SVG * { transition: none; }
+.MathJax_SVG_Display svg { vertical-align: middle !important; margin-bottom: 0px !important; }
+.os-windows.monocolor-emoji .md-emoji { font-family: "Segoe UI Symbol", sans-serif; }
+.md-diagram-panel > svg { max-width: 100%; }
+[lang="mermaid"] svg, [lang="flow"] svg { max-width: 100%; }
+[lang="mermaid"] .node text { font-size: 1rem; }
+table tr th { border-bottom: 0px; }
+video { max-width: 100%; display: block; margin: 0px auto; }
+iframe { max-width: 100%; width: 100%; border: none; }
+.highlight td, .highlight tr { border: 0px; }
+
+
+:root { --control-text-color: #777; }
+@font-face { font-family: Merriweather; font-style: normal; font-weight: normal; src: local("Merriweather Light"), local("Merriweather-Light"), url("./pixyll/merriweather-v19-latin-300.woff") format("woff"); }
+@font-face { font-family: Merriweather; font-style: normal; font-weight: bold; src: local("Merriweather Heavy"), local("Merriweather-Heavy"), url("./pixyll/merriweather-v19-latin-700.woff") format("woff"); }
+@font-face { font-family: Merriweather; font-style: italic; font-weight: normal; src: local("Merriweather Light Italic"), local("Merriweather-LightItalic"), url("./pixyll/merriweather-v19-latin-300italic.woff") format("woff"); }
+@font-face { font-family: Merriweather; font-style: italic; font-weight: bold; src: local("Merriweather Heavy Italic"), local("Merriweather-HeavyItalic"), url("./pixyll/merriweather-v19-latin-700italic.woff") format("woff"); }
+@font-face { font-family: Lato; font-style: normal; font-weight: normal; src: local("Lato Light"), local("Lato-Light"), url("./pixyll/lato-v14-latin-300.woff") format("woff"); }
+@font-face { font-family: Lato; font-style: normal; font-weight: bold; src: local("Lato Black"), local("Lato-Blcak"), url("./pixyll/lato-v14-latin-900.woff") format("woff"); }
+@font-face { font-family: Lato; font-style: italic; font-weight: normal; src: local("Lato LightItalic"), local("Lato-LightItalic"), url("./pixyll/lato-v14-latin-300italic.woff") format("woff"); }
+@font-face { font-family: Lato; font-style: italic; font-weight: bold; src: local("Lato BlackItalic"), local("Lato-BlackItalic"), url("./pixyll/lato-v14-latin-900italic.woff") format("woff"); }
+h1, .h1, .f1 { font-size: 2rem; line-height: 2.5rem; }
+h2, .h2, .f2 { font-size: 1.5rem; line-height: 2rem; }
+h3, .h3, .f3 { font-size: 1.25rem; line-height: 1.5rem; }
+p, .p, .f4, h4, h5, h6, dl, ol, ul, pre[cid], div[cid], #typora-source { font-size: 1.125rem; line-height: 1.5rem; }
+h4 { font-size: 1.13rem; }
+body { font-family: Merriweather, "PT Serif", Georgia, "Times New Roman", STSong, serif; line-height: 1.5rem; font-weight: 400; }
+#write { max-width: 914px; color: rgb(51, 51, 51); }
+img { width: auto; max-width: 100%; }
+body { font-size: 1.5rem; box-sizing: border-box; }
+.ty-table-edit { background: rgb(237, 237, 237); }
+table { width: 100%; font-size: 1.125rem; }
+table > thead > tr > th, table > thead > tr > td, table > tbody > tr > th, table > tbody > tr > td, table > tfoot > tr > th, table > tfoot > tr > td { padding: 12px; line-height: 1.2; vertical-align: top; border-top: 1px solid rgb(51, 51, 51); }
+table > thead > tr > th { vertical-align: bottom; border-bottom: 2px solid rgb(51, 51, 51); }
+table > caption + thead > tr:first-child > th, table > caption + thead > tr:first-child > td, table > colgroup + thead > tr:first-child > th, table > colgroup + thead > tr:first-child > td, table > thead:first-child > tr:first-child > th, table > thead:first-child > tr:first-child > td { border-top: 0px; }
+table > tbody + tbody { border-top: 2px solid rgb(51, 51, 51); }
+p { font-weight: 300; line-height: 1.5; }
+abbr { border-bottom: 1px dotted black; cursor: help; }
+pre, code { font-family: Menlo, Monaco, "Courier New", monospace; }
+code, .md-fences { color: rgb(122, 122, 122); }
+.md-fences { padding: 0.5rem 1.125em; margin-bottom: 0.88em; font-size: 1rem; border: 1px solid rgb(122, 122, 122); }
+blockquote { padding: 1.33em; font-style: italic; border-left: 5px solid rgb(122, 122, 122); color: rgb(85, 85, 85); }
+blockquote em { color: rgb(0, 0, 0); }
+blockquote footer { font-size: 0.85rem; font-style: normal; background-color: rgb(255, 255, 255); color: rgb(122, 122, 122); border-color: transparent; }
+h1, .h1, h2, .h2, h3, .h3, h4, .h4, h5, .h5, h6, .h6 { font-family: Lato, "Helvetica Neue", Helvetica, sans-serif; font-weight: bold; line-height: 1.2; margin: 1em 0px 0.5em; }
+@media screen and (min-width: 48em) {
+  .h1, h1 { font-size: 3.25rem; }
+  .h2, h2 { font-size: 2.298rem; }
+  .h3, h3 { font-size: 1.625rem; }
+  .h4, h4 { font-size: 1.3rem; }
+  #write > h4.md-focus::before, #write > h5.md-focus::before, #write > h6.md-focus::before { top: 1px; }
+  .p, p, li { font-size: 1.25rem; line-height: 1.8; }
+  table { font-size: 1.25rem; }
+}
+@media (max-width: 48em) {
+  blockquote { margin-left: 1rem; margin-right: 0px; padding: 0.5em; }
+  .h1, h1 { font-size: 2.827rem; }
+  .h2, h2 { font-size: 1.999rem; }
+  .h3, h3 { font-size: 1.413rem; }
+  .h4, h4 { font-size: 1.3rem; }
+}
+@media screen and (min-width: 64em) {
+  .h1, h1 { font-size: 4.498rem; }
+  .h2, h2 { font-size: 2.29rem; }
+  .h3, h3 { font-size: 1.9rem; }
+  .h4, h4 { font-size: 1.591rem; }
+  #write > h4.md-focus::before { top: 4px; }
+}
+a { color: rgb(70, 63, 92); text-decoration: underline; }
+#write { padding-top: 2rem; }
+#write pre.md-meta-block { min-height: 35px; padding: 2000px 1em 10px 0px; white-space: pre; border-width: 0px 30px; border-top-style: initial; border-bottom-style: initial; border-top-color: initial; border-bottom-color: initial; border-image: initial; border-left-style: solid; border-left-color: rgb(248, 248, 248); border-right-style: solid; border-right-color: rgb(248, 248, 248); width: 100vw; max-width: calc(100% + 60px); margin-left: -30px; margin-bottom: 2em; margin-top: -2010px; line-height: 1.5em; color: rgb(122, 122, 122); background-color: rgb(250, 250, 250); font-family: Lato, "Helvetica Neue", Helvetica, sans-serif; font-weight: 300; clear: both; font-size: 1.125rem; }
+.md-image > .md-meta { color: rgb(70, 63, 92); }
+.footnotes { font-size: 1.1rem; }
+.md-tag { font-family: Lato, "Helvetica Neue", Helvetica, sans-serif; }
+.code-tooltip { background: white; }
+.code-tooltip-content { font-size: 1.1rem; }
+.task-list { padding-left: 0px; }
+.md-task-list-item { padding-left: 34px; }
+.md-task-list-item > input { width: 1.25rem; height: 1.25rem; display: block; -webkit-appearance: initial; top: -2px; margin-left: -1.6em; margin-top: calc(1rem - 7px); }
+.md-task-list-item > input:focus { outline: none; box-shadow: none; }
+.md-task-list-item > input::before { border: 1px solid rgb(85, 85, 85); border-radius: 1.5rem; width: 1.5rem; height: 1.5rem; background: rgb(255, 255, 255); content: " "; transition: background-color 200ms ease-in-out; display: block; }
+.md-task-list-item > input:checked::before, .md-task-list-item > input[checked]::before { background: rgb(51, 51, 51); border-width: 2px; display: inline-block; transition: background-color 200ms ease-in-out; }
+.md-task-list-item > input:checked::after, .md-task-list-item > input[checked]::after { opacity: 1; }
+.md-task-list-item > input::after { transition: opacity 0.05s ease-in-out; transform: rotate(-45deg); position: absolute; top: 0.4375rem; left: 0.28125rem; width: 0.9375rem; height: 0.5rem; border-width: 0px 0px 3px 3px; border-bottom-style: solid; border-left-style: solid; border-bottom-color: rgb(255, 255, 255); border-left-color: rgb(255, 255, 255); border-image: initial; border-top-style: initial; border-top-color: initial; border-right-style: initial; border-right-color: initial; content: " "; opacity: 0; }
+.md-tag { color: inherit; }
+.md-toc:focus .md-toc-content { margin-top: 19px; }
+#typora-sidebar { font-size: 1rem !important; }
+.html-for-mac #typora-sidebar { background-color: white; }
+.outline-content li, .outline-content ul { font-size: 1rem !important; }
+.outline-title { line-height: inherit; margin-top: 10px; }
+.outline-expander { width: 18px; }
+.outline-expander::before { content: "+"; font-family: inherit; color: rgb(108, 108, 108); font-size: 1.5rem; top: 0.1rem; }
+.outline-expander:hover::before { content: "+"; }
+.outline-item-open > .outline-item > .outline-expander::before { content: "-"; }
+#typora-source { font-family: Courier, monospace; color: rgb(106, 106, 106); }
+.os-windows #typora-source { font-family: inherit; }
+.cm-s-typora-default .cm-header, .cm-s-typora-default .cm-property, .CodeMirror.cm-s-typora-default div.CodeMirror-cursor { color: rgb(66, 139, 202); }
+.cm-s-typora-default .cm-atom, .cm-s-typora-default .cm-number { color: rgb(119, 119, 119); }
+.preference-item-hint { margin-top: 16px; }
+.md-diagram-panel { margin-top: 24px; margin-left: -1.2em; }
+.md-mathjax-midline { background: rgb(250, 250, 250); }
+.enable-diagrams pre.md-fences[lang="sequence"] .code-tooltip, .enable-diagrams pre.md-fences[lang="flow"] .code-tooltip, .enable-diagrams pre.md-fences[lang="mermaid"] .code-tooltip { bottom: -3.4em; }
+.dropdown-menu .divider { border-color: rgb(229, 229, 229); }
+
+
+
+
+
+ .typora-export p, .typora-export .footnote-line {white-space: normal;} 
+</style>
+</head>
+<body class='typora-export' >
+<div  id='write'  class = 'is-node'><h1><a name='header-n2' class='md-header-anchor '></a>User Manual</h1><div class='md-toc' mdtype='toc'><p class="md-toc-content"><span class="md-toc-item md-toc-h1" data-ref="n2"><a class="md-toc-inner" href="#header-n2">User Manual</a></span><span class="md-toc-item md-toc-h2" data-ref="n6"><a class="md-toc-inner" href="#header-n6">General information</a></span><span class="md-toc-item md-toc-h2" data-ref="n8"><a class="md-toc-inner" href="#header-n8">Getting started</a></span><span class="md-toc-item md-toc-h3" data-ref="n9"><a class="md-toc-inner" href="#header-n9">Download</a></span><span class="md-toc-item md-toc-h3" data-ref="n28"><a class="md-toc-inner" href="#header-n28">Installation</a></span><span class="md-toc-item md-toc-h2" data-ref="n47"><a class="md-toc-inner" href="#header-n47">Software overview</a></span><span class="md-toc-item md-toc-h3" data-ref="n48"><a class="md-toc-inner" href="#header-n48">Files panel</a></span><span class="md-toc-item md-toc-h3" data-ref="n59"><a class="md-toc-inner" href="#header-n59">Display panel</a></span><span class="md-toc-item md-toc-h3" data-ref="n61"><a class="md-toc-inner" href="#header-n61">Parameters panel</a></span><span class="md-toc-item md-toc-h3" data-ref="n142"><a class="md-toc-inner" href="#header-n142">Replay panel</a></span><span class="md-toc-item md-toc-h4" data-ref="n300"><a class="md-toc-inner" href="#header-n300">Open a tracking analysis</a></span><span class="md-toc-item md-toc-h4" data-ref="n144"><a class="md-toc-inner" href="#header-n144">Correct errors</a></span><span class="md-toc-item md-toc-h4" data-ref="n157"><a class="md-toc-inner" href="#header-n157">Correct rapidly a tracked images sequence</a></span><span class="md-toc-item md-toc-h2" data-ref="n189"><a class="md-toc-inner" href="#header-n189">Input files</a></span><span class="md-toc-item md-toc-h2" data-ref="n205"><a class="md-toc-inner" href="#header-n205">Output files</a></span><span class="md-toc-item md-toc-h2" data-ref="n276"><a class="md-toc-inner" href="#header-n276">For developers</a></span><span class="md-toc-item md-toc-h2" data-ref="n278"><a class="md-toc-inner" href="#header-n278">Performance</a></span></p></div><p>&nbsp;</p><h2><a name='header-n6' class='md-header-anchor '></a>General information</h2><p>Fishy Tracking is an application that allows the user to track multiple animals in video recording. The application takes a sequence of images and outputs a folder with the tracking data, the parameter used to produce the data and a log file. Fishy Tracking can operate on Linux, Mac, and Windows systems.</p><h2><a name='header-n8' class='md-header-anchor '></a>Getting started</h2><h3><a name='header-n9' class='md-header-anchor '></a>Download</h3><p>Stable versions of Fishy Tracking are released for Linux (installer or AppImage), MacOs (installer or dmg) and Windows (installer). Development versions are accessible from source and can be compiled for every system.</p><ol start='' ><li><p>Stable versions</p><ul><li>Download the installer for your system at <a href='http://fishytracking.benjamin-gallois.fr/download.html' target='_blank' class='url'>http://fishytracking.benjamin-gallois.fr/download.html</a>.</li></ul></li><li><p>Development versions</p><ul><li>Install OpenCV 4 on your system by following instructions at <a href='https://docs.opencv.org/4.0.0/df/d65/tutorial_table_of_content_introduction.html' target='_blank' class='url'>https://docs.opencv.org/4.0.0/df/d65/tutorial_table_of_content_introduction.html</a>.</li><li>Install Qt5 on your system by following instructions at <a href='http://doc.qt.io/qt-5/gettingstarted.html#offline-installation' target='_blank' class='url'>http://doc.qt.io/qt-5/gettingstarted.html#offline-installation</a>.</li><li>Download Fishy Tracking code source at <a href='https://git.benjamin-gallois.fr/bgallois/FishyTracking' target='_blank' class='url'>https://git.benjamin-gallois.fr/bgallois/FishyTracking</a>.</li><li>Referred to the developer user guide to compile the project.</li></ul></li></ol><h3><a name='header-n28' class='md-header-anchor '></a>Installation</h3><ol start='' ><li><p>With Fishy Tracking installer:</p><ul><li>Executes the installer and follows instructions.</li></ul></li><li><p>With Linux AppImage:</p><p>Allows FishyTracking.appimage to be executed:</p><ul><li>Right click on the AppImage file.</li><li>Click on properties.</li><li>Click on permissions.</li><li>Check &quot;allow executing the file as a program&quot;.</li></ul></li></ol><h2><a name='header-n47' class='md-header-anchor '></a>Software overview</h2><h3><a name='header-n48' class='md-header-anchor '></a>Files panel</h3><p>The files panel allows the user to add paths to folders where the images sequence to analyze are stored. Multiple paths can be added to analyze data in a bunch.</p><p>How to add movies to analyze?</p><ol start='' ><li><p>Add the path to the folder where the images sequence is stored:</p><ul><li>Click on the (1) button to select a folder or copy the folder path to (2) the path bar.</li></ul></li><li><p>Click on the (3) button to add the path to the list of movie to analyze.</p></li><li><p>Remove a path if necessary by selecting it in the (5) path table list and by clicking on the (4) button to remove the path.</p></li><li><p>Start the analysis by clicking on the (6) button start. </p></li></ol><p><img src='/home/benjamin/Codes/FishyTracking/UserManual/Files_Panel.png' alt='Files_Panel' referrerPolicy='no-referrer' /></p><h3><a name='header-n59' class='md-header-anchor '></a>Display panel</h3><p>The display panel shows the current analysis process by displaying the binary image (1) and the tracking image (2). The tracking can be extremely fast, to review the tracking please referred to the replay panel.</p><h3><a name='header-n61' class='md-header-anchor '></a>Parameters panel</h3><p>The parameters panel provides a mean to change the tracking parameters before or during analysis. We recommend finding a set of parameters by changing parameters one by one and controlling effects in the display panel. When an optimal set of parameters are found, restart the analysis.
+An interactive help to determine some parameters is available by clicking on the help button (1).</p><p>All parameters are saved and reloaded at each closing and opening of the program.</p><figure><table><thead><tr><th>Parameter</th><th>Range</th><th>Description</th></tr></thead><tbody><tr><td>Dilatation</td><td>0 to inf</td><td>Dilates detected objects. Sets to 0 for not dilatation.</td></tr><tr><td>Registration</td><td>yes, no</td><td>Registers images.</td></tr><tr><td>Light background</td><td>yes, no</td><td>yes: dark objects on light background, no: light object on dark background</td></tr><tr><td>ROI bottom y</td><td>0 to image height</td><td>0: no ROI. y-coordinate of the bottom right corner of the rectangle ROI.</td></tr><tr><td>ROI bottom x</td><td>0 to image width</td><td>0: no ROI. x-coordinate of the bottom right corner of the rectangle ROI.</td></tr><tr><td>ROI top y</td><td>0 to ROI bottom y</td><td>0: no ROI. y-coordinate of the top left corner of the rectangle ROI.</td></tr><tr><td>ROI top x</td><td>0 to ROI bottom x</td><td>0: no ROI. x-coordinate of the top left corner of the rectangle ROI.</td></tr><tr><td>Number of images background</td><td>1 to number of images in the image sequences</td><td>Number of images to average to compute the background. The images are taken at equal interval in the images sequence.</td></tr><tr><td>Arrow size</td><td>2 to inf</td><td>Size of the arrow displayed on the object in the tracking image in the display panel.</td></tr><tr><td>Maximal occlusion</td><td>0 to inf</td><td>Maximal distance in pixels that an object can travel when occluded.</td></tr><tr><td>Weight</td><td>0 to 1</td><td>Weight between difference in displacement or difference in direction to compute the cost (see matching method).</td></tr><tr><td>Maximal angle</td><td>0 to 360</td><td>Angle in degree that an object can change between two frames (see matching method).</td></tr><tr><td>Maximal length</td><td>0 to inf</td><td>Length that an object can travel between two frames (see matching method).</td></tr><tr><td>Spot to track</td><td>0, 1, 2</td><td>0: head, 1: tail, 2: body. Body part parameters (position and angle) used for the matching process (see matching method).</td></tr><tr><td>Binary threshold</td><td>0 to 255</td><td>Threshold value that separate background and foreground.</td></tr><tr><td>Minimal size</td><td>0 to maximal size</td><td>Minimal size in pixels of the tiniest object to track in the images sequences.</td></tr><tr><td>Maximal size</td><td>minimal size to inf</td><td>Maximal size in pixels of the biggest object to track in the images sequences.</td></tr><tr><td>Object number</td><td>1 to inf</td><td>Number of object to track.</td></tr></tbody></table></figure><p>&nbsp;</p><h3><a name='header-n142' class='md-header-anchor '></a>Replay panel</h3><p>The replay panel allows the user to open and see the result of a tracking analysis and to correct the tracking if errors are detected.</p><h4><a name='header-n300' class='md-header-anchor '></a>Open a tracking analysis</h4><ol><li>Clicks on the (1) button to open a folder where an images sequence previously analyzed is stored.</li><li>The images sequence is displayed in the (6) screen and can be played by clicking on the (5) button or by moving the (7) cursor.</li><li>You can change display option with (2) tick-boxes.</li></ol><h4><a name='header-n144' class='md-header-anchor '></a>Correct errors</h4><p>To correct a tracking error (mismatching between two objects):</p><ol start='' ><li><p>Get to the frame where the error occurs:</p><ul><li>By playing the image sequence and visually identify errors.</li><li>By clicking on (4) buttons to go to previous and next occlusion events where mismatching are the most probable to occurs.</li></ul></li><li><p>Left click on the first object or select the number of the first object in the (3) box. The box displays the number and the color of the selected object.</p></li><li><p>Left click on the second object or select the number of the second object in the (3) box. The box displays the number and the color of the selected object.</p></li><li><p>Right click on the (6) image or click on the (3) swap button to swap the two objects from the image displayed to the end of the images sequence.</p></li></ol><p><img src='/home/benjamin/Codes/FishyTracking/UserManual/Replay_Panel.png' alt='Replay_Panel' referrerPolicy='no-referrer' /></p><h4><a name='header-n157' class='md-header-anchor '></a>Correct rapidly a tracked images sequence</h4><p>Mouse and keyboards shortcuts are provided to the user to rapidly correct a tracked images sequence.</p><p>For AZERTY keyboard:</p><ul><li>Next image: Z</li><li>Previous image: S</li><li>Next occlusion: Q</li><li>Previous occlusion: D</li><li>Play: Space</li></ul><p>For QWERTY keyboard:</p><ul><li>Next image: W</li><li>Previous image: S</li><li>Next occlusion: A</li><li>Previous occlusion: D</li><li>Play: Space</li></ul><p>Mouse shortcuts:</p><ul><li>Left click to select objects.</li><li>Right click to swap objects.</li></ul><p><img src='/home/benjamin/Codes/FishyTracking/UserManual/helpImg.png' alt='helpImg' referrerPolicy='no-referrer' /></p><h2><a name='header-n189' class='md-header-anchor '></a>Input files</h2><p>Fishy Tracking analyzes images sequence. &quot;pgm&quot;, &quot;png&quot;, &quot;jpeg&quot;, &quot;jpg&quot;, &quot;tiff&quot;, &quot;tif&quot;, &quot;bmp&quot;, &quot;dib&quot;, &quot;jpe&quot;, &quot;jp2&quot;, &quot;webp&quot;, &quot;pbm&quot;, &quot;ppm&quot;, &quot;sr&quot;, &quot;ras&quot;, &quot;tif&quot; image formats are supported.</p><p>If you have recording in a video format, you need to convert it into images sequence as follow.</p><ol start='' ><li><p>For Linux, windows, and mac in command lines:</p><ul><li>Install ffmpeg.</li><li>In a terminal type: ffmpeg -i video.webm image-%03d.png</li></ul></li><li><p>For Linux, windows, and mac in graphical:</p><ul><li>Use Handbrake: <a href='https://handbrake.fr/' target='_blank' class='url'>https://handbrake.fr/</a> or ImageJ.</li></ul></li></ol><h2><a name='header-n205' class='md-header-anchor '></a>Output files</h2><p>When an analysis is started, Fishy Tracking creates a folder named Tracking_Result containing:</p><ul><li><p>tracking.txt containing the tracking data (in the frame of reference of the full image with the origin in the top left corner) as following:</p><figure><table><thead><tr><th>xHead</th><th>yHead</th><th>tHead</th><th>xTail</th><th>yTail</th><th>tTail</th><th>xBody</th><th>yBody</th><th>tBody</th><th>Curvature</th><th>ImageNumber</th><th>headMajorAxisLength</th><th>headMinorAxisLength</th><th>tailMajorAxisLength</th><th>tailMinorAxisLength</th></tr></thead><tbody><tr><td>x coordinate of the head. Object 1</td><td>y coordinate of the head. Object 1</td><td>Angle of the head. Object 1</td><td>x coordinate of the tail. Object 1</td><td>y coordinate of the tail. Object 1</td><td>Angle of the tail. Object 1</td><td>x coordinate of the body. Object 1</td><td>y coordinate of the body. Object 1</td><td>Angle of the body. Object 1</td><td>Curvature. Object 1</td><td>Image number. Object 1</td><td>Length of the major axis of the head equivalent ellipse. Object 1.</td><td>Length of the minor axis of the head equivalent ellipse. Object 1.</td><td>Length of the major axis of the tail equivalent ellipse. Object 1.</td><td>Length of the minor axis of the tail equivalent ellipse. Object 1.</td></tr><tr><td>x coordinate of the head. Object 2</td><td>y coordinate of the head. Object 2</td><td>Angle of the head. Object 2</td><td>x coordinate of the tail. Object 2</td><td>y coordinate of the tail. Object 2</td><td>Angle of the tail. Object 2</td><td>x coordinate of the body. Object 2</td><td>y coordinate of the body. Object 2</td><td>Angle of the body. Object 2</td><td>Curvature. Object 2</td><td>Image number. Object 2</td><td>Length of the major axis of the head equivalent ellipse. Object 2.</td><td>Length of the minor axis of the head equivalent ellipse. Object 2.</td><td>Length of the major axis of the tail equivalent ellipse. Object 2.</td><td>Length of the minor axis of the tail equivalent ellipse. Object 2.</td></tr><tr><td>x coordinate of the head. Object 1</td><td>y coordinate of the head. Object 1</td><td>Angle of the head. Object 1</td><td>x coordinate of the tail. Object 1</td><td>y coordinate of the tail. Object 1</td><td>Angle of the tail. Object 1</td><td>x coordinate of the body. Object 1</td><td>y coordinate of the body. Object 1</td><td>Angle of the body. Object 1</td><td>Curvature. Object 1</td><td>Image number. Object 1</td><td>Length of the major axis of the head equivalent ellipse. Object 1.</td><td>Length of the minor axis of the head equivalent ellipse. Object 1.</td><td>Length of the major axis of the tail equivalent ellipse. Object 1.</td><td>Length of the minor axis of the tail equivalent ellipse. Object 1.</td></tr><tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr></tbody></table></figure><p>Note: if you want to extract the data for a particular object:</p><p class='md-math-block'><div contenteditable="false" spellcheck="false" class="mathjax-block md-end-block md-math-block md-rawblock" id="mathjax-n272" cid="n272" mdtype="math_block"><div class="md-rawblock-container md-math-container" tabindex="-1"><span class="md-math-source"><span class="MathJax_Preview"></span><span class="MathJax_SVG_Display" style="text-align: center;"><span class="MathJax_SVG" id="MathJax-Element-1-Frame" tabindex="-1" style="font-size: 100%; display: inline-block;"><svg xmlns:xlink="http://www.w3.org/1999/xlink" width="59.194ex" height="2.577ex" viewBox="0 -806.1 25486.4 1109.7" role="img" focusable="false" style="vertical-align: -0.705ex;"><defs><path stroke-width="0" id="E1-MJMATHI-64" d="M366 683Q367 683 438 688T511 694Q523 694 523 686Q523 679 450 384T375 83T374 68Q374 26 402 26Q411 27 422 35Q443 55 463 131Q469 151 473 152Q475 153 483 153H487H491Q506 153 506 145Q506 140 503 129Q490 79 473 48T445 8T417 -8Q409 -10 393 -10Q359 -10 336 5T306 36L300 51Q299 52 296 50Q294 48 292 46Q233 -10 172 -10Q117 -10 75 30T33 157Q33 205 53 255T101 341Q148 398 195 420T280 442Q336 442 364 400Q369 394 369 396Q370 400 396 505T424 616Q424 629 417 632T378 637H357Q351 643 351 645T353 664Q358 683 366 683ZM352 326Q329 405 277 405Q242 405 210 374T160 293Q131 214 119 129Q119 126 119 118T118 106Q118 61 136 44T179 26Q233 26 290 98L298 109L352 326Z"></path><path stroke-width="0" id="E1-MJMATHI-61" d="M33 157Q33 258 109 349T280 441Q331 441 370 392Q386 422 416 422Q429 422 439 414T449 394Q449 381 412 234T374 68Q374 43 381 35T402 26Q411 27 422 35Q443 55 463 131Q469 151 473 152Q475 153 483 153H487Q506 153 506 144Q506 138 501 117T481 63T449 13Q436 0 417 -8Q409 -10 393 -10Q359 -10 336 5T306 36L300 51Q299 52 296 50Q294 48 292 46Q233 -10 172 -10Q117 -10 75 30T33 157ZM351 328Q351 334 346 350T323 385T277 405Q242 405 210 374T160 293Q131 214 119 129Q119 126 119 118T118 106Q118 61 136 44T179 26Q217 26 254 59T298 110Q300 114 325 217T351 328Z"></path><path stroke-width="0" id="E1-MJMATHI-74" d="M26 385Q19 392 19 395Q19 399 22 411T27 425Q29 430 36 430T87 431H140L159 511Q162 522 166 540T173 566T179 586T187 603T197 615T211 624T229 626Q247 625 254 615T261 596Q261 589 252 549T232 470L222 433Q222 431 272 431H323Q330 424 330 420Q330 398 317 385H210L174 240Q135 80 135 68Q135 26 162 26Q197 26 230 60T283 144Q285 150 288 151T303 153H307Q322 153 322 145Q322 142 319 133Q314 117 301 95T267 48T216 6T155 -11Q125 -11 98 4T59 56Q57 64 57 83V101L92 241Q127 382 128 383Q128 385 77 385H26Z"></path><path stroke-width="0" id="E1-MJMATHI-69" d="M184 600Q184 624 203 642T247 661Q265 661 277 649T290 619Q290 596 270 577T226 557Q211 557 198 567T184 600ZM21 287Q21 295 30 318T54 369T98 420T158 442Q197 442 223 419T250 357Q250 340 236 301T196 196T154 83Q149 61 149 51Q149 26 166 26Q175 26 185 29T208 43T235 78T260 137Q263 149 265 151T282 153Q302 153 302 143Q302 135 293 112T268 61T223 11T161 -11Q129 -11 102 10T74 74Q74 91 79 106T122 220Q160 321 166 341T173 380Q173 404 156 404H154Q124 404 99 371T61 287Q60 286 59 284T58 281T56 279T53 278T49 278T41 278H27Q21 284 21 287Z"></path><path stroke-width="0" id="E1-MJMAIN-3D" d="M56 347Q56 360 70 367H707Q722 359 722 347Q722 336 708 328L390 327H72Q56 332 56 347ZM56 153Q56 168 72 173H708Q722 163 722 153Q722 140 707 133H70Q56 140 56 153Z"></path><path stroke-width="0" id="E1-MJMAIN-28" d="M94 250Q94 319 104 381T127 488T164 576T202 643T244 695T277 729T302 750H315H319Q333 750 333 741Q333 738 316 720T275 667T226 581T184 443T167 250T184 58T225 -81T274 -167T316 -220T333 -241Q333 -250 318 -250H315H302L274 -226Q180 -141 137 -14T94 250Z"></path><path stroke-width="0" id="E1-MJMATHI-6F" d="M201 -11Q126 -11 80 38T34 156Q34 221 64 279T146 380Q222 441 301 441Q333 441 341 440Q354 437 367 433T402 417T438 387T464 338T476 268Q476 161 390 75T201 -11ZM121 120Q121 70 147 48T206 26Q250 26 289 58T351 142Q360 163 374 216T388 308Q388 352 370 375Q346 405 306 405Q243 405 195 347Q158 303 140 230T121 120Z"></path><path stroke-width="0" id="E1-MJMATHI-62" d="M73 647Q73 657 77 670T89 683Q90 683 161 688T234 694Q246 694 246 685T212 542Q204 508 195 472T180 418L176 399Q176 396 182 402Q231 442 283 442Q345 442 383 396T422 280Q422 169 343 79T173 -11Q123 -11 82 27T40 150V159Q40 180 48 217T97 414Q147 611 147 623T109 637Q104 637 101 637H96Q86 637 83 637T76 640T73 647ZM336 325V331Q336 405 275 405Q258 405 240 397T207 376T181 352T163 330L157 322L136 236Q114 150 114 114Q114 66 138 42Q154 26 178 26Q211 26 245 58Q270 81 285 114T318 219Q336 291 336 325Z"></path><path stroke-width="0" id="E1-MJMATHI-6A" d="M297 596Q297 627 318 644T361 661Q378 661 389 651T403 623Q403 595 384 576T340 557Q322 557 310 567T297 596ZM288 376Q288 405 262 405Q240 405 220 393T185 362T161 325T144 293L137 279Q135 278 121 278H107Q101 284 101 286T105 299Q126 348 164 391T252 441Q253 441 260 441T272 442Q296 441 316 432Q341 418 354 401T367 348V332L318 133Q267 -67 264 -75Q246 -125 194 -164T75 -204Q25 -204 7 -183T-12 -137Q-12 -110 7 -91T53 -71Q70 -71 82 -81T95 -112Q95 -148 63 -167Q69 -168 77 -168Q111 -168 139 -140T182 -74L193 -32Q204 11 219 72T251 197T278 308T289 365Q289 372 288 376Z"></path><path stroke-width="0" id="E1-MJMATHI-65" d="M39 168Q39 225 58 272T107 350T174 402T244 433T307 442H310Q355 442 388 420T421 355Q421 265 310 237Q261 224 176 223Q139 223 138 221Q138 219 132 186T125 128Q125 81 146 54T209 26T302 45T394 111Q403 121 406 121Q410 121 419 112T429 98T420 82T390 55T344 24T281 -1T205 -11Q126 -11 83 42T39 168ZM373 353Q367 405 305 405Q272 405 244 391T199 357T170 316T154 280T149 261Q149 260 169 260Q282 260 327 284T373 353Z"></path><path stroke-width="0" id="E1-MJMATHI-63" d="M34 159Q34 268 120 355T306 442Q362 442 394 418T427 355Q427 326 408 306T360 285Q341 285 330 295T319 325T330 359T352 380T366 386H367Q367 388 361 392T340 400T306 404Q276 404 249 390Q228 381 206 359Q162 315 142 235T121 119Q121 73 147 50Q169 26 205 26H209Q321 26 394 111Q403 121 406 121Q410 121 419 112T429 98T420 83T391 55T346 25T282 0T202 -11Q127 -11 81 37T34 159Z"></path><path stroke-width="0" id="E1-MJMATHI-4E" d="M234 637Q231 637 226 637Q201 637 196 638T191 649Q191 676 202 682Q204 683 299 683Q376 683 387 683T401 677Q612 181 616 168L670 381Q723 592 723 606Q723 633 659 637Q635 637 635 648Q635 650 637 660Q641 676 643 679T653 683Q656 683 684 682T767 680Q817 680 843 681T873 682Q888 682 888 672Q888 650 880 642Q878 637 858 637Q787 633 769 597L620 7Q618 0 599 0Q585 0 582 2Q579 5 453 305L326 604L261 344Q196 88 196 79Q201 46 268 46H278Q284 41 284 38T282 19Q278 6 272 0H259Q228 2 151 2Q123 2 100 2T63 2T46 1Q31 1 31 10Q31 14 34 26T39 40Q41 46 62 46Q130 49 150 85Q154 91 221 362L289 634Q287 635 234 637Z"></path><path stroke-width="0" id="E1-MJMATHI-75" d="M21 287Q21 295 30 318T55 370T99 420T158 442Q204 442 227 417T250 358Q250 340 216 246T182 105Q182 62 196 45T238 27T291 44T328 78L339 95Q341 99 377 247Q407 367 413 387T427 416Q444 431 463 431Q480 431 488 421T496 402L420 84Q419 79 419 68Q419 43 426 35T447 26Q469 29 482 57T512 145Q514 153 532 153Q551 153 551 144Q550 139 549 130T540 98T523 55T498 17T462 -8Q454 -10 438 -10Q372 -10 347 46Q345 45 336 36T318 21T296 6T267 -6T233 -11Q189 -11 155 7Q103 38 103 113Q103 170 138 262T173 379Q173 380 173 381Q173 390 173 393T169 400T158 404H154Q131 404 112 385T82 344T65 302T57 280Q55 278 41 278H27Q21 284 21 287Z"></path><path stroke-width="0" id="E1-MJMATHI-6D" d="M21 287Q22 293 24 303T36 341T56 388T88 425T132 442T175 435T205 417T221 395T229 376L231 369Q231 367 232 367L243 378Q303 442 384 442Q401 442 415 440T441 433T460 423T475 411T485 398T493 385T497 373T500 364T502 357L510 367Q573 442 659 442Q713 442 746 415T780 336Q780 285 742 178T704 50Q705 36 709 31T724 26Q752 26 776 56T815 138Q818 149 821 151T837 153Q857 153 857 145Q857 144 853 130Q845 101 831 73T785 17T716 -10Q669 -10 648 17T627 73Q627 92 663 193T700 345Q700 404 656 404H651Q565 404 506 303L499 291L466 157Q433 26 428 16Q415 -11 385 -11Q372 -11 364 -4T353 8T350 18Q350 29 384 161L420 307Q423 322 423 345Q423 404 379 404H374Q288 404 229 303L222 291L189 157Q156 26 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 112 181Q151 335 151 342Q154 357 154 369Q154 405 129 405Q107 405 92 377T69 316T57 280Q55 278 41 278H27Q21 284 21 287Z"></path><path stroke-width="0" id="E1-MJMATHI-72" d="M21 287Q22 290 23 295T28 317T38 348T53 381T73 411T99 433T132 442Q161 442 183 430T214 408T225 388Q227 382 228 382T236 389Q284 441 347 441H350Q398 441 422 400Q430 381 430 363Q430 333 417 315T391 292T366 288Q346 288 334 299T322 328Q322 376 378 392Q356 405 342 405Q286 405 239 331Q229 315 224 298T190 165Q156 25 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 114 189T154 366Q154 405 128 405Q107 405 92 377T68 316T57 280Q55 278 41 278H27Q21 284 21 287Z"></path><path stroke-width="0" id="E1-MJMAIN-29" d="M60 749L64 750Q69 750 74 750H86L114 726Q208 641 251 514T294 250Q294 182 284 119T261 12T224 -76T186 -143T145 -194T113 -227T90 -246Q87 -249 86 -250H74Q66 -250 63 -250T58 -247T55 -238Q56 -237 66 -225Q221 -64 221 250T66 725Q56 737 55 738Q55 746 60 749Z"></path><path stroke-width="0" id="E1-MJMAIN-2217" d="M229 286Q216 420 216 436Q216 454 240 464Q241 464 245 464T251 465Q263 464 273 456T283 436Q283 419 277 356T270 286L328 328Q384 369 389 372T399 375Q412 375 423 365T435 338Q435 325 425 315Q420 312 357 282T289 250L355 219L425 184Q434 175 434 161Q434 146 425 136T401 125Q393 125 383 131T328 171L270 213Q283 79 283 63Q283 53 276 44T250 35Q231 35 224 44T216 63Q216 80 222 143T229 213L171 171Q115 130 110 127Q106 124 100 124Q87 124 76 134T64 161Q64 166 64 169T67 175T72 181T81 188T94 195T113 204T138 215T170 230T210 250L74 315Q65 324 65 338Q65 353 74 363T98 374Q106 374 116 368T171 328L229 286Z"></path><path stroke-width="0" id="E1-MJMATHI-67" d="M311 43Q296 30 267 15T206 0Q143 0 105 45T66 160Q66 265 143 353T314 442Q361 442 401 394L404 398Q406 401 409 404T418 412T431 419T447 422Q461 422 470 413T480 394Q480 379 423 152T363 -80Q345 -134 286 -169T151 -205Q10 -205 10 -137Q10 -111 28 -91T74 -71Q89 -71 102 -80T116 -111Q116 -121 114 -130T107 -144T99 -154T92 -162L90 -164H91Q101 -167 151 -167Q189 -167 211 -155Q234 -144 254 -122T282 -75Q288 -56 298 -13Q311 35 311 43ZM384 328L380 339Q377 350 375 354T369 368T359 382T346 393T328 402T306 405Q262 405 221 352Q191 313 171 233T151 117Q151 38 213 38Q269 38 323 108L331 118L384 328Z"></path><path stroke-width="0" id="E1-MJMAIN-2B" d="M56 237T56 250T70 270H369V420L370 570Q380 583 389 583Q402 583 409 568V270H707Q722 262 722 250T707 230H409V-68Q401 -82 391 -82H389H387Q375 -82 369 -68V230H70Q56 237 56 250Z"></path></defs><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="matrix(1 0 0 -1 0 0)"><use xlink:href="#E1-MJMATHI-64" x="0" y="0"></use><use xlink:href="#E1-MJMATHI-61" x="523" y="0"></use><use xlink:href="#E1-MJMATHI-74" x="1052" y="0"></use><g transform="translate(1413,0)"><use xlink:href="#E1-MJMATHI-61" x="0" y="0"></use><use transform="scale(0.707)" xlink:href="#E1-MJMATHI-69" x="748" y="-213"></use></g><use xlink:href="#E1-MJMAIN-3D" x="2563" y="0"></use><use xlink:href="#E1-MJMAIN-28" x="3619" y="0"></use><use xlink:href="#E1-MJMATHI-6F" x="4008" y="0"></use><use xlink:href="#E1-MJMATHI-62" x="4493" y="0"></use><use xlink:href="#E1-MJMATHI-6A" x="4922" y="0"></use><use xlink:href="#E1-MJMATHI-65" x="5334" y="0"></use><use xlink:href="#E1-MJMATHI-63" x="5800" y="0"></use><use xlink:href="#E1-MJMATHI-74" x="6233" y="0"></use><use xlink:href="#E1-MJMATHI-4E" x="6594" y="0"></use><use xlink:href="#E1-MJMATHI-75" x="7482" y="0"></use><use xlink:href="#E1-MJMATHI-6D" x="8054" y="0"></use><use xlink:href="#E1-MJMATHI-62" x="8932" y="0"></use><use xlink:href="#E1-MJMATHI-65" x="9361" y="0"></use><use xlink:href="#E1-MJMATHI-72" x="9827" y="0"></use><use xlink:href="#E1-MJMAIN-29" x="10278" y="0"></use><use xlink:href="#E1-MJMAIN-2217" x="10889" y="0"></use><use xlink:href="#E1-MJMATHI-69" x="11611" y="0"></use><use xlink:href="#E1-MJMATHI-6D" x="11956" y="0"></use><use xlink:href="#E1-MJMATHI-61" x="12834" y="0"></use><use xlink:href="#E1-MJMATHI-67" x="13363" y="0"></use><use xlink:href="#E1-MJMATHI-65" x="13843" y="0"></use><use xlink:href="#E1-MJMATHI-4E" x="14309" y="0"></use><use xlink:href="#E1-MJMATHI-75" x="15197" y="0"></use><use xlink:href="#E1-MJMATHI-6D" x="15769" y="0"></use><use xlink:href="#E1-MJMATHI-62" x="16647" y="0"></use><use xlink:href="#E1-MJMATHI-65" x="17076" y="0"></use><use xlink:href="#E1-MJMATHI-72" x="17542" y="0"></use><use xlink:href="#E1-MJMAIN-2B" x="18216" y="0"></use><use xlink:href="#E1-MJMATHI-6F" x="19216" y="0"></use><use xlink:href="#E1-MJMATHI-62" x="19701" y="0"></use><use xlink:href="#E1-MJMATHI-6A" x="20130" y="0"></use><use xlink:href="#E1-MJMATHI-65" x="20542" y="0"></use><use xlink:href="#E1-MJMATHI-63" x="21008" y="0"></use><use xlink:href="#E1-MJMATHI-74" x="21441" y="0"></use><use xlink:href="#E1-MJMATHI-4E" x="21802" y="0"></use><use xlink:href="#E1-MJMATHI-75" x="22690" y="0"></use><use xlink:href="#E1-MJMATHI-6D" x="23262" y="0"></use><use xlink:href="#E1-MJMATHI-62" x="24140" y="0"></use><use xlink:href="#E1-MJMATHI-65" x="24569" y="0"></use><use xlink:href="#E1-MJMATHI-72" x="25035" y="0"></use></g></svg></span></span><script type="math/tex; mode=display" id="MathJax-Element-1">data_i = (objectNumber)*imageNumber + objectNumber</script></span></div></div></p><p>with objectNumber the object number {1, 2, 3, ...}, imageNumber the image number {0, 1, 2, ...}.</p></li><li><p>parameters.txt containing the set of parameters at the beginning of the analysis, changes during the analysis are not saved.</p></li></ul><h2><a name='header-n276' class='md-header-anchor '></a>For developers</h2><p>A complete API and developer documentation is available. It can be generated for the latest version of Fishy Tracking by executing ./generateDocumentation.sh. A folder Documentation is created with the developer documentation.</p><h2><a name='header-n278' class='md-header-anchor '></a>Performance</h2><p>The performance can vary with the selected parameters. Registration and dilatation can cause a loss of 50% in performance. The number of objects influences the performance as the cube of the object number.</p><p>&nbsp;</p><p>Revised: 2018/12/26</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p></div>
+</body>
+</html>

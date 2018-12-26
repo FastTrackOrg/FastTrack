@@ -55,19 +55,19 @@ How to add movies to analyze?
 
 ### Display panel
 
-The display panel shows the current analysis process by displaying the binary image (1) and the tracking image (2). The tracking can be extremely fast, to review the tracking referred to the replay panel.
+The display panel shows the current analysis process by displaying the binary image (1) and the tracking image (2). The tracking can be extremely fast, to review the tracking please referred to the replay panel.
 
 ### Parameters panel
 
 The parameters panel provides a mean to change the tracking parameters before or during analysis. We recommend finding a set of parameters by changing parameters one by one and controlling effects in the display panel. When an optimal set of parameters are found, restart the analysis.
-An interactive help to determine some parameters is available by clicking on the help button at the bottom of the panel.
+An interactive help to determine some parameters is available by clicking on the help button (1).
 
-Parameters set are saved and reload at each closing and opening of the program.
+All parameters are saved and reloaded at each closing and opening of the program.
 
 | Parameter                   | Range                                        | Description                                                  |
 | --------------------------- | -------------------------------------------- | ------------------------------------------------------------ |
-| Dilatation                  | 0 to inf                                     | Dilates detected objects                                     |
-| Registration                | yes, no                                      | Registers images                                             |
+| Dilatation                  | 0 to inf                                     | Dilates detected objects. Sets to 0 for not dilatation.      |
+| Registration                | yes, no                                      | Registers images.                                            |
 | Light background            | yes, no                                      | yes: dark objects on light background, no: light object on dark background |
 | ROI bottom y                | 0 to image height                            | 0: no ROI. y-coordinate of the bottom right corner of the rectangle ROI. |
 | ROI bottom x                | 0 to image width                             | 0: no ROI. x-coordinate of the bottom right corner of the rectangle ROI. |
@@ -91,22 +91,28 @@ Parameters set are saved and reload at each closing and opening of the program.
 
 The replay panel allows the user to open and see the result of a tracking analysis and to correct the tracking if errors are detected.
 
+#### Open a tracking analysis
+
+1. Clicks on the (1) button to open a folder where an images sequence previously analyzed is stored.
+2. The images sequence is displayed in the (6) screen and can be played by clicking on the (5) button or by moving the (7) cursor.
+3. You can change display option with (2) tick-boxes.
+
 #### Correct errors
 
 To correct a tracking error (mismatching between two objects):
 
-1. Get to the frame where the error occurs.
-2. Left click on the first object or select the number of the first object in the combo box in the top left. The box displays the number and the color of the selected object.
-3. Left click on the second object or select the number of the second object in the other combo box in the top left corner.
-4. Right click on the image to swap the two objects from the image displayed to the end of the images sequence, or click on the swap button at the right of the two combo box.
+1. Get to the frame where the error occurs:
+   - By playing the image sequence and visually identify errors.
+   - By clicking on (4) buttons to go to previous and next occlusion events where mismatching are the most probable to occurs.
+2. Left click on the first object or select the number of the first object in the (3) box. The box displays the number and the color of the selected object.
+3. Left click on the second object or select the number of the second object in the (3) box. The box displays the number and the color of the selected object.
+4. Right click on the (6) image or click on the (3) swap button to swap the two objects from the image displayed to the end of the images sequence.
 
-#### Occlusion events review
-
-The tracking error occurs mostly during occlusion events. An occlusion review mode is available by clicking on the next and previous button at the top right of the image. This will display an image where an occlusion event occurs.
+![Replay_Panel](/home/benjamin/Codes/FishyTracking/UserManual/Replay_Panel.png)
 
 #### Correct rapidly a tracked images sequence
 
-Mouse and keyboards shortcuts provide to the user a main to rapidly correct a tracked image sequence.
+Mouse and keyboards shortcuts are provided to the user to rapidly correct a tracked images sequence.
 
 For AZERTY keyboard:
 
@@ -129,16 +135,18 @@ Mouse shortcuts:
 - Left click to select objects.
 - Right click to swap objects.
 
+![helpImg](/home/benjamin/Codes/FishyTracking/UserManual/helpImg.png)
+
 ## Input files
 
 Fishy Tracking analyzes images sequence. "pgm", "png", "jpeg", "jpg", "tiff", "tif", "bmp", "dib", "jpe", "jp2", "webp", "pbm", "ppm", "sr", "ras", "tif" image formats are supported.
 
-If you have recorded in video format, you need to convert it into images sequence as follow.
+If you have recording in a video format, you need to convert it into images sequence as follow.
 
-1. For Linux, windows, and mac in command lines
+1. For Linux, windows, and mac in command lines:
    - Install ffmpeg.
    - In a terminal type: ffmpeg -i video.webm image-%03d.png
-2. For Linux, windows, and mac in graphical
+2. For Linux, windows, and mac in graphical:
    - Use Handbrake: https://handbrake.fr/ or ImageJ.
 
 ## Output files
@@ -147,12 +155,12 @@ When an analysis is started, Fishy Tracking creates a folder named Tracking_Resu
 
 - tracking.txt containing the tracking data (in the frame of reference of the full image with the origin in the top left corner) as following:
 
-  | xHead                              | yHead                              | tHead                       | xTail                              | yTail                              | tTail                       | xBody                              | yBody                              | tBody                       | Curvature           | ImageNumber            |
-  | ---------------------------------- | ---------------------------------- | --------------------------- | ---------------------------------- | ---------------------------------- | --------------------------- | ---------------------------------- | ---------------------------------- | --------------------------- | ------------------- | ---------------------- |
-  | x coordinate of the head. Object 1 | y coordinate of the head. Object 1 | Angle of the head. Object 1 | x coordinate of the tail. Object 1 | y coordinate of the tail. Object 1 | Angle of the tail. Object 1 | x coordinate of the body. Object 1 | y coordinate of the body. Object 1 | Angle of the body. Object 1 | Curvature. Object 1 | Image number. Object 1 |
-  | x coordinate of the head. Object 2 | y coordinate of the head. Object 2 | Angle of the head. Object 2 | x coordinate of the tail. Object 2 | y coordinate of the tail. Object 2 | Angle of the tail. Object 2 | x coordinate of the body. Object 2 | y coordinate of the body. Object 2 | Angle of the body. Object 2 | Curvature. Object 2 | Image number. Object 2 |
-  | x coordinate of the head. Object 1 | y coordinate of the head. Object 1 | Angle of the head. Object 1 | x coordinate of the tail. Object 1 | y coordinate of the tail. Object 1 | Angle of the tail. Object 1 | x coordinate of the body. Object 1 | y coordinate of the body. Object 1 | Angle of the body. Object 1 | Curvature. Object 1 | Image number. Object 1 |
-  | ...                                | ...                                | ...                         | ...                                | ...                                | ...                         | ...                                | ...                                | ...                         | ...                 | ...                    |
+  | xHead                              | yHead                              | tHead                       | xTail                              | yTail                              | tTail                       | xBody                              | yBody                              | tBody                       | Curvature           | ImageNumber            | headMajorAxisLength                                          | headMinorAxisLength                                          | tailMajorAxisLength                                          | tailMinorAxisLength                                          |
+  | ---------------------------------- | ---------------------------------- | --------------------------- | ---------------------------------- | ---------------------------------- | --------------------------- | ---------------------------------- | ---------------------------------- | --------------------------- | ------------------- | ---------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
+  | x coordinate of the head. Object 1 | y coordinate of the head. Object 1 | Angle of the head. Object 1 | x coordinate of the tail. Object 1 | y coordinate of the tail. Object 1 | Angle of the tail. Object 1 | x coordinate of the body. Object 1 | y coordinate of the body. Object 1 | Angle of the body. Object 1 | Curvature. Object 1 | Image number. Object 1 | Length of the major axis of the head equivalent ellipse. Object 1. | Length of the minor axis of the head equivalent ellipse. Object 1. | Length of the major axis of the tail equivalent ellipse. Object 1. | Length of the minor axis of the tail equivalent ellipse. Object 1. |
+  | x coordinate of the head. Object 2 | y coordinate of the head. Object 2 | Angle of the head. Object 2 | x coordinate of the tail. Object 2 | y coordinate of the tail. Object 2 | Angle of the tail. Object 2 | x coordinate of the body. Object 2 | y coordinate of the body. Object 2 | Angle of the body. Object 2 | Curvature. Object 2 | Image number. Object 2 | Length of the major axis of the head equivalent ellipse. Object 2. | Length of the minor axis of the head equivalent ellipse. Object 2. | Length of the major axis of the tail equivalent ellipse. Object 2. | Length of the minor axis of the tail equivalent ellipse. Object 2. |
+  | x coordinate of the head. Object 1 | y coordinate of the head. Object 1 | Angle of the head. Object 1 | x coordinate of the tail. Object 1 | y coordinate of the tail. Object 1 | Angle of the tail. Object 1 | x coordinate of the body. Object 1 | y coordinate of the body. Object 1 | Angle of the body. Object 1 | Curvature. Object 1 | Image number. Object 1 | Length of the major axis of the head equivalent ellipse. Object 1. | Length of the minor axis of the head equivalent ellipse. Object 1. | Length of the major axis of the tail equivalent ellipse. Object 1. | Length of the minor axis of the tail equivalent ellipse. Object 1. |
+  | ...                                | ...                                | ...                         | ...                                | ...                                | ...                         | ...                                | ...                                | ...                         | ...                 | ...                    |                                                              |                                                              |                                                              |                                                              |
 
   Note: if you want to extract the data for a particular object:
   $$
@@ -172,7 +180,7 @@ The performance can vary with the selected parameters. Registration and dilatati
 
 
 
-Revised: 2018/12/22
+Revised: 2018/12/26
 
 
 

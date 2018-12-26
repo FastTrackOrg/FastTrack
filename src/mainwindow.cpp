@@ -639,7 +639,7 @@ void MainWindow::correctTracking() {
     QFile file(ui->replayPath->text()+ QDir::separator() + "Tracking_Result" + QDir::separator() + "tracking.txt");
     if (file.open(QFile::WriteOnly | QFile::Text)) {
       QTextStream out(&file);
-      out << "xHead" << '\t' << "yHead" << '\t' << "tHead" << '\t'  << "xTail" << '\t' << "yTail      " << '\t' << "tTail"   << '\t'  << "xBody" << '\t' << "yBody" << '\t' << "tBody"   << '\t'  << "cur      vature" << '\t' << "headMajorAxisLength" << '\t' << "headMinorAxisLength" << '\t' << "tailMajorAxis" << '\t' << "tailMinorAxis" << '\t'  << "imageNumber" << endl; 
+      out << "xHead" << '\t' << "yHead" << '\t' << "tHead" << '\t'  << "xTail" << '\t' << "yTail      " << '\t' << "tTail"   << '\t'  << "xBody" << '\t' << "yBody" << '\t' << "tBody"   << '\t'  << "curvature" << '\t' << "headMajorAxisLength" << '\t' << "headMinorAxisLength" << '\t' << "tailMajorAxis" << '\t' << "tailMinorAxis" << '\t'  << "imageNumber" << endl; 
       for(auto& a: replayTracking) {
         out << a << endl;
       }
