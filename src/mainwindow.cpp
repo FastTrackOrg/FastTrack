@@ -351,7 +351,7 @@ void MainWindow::display(UMat &visu, UMat &cameraFrame){
   * @brief Loads a settings file settings.ini at the start up of the program and updates the ui->parameterTable with the new parameters.
 */
 void MainWindow::loadSettings() {
-    settingsFile = new QSettings("settings.ini", QSettings::NativeFormat, this);
+    settingsFile = new QSettings("FishyTracking", "Benjamin Gallois", this);
     QStringList keyList = settingsFile->allKeys(); 
 
     for(auto a: keyList) {
