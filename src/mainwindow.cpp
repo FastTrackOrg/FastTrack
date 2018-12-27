@@ -79,6 +79,10 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->replayHelp->setIcon(img);
     ui->replayHelp->setIconSize(QSize(ui->replayHelp->width(), ui->replayHelp->height()));
     
+    img = QIcon(":/buttons/save.png");
+    ui->replaySave->setIcon(img);
+    ui->replaySave->setIconSize(QSize(ui->replaySave->width(), ui->replaySave->height()));
+    
     setupWindow = new SetupWindow(this);
     connect(ui->setupWindow, &QPushButton::clicked, [this]() {
       setupWindow->show();
@@ -180,6 +184,7 @@ MainWindow::MainWindow(QWidget *parent) :
       ui->replayNumber->setText(QString::number(newValue));
     });
     connect(ui->swapReplay, &QPushButton::clicked, this, &MainWindow::correctTracking);
+    
     connect(framerate, &QTimer::timeout, [this]() {
       ui->replaySlider->setValue(autoPlayerIndex);
       autoPlayerIndex++;
@@ -187,9 +192,18 @@ MainWindow::MainWindow(QWidget *parent) :
         autoPlayerIndex = 0;
       }
     });
+    connect(ui->replayFps, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [this]() {
+      if (isReplayable && ui->playReplay->isChecked()) {
+        framerate->stop();
+        framerate->start(1000/ui->replayFps->value());
+      }
+    });
     connect(ui->playReplay, &QPushButton::clicked, this, &MainWindow::toggleReplayPlay);
+    
     connect(ui->replayNext, &QPushButton::clicked, this, &MainWindow::nextOcclusionEvent);
     connect(ui->replayPrevious, &QPushButton::clicked, this, &MainWindow::previousOcclusionEvent);
+
+    connect(ui->replaySave, &QPushButton::clicked, this, &MainWindow::saveTrackedMovie);
 
     connect(ui->replayHelp, &QPushButton::clicked, [this]() {
           QMessageBox helpBox(this);
@@ -535,7 +549,7 @@ void MainWindow::toggleReplayPlay() {
       QIcon img(":/buttons/pause.png");
       ui->playReplay->setIcon(img);
       ui->playReplay->setIconSize(QSize(ui->playReplay->width(), ui->playReplay->height()));
-      framerate->start(40);
+      framerate->start(1000/ui->replayFps->value());
       autoPlayerIndex = ui->replaySlider->value();
     }
     else if (isReplayable && !ui->playReplay->isChecked()) {
@@ -671,6 +685,53 @@ void MainWindow::previousOcclusionEvent() {
       int current = ui->replaySlider->value();
       int previousOcclusion = occlusionEvents.at(std::upper_bound(occlusionEvents.begin(), occlusionEvents.end(), current) - occlusionEvents.begin() - 2);
       ui->replaySlider->setValue(previousOcclusion);
+    }
+}
+
+
+/**
+  * @brief Saves the tracked movie in an avi.
+  * @detailed Triggered when ui->previousReplay is pressed.
+*/
+void MainWindow::saveTrackedMovie() {
+    
+    // If tracking data are available, get the display setting and saves the movie in the
+    // selected folder
+    if( isReplayable ){
+      QString savePath = QFileDialog::getSaveFileName(this, tr("Save File"), "/home/save.avi", tr("Videos (*.avi)"));
+      cv::VideoWriter outputVideo(savePath.toStdString(), cv::VideoWriter::fourcc('M', 'J', 'P', 'G'), ui->replayFps->value(), Size(originalImageSize.width(), originalImageSize.height()));
+      int scale = ui->replaySize->value();
+     
+     for(size_t frameIndex = 0; frameIndex < replayFrames.size(); frameIndex++) { 
+        Mat frame = imread(replayFrames.at(frameIndex), IMREAD_COLOR);
+       
+        // Takes the tracking data corresponding to the replayed frame and parse data to display
+        // arrow on tracked objects.
+        for (size_t i = frameIndex*replayNumberObject; i < frameIndex*replayNumberObject + replayNumberObject; i++) {
+          
+          if (replayTracking.at(i) == "NaN") {
+            continue;
+          }
+
+          QStringList coordinate = replayTracking.at(i).split('\t', QString::SkipEmptyParts);
+
+          if (ui->replayEllipses->isChecked()) {
+          cv::ellipse(frame, Point( coordinate.at(0).toDouble(), coordinate.at(1).toDouble() ), Size( coordinate.at(10).toDouble(), coordinate.at(11).toDouble() ), 180 - (coordinate.at(2).toDouble()*180)/M_PI, 0, 360,  Scalar(colorMap.at(i - frameIndex*replayNumberObject).x, colorMap.at(i - frameIndex*replayNumberObject).y, colorMap.at(i - frameIndex*replayNumberObject).z), scale, 8 );
+            cv::ellipse(frame, Point( coordinate.at(3).toDouble(), coordinate.at(4).toDouble() ), Size( coordinate.at(12).toDouble(), coordinate.at(13).toDouble() ), 180 - (coordinate.at(5).toDouble()*180)/M_PI, 0, 360,  Scalar(colorMap.at(i - frameIndex*replayNumberObject).x, colorMap.at(i - frameIndex*replayNumberObject).y, colorMap.at(i - frameIndex*replayNumberObject).z), scale, cv::LINE_AA );
+          }
+
+          if (ui->replayArrows->isChecked()) {
+            cv::arrowedLine(frame, Point(coordinate.at(0).toDouble(), coordinate.at(1).toDouble()), Point(coordinate.at(0).toDouble() + coordinate.at(10).toDouble()*cos(coordinate.at(2).toDouble()), coordinate.at(1).toDouble() - coordinate.at(10).toDouble()*sin(coordinate.at(2).toDouble())), Scalar(colorMap.at(i - frameIndex*replayNumberObject).x, colorMap.at(i - frameIndex*replayNumberObject).y, colorMap.at(i - frameIndex*replayNumberObject).z), scale, cv::LINE_AA, 0, double(scale)/10);
+          }
+          
+          if (ui->replayNumbers->isChecked()) {
+            cv::putText(frame, to_string(i - frameIndex*replayNumberObject), Point(coordinate.at(0).toDouble() + coordinate.at(10).toDouble()*cos(coordinate.at(2).toDouble()), coordinate.at(1).toDouble() - coordinate.at(10).toDouble()*sin(coordinate.at(2).toDouble()) ), cv::FONT_HERSHEY_SIMPLEX, double(scale)*0.5, Scalar(colorMap.at(i - frameIndex*replayNumberObject).x, colorMap.at(i - frameIndex*replayNumberObject).y, colorMap.at(i - frameIndex*replayNumberObject).z), scale*1.2, cv::LINE_AA);
+          }
+        }
+      outputVideo.write(frame);
+      ui->replaySlider->setValue(frameIndex);
+      }
+      outputVideo.release();
     }
 }
 

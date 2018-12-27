@@ -113,6 +113,7 @@ public slots:
     void correctTracking();
     void nextOcclusionEvent();
     void previousOcclusionEvent();
+    void saveTrackedMovie();
 signals:
   /**
   * @brief Emitted when a parameter is changed.

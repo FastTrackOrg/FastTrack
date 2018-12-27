@@ -9,6 +9,7 @@
         <file>buttons/previous.png</file>
         <file>buttons/next.png</file>
         <file>buttons/help.png</file>
+        <file>buttons/save.png</file>
         <file>buttons/helpImg.png</file>
     </qresource>
 </RCC>
