@@ -1,3 +1,5 @@
+
+
 # User Manual
 
 [TOC]
@@ -8,11 +10,13 @@
 
 Fishy Tracking is an application that allows the user to track multiple animals in video recording. The application takes a sequence of images and outputs a folder with the tracking data, the parameter used to produce the data and a log file. Fishy Tracking can operate on Linux, Mac, and Windows systems.
 
+The software provides to the user an automatic tracking and a facultative manual review of the tracking where errors can be corrected easily on-the-fly.
+
 ## Getting started
 
 ### Download
 
-Stable versions of Fishy Tracking are released for Linux (installer or AppImage), MacOs (installer or dmg) and Windows (installer). Development versions are accessible from source and can be compiled for every system.
+Stable versions of Fishy Tracking are released for Linux (AppImage file), MacOs (dmg file) and Windows (installer). Development version is accessible from source and can be compiled for every system.
 
 1. Stable versions
    - Download the installer for your system at http://fishytracking.benjamin-gallois.fr/download.html.
@@ -26,7 +30,7 @@ Stable versions of Fishy Tracking are released for Linux (installer or AppImage)
 
 1. With Fishy Tracking installer:
 
-   - Executes the installer and follows instructions.
+   - Executes the installer and follows instructions. 
 
 2. With Linux AppImage:
 
@@ -37,25 +41,29 @@ Stable versions of Fishy Tracking are released for Linux (installer or AppImage)
    - Click on permissions.
    - Check "allow executing the file as a program".
 
+3. With MacOs dmg file:
+
+   - Drag the application from the dmg file window into /Applications. 
+
 ##  Software overview
 
 ### Files panel
 
-The files panel allows the user to add paths to folders where the images sequence to analyze are stored. Multiple paths can be added to analyze data in a bunch.
+The files panel allows the user to add paths to folders where the image sequence to analyze are stored. Multiple paths can be added to analyze data in a bunch.
 
-How to add movies to analyze?
+How to add image sequences to analyze?
 
-1. Add the path to the folder where the images sequence is stored:
+1. Add the path to the folder where the image sequence is stored:
    - Click on the (1) button to select a folder or copy the folder path to (2) the path bar.
-2. Click on the (3) button to add the path to the list of movie to analyze.
+2. Click on the (3) button to add the path to the list of movie to analyze (5).
 3. Remove a path if necessary by selecting it in the (5) path table list and by clicking on the (4) button to remove the path.
 4. Start the analysis by clicking on the (6) button start. 
 
-![Files_Panel](/home/benjamin/Codes/FishyTracking/UserManual/Files_Panel.png)
+![Files_Panel](Files_Panel.png)
 
 ### Display panel
 
-The display panel shows the current analysis process by displaying the binary image (1) and the tracking image (2). The tracking can be extremely fast, to review the tracking please referred to the replay panel.
+The display panel shows the current analysis processus by displaying the binary image (1) and the tracking image (2). The tracking can be extremely fast, to review the tracking please referred to the replay panel.
 
 ### Parameters panel
 
@@ -73,7 +81,7 @@ All parameters are saved and reloaded at each closing and opening of the program
 | ROI bottom x                | 0 to image width                             | 0: no ROI. x-coordinate of the bottom right corner of the rectangle ROI. |
 | ROI top y                   | 0 to ROI bottom y                            | 0: no ROI. y-coordinate of the top left corner of the rectangle ROI. |
 | ROI top x                   | 0 to ROI bottom x                            | 0: no ROI. x-coordinate of the top left corner of the rectangle ROI. |
-| Number of images background | 1 to number of images in the image sequences | Number of images to average to compute the background. The images are taken at equal interval in the images sequence. |
+| Number of images background | 1 to number of images in the image sequences | Number of images to average to compute the background. The images are taken at equal interval in the image sequence. |
 | Arrow size                  | 2 to inf                                     | Size of the arrow displayed on the object in the tracking image in the display panel. |
 | Maximal occlusion           | 0 to inf                                     | Maximal distance in pixels that an object can travel when occluded. |
 | Weight                      | 0 to 1                                       | Weight between difference in displacement or difference in direction to compute the cost (see matching method). |
@@ -81,11 +89,28 @@ All parameters are saved and reloaded at each closing and opening of the program
 | Maximal length              | 0 to inf                                     | Length that an object can travel between two frames (see matching method). |
 | Spot to track               | 0, 1, 2                                      | 0: head, 1: tail, 2: body. Body part parameters (position and angle) used for the matching process (see matching method). |
 | Binary threshold            | 0 to 255                                     | Threshold value that separate background and foreground.     |
-| Minimal size                | 0 to maximal size                            | Minimal size in pixels of the tiniest object to track in the images sequences. |
-| Maximal size                | minimal size to inf                          | Maximal size in pixels of the biggest object to track in the images sequences. |
+| Minimal size                | 0 to maximal size                            | Minimal size in pixels of the tiniest object to track in the image sequences. |
+| Maximal size                | minimal size to inf                          | Maximal size in pixels of the biggest object to track in the image sequences. |
 | Object number               | 1 to inf                                     | Number of object to track.                                   |
 
+#### Help parameter panel
 
+An semi-automatic help is provided to help the user to setup the size of the tracked objects. Open the Setup Help window by clicking the (1) help button.
+
+- Open an image by clicking on the Open image button.
+
+![Help_Panel_1](Help_Panel_0.png)
+
+- Select a typical object by clicking and dragging the mouse to enclose the object in the green rectangle.
+- Click on the Crop button to crop the image.
+
+![Help_Panel_3](Help_Panel_1.png)
+
+- Threshold the object by displacing the slider.
+- Tick/untick the Invert tick-box to have a white object on black background.
+- Click on the Compute button to display the recommended maximal and minimal area parameters.
+
+![Help_Panel_0](Help_Panel_3.png)
 
 ### Replay panel
 
@@ -93,9 +118,9 @@ The replay panel allows the user to open and see the result of a tracking analys
 
 #### Open a tracking analysis
 
-1. Clicks on the (1) button to open a folder where an images sequence previously analyzed is stored.
-2. The images sequence is displayed in the (6) screen and can be played by clicking on the (5) button or by moving the (7) cursor.
-3. You can change display option with (2) tick-boxes.
+1. Clicks on the (1) button to open a folder where an image sequence previously analyzed is stored.
+2. The image sequence is displayed in the (6) screen and can be played by clicking on the (5) button or by moving the (7) cursor. The frame rate can be chosen with the (7) box.
+3. You can change display options with (2) tick-boxes.
 
 #### Correct errors
 
@@ -106,13 +131,19 @@ To correct a tracking error (mismatching between two objects):
    - By clicking on (4) buttons to go to previous and next occlusion events where mismatching are the most probable to occurs.
 2. Left click on the first object or select the number of the first object in the (3) box. The box displays the number and the color of the selected object.
 3. Left click on the second object or select the number of the second object in the (3) box. The box displays the number and the color of the selected object.
-4. Right click on the (6) image or click on the (3) swap button to swap the two objects from the image displayed to the end of the images sequence.
+4. Right click on the (6) image or click on the (3) swap button to swap the two objects from the image displayed to the end of the image sequence.
 
-![Replay_Panel](/home/benjamin/Codes/FishyTracking/UserManual/Replay_Panel.png)
+#### Save tracking movie
 
-#### Correct rapidly a tracked images sequence
+The result of the tracking can be saved by selecting the display options (2) and the frame rate (8) and by clicking the (8) button. The movie is saved in .avi container with the MJPEG codec.
 
-Mouse and keyboards shortcuts are provided to the user to rapidly correct a tracked images sequence.
+In case of error, check that you have the MJPEG codec available on your system.
+
+![Replay_Panel](Replay_Panel.png)
+
+#### Correct rapidly a tracked image sequence
+
+Mouse and keyboards shortcuts are provided to rapidly correct a tracked image sequence.
 
 For AZERTY keyboard:
 
@@ -135,18 +166,18 @@ Mouse shortcuts:
 - Left click to select objects.
 - Right click to swap objects.
 
-![helpImg](/home/benjamin/Codes/FishyTracking/UserManual/helpImg.png)
+![helpImg](helpImg.png)
 
 ## Input files
 
-Fishy Tracking analyzes images sequence. "pgm", "png", "jpeg", "jpg", "tiff", "tif", "bmp", "dib", "jpe", "jp2", "webp", "pbm", "ppm", "sr", "ras", "tif" image formats are supported.
+Fishy Tracking analyzes image sequence. "pgm", "png", "jpeg", "jpg", "tiff", "tif", "bmp", "dib", "jpe", "jp2", "webp", "pbm", "ppm", "sr", "ras", "tif" image formats are supported.
 
-If you have recording in a video format, you need to convert it into images sequence as follow.
+If you have recording in a video format, you need to convert it into image sequence.
 
-1. For Linux, windows, and mac in command lines:
+1. For Linux, Windows, and MacOs in command lines:
    - Install ffmpeg.
    - In a terminal type: ffmpeg -i video.webm image-%03d.png
-2. For Linux, windows, and mac in graphical:
+2. For Linux, Windows, and MacOs in graphical:
    - Use Handbrake: https://handbrake.fr/ or ImageJ.
 
 ## Output files
