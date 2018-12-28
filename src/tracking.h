@@ -1,31 +1,5 @@
-/**############################################################################################
-								    main.cpp
-								    Purpose: functions header for the functions.cpp
-
-								    @author Benjamin GALLOIS
-										@email benjamin.gallois@upmc.fr
-										@website benjamin-gallois.fr
-								    @version 2.0
-										@date 2017
-###############################################################################################*/
-
-/*
-     .-""L_        		     .-""L_
-;`, /   ( o\ 					;`, /   ( o\
-\  ;    `, /   				\  ;    `, /
-;_/"`.__.-"						;_/"`.__.-"
-
-     .-""L_        		     .-""L_
-;`, /   ( o\ 					;`, /   ( o\
-\  ;    `, /   				\  ;    `, /
-;_/"`.__.-"						;_/"`.__.-"
-
-
-*/
-
-
-#ifndef FUNCTIONS_H
-#define FUNCTIONS_H
+#ifndef TRACKING_H
+#define TRACKING_H
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <iostream>

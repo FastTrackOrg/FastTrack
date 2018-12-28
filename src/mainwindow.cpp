@@ -220,8 +220,7 @@ MainWindow::MainWindow(QWidget *parent) :
 \*******************************************************************************************/
 
 /**
-  * @brief Updates the parameterList vector with the new parameter when user changes a parameter in the QTableWidget of parameters.
-  * @detailed Triggered when ui->tableParameters is modified. Emits the updated parameters QMap.
+  * @brief Updates the parameterList vector with the new parameter when user changes a parameter in the QTableWidget of parameters. Triggered when ui->tableParameters is modified. Emits the updated parameters QMap.
   * @param[in] item QTableWidgetItem from a QTableWidget.
 */
 void MainWindow::updateParameterList(QTableWidgetItem* item) {
@@ -233,8 +232,7 @@ void MainWindow::updateParameterList(QTableWidgetItem* item) {
 }
 
 /**
-  * @brief Opens a dialogue window to select a folder and updates ui->textPathAdd.
-  * @detailed Triggered when ui->openPath is clicked.
+  * @brief Opens a dialogue window to select a folder and updates ui->textPathAdd. Triggered when ui->openPath is clicked.
 */
 void MainWindow::openPathFolder() {
     QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"), "/home", QFileDialog::ShowDirsOnly);
@@ -257,8 +255,7 @@ void MainWindow::addPath() {
 
 
 /**
-  * @brief Deletes the selected line in the ui->tablePath and the corresponding path in the pathList. 
-  * @detailed Triggered when the ui->removePath button is clicked.
+  * @brief Deletes the selected line in the ui->tablePath and the corresponding path in the pathList. Triggered when the ui->removePath button is clicked.
 */
 void MainWindow::removePath() {
     int row = ui->tablePath->currentRow();
@@ -270,8 +267,7 @@ void MainWindow::removePath() {
 
 
 /**
-  * @brief Starts a new tracking analysis. First it get the path to the folder containing the images sequence. It creates a folder named Tracking_Result in this folder and a file parameters.txt containing the parameterList. It creates a new Tracking object that has to be run in a separate thread. When the analysis is finished, the Tracking object is destroyed and a new analysis is started.
-  * @detailed Trigerred when the start analysis button is clicked or when the signal finishedAnalysis() is emitted.
+  * @brief Starts a new tracking analysis. First it get the path to the folder containing the images sequence. It creates a folder named Tracking_Result in this folder and a file parameters.txt containing the parameterList. It creates a new Tracking object that has to be run in a separate thread. When the analysis is finished, the Tracking object is destroyed and a new analysis is started. Trigerred when the start analysis button is clicked or when the signal finishedAnalysis() is emitted.
 */
 void MainWindow::startTracking() {
     
@@ -340,8 +336,7 @@ void MainWindow::startTracking() {
 
 
 /**
-  * @brief Displays images received from the Tracking object.
-  * @detailed Triggered when the signal newImageToDisplay is emitted.
+  * @brief Displays images received from the Tracking object. Triggered when the signal newImageToDisplay is emitted.
 */
 void MainWindow::display(UMat &visu, UMat &cameraFrame){
 
@@ -391,13 +386,8 @@ void MainWindow::saveSettings() {
                                   Replay panel
 \*******************************************************************************************/
 
-/*!
-  \fn void &MainWindow::loadReplayFolder()
-  
-  Loads a folder containing an image sequences and detect the image format.
-  Loads tracking data if it exist.
-
-  Trigerred when ui->pathButton is pressed.
+/**
+  * @brief Loads a folder containing an image sequences and the tracking data if it exist. Trigerred when ui->pathButton is pressed.
 */
 void MainWindow::loadReplayFolder() {
 
@@ -496,8 +486,7 @@ void MainWindow::loadReplayFolder() {
 
 
 /**
-  * @brief Displays the image and the tracking data in the ui->displayReplay.
-  * @detailed Triggered when the ui->replaySlider value is changed.
+  * @brief Displays the image and the tracking data in the ui->displayReplay. Triggered when the ui->replaySlider value is changed.
 */
 void MainWindow::loadFrame(int frameIndex) {
 
@@ -540,8 +529,7 @@ void MainWindow::loadFrame(int frameIndex) {
 }
 
 /**
-  * @brief Start the autoplay of the replay.
-  * @detail Triggered when ui->playreplay is clicked.
+  * @brief Start the autoplay of the replay. Triggered when ui->playreplay is clicked.
 */
 void MainWindow::toggleReplayPlay() {
   
@@ -638,8 +626,7 @@ void MainWindow::mousePressEvent(QMouseEvent* event) {
 
 
 /**
-  * @brief Gets the index of two selected object and a start index and swaps the data from the start index to the end and saves the new tracking data.
-  * @detailed Triggered when ui->swapButton is pressed or right click in the replayDisplay.
+  * @brief Gets the index of two selected object and a start index and swaps the data from the start index to the end and saves the new tracking data. Triggered when ui->swapButton is pressed or right click in the replayDisplay.
 */
 void MainWindow::correctTracking() {
 
@@ -664,8 +651,7 @@ void MainWindow::correctTracking() {
 
 
 /**
-  * @brief Finds and displays the next occlusion event on the ui->replayDisplay.
-  * @detailed Triggered when ui->nextReplay is pressed.
+  * @brief Finds and displays the next occlusion event on the ui->replayDisplay. Triggered when ui->nextReplay is pressed.
 */
 void MainWindow::nextOcclusionEvent() {
     if( !occlusionEvents.isEmpty() ){
@@ -677,8 +663,7 @@ void MainWindow::nextOcclusionEvent() {
       
 
 /**
-  * @brief Finds and displays the previous occlusion event on the ui->replayDisplay.
-  * @detailed Triggered when ui->previousReplay is pressed.
+  * @brief Finds and displays the previous occlusion event on the ui->replayDisplay. Triggered when ui->previousReplay is pressed.
 */
 void MainWindow::previousOcclusionEvent() {
     if( !occlusionEvents.isEmpty() ){
@@ -690,8 +675,7 @@ void MainWindow::previousOcclusionEvent() {
 
 
 /**
-  * @brief Saves the tracked movie in an avi.
-  * @detailed Triggered when ui->previousReplay is pressed.
+  * @brief Saves the tracked movie in an avi. Triggered when ui->previousReplay is pressed.
 */
 void MainWindow::saveTrackedMovie() {
     

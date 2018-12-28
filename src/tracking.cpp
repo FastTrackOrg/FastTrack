@@ -12,11 +12,11 @@ This file is part of Fishy Tracking.
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with Foobar.  If not, see <https://www.gnu.org/licenses/>.
+    along with FishyTracking.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 
-#include "functions.h"
+#include "tracking.h"
 #include "Hungarian.h"
 
 using namespace cv;
@@ -42,8 +42,8 @@ using namespace std;
 
 /**
   * @brief Computes the center of the curvature defined as the intersection of the minor axis of the head ellipse with the minor axis of the tail ellipse of the object.
+  * @param[in] tail Parameters of the tail ellipse: coordinate and direction of the major axis.
   * @param[in] head Parameters of the head ellipse: coordinate and direction of the major axis.
-  * @param[in] head Parameters of the tail ellipse: coordinate and direction of the major axis.
   * @return Coordinate of the curvature center.
 */
 Point2d Tracking::curvatureCenter(const Point3d &tail, const Point3d &head){
@@ -162,8 +162,8 @@ vector<double> Tracking::objectInformation(const UMat &image) {
   * @brief Computes the direction of the object from the object parameter (coordinate of the center of mass and orientation).
   * @details To use this function, the object major axis as to be the horizontal axis of the image. Therefore, it is necessary to rotate the image before calling objectDirection.
   * @param[in] image Binary image CV_8U.
-  * @information[in, out] Parameters of the object (x coordinate, y coordinate, orientation).
-  * @center[in] Center of mass of the object.
+  * @param[in] center Center of mass of the object.
+  * @param[in, out] information Parameters of the object (x coordinate, y coordinate, orientation).
   * @return True if the direction angle is the orientation angle. False if the direction angle is the orientation angle plus pi.
 */
 bool Tracking::objectDirection(const UMat &image, Point center, vector<double> &information) {
@@ -423,10 +423,10 @@ vector<vector<Point3d>> Tracking::objectPosition(const UMat &frame, int minSize,
   * @details Method adapted from: "An effective and robust method for Tracking multiple fish in video image based on fish head detection" YQ Chen et al. Use the Hungarian method implemented by Cong Ma, 2016 "https://github.com/mcximing/hungarian-algorithm-cpp" adapted from the matlab implementation by Markus Buehren "https://fr.mathworks.com/matlabcentral/fileexchange/6543-functions-for-the-rectangular-assignment-problem".
   * @param[in] prevPos Vector of objects at t minus one.
 	* @param[in] pos Vector of objects parameters at t that we want to reorder in order to conserve objects identity.
-	* @param[in] length Maximal displacement of an object between two frames in pixels.
-	* @param[in] angle Maximal difference in orientation an object between two frames in radians.
-	* @param[in] weight Weight between distance and direction in the computation of the cost function. Close to 0 the cost function used the distance, close to one it will be used the direction. 
-	* @param[in] lo Maximal occlusion distance of objects between two frames in pixels.
+	* @param[in] LENGTH Maximal displacement of an object between two frames in pixels.
+	* @param[in] ANGLE Maximal difference in orientation an object between two frames in radians.
+	* @param[in] WEIGHT Weight between distance and direction in the computation of the cost function. Close to 0 the cost function used the distance, close to one it will be used the direction. 
+	* @param[in] LO Maximal occlusion distance of objects between two frames in pixels.
 	* @return The assignment vector containing the new index position to sort the pos vector. 
 */
 vector<int> Tracking::costFunc(const vector<Point3d> &prevPos, const vector<Point3d> &pos, double LENGTH, double ANGLE, double WEIGHT, double LO){
@@ -529,11 +529,10 @@ vector<Point3d> Tracking::reassignment(const vector<Point3d> &past, const vector
 
 
 /**
-  * @Reassignment Resamples a vector accordingly to a new index.
-  * @param vector<Point3d> output: output vector of size n
-  * @param vector<Point3d> input: input vector of size m <= n
-  * @param vector<int> assignment: vector with the new index that will be used to resample the input vector
-  * @return vector<Point3d>: output vector of size n.
+  * @brief Predicts the next position of an object from previous position.
+  * @param past Previous parameters.
+  * @param present: Current parameters.
+  * @return Output vector of size n.
 */
 vector<Point3d> Tracking::prevision(vector<Point3d> past, vector<Point3d> present){
 

@@ -49,7 +49,7 @@ private:
     cv::Mat binary;    /*!< Binary image after thresholding */
     QPainter paint;    /*!< QPainter to draw on top of the Pixmap. */
     int xTop, yTop, xBottom, yBottom;    /*!< Region of interest top left and bottom right corners coordinates. */
-    Ui::SetupWindow *ui;
+    Ui::SetupWindow *ui;   /*!< ui file from Qt designer. */
 
 private slots:
     void loadImage();

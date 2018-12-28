@@ -8,7 +8,7 @@ QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = Fishy
+TARGET = FishyTracking
 TEMPLATE = app
 
 DESTDIR=build
@@ -35,7 +35,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
-        functions.cpp \
+        tracking.cpp \
         setupwindow.cpp \
         Hungarian.cpp
 
@@ -45,7 +45,7 @@ INCLUDEPATH += /usr/local/include/opencv4/
 LIBS += -L /usr/local/lib64/  -lopencv_core -lopencv_imgproc -lopencv_highgui -lopencv_imgcodecs -lopencv_videoio -lopencv_video -lopencv_photo -fopenmp
 HEADERS += \
         mainwindow.h\
-        functions.h \
+        tracking.h \
         setupwindow.h \
         Hungarian.h
 

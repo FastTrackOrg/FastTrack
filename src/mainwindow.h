@@ -33,7 +33,7 @@
 #include <QThread>
 #include <QDebug>
 #include <QTableWidgetItem>
-#include "functions.h"
+#include "tracking.h"
 #include "setupwindow.h"
 #include "ui_mainwindow.h"
 #include <QDebug>
@@ -63,16 +63,16 @@ public:
 
 
 private:
-    Ui::MainWindow *ui;
+    Ui::MainWindow *ui;    /*!< ui file from Qt designer. */
     QMap<QString, QString> parameterList;   /*!< All the parameters necessary for the tracking analysis. */
     
     QThread* thread;   /*!< Thread where lives the Tracking object. */
     Tracking* tracking;   /*!< Objects that track images sequence. */
 
-    QShortcut *wShortcut;
-    QShortcut *qShortcut;
-    QShortcut *aShortcut;
-    QShortcut *dShortcut;
+    QShortcut *wShortcut;   /*!< Keyboard shortcut to next occlusion event. */
+    QShortcut *qShortcut;   /*!< Keyboard shortcut to previous frame. */
+    QShortcut *aShortcut;   /*!< Keyboard shortcut to previous frame. */
+    QShortcut *dShortcut;   /*!< Keyboard shortcut to next frame. */
 
     QVector<QString> pathList;   /*!< Paths to images sequences to analyze. */
 

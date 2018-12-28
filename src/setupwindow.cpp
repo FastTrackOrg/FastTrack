@@ -102,7 +102,7 @@ void SetupWindow::cropImage() {
 
 /**
   * @brief Opens an image from a path ui->open, gets the threshold value from ui->thresholdSlider and the ROI from user selection and binarizes the image.
-  * @param[in] int Threshold value.
+  * @param[in] value Threshold value.
 */
 void SetupWindow::thresholdImage(int value) {
 
