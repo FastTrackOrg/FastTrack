@@ -396,8 +396,8 @@ vector<vector<Point3d>> Tracking::objectPosition(const UMat &frame, int minSize,
 						}
 
 
-						positionHead.push_back(Point3d(xHead, yHead, angleHead));
-						positionTail.push_back(Point3d(xTail, yTail, angleTail));
+						positionHead.push_back(Point3d(xHead + m_ROI.tl().x, yHead + m_ROI.tl().y, angleHead));
+						positionTail.push_back(Point3d(xTail + m_ROI.tl().x, yTail + m_ROI.tl().y, angleTail));
 						positionFull.push_back(Point3d(parameter.at(0) + roiFull.tl().x, parameter.at(1) + roiFull.tl().y, parameter.at(2)));
             ellipseHead.push_back(Point3d(parameterHead.at(3), parameterHead.at(4), 0));
             ellipseTail.push_back(Point3d(parameterTail.at(3), parameterTail.at(4), 0));
@@ -590,6 +590,7 @@ vector<Point3d> Tracking::color(int number){
 */
 void Tracking::imageProcessing(){
 
+    // Reads the next image in the image sequence and applies the image processing work flow
     imread(m_files.at(m_im), IMREAD_GRAYSCALE).copyTo(m_visuFrame);
     if(statusRegistration){
       registration(m_background, m_visuFrame);
@@ -604,59 +605,70 @@ void Tracking::imageProcessing(){
       dilate(m_binaryFrame, m_binaryFrame, element);
     }
 
-    if(m_ROI.width != 0 ) {
+    if(m_ROI.width != 0 || m_ROI.height != 0 ) {
       m_binaryFrame = m_binaryFrame(m_ROI);
       m_visuFrame = m_visuFrame(m_ROI);
     }
 
+    // Detects objects and extracts  parameters
     m_out = objectPosition(m_binaryFrame, param_minArea, param_maxArea);
 
+    // Associates objets with the previous image
     vector<int> identity = costFunc(m_outPrev.at(param_spot), m_out.at(param_spot), param_len, param_angle, param_weight, param_lo);
     vector<int> occluded = findOcclusion(identity);
     for (size_t i = 0; i < m_out.size(); i++) {
       m_out.at(i) = reassignment(m_outPrev.at(i), m_out.at(i), identity);
     }
+
+    // Saves objects parameters in text file and display tracking result in the display panel
     cvtColor(m_visuFrame, m_visuFrame, COLOR_GRAY2RGB);
-    // Visualisation
 
+    // Draws lines and arrows on the image in the display panel
     for(size_t l = 0; l < m_out.at(0).size(); l++){
-      Point3d coord = m_out.at(param_spot).at(l);
-      arrowedLine(m_visuFrame, Point(coord.x, coord.y), Point(coord.x + 5*param_arrowSize*cos(coord.z), coord.y - 5*param_arrowSize*sin(coord.z)), Scalar(m_colorMap.at(l).x, m_colorMap.at(l).y, m_colorMap.at(l).z), param_arrowSize, 10*param_arrowSize, 0);
+      m_memory.at(l).push_back( Point( m_out.at(param_spot).at(l).x, m_out.at(param_spot).at(l).y ) );
+      arrowedLine(m_visuFrame, Point(m_out.at(param_spot).at(l).x, m_out.at(param_spot).at(l).y), Point(m_out.at(param_spot).at(l).x + 5*param_arrowSize*cos(m_out.at(param_spot).at(l).z), m_out.at(param_spot).at(l).y - 5*param_arrowSize*sin(m_out.at(param_spot).at(l).z)), Scalar(m_colorMap.at(l).x, m_colorMap.at(l).y, m_colorMap.at(l).z), param_arrowSize + 2, 10*param_arrowSize, 0);
+      polylines(m_visuFrame, m_memory.at(l), false, Scalar(m_colorMap.at(l).x, m_colorMap.at(l).y, m_colorMap.at(l).z), param_arrowSize + 2, 8, 0);
 
-      if((m_im > 5)){ // Faudra refaire un buffer correct
-        polylines(m_visuFrame, m_memory.at(l), false, Scalar(m_colorMap.at(l).x, m_colorMap.at(l).y, m_colorMap.at(l).z), param_arrowSize, 8, 0);
-        m_memory.at(l).push_back(Point((int)coord.x, (int)coord.y));
-      if(m_im > 50){
+      if(m_memory.at(l).size() > 10){
           m_memory.at(l).erase(m_memory.at(l).begin());
         }
-      }
 
-      if ( find(occluded.begin(), occluded.end(), int(l)) == occluded.end() ) {
-        m_savefile << m_out.at(0).at(l).x + m_ROI.tl().x << '\t' << m_out.at(0).at(l).y + m_ROI.tl().y << '\t' << m_out.at(0).at(l).z << '\t'  << m_out.at(1).at(l).x + m_ROI.tl().x << '\t' << m_out.at(1).at(l).y + m_ROI.tl().y << '\t' << m_out.at(1).at(l).z  <<  '\t' << m_out.at(2).at(l).x + m_ROI.tl().x << '\t' << m_out.at(2).at(l).y  + m_ROI.tl().y << '\t' << m_out.at(2).at(l).z <<  '\t' << m_out.at(3).at(l).x << '\t' << m_out.at(4).at(l).x << '\t' << m_out.at(4).at(l).y << '\t' << m_out.at(5).at(l).x << '\t' << m_out.at(5).at(l).y << '\t' << m_im << '\n';
+        // Tracking data are available
+        if ( find(occluded.begin(), occluded.end(), int(l)) == occluded.end() ) {
+          for (auto const &a: m_out) {
+            m_savefile << a.at(l).x; 
+            m_savefile << '\t';
+            m_savefile << a.at(l).y; 
+            m_savefile << '\t';
+            m_savefile << a.at(l).z; 
+            m_savefile << '\t';
+          }
+          m_savefile << m_im << '\n';
+        }
+        // No tracking data available due to an occlusion event
+        else {
+
+          m_savefile << "NaN" << '\n';
+        }
+      }
+  
+      m_im ++;
+      m_outPrev = m_out;
+    
+      // Sending rate of images to display
+      if ( (timer->elapsed() - m_displayTime) > 40) {
+        emit(newImageToDisplay(m_visuFrame, m_binaryFrame));
+       m_displayTime = timer->elapsed();
+      }
+      if(m_im + 1 > int(m_files.size())){
+        m_savefile.flush();
+        m_outputFile.close();
+        emit(finished());
+      qInfo() << timer->elapsed() << endl;
       }
       else {
-
-        m_savefile << "NaN" << '\n';
+      QTimer::singleShot(0, this, SLOT(imageProcessing()));
       }
-    }
-  
-    m_im ++;
-    m_outPrev = m_out;
-    
-    // Sending rate of images to display
-    if ( (timer->elapsed() - m_displayTime) > 40) {
-      emit(newImageToDisplay(m_visuFrame, m_binaryFrame));
-     m_displayTime = timer->elapsed();
-    }
-    if(m_im + 1 > int(m_files.size())){
-      m_savefile.flush();
-      m_outputFile.close();
-      emit(finished());
-    qInfo() << timer->elapsed() << endl;
-    }
-    else {
-    QTimer::singleShot(0, this, SLOT(imageProcessing()));
-    }
 }
 
 
@@ -702,10 +714,7 @@ void Tracking::startProcess() {
 
   m_background = backgroundExtraction(m_files, param_nBackground);
   m_colorMap = color(param_n);
-  vector<vector<Point> > tmp(param_n, vector<Point>());
-  m_memory = tmp;
-
-
+  m_memory = vector<vector<Point>>(param_n, vector<Point>());
   // First frame
   imread(m_files.at(0), IMREAD_GRAYSCALE).copyTo(m_visuFrame);
   
@@ -749,24 +758,24 @@ void Tracking::startProcess() {
   m_savefile.setDevice(&m_outputFile);
 
   // Saving
-  m_savefile << "xHead" << '\t' << "yHead" << '\t' << "tHead" << '\t'  << "xTail" << '\t' << "yTail" << '\t' << "tTail"   << '\t'  << "xBody" << '\t' << "yBody" << '\t' << "tBody"   << '\t'  << "curvature" << '\t'<< "headMajorAxisLength" << '\t' << "headMinorAxisLength" << '\t' << "tailMajorAxisLength" << '\t' << "tailMinorAxisLength" << '\t'  << "imageNumber" << "\n";
+
+  // File header
+  m_savefile << "xHead" << '\t' << "yHead" << '\t' << "tHead" << '\t'  << "xTail" << '\t' << "yTail" << '\t' << "tTail"   << '\t'  << "xBody" << '\t' << "yBody" << '\t' << "tBody"   << '\t'  << "curvature"  << '\t' << "Reserved" << '\t' << "Reserved" << '\t' << "headMajorAxisLength" << '\t' << "headMinorAxisLength" << '\t' << "Reserved" << '\t' << "tailMajorAxisLength" << '\t' << "tailMinorAxisLength" << '\t' << "Reserved" << '\t'  << "imageNumber" << "\n";
+  
+  // Draws lines and arrows on the image in the display panel
   for(size_t l = 0; l < m_out.at(0).size(); l++){
-    Point3d coord = m_out.at(param_spot).at(l);      
-    arrowedLine(m_visuFrame, Point(coord.x, coord.y), Point(coord.x + 5*param_arrowSize*cos(coord.z), coord.y - 5*param_arrowSize*sin(coord.z)), Scalar(m_colorMap.at(l).x, m_colorMap.at(l).y, m_colorMap.at(l).z), param_arrowSize, 10*param_arrowSize, 0);
+    arrowedLine(m_visuFrame, Point(m_out.at(param_spot).at(l).x, m_out.at(param_spot).at(l).y), Point(m_out.at(param_spot).at(l).x + 5*param_arrowSize*cos(m_out.at(param_spot).at(l).z), m_out.at(param_spot).at(l).y - 5*param_arrowSize*sin(m_out.at(param_spot).at(l).z)), Scalar(m_colorMap.at(l).x, m_colorMap.at(l).y, m_colorMap.at(l).z), param_arrowSize + 2, 10*param_arrowSize, 0);
+    m_memory.at(l).push_back( Point( m_out.at(param_spot).at(l).x, m_out.at(param_spot).at(l).y ) );
 
-    if((m_im > 5)){ // Faudra refaire un buffer correct
-      polylines(m_visuFrame, m_memory.at(l), false, Scalar(m_colorMap.at(l).x, m_colorMap.at(l).y, m_colorMap.at(l).z), param_arrowSize, 8, 0);
-      m_memory.at(l).push_back(Point((int)coord.x, (int)coord.y));
-    if(m_im > 50){
-        m_memory.at(l).erase(m_memory.at(l).begin());
-      }
+    for (auto const &a: m_out) {
+      m_savefile << a.at(l).x; 
+      m_savefile << '\t';
+      m_savefile << a.at(l).y; 
+      m_savefile << '\t';
+      m_savefile << a.at(l).z; 
+      m_savefile << '\t';
     }
-
-    // Saving
-    coord.x += m_ROI.tl().x;
-    coord.y += m_ROI.tl().y;
-
-    m_savefile << m_out.at(0).at(l).x + m_ROI.tl().x << '\t' << m_out.at(0).at(l).y + m_ROI.tl().y << '\t' << m_out.at(0).at(l).z << '\t'  << m_out.at(1).at(l).x + m_ROI.tl().x << '\t' << m_out.at(1).at(l).y + m_ROI.tl().y << '\t' << m_out.at(1).at(l).z  <<  '\t' << m_out.at(2).at(l).x + m_ROI.tl().x << '\t' << m_out.at(2).at(l).y  + m_ROI.tl().y << '\t' << m_out.at(2).at(l).z <<  '\t' << m_out.at(3).at(l).x << '\t' << m_out.at(4).at(l).x << '\t' << m_out.at(4).at(l).y << '\t' << m_out.at(5).at(l).x << '\t' << m_out.at(5).at(l).y << '\t' << m_im << '\n';
+    m_savefile << m_im << '\n';
 
   }
   m_outPrev = m_out;

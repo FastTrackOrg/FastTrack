@@ -100,8 +100,6 @@ class Tracking : public QObject {
   public slots:
   void startProcess();
   void updatingParameters(const QMap<QString, QString> &);
-
-  private slots:
   void imageProcessing();
 
   signals:

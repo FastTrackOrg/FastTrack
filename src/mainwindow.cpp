@@ -506,8 +506,8 @@ void MainWindow::loadFrame(int frameIndex) {
         QStringList coordinate = replayTracking.at(i).split('\t', QString::SkipEmptyParts);
 
         if (ui->replayEllipses->isChecked()) {
-        cv::ellipse(frame, Point( coordinate.at(0).toDouble(), coordinate.at(1).toDouble() ), Size( coordinate.at(10).toDouble(), coordinate.at(11).toDouble() ), 180 - (coordinate.at(2).toDouble()*180)/M_PI, 0, 360,  Scalar(colorMap.at(i - frameIndex*replayNumberObject).x, colorMap.at(i - frameIndex*replayNumberObject).y, colorMap.at(i - frameIndex*replayNumberObject).z), scale, 8 );
-          cv::ellipse(frame, Point( coordinate.at(3).toDouble(), coordinate.at(4).toDouble() ), Size( coordinate.at(12).toDouble(), coordinate.at(13).toDouble() ), 180 - (coordinate.at(5).toDouble()*180)/M_PI, 0, 360,  Scalar(colorMap.at(i - frameIndex*replayNumberObject).x, colorMap.at(i - frameIndex*replayNumberObject).y, colorMap.at(i - frameIndex*replayNumberObject).z), scale, cv::LINE_AA );
+        cv::ellipse(frame, Point( coordinate.at(0).toDouble(), coordinate.at(1).toDouble() ), Size( coordinate.at(12).toDouble(), coordinate.at(13).toDouble() ), 180 - (coordinate.at(2).toDouble()*180)/M_PI, 0, 360,  Scalar(colorMap.at(i - frameIndex*replayNumberObject).x, colorMap.at(i - frameIndex*replayNumberObject).y, colorMap.at(i - frameIndex*replayNumberObject).z), scale, 8 );
+          cv::ellipse(frame, Point( coordinate.at(3).toDouble(), coordinate.at(4).toDouble() ), Size( coordinate.at(15).toDouble(), coordinate.at(16).toDouble() ), 180 - (coordinate.at(5).toDouble()*180)/M_PI, 0, 360,  Scalar(colorMap.at(i - frameIndex*replayNumberObject).x, colorMap.at(i - frameIndex*replayNumberObject).y, colorMap.at(i - frameIndex*replayNumberObject).z), scale, cv::LINE_AA );
         }
 
         if (ui->replayArrows->isChecked()) {
@@ -700,8 +700,8 @@ void MainWindow::saveTrackedMovie() {
           QStringList coordinate = replayTracking.at(i).split('\t', QString::SkipEmptyParts);
 
           if (ui->replayEllipses->isChecked()) {
-          cv::ellipse(frame, Point( coordinate.at(0).toDouble(), coordinate.at(1).toDouble() ), Size( coordinate.at(10).toDouble(), coordinate.at(11).toDouble() ), 180 - (coordinate.at(2).toDouble()*180)/M_PI, 0, 360,  Scalar(colorMap.at(i - frameIndex*replayNumberObject).x, colorMap.at(i - frameIndex*replayNumberObject).y, colorMap.at(i - frameIndex*replayNumberObject).z), scale, 8 );
-            cv::ellipse(frame, Point( coordinate.at(3).toDouble(), coordinate.at(4).toDouble() ), Size( coordinate.at(12).toDouble(), coordinate.at(13).toDouble() ), 180 - (coordinate.at(5).toDouble()*180)/M_PI, 0, 360,  Scalar(colorMap.at(i - frameIndex*replayNumberObject).x, colorMap.at(i - frameIndex*replayNumberObject).y, colorMap.at(i - frameIndex*replayNumberObject).z), scale, cv::LINE_AA );
+            cv::ellipse(frame, Point( coordinate.at(0).toDouble(), coordinate.at(1).toDouble() ), Size( coordinate.at(12).toDouble(), coordinate.at(13).toDouble() ), 180 - (coordinate.at(2).toDouble()*180)/M_PI, 0, 360,  Scalar(colorMap.at(i - frameIndex*replayNumberObject).x, colorMap.at(i - frameIndex*replayNumberObject).y, colorMap.at(i - frameIndex*replayNumberObject).z), scale, 8 );
+            cv::ellipse(frame, Point( coordinate.at(3).toDouble(), coordinate.at(4).toDouble() ), Size( coordinate.at(15).toDouble(), coordinate.at(16).toDouble() ), 180 - (coordinate.at(5).toDouble()*180)/M_PI, 0, 360,  Scalar(colorMap.at(i - frameIndex*replayNumberObject).x, colorMap.at(i - frameIndex*replayNumberObject).y, colorMap.at(i - frameIndex*replayNumberObject).z), scale, cv::LINE_AA );
           }
 
           if (ui->replayArrows->isChecked()) {

@@ -6,7 +6,7 @@ if [ "$1" = "full" ]; then
   make clean
   make
   cd build
-  ./Fishy
+  ./FishyTracking
   cd ..
   make clean
 fi
@@ -16,7 +16,7 @@ if [ "$1" = "partial" ]; then
   qmake CONFIG+=released src/Fishy.pro
   make
   cd build
-  ./Fishy
+  ./FishyTracking
   cd ..
 fi
 
@@ -25,7 +25,7 @@ if [ "$1" = "debug" ]; then
   qmake CONFIG+=debug src/Fishy.pro
   make
   cd build
-  ./Fishy
+  ./FishyTracking
   cd ..
 fi
 
@@ -35,7 +35,7 @@ if [ "$1" = "profile" ]; then
   qmake QMAKE_CXXFLAGS+=-pg QMAKE_LFLAGS+=-pg CONFIG+=debug src/Fishy.pro
   make
   cd build
-  ./Fishy
+  ./FishyTracking
   cd ..
   gprof build/Fishy build/gmon.out > profiling.txt
 fi
