@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "../src/functions.cpp"
+#include "../src/tracking.cpp"
 #include "../src/mainwindow.cpp"
 #include <string>
 
