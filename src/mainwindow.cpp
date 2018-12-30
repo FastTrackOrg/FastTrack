@@ -318,8 +318,8 @@ void MainWindow::startTracking() {
         connect(tracking, &Tracking::finished, tracking, &Tracking::deleteLater);
         connect(thread, &QThread::finished, thread, &QThread::deleteLater);
         
-        thread->start();
         tracking->updatingParameters(parameterList);
+        thread->start();
     }
     else {
         pathList.removeFirst();
