@@ -360,14 +360,16 @@ void MainWindow::display(UMat &visu, UMat &cameraFrame){
   * @brief Loads a settings file settings.ini at the start up of the program and updates the ui->parameterTable with the new parameters.
 */
 void MainWindow::loadSettings() {
+
     settingsFile = new QSettings("FishyTracking", "Benjamin Gallois", this);
-    QStringList keyList = settingsFile->allKeys(); 
+    settingsFile->setFallbacksEnabled(false); // Shadows global variables added in MacOs system
+    QStringList keyList = settingsFile->allKeys();
 
     for(auto a: keyList) {
       QStringList parameterDescription = parameterList.value(a).split('|');
       QString valueDescription = QString( settingsFile->value(a).toString()+ "|" + parameterDescription.at(1)); 
       parameterList.insert(a, valueDescription);
-    }    
+    }
 }
 
 
