@@ -87,3 +87,8 @@ QCheckBox::indicator {
 QCheckBox::indicator::checked{
   background: #4286f4;
 }
+
+QFileDialog{
+  background-color: #333333;
+  color: white;
+}
