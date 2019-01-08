@@ -122,26 +122,25 @@ MainWindow::MainWindow(QWidget *parent) :
     // and <QString>value: value | description of the parameter for the initialization
     // After initialization the QMap parameterList is {<QString> key, <QString> value}
     ui->tableParameters->horizontalHeader()->setStretchLastSection(true);
-
     // Default Name, value|description
-    parameterList.insert("Dilatation", "0|Dilate the image. Range 0 to inf.");
-    parameterList.insert("Registration", "yes|Yes to activate registration.");
-    parameterList.insert("Light background", "yes|Yes if dark objects on light background. No if light objects on dark background. ");
-    parameterList.insert("ROI bottom y", "0|Defines region of interest bottom corner.");
-    parameterList.insert("ROI bottom x", "0|Defines region of interest bottom corner.");
-    parameterList.insert("ROI top y", "0|Defines region of interest top corner.");
-    parameterList.insert("ROI top x", "0|Defines region of interest top corner.");
-    parameterList.insert("Number of images background", "0|Number of images to average for computing the background.");
-    parameterList.insert("Arrow size", "2|Display arrow on fish in the tracking display.");
-    parameterList.insert("Maximal occlusion", "100|Maximum distance in pixel that a fish can travel when occluded.");
-    parameterList.insert("Weight", "0.5|Relative importance between angle and distance. 0: only angle, 1: only distance. ");
-    parameterList.insert("Maximal angle", "90|Maximal angular difference between two frames.");
-    parameterList.insert("Maximal length", "100|Maximal distance travelled between two frames");
-    parameterList.insert("Spot to track", "0|What spot to track. 0: head, 1: tail, 2: center");
-    parameterList.insert("Binary threshold", "70|Threshold to separate background and object. Range from 0 to 255.");
-    parameterList.insert("Minimal size", "50|Minimal size of the object to track in pixels.");
-    parameterList.insert("Maximal size", "5000|Maximal size of the object to track in pixels.");
-    parameterList.insert("Object number", "1|Number of moving objects to track.");
+    parameterList.insert("Dilatation", "0|Dilates the image. Sets to 0 for no dilatation.");
+    parameterList.insert("Registration", "no|Sets to yes to activate registration.");
+    parameterList.insert("Light background", "yes|Sets to yes if objects are dark on light background. Sets to no if objects are light on dark background.");
+    parameterList.insert("ROI bottom y", "0|Bottom corner y coordinate of the region of interest. Sets to 0 for keeping the full image.");
+    parameterList.insert("ROI bottom x", "0|Bottom corner x coordinate of the region of interest. Sets to 0 for keeping the full image.");
+    parameterList.insert("ROI top y", "0|Top corner y coordinate of the region of interest. Sets to 0 for keeping the full image.");
+    parameterList.insert("ROI top x", "0|Top corner x coordinate of the region of interest. Sets to 0 for keeping the full image.");
+    parameterList.insert("Number of images background", "50|The number of images averaged to compute the background.");
+    parameterList.insert("Arrow size", "2|Size of the arrow in the tracking display.");
+    parameterList.insert("Maximal occlusion", "100|The maximum assignment distancei in pixels. Only objects that have moved less than this value between two images are considered for the matching phase.");
+    parameterList.insert("Weight", "0.5|Closer to one the cost function used in the matching phase will be more sensitive to change in distance, closer to zero it will be more sensitive to change in direction.");
+    parameterList.insert("Maximal angle", "90|The maximal change in orientation in degrees of an object between two consecutive images.");
+    parameterList.insert("Maximal length", "100|The maximal displacement in pixels of an object between two consecutive images.");
+    parameterList.insert("Spot to track", "0|The part of the object used for the matching. 0: head, 1: tail, 2: full body.");
+    parameterList.insert("Binary threshold", "70|The threshold value (0 to 255) to separate objects from the background.");
+    parameterList.insert("Minimal size", "50|The minimal size of an object in pixels.");
+    parameterList.insert("Maximal size", "5000|The maximal size of an object to in pixels.");
+    parameterList.insert("Object number", "1|The number of objects to track.");
 
     loadSettings();
 
@@ -158,8 +157,8 @@ MainWindow::MainWindow(QWidget *parent) :
       ui->tableParameters->setItem(i, 2, new QTableWidgetItem(parameterAttributs.at(1)));
       ui->tableParameters->item(i, 2)->setFlags(ui->tableParameters->item(i, 2)->flags() & ~Qt::ItemIsEditable);
       parameterList.insert(parameterName, parameterAttributs.at(0));
+      ui->tableParameters->setRowHeight(i, 96);
      }
-
 
     connect(ui->tableParameters, SIGNAL(itemChanged(QTableWidgetItem*)), this, SLOT(updateParameterList(QTableWidgetItem*)));
 
