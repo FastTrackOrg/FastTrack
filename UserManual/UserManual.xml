@@ -4,8 +4,8 @@
   <title>Fishy Tracking user manual</title>
   <titleabbrev>User Manual</titleabbrev>
   <bookinfo>
-    <legalnotice><para>This file is part of Fishy Tracking.
-      
+    <legalnotice><para>
+      This file is part of Fishy Tracking.
       Fishy Tracking is free software: you can redistribute it and/or modify
       it under the terms of the GNU General Public License as published by
       the Free Software Foundation, either version 3 of the License, or
@@ -26,20 +26,21 @@
   <chapter xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="general-information">
     <title>General information</title>
     <para>
-      Fishy Tracking is an application that allows the user to track multiple animals in video recording. The application takes a sequence of images and outputs a folder with the tracking data, the parameter used to produce the data and a log file. Fishy Tracking can operate on Linux, Mac, and Windows systems.
+      Fishy Tracking is an application that allows the user to track multiple animals in video recording.
+      Fishy Tracking can operate on Linux, Mac, and Windows systems.
     </para>
     <para>
-      The software provides to the user two mains features:
+      Two mains features are implemented in the software:
     </para>
     <itemizedlist spacing="compact">
       <listitem>
         <para>
-          An automatic tracking algorithm that can track multiple objects and deals in the most cases with occlusion.
+          An automatic tracking algorithm that can detect objects and maintain objects identity.
         </para>
       </listitem>
       <listitem>
         <para>
-          An manual review of the tracking where errors can be corrected on-the-fly.
+          A manual review of the tracking where errors can be corrected rapidly and easily.
         </para>
       </listitem>  
     </itemizedlist>
@@ -50,7 +51,7 @@
     <section xml:id="download">
       <title>Download</title>
       <para>
-        Stable versions of Fishy Tracking are released for Linux (AppImage file), MacOs (dmg file) and Windows (installer). Development version is accessible from source and can be compiled for every system.
+        Stable versions of Fishy Tracking are released for Linux (as AppImage), MacOs (as dmg) and Windows (installer). The development version is accessible from source and can be compiled on Linux, Mac, and Windows (see the developer guide for more information).
       </para>
       <orderedlist numeration="arabic" spacing="compact">
         <listitem>
@@ -60,34 +61,19 @@
           <itemizedlist spacing="compact">
             <listitem>
               <para>
-                Download the right installer for your system at http://fishytracking.benjamin-gallois.fr/download.html.
+                Download the right file for your system at http://fishytracking.benjamin-gallois.fr/download.html.
               </para>
             </listitem>
           </itemizedlist>
         </listitem>
         <listitem>
           <para>
-            Development versions:
+            The development version:
           </para>
           <itemizedlist spacing="compact">
             <listitem>
               <para>
-                Install OpenCV 4 on your system by following instructions at https://docs.opencv.org/4.0.0/df/d65/tutorial_table_of_content_introduction.html.
-              </para>
-            </listitem>
-            <listitem>
-              <para>
-                Install Qt5 on your system by following instructions at http://doc.qt.io/qt-5/gettingstarted.html#offline-installation.
-              </para>
-            </listitem>
-            <listitem>
-              <para>
-                Download Fishy Tracking code source at https://git.benjamin-gallois.fr/bgallois/FishyTracking.
-              </para>
-            </listitem>
-            <listitem>
-              <para>
-                Referred to the developer user guide to compile the project if necessary.
+                Please refers to the developer guide at the link http://fishytracking.benjamin-gallois.fr/API/index.html.
               </para>
             </listitem>
           </itemizedlist>
@@ -104,17 +90,17 @@
           <itemizedlist spacing="compact">
             <listitem>
               <para>
-                Executes the installer and follows instructions.
+                Execute the installer and follow the provided instructions.
               </para>
             </listitem>
           </itemizedlist>
         </listitem>
         <listitem>
           <para>
-            With Linux AppImage:
+            For Linux:
           </para>
           <para>
-            Allows FishyTracking.appimage to be executed:
+            Allow FishyTracking.appimage to be executed:
           </para>
           <itemizedlist spacing="compact">
             <listitem>
@@ -124,30 +110,34 @@
             </listitem>
             <listitem>
               <para>
-                Click on properties.
+                Click on Properties.
               </para>
             </listitem>
             <listitem>
               <para>
-                Click on permissions.
+                Click on Permissions.
               </para>
             </listitem>
             <listitem>
               <para>
-                Check <quote>allow executing the file as a
-                program</quote>.
+                Tick <quote>Allow executing file as program</quote>.
               </para>
             </listitem>
           </itemizedlist>
         </listitem>
         <listitem>
           <para>
-            With MacOs dmg file:
+            For Mac:
           </para>
           <itemizedlist spacing="compact">
             <listitem>
               <para>
-                Drag the application from the dmg file window into the Applications folder.
+                Double click on the dmg file.
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                Drag the application from the dmg window into the Applications folder.
               </para>
             </listitem>
           </itemizedlist>
@@ -157,32 +147,28 @@
   </chapter>
   
   <chapter xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="software-overview">
-    <title>Software overview</title>
+    <title>How to use Fishy Tracking</title>
     <section xml:id="files-panel">
-      <title>Files panel</title>
-      <para>
-        The files panel allows the user to add paths to folders where the image sequence to analyze are stored. Multiple paths can be added to analyze data in a bunch.
-      </para>
+      <title>Start an analysis</title>
       <para>
         How to add image sequences to analyze?
       </para>
       <orderedlist numeration="arabic" spacing="compact">
         <listitem>
-          <para> Add the path to the folder where the image sequence is stored by clicking on the
-            (1) open folder button to select a folder or copy the folder path directly into (2) the
-            path bar. </para>
+          <para> Click on the (1) open folder button to select a folder where an image sequence to
+            analyze is stored.  The path can directly be copied into the (2) path bar. </para>
         </listitem>
         <listitem>
-          <para> Click on the (3) add path button to add the path to the list of movie to analyze ,
-            visible in the (5) paths table. </para>
+          <para> Click on the (3) add path button to add the path to the list of image sequences to
+            analyze, visible in the (5) paths table. </para>
         </listitem>
         <listitem>
-          <para>The added path appears now in the (5) table.</para>
+          <para>The added path is now visible in the (5) table.</para>
         </listitem>
         <listitem>
-          <para> If necessary you can remove a path from the (5) paths table by clicking on it, it
-            will become highlighted in blue. Finally click on the (4) remove path button to remove
-            the path from the (5) paths table. </para>
+          <para> If necessary you can remove a path from the (5) paths table by clicking on the
+            path, it will become highlighted in blue. Finally, click on the (4) remove path button
+            to remove the path from the (5) paths table. </para>
         </listitem>
         <listitem>
           <para> Start the analysis by clicking on the (6) button start. The path will be deleted
@@ -203,26 +189,26 @@
       </figure>
     </section>
     <section xml:id="display-panel">
-      <title>Display panel</title>
-      <para>
-        The display panel shows the current analysis processes by
-        displaying the binary image (1) and the tracking image (2). The
-        tracking can be extremely fast, to review the tracking please
-        referred to the replay panel.
-      </para>
+      <title>See current analysis</title>
+      <para> The display panel shows the current analysis process by displaying the binary image (1)
+        and the tracking image (2). Note that the tracking can be extremely fast, to review the
+        tracking please see <xref linkend="replay-panel"/>. </para>
     </section>
     <section xml:id="parameters-panel">
-      <title>Parameters panel</title>
-      <para> The parameters panel provides a mean to change the tracking parameters before or during
-        analysis. We recommend finding a set of parameters by changing parameters one by one and controlling effects in the display panel. When an optimal set of parameters is found,
-        restart the analysis. An interactive help to determine some parameters is available by clicking on the help button (1).
-        All parameters are saved and reloaded at each closing and opening of the program.
+      <title>Change parameters</title>
+      <para> The tracking parameters can be changed in the Parameters panel. Note that the number of
+        objects can't be changed during analysis. </para>
+      <para>
+        We recommend finding a set of parameters by
+        changing parameters one by one and controlling their effects in the display panel. When an
+        optimal set of parameters is found, restart the analysis. An interactive help to determine
+        some parameters is available by clicking on the help button (1).
       </para>
       <informaltable>
         <tgroup cols="3">
-          <colspec colwidth="20*" align="left" />
-          <colspec colwidth="33*" align="left" />
-          <colspec colwidth="45*" align="left" />
+          <colspec colwidth="20*" align="left"/>
+          <colspec colwidth="33*" align="left"/>
+          <colspec colwidth="45*" align="left"/>
           <thead>
             <row>
               <entry>
@@ -244,7 +230,7 @@
               <entry>
                 0 to inf
               </entry>
-              <entry> Dilates detected objects. Sets to 0 for no dilatation. </entry>
+              <entry>Dilates the image. Sets to 0 for no dilatation.</entry>
             </row>
             <row>
               <entry>
@@ -253,9 +239,7 @@
               <entry>
                 yes, no
               </entry>
-              <entry>
-                Registers images.
-              </entry>
+              <entry>Sets to yes to activate registration.</entry>
             </row>
             <row>
               <entry>
@@ -264,8 +248,8 @@
               <entry>
                 yes, no
               </entry>
-              <entry> yes: dark objects on light background.<?linebreak?>
-                no: light object on dark background </entry>
+              <entry>Sets to yes if objects are dark on light background. Sets to no if objects are
+                light on dark background.</entry>
             </row>
             <row>
               <entry>
@@ -274,10 +258,8 @@
               <entry>
                 0 to image height
               </entry>
-              <entry>
-                0: no ROI.<?linebreak?>y-coordinate of the bottom right corner of
-                the rectangle ROI.
-              </entry>
+              <entry>Bottom corner y coordinate of the region of interest. Sets to 0 for keeping the
+                full image.</entry>
             </row>
             <row>
               <entry>
@@ -286,10 +268,8 @@
               <entry>
                 0 to image width
               </entry>
-              <entry>
-                0: no ROI.<?linebreak?>x-coordinate of the bottom right corner of
-                the rectangle ROI.
-              </entry>
+              <entry>Bottom corner x coordinate of the region of interest. Sets to 0 for keeping the
+                full image.</entry>
             </row>
             <row>
               <entry>
@@ -298,10 +278,8 @@
               <entry>
                 0 to ROI bottom y
               </entry>
-              <entry>
-                0: no ROI.<?linebreak?>y-coordinate of the top left corner of the
-                rectangle ROI.
-              </entry>
+              <entry>Top corner y coordinate of the region of interest. Sets to 0 for keeping the
+                full image.</entry>
             </row>
             <row>
               <entry>
@@ -310,10 +288,8 @@
               <entry>
                 0 to ROI bottom x
               </entry>
-              <entry>
-                0: no ROI.<?linebreak?>x-coordinate of the top left corner of the
-                rectangle ROI.
-              </entry>
+              <entry> Top corner x coordinate of the region of interest. Sets to 0 for keeping the
+                full image.</entry>
             </row>
             <row>
               <entry>
@@ -322,21 +298,14 @@
               <entry>
                 1 to number of images in the image sequences
               </entry>
-              <entry>
-                Number of images to average to compute the background.
-                The images are taken at equal interval in the image
-                sequence.
-              </entry>
+              <entry>The number of images averaged to compute the background.</entry>
             </row>
             <row>
               <entry>
                 Arrow size
               </entry>
               <entry> 0 to inf </entry>
-              <entry>
-                Size of the arrow displayed on the object in the
-                tracking image in the display panel.
-              </entry>
+              <entry>Size of the arrow in the tracking display.</entry>
             </row>
             <row>
               <entry>
@@ -345,10 +314,8 @@
               <entry>
                 0 to inf
               </entry>
-              <entry>
-                Maximal distance in pixels that an object can travel
-                when occluded.
-              </entry>
+              <entry>The maximum assignment distancei in pixels. Only objects that have moved less
+                than this value between two images are considered for the matching phase.</entry>
             </row>
             <row>
               <entry>
@@ -357,9 +324,9 @@
               <entry>
                 0 to 1
               </entry>
-              <entry> Weight between difference in displacement or difference in direction to
-                compute the cost. Closer to 1 the matching is done with the difference in direction.
-                Closer to 0 the matching is done only the angular difference. </entry>
+              <entry>Closer to one the cost function used in the matching phase will be more
+                sensitive to change in distance, closer to zero it will be more sensitive to change
+                in direction.</entry>
             </row>
             <row>
               <entry>
@@ -368,7 +335,8 @@
               <entry>
                 0 to 360
               </entry>
-              <entry> Angle in degree that the object direction can change between two frames. </entry>
+              <entry>The maximal change in orientation in degrees of an object between two
+                consecutive images.</entry>
             </row>
             <row>
               <entry>
@@ -377,7 +345,8 @@
               <entry>
                 0 to inf
               </entry>
-              <entry> Length that an object can travel between two frames </entry>
+              <entry>The maximal displacement in pixels of an object between two consecutive
+                images.</entry>
             </row>
             <row>
               <entry>
@@ -386,8 +355,8 @@
               <entry>
                 0, 1, 2
               </entry>
-              <entry> 0: head, 1: tail, 2: body. Body part parameters (position and angle) used for
-                the matching process. </entry>
+              <entry>The part of the object used for the matching. 0: head, 1: tail, 2: full
+                body.</entry>
             </row>
             <row>
               <entry>
@@ -396,7 +365,7 @@
               <entry>
                 0 to 255
               </entry>
-              <entry> Threshold value that separates background and foreground. </entry>
+              <entry>The threshold value (0 to 255) to separate objects from the background.</entry>
             </row>
             <row>
               <entry>
@@ -405,7 +374,7 @@
               <entry>
                 0 to maximal size
               </entry>
-              <entry> Minimal size in pixels of the tiniest object to track in the image sequence. </entry>
+              <entry>The minimal size of an object in pixels.</entry>
             </row>
             <row>
               <entry>
@@ -414,7 +383,7 @@
               <entry>
                 minimal size to inf
               </entry>
-              <entry> Maximal size in pixels of the biggest object to track in the image sequence. </entry>
+              <entry>The maximal size of an object to in pixels.</entry>
             </row>
             <row>
               <entry>
@@ -423,16 +392,14 @@
               <entry>
                 1 to inf
               </entry>
-              <entry>
-                Number of object to track.
-              </entry>
+              <entry>The number of objects to track.</entry>
             </row>
           </tbody>
         </tgroup>
       </informaltable>
       <section xml:id="help-parameter-panel">
-        <title>Help parameter panel</title>
-        <para> An semi-automatic help is provided to help the user to setup the size of  tracked
+        <title>Interactive parameters help</title>
+        <para> A semi-automatic help is provided to help the user to set up the size of tracked
           objects. Open the Setup Help window by clicking the (1) help button. </para>
         <itemizedlist spacing="compact">
           <listitem>
@@ -479,7 +446,7 @@
             </para>
           </listitem>
           <listitem>
-            <para> Tick/untick the Invert tick-box to have a white object on black background. </para>
+            <para> Tick/untick the Invert tick-box to have a white object on a black background. </para>
           </listitem>
           <listitem>
             <para>
@@ -500,7 +467,7 @@
       </section>
     </section>
     <section xml:id="replay-panel">
-      <title>Replay panel</title>
+      <title>Tracking review</title>
       <para>
         The replay panel allows the user to open and see the result of a
         tracking analysis and to correct the tracking if errors are
@@ -510,8 +477,10 @@
         <title>Open a tracking analysis</title>
         <orderedlist numeration="arabic" spacing="compact">
           <listitem>
-            <para> Clicks on the (1) open folder button to open a folder where an image sequence
-              previously analyzed is stored (if no tracking data are detected, the software will display only the image sequence). Be careful to open the image sequence folder and not the tracking_result folder. </para>
+            <para> Click on the (1) open folder button to open a folder where an image sequence
+              previously analyzed is stored (if no tracking data are detected, the software will
+              display only the image sequence). Be careful to open the image sequence folder and not
+              the tracking_result folder. </para>
           </listitem>
           <listitem>
             <para> The image sequence is displayed in the (6) display screen and can be played by
@@ -541,8 +510,8 @@
                 </para>
               </listitem>
               <listitem>
-                <para> By clicking on (4) occlusion buttons to go to previous and next occlusion
-                  events where mismatching are the most probable to occurs. </para>
+                <para> By clicking on (4) occlusion buttons to go to the previous and the next
+                  occlusion event where mismatchings are the most probable to occurs. </para>
               </listitem>
             </itemizedlist>
           </listitem>
@@ -560,30 +529,11 @@
           </listitem>
         </orderedlist>
       </section>
-      <section xml:id="save-tracking-movie">
-        <title>Save tracking movie</title>
-        <para> The result of the tracking can be saved in a video file. Select display options and
-          the frame rate wanted and click on the (8) save button. The movie will be saved in .avi
-          container with the MJPEG codec. In case of error, check that you have the MJPEG codec available on your system. </para>
-        <figure>
-          <title>The replay panel</title>
-          <mediaobject>
-            <imageobject>
-              <imagedata fileref="Replay_Panel.png" width="150mm" align="center"/>
-            </imageobject>
-            <textobject><phrase>Replay_Panel</phrase></textobject>
-          </mediaobject>
-          <caption>
-            <para>1:  Open folder button. 2: Option boxes. 3: Swap boxes and swap button. 4:
-              Occlusion buttons. 5: Play button. 6: Display screen. 7: Fps box. 8: Save button. 9:
-              Play button. 10: Keyboard shortcuts help.</para>
-          </caption>
-        </figure>
-      </section>
       <section xml:id="correct-rapidly-a-tracked-image-sequence">
         <title>Correct rapidly a tracked image sequence</title>
-        <para> Mouse and keyboards shortcuts are provided to rapidly correct a tracked image
-          sequence. The user can move inside the image sequence and review all occlusion events with the keyboard shortcuts and correct the tracking by swapping objects with the mouse. </para>
+        <para> Mouse and keyboard shortcuts are provided to rapidly correct errors. The user can
+          move inside the image sequence and review all occlusion events with the keyboard shortcuts
+          and correct the tracking by swapping objects with the mouse. </para>
         <para>
           For AZERTY keyboard:
         </para>
@@ -669,23 +619,38 @@
           </mediaobject>
         </figure>
       </section>
+      <section xml:id="save-tracking-movie">
+        <title>Save a tracking movie</title>
+        <para> The result of a tracking can be saved in a video file. Select the display options and
+          the frame rate desired and click on the (8) save button. The movie will be saved in a .avi
+          container with the MJPEG codec. In case of errors, check that you have the MJPEG codec
+          available on your system. </para>
+        <figure>
+          <title>The replay panel</title>
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="Replay_Panel.png" width="150mm" align="center"/>
+            </imageobject>
+            <textobject><phrase>Replay_Panel</phrase></textobject>
+          </mediaobject>
+          <caption>
+            <para>1:  Open folder button. 2: Option boxes. 3: Swap boxes and swap button. 4:
+              Occlusion buttons. 5: Play button. 6: Display screen. 7: Fps box. 8: Save button. 9:
+              Play button. 10: Keyboard shortcuts help.</para>
+          </caption>
+        </figure>
+      </section>
     </section>
   </chapter>
   <chapter xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="input-files">
     <title>Input files</title>
-    <para>
-      Fishy Tracking analyzes image sequence. <quote>pgm</quote>,
-      <quote>png</quote>, <quote>jpeg</quote>, <quote>jpg</quote>,
-      <quote>tiff</quote>, <quote>tif</quote>, <quote>bmp</quote>,
-      <quote>dib</quote>, <quote>jpe</quote>, <quote>jp2</quote>,
-      <quote>webp</quote>, <quote>pbm</quote>, <quote>ppm</quote>,
-      <quote>sr</quote>, <quote>ras</quote>, <quote>tif</quote> image
-      formats are supported.
-    </para>
-    <para>
-      If you have recording in a video format, you need to convert it
-      into image sequence.
-    </para>
+    <para> Fishy Tracking analyzes only image sequence with zeroes padding naming convention.
+        <quote>pgm</quote>, <quote>png</quote>, <quote>jpeg</quote>, <quote>jpg</quote>,
+        <quote>tiff</quote>, <quote>tif</quote>, <quote>bmp</quote>, <quote>dib</quote>,
+        <quote>jpe</quote>, <quote>jp2</quote>, <quote>webp</quote>, <quote>pbm</quote>,
+        <quote>ppm</quote>, <quote>sr</quote>, <quote>ras</quote>, <quote>tif</quote> image formats
+      are supported. </para>
+    <para> If you have a recording in a video format, you need to convert it into an image sequence. </para>
     <orderedlist numeration="arabic" spacing="compact">
       <listitem>
         <para>
@@ -726,28 +691,25 @@
     </para>
     <itemizedlist>
       <listitem>
-        <para>
-          tracking.txt containing the tracking data (in the frame of
-          reference of the full image with the origin in the top left
-          corner) as following:
-        </para>
+        <para> tracking.txt containing the tracking data (in the frame of reference of the full
+          image with the origin in the top left corner) as follows: </para>
         <informaltable>
           <tgroup cols="15">
-            <colspec colwidth="6*" align="left" />
-            <colspec colwidth="6*" align="left" />
-            <colspec colwidth="4*" align="left" />
-            <colspec colwidth="6*" align="left" />
-            <colspec colwidth="6*" align="left" />
-            <colspec colwidth="4*" align="left" />
-            <colspec colwidth="6*" align="left" />
-            <colspec colwidth="6*" align="left" />
-            <colspec colwidth="4*" align="left" />
-            <colspec colwidth="3*" align="left" />
-            <colspec colwidth="3*" align="left" />
-            <colspec colwidth="10*" align="left" />
-            <colspec colwidth="10*" align="left" />
-            <colspec colwidth="10*" align="left" />
-            <colspec colwidth="10*" align="left" />
+            <colspec colwidth="6*" align="left"/>
+            <colspec colwidth="6*" align="left"/>
+            <colspec colwidth="4*" align="left"/>
+            <colspec colwidth="6*" align="left"/>
+            <colspec colwidth="6*" align="left"/>
+            <colspec colwidth="4*" align="left"/>
+            <colspec colwidth="6*" align="left"/>
+            <colspec colwidth="6*" align="left"/>
+            <colspec colwidth="4*" align="left"/>
+            <colspec colwidth="3*" align="left"/>
+            <colspec colwidth="3*" align="left"/>
+            <colspec colwidth="10*" align="left"/>
+            <colspec colwidth="10*" align="left"/>
+            <colspec colwidth="10*" align="left"/>
+            <colspec colwidth="10*" align="left"/>
             <thead>
               <row>
                 <entry>
@@ -1028,8 +990,6 @@
       The performance can vary with the selected parameters.
       Registration and dilatation can cause a loss of 50% in performance. The number of objects influences the performance as the cube of the object number.
     </para>
-    <para>
-      Revised: 2019/01/03
-    </para>
+    <para> Revised: 2019/01/09 </para>
   </chapter>
 </book>

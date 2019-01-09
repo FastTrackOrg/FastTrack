@@ -117,8 +117,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
 ////////////////////////////Parameters panel/////////////////////////////////////////////
     
-    // Defines all parameters to fill the parameter panel.
-    // For initialization parameters are stored in a QMap with <QString>key: name of the parameter
+    // Defines all the parameters to fill the parameter panel.
+    // For initialization the parameters are stored in a QMap with <QString>key: name of the parameter
     // and <QString>value: value | description of the parameter for the initialization
     // After initialization the QMap parameterList is {<QString> key, <QString> value}
     ui->tableParameters->horizontalHeader()->setStretchLastSection(true);
@@ -132,7 +132,7 @@ MainWindow::MainWindow(QWidget *parent) :
     parameterList.insert("ROI top x", "0|Top corner x coordinate of the region of interest. Sets to 0 for keeping the full image.");
     parameterList.insert("Number of images background", "50|The number of images averaged to compute the background.");
     parameterList.insert("Arrow size", "2|Size of the arrow in the tracking display.");
-    parameterList.insert("Maximal occlusion", "100|The maximum assignment distancei in pixels. Only objects that have moved less than this value between two images are considered for the matching phase.");
+    parameterList.insert("Maximal occlusion", "100|The maximum assignment distance in pixels. Only objects that have moved less than this value between two images are considered for the matching phase.");
     parameterList.insert("Weight", "0.5|Closer to one the cost function used in the matching phase will be more sensitive to change in distance, closer to zero it will be more sensitive to change in direction.");
     parameterList.insert("Maximal angle", "90|The maximal change in orientation in degrees of an object between two consecutive images.");
     parameterList.insert("Maximal length", "100|The maximal displacement in pixels of an object between two consecutive images.");
@@ -144,8 +144,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     loadSettings();
 
-    // Fill the parameters table with the default names values and descriptions
-    // and delete the description that are not used anymore
+    // Fills the parameters table with the default names values and descriptions
+    // and deletes the descriptions that are not used anymore
     for(int i = 0; i < parameterList.keys().length(); i++) {
       ui->tableParameters->setSortingEnabled(false);
       ui->tableParameters->insertRow(i);
@@ -219,7 +219,7 @@ MainWindow::MainWindow(QWidget *parent) :
 \*******************************************************************************************/
 
 /**
-  * @brief Updates the parameterList vector with the new parameter when user changes a parameter in the QTableWidget of parameters. Triggered when ui->tableParameters is modified. Emits the updated parameters QMap.
+  * @brief Updates the parameterList vector with the new parameter when users changes a parameter in the QTableWidget of parameters. Triggered when ui->tableParameters is modified. Emits the updated parameters QMap.
   * @param[in] item QTableWidgetItem from a QTableWidget.
 */
 void MainWindow::updateParameterList(QTableWidgetItem* item) {
@@ -266,12 +266,12 @@ void MainWindow::removePath() {
 
 
 /**
-  * @brief Starts a new tracking analysis. First it get the path to the folder containing the images sequence. It creates a folder named Tracking_Result in this folder and a file parameters.txt containing the parameterList. It creates a new Tracking object that has to be run in a separate thread. When the analysis is finished, the Tracking object is destroyed and a new analysis is started. Trigerred when the start analysis button is clicked or when the signal finishedAnalysis() is emitted.
+  * @brief Starts a new tracking analysis. First, it gets the path to the folder containing the image sequence. It creates a folder named Tracking_Result in this folder and a file parameters.txt containing the parameterList. It creates a new Tracking object that has to be run in a separate thread. When the analysis is finished, the Tracking object is destroyed and a new analysis is started. Triggerred when the start analysis button is clicked or when the signal finishedAnalysis() is emitted.
 */
 void MainWindow::startTracking() {
     
-    // If the list that contains all the path path to process is not empty
-    // And if the path exist.
+    // If the list that contains all the path to process is not empty
+    // And if the path exists.
     // Creates a folder "Tracking_Result" inside the path and save the parameters file.
     // Start the tracking analysis in a new thread and manage creation and destruction
     // of the tracking object.
@@ -284,7 +284,7 @@ void MainWindow::startTracking() {
         QDir().mkdir( QString::fromStdString(path) + QDir::separator() + "Tracking_Result" );
         
 
-        // Saves parameters in a file named "parameter.txt"
+        // Saves the parameters in a file named "parameter.txt"
         QFile parameterFile(QString::fromStdString(path) + QDir::separator() +  "Tracking_Result" + QDir::separator() + "parameter.txt" );
         if(!parameterFile.open(QFile::WriteOnly | QFile::Text)){
           QMessageBox errorBox(this);
@@ -305,7 +305,7 @@ void MainWindow::startTracking() {
       
         connect(thread, &QThread::started, tracking, &Tracking::startProcess);
         connect(this, &MainWindow::newParameterList, tracking, &Tracking::updatingParameters);
-        // When tha analysis is finished, clears the path in the Ui and removes it from the pathList
+        // When the analysis is finished, clears the path in the ui and removes it from the pathList
         connect(tracking, &Tracking::finished, [this]() {
           pathList.removeFirst();
           ui->tablePath->removeRow(0);
@@ -335,7 +335,7 @@ void MainWindow::startTracking() {
 
 
 /**
-  * @brief Displays images received from the Tracking object. Triggered when the signal newImageToDisplay is emitted.
+  * @brief Displays the images received from the Tracking object. Triggered when the signal newImageToDisplay is emitted.
 */
 void MainWindow::display(UMat &visu, UMat &cameraFrame){
 
@@ -356,7 +356,7 @@ void MainWindow::display(UMat &visu, UMat &cameraFrame){
 \*******************************************************************************************/
 
 /**
-  * @brief Loads a settings file settings.ini at the start up of the program and updates the ui->parameterTable with the new parameters.
+  * @brief Loads the settings file at the startup of the program and updates the ui->parameterTable with the new parameters.
 */
 void MainWindow::loadSettings() {
 
@@ -373,7 +373,7 @@ void MainWindow::loadSettings() {
 
 
 /**
-  * @brief Saves all parameters in a settings file named settings.in.
+  * @brief Saves all the parameters in the settings file.
 */
 void MainWindow::saveSettings() {
       QList<QString> keyList = parameterList.keys();
@@ -388,7 +388,7 @@ void MainWindow::saveSettings() {
 \*******************************************************************************************/
 
 /**
-  * @brief Loads a folder containing an image sequences and the tracking data if it exist. Trigerred when ui->pathButton is pressed.
+  * @brief Loads a folder containing an image sequence and the tracking data if it exists. Triggerred when ui->pathButton is pressed.
 */
 void MainWindow::loadReplayFolder() {
 
@@ -404,7 +404,7 @@ void MainWindow::loadReplayFolder() {
     if (dir.length()) {
         ui->replayPath->setText(dir + QDir::separator());
 
-        // Find image format
+        // Finds image format
         QList<QString> extensions = { "pgm", "png", "jpeg", "jpg", "tiff", "tif", "bmp", "dib", "jpe", "jp2", "webp", "pbm", "ppm", "sr", "ras", "tif" };
         QDirIterator it(dir, QStringList(), QDir::NoFilter);
         QString extension;
@@ -415,10 +415,10 @@ void MainWindow::loadReplayFolder() {
   
         try{
 
-          // Get path to all the frames in the folder a,d put it in a vector.
-          // Setup the ui by setting maximum and minimum of the slider bar.
+          // Gets the paths to all the frames in the folder and puts it in a vector.
+          // Setups the ui by setting maximum and minimum of the slider bar.
           string path = (dir + QDir::separator() + "*." + extension).toStdString();
-          glob(path, replayFrames, false); // Get all path to frames
+          glob(path, replayFrames, false); // Gets all the paths to frames
           ui->replaySlider->setMinimum(0);
           ui->replaySlider->setMaximum(replayFrames.size() - 1);
           Mat frame = imread(replayFrames.at(0), IMREAD_COLOR);
@@ -426,7 +426,7 @@ void MainWindow::loadReplayFolder() {
           originalImageSize.setHeight(frame.rows);
           isReplayable = true;
 
-          // If tracking data are available, load data in a vector and find number of object in the frame.
+          // If tracking data are available, load data in a vector and find the number of objects in the frame.
           if( QDir().exists(dir + QDir::separator() + "Tracking_Result") ) {
             QFile trackingFile( dir + QDir::separator() + "Tracking_Result" + QDir::separator() + "tracking.txt");
             if (trackingFile.open(QIODevice::ReadOnly)) {
@@ -436,7 +436,7 @@ void MainWindow::loadReplayFolder() {
                 replayTracking.append(line);
               }
             }
-            replayTracking.removeFirst(); // Delete header line
+            replayTracking.removeFirst(); // Deletes header line
 
 
             QFile parameterFile( dir + QDir::separator() + "Tracking_Result" + QDir::separator() + "parameter.txt");
@@ -450,7 +450,7 @@ void MainWindow::loadReplayFolder() {
                 }
               }
             }
-            // Finds occlusion events, ie line where value is equal to "NaN"
+            // Finds occlusion events, ie line where the value is equal to "NaN"
             int occlusionEventIndex = replayTracking.indexOf("NaN");
             while ( occlusionEventIndex != -1 ) {
               occlusionEvents.append(occlusionEventIndex / replayNumberObject);
@@ -530,7 +530,7 @@ void MainWindow::loadFrame(int frameIndex) {
 }
 
 /**
-  * @brief Start the autoplay of the replay. Triggered when ui->playreplay is clicked.
+  * @brief Starts the autoplay of the replay. Triggered when ui->playreplay is clicked.
 */
 void MainWindow::toggleReplayPlay() {
   
@@ -564,7 +564,7 @@ void MainWindow::swapTrackingData(int firstObject, int secondObject, int from) {
 }
 
 /**
-  * @brief Gets the mouse coordinate in the frame of reference of the widget where user have clicked.
+  * @brief Gets the mouse coordinate in the frame of reference of the widget where the user has clicked.
   * @param[in] event Describes the mouse event.
 */
 void MainWindow::mousePressEvent(QMouseEvent* event) {
@@ -575,16 +575,16 @@ void MainWindow::mousePressEvent(QMouseEvent* event) {
       double xTop = ((double(ui->replayDisplay->mapFrom(this, event->pos()).x())- 0.5*( ui->replayDisplay->width() - resizedFrame.width()))*double(originalImageSize.width()))/double(resizedFrame.width()) ; 
       double yTop = ((double(ui->replayDisplay->mapFrom(this, event->pos()).y()) - 0.5*( ui->replayDisplay->height() - resizedFrame.height()))*double(originalImageSize.height()))/double(resizedFrame.height()) ; 
 
-      // If the replay tracking is available, computes the distance between the user click and the
-      // objects to determinate on whick object the user has clicked
+      // If the replay tracking is available, computes the distance between the user click and all the
+      // objects to find on which object the user has clicked
       if (!replayTracking.isEmpty()) {
 
         int frameIndex = ui->replaySlider->value();
         QVector<double> distance;
 
         // Computes the distance between the user click and all the objects
-        // If the coordinate are not available due to occlusion, the distance is computed 
-        // with the previous know coordinate
+        // If the coordinate is not available due to occlusion, the distance is computed 
+        // with the last previous known coordinate
         for (int i = frameIndex*replayNumberObject; i < frameIndex*replayNumberObject + replayNumberObject; i++) {
           QStringList coordinate = replayTracking.at(i).split('\t', QString::SkipEmptyParts);
           if (coordinate.at(0) != "NaN") {
@@ -593,7 +593,7 @@ void MainWindow::mousePressEvent(QMouseEvent* event) {
           else {
             QStringList previousCoordinate = replayTracking.at(i - replayNumberObject).split('\t', QString::SkipEmptyParts);
             int count = 0;
-            // Find last know position of the occluded object
+            // Finds last known position of the occluded object
             while (previousCoordinate.at(0) == "NaN") {
               count++;
               previousCoordinate = replayTracking.at(i - replayNumberObject*count).split('\t', QString::SkipEmptyParts);
@@ -602,7 +602,7 @@ void MainWindow::mousePressEvent(QMouseEvent* event) {
           }
         }
 
-      // Find the minimal distance and update the UI  
+      // Finds the minimal distance and updates the UI  
       int min = std::min_element(distance.begin(), distance.end()) - distance.begin();
       if (object) {
         ui->object1Replay->setCurrentIndex(min);
@@ -627,7 +627,7 @@ void MainWindow::mousePressEvent(QMouseEvent* event) {
 
 
 /**
-  * @brief Gets the index of two selected object and a start index and swaps the data from the start index to the end and saves the new tracking data. Triggered when ui->swapButton is pressed or right click in the replayDisplay.
+  * @brief Gets the index of the two selected objects, the start index, swaps the data from the start index to the end, and saves the new tracking data. Triggered when ui->swapButton is pressed or a right-click event is registered inside the replayDisplay.
 */
 void MainWindow::correctTracking() {
 
@@ -676,11 +676,11 @@ void MainWindow::previousOcclusionEvent() {
 
 
 /**
-  * @brief Saves the tracked movie in an avi. Triggered when ui->previousReplay is pressed.
+  * @brief Saves the tracked movie in .avi. Triggered when ui->previousReplay is pressed.
 */
 void MainWindow::saveTrackedMovie() {
     
-    // If tracking data are available, get the display setting and saves the movie in the
+    // If tracking data are available, gets the display settings and saves the movie in the
     // selected folder
     if( isReplayable ){
       QString savePath = QFileDialog::getSaveFileName(this, tr("Save File"), "/home/save.avi", tr("Videos (*.avi)"));
@@ -691,7 +691,7 @@ void MainWindow::saveTrackedMovie() {
         Mat frame = imread(replayFrames.at(frameIndex), IMREAD_COLOR);
        
         // Takes the tracking data corresponding to the replayed frame and parse data to display
-        // arrow on tracked objects.
+        // arrows on tracked objects.
         for (size_t i = frameIndex*replayNumberObject; i < frameIndex*replayNumberObject + replayNumberObject; i++) {
           
           if (replayTracking.at(i) == "NaN") {
@@ -722,7 +722,7 @@ void MainWindow::saveTrackedMovie() {
 
 
 /**
-  * @brief Destructs the MainWindow object and saves previous set of parameters.  
+  * @brief Destructs the MainWindow object and saves the previous set of parameters.  
 */
 MainWindow::~MainWindow()
 {

@@ -27,7 +27,7 @@ using namespace std;
 /**
  * @class Tracking
  *
- * @brief This class is intented to execute a tracking analysis on an images sequence. It is initialized with the path where images are stored. This class can be used inside an application by creating a new thread and calling the method startProcess. The tracking workflow can be reimplemented by reimplementing the method startProcess and imageProcessing. This class can also be used as a library by constructing Tracking tracking("") to access public class members and build a new workflow before reimplementing it in imageProcessing public slot.
+ * @brief This class is intended to execute a tracking analysis on an image sequence. It is initialized with the path to the folder where images are stored. This class can be used inside an application by creating a new thread and calling the method startProcess. The tracking workflow can be changed by reimplementing the method startProcess and imageProcessing. This class can also be used as a library by constructing Tracking tracking("") to access the public class members and builds a new workflow.
  *
  * @author Benjamin Gallois
  *
@@ -41,9 +41,9 @@ using namespace std;
 
 
 /**
-  * @brief Computes the center of the curvature defined as the intersection of the minor axis of the head ellipse with the minor axis of the tail ellipse of the object.
-  * @param[in] tail Parameters of the tail ellipse: coordinate and direction of the major axis.
-  * @param[in] head Parameters of the head ellipse: coordinate and direction of the major axis.
+  * @brief Computes the center of the curvature, defined as the intersection of the minor axis of the head ellipse with the minor axis of the tail ellipse of the object.
+  * @param[in] tail The parameters of the tail ellipse: coordinate and direction of the major axis.
+  * @param[in] head The parameters of the head ellipse: coordinate and direction of the major axis.
   * @return Coordinate of the curvature center.
 */
 Point2d Tracking::curvatureCenter(const Point3d &tail, const Point3d &head){
@@ -51,7 +51,7 @@ Point2d Tracking::curvatureCenter(const Point3d &tail, const Point3d &head){
 	Point2d center;
   
   // Computes the equation of the slope of the two minors axis of each ellipse
-  // from the coordinate and direction of each ellipse.
+  // from the coordinates and direction of each ellipse.
 	Point p1 = Point(tail.x + 10*cos(tail.z + 0.5*M_PI), tail.y + 10*sin(tail.z + 0.5*M_PI));
 	Point p2 = Point(head.x + 10*cos(head.z + 0.5*M_PI), head.y + 10*sin(head.z + 0.5*M_PI));
 
@@ -76,7 +76,7 @@ Point2d Tracking::curvatureCenter(const Point3d &tail, const Point3d &head){
 
 
 /**
-  * @brief Computes the radius of curvature of the object defined as the inverse of the mean distance between each pixel of the object, and the center of the curvature. The center of curvature is defined as the intersection of the two minor axis of the head and tail ellipse.
+  * @brief Computes the radius of curvature of the object defined as the inverse of the mean distance between each pixel of the object, and the center of the curvature. The center of curvature is defined as the intersection of the two minor axes of the head and tail ellipse.
   * @param[in] center Center of the curvature.
 	* @param[in] image Binary image CV_8U.
   * @return Radius of curvature.
@@ -112,7 +112,7 @@ double Tracking::modul(double angle) {
 
 
 /**
-  * @brief Computes the least difference between two angles, alpha - beta. The difference is oriented in trigonometric convention.
+  * @brief Computes the least difference between two angles, alpha - beta. The difference is oriented in the trigonometric convention.
   * @param[in] alpha Input angle.
   * @param[in] beta Input angle.
   * @return Least difference.
@@ -126,7 +126,7 @@ double Tracking::angleDifference(double alpha, double beta) {
 
 
 /**
-  * @brief Computes the equivalente ellipse of an object by computing moments of the image.
+  * @brief Computes the equivalent ellipse of an object by computing the moments of the image.
   * @param[in] image Binary image CV_8U.
   * @return The equivalent ellipse parameters: the object center of mass coordinate and its orientation.
   * @note: This function computes the object orientation, not its direction.
@@ -159,11 +159,10 @@ vector<double> Tracking::objectInformation(const UMat &image) {
 
 
 /**
-  * @brief Computes the direction of the object from the object parameter (coordinate of the center of mass and orientation).
-  * @details To use this function, the object major axis as to be the horizontal axis of the image. Therefore, it is necessary to rotate the image before calling objectDirection.
+  * @brief Computes the direction of the object from the object parameter (coordinate of the center of mass and orientation). To use this function, the object major axis has to be the horizontal axis of the image. Therefore, it is necessary to rotate the image before calling objectDirection.
   * @param[in] image Binary image CV_8U.
-  * @param[in] center Center of mass of the object.
-  * @param[in, out] information Parameters of the object (x coordinate, y coordinate, orientation).
+  * @param[in] center The center of mass of the object.
+  * @param[in, out] information The parameters of the object (x coordinate, y coordinate, orientation).
   * @return True if the direction angle is the orientation angle. False if the direction angle is the orientation angle plus pi.
 */
 bool Tracking::objectDirection(const UMat &image, Point center, vector<double> &information) {
@@ -205,9 +204,9 @@ bool Tracking::objectDirection(const UMat &image, Point center, vector<double> &
 
 
 /**
-  * @brief Computes the background of an images sequence by averaging n images.
-  * @param[in] files List of path for each image in the images sequence.
-  * @param[in] n Number of frames to average to computes the background.
+  * @brief Computes the background of an image sequence by averaging n images.
+  * @param[in] files List of paths to each image in the images sequence.
+  * @param[in] n The number of images to average to computes the background.
   * @return The background image.
 */
 UMat Tracking::backgroundExtraction(const vector<String> &files, double n){
@@ -243,8 +242,8 @@ UMat Tracking::backgroundExtraction(const vector<String> &files, double n){
 
 /**
   * @brief Register two images by phase correlation.
-  * @param[in] imageReference Reference image for the registration.
-	* @param[in, out] frame Image to register.
+  * @param[in] imageReference The reference image for the registration.
+  * @param[in, out] frame The image to register.
 */
 void Tracking::registration(UMat imageReference, UMat &frame){
 
@@ -260,10 +259,10 @@ void Tracking::registration(UMat imageReference, UMat &frame){
 
 
 /**
-  * @brief Binarises the image by thresholding.
-  * @param[in, out] frame Image to binarised.
-	* @param[in] backgroundColor If equal at 'w' the thresholded image will be inverted, if equal at 'b' it will not be inverted.
-  * @param[in] value Value at which to threshold the image.
+  * @brief Binarizes the image by thresholding.
+  * @param[in, out] frame The image to binarize.
+  * @param[in] backgroundColor If equals to 'w' the thresholded image will be inverted, if equal to 'b' it will not be inverted.
+  * @param[in] value The value at which to threshold the image.
 */
 void Tracking::binarisation(UMat& frame, char backgroundColor, int value){
 
@@ -282,12 +281,11 @@ void Tracking::binarisation(UMat& frame, char backgroundColor, int value){
 
 
 /**
-  * @brief Computes positions of multiples objects and extracts some features.
-  * @details 
-  * @param[in] frame: binary image CV_8U.
-	* @param[in] minSize Minimal size of an object.
-	* @param[in] maxSize: Maximal size of an object.
-  * @return All parameters of all objects formated as follows. One vector, inside of this vector, four vectors for parameters of the head, tail, body and features with number of object size. {  { Point(xHead, yHead, thetaHead), ...}, Point({xTail, yTail, thetaHead), ...}, {Point(xBody, yBody, thetaBody), ...}, {Point(curvature, 0, 0), ...}}
+  * @brief Computes the positions of the objects and extracts the object's features.
+  * @param[in] frame Binary image CV_8U.
+  * @param[in] minSize The minimal size of an object.
+  * @param[in] maxSize: The maximal size of an object.
+  * @return All the parameters of all the objects formated as follows: one vector, inside of this vector, four vectors for parameters of the head, tail, body and features with number of object size. {  { Point(xHead, yHead, thetaHead), ...}, Point({xTail, yTail, thetaHead), ...}, {Point(xBody, yBody, thetaBody), ...}, {Point(curvature, 0, 0), ...}}
 */
 vector<vector<Point3d>> Tracking::objectPosition(const UMat &frame, int minSize, int maxSize){
 
@@ -311,9 +309,9 @@ vector<vector<Point3d>> Tracking::objectPosition(const UMat &frame, int minSize,
 
 	for (size_t i = 0; i < contours.size(); i++){
 			
-      if(contourArea(contours[i]) > minSize && contourArea(contours[i]) < maxSize){ // Only select objects minArea << objectArea <<maxArea
+      if(contourArea(contours[i]) > minSize && contourArea(contours[i]) < maxSize){ // Only selects objects minArea << objectArea <<maxArea
 
-            // Draw the object in a temporary black image avoiding selecting a 
+            // Draws the object in a temporary black image to avoid selecting a 
             // part of another object if two objects are very close.
 						dst = UMat::zeros(frame.size(), CV_8U);
 						drawContours(dst, contours, i, Scalar(255, 255, 255), FILLED,8); 
@@ -335,7 +333,7 @@ vector<vector<Point3d>> Tracking::objectPosition(const UMat &frame, int minSize,
             warpAffine(RoiFull, rotate, rotMatrix, bbox.size());
 
 
-           // Computes the coordinate of the center of mass of the fish in the rotated
+           // Computes the coordinate of the center of mass of the object in the rotated
            // image frame of reference.
             p = (Mat_<double>(3,1) << parameter.at(0), parameter.at(1), 1);
             pp = rotMatrix * p;
@@ -370,7 +368,7 @@ vector<vector<Point3d>> Tracking::objectPosition(const UMat &frame, int minSize,
             }
 
 
-            // Gets all the parameter in the frame of reference of RoiFull image.
+            // Gets all the parameters in the frame of reference of RoiFull image.
 						invertAffineTransform(rotMatrix, rotMatrix);
 						p = (Mat_<double>(3,1) << parameterHead.at(0) + roiHead.tl().x,parameterHead.at(1) + roiHead.tl().y, 1);
 						pp = rotMatrix * p;
@@ -387,8 +385,7 @@ vector<vector<Point3d>> Tracking::objectPosition(const UMat &frame, int minSize,
 						double angleTail = parameterTail.at(2) - M_PI*(parameterTail.at(2) > M_PI);
 						angleTail = modul(angleTail + parameter.at(2) + M_PI*(abs(angleTail) > 0.5*M_PI)); // Computes the direction
 
-						// Computes the curvature of the object as the invert of all distances from each
-            // pixels of the fish and the intersection of the minor axis off tail and head ellipse.
+						// Computes the curvature of the object
 						double curv = 1./1e-16;
 						radiusCurv = curvatureCenter(Point3d(xTail, yTail, angleTail), Point3d(xHead, yHead, angleHead));
 						if(radiusCurv.x != NAN){ //
@@ -419,15 +416,14 @@ vector<vector<Point3d>> Tracking::objectPosition(const UMat &frame, int minSize,
 
 
 /**
-  * @brief Computes a cost function and use a global optimization association to associate targets between frame. 
-  * @details Method adapted from: "An effective and robust method for Tracking multiple fish in video image based on fish head detection" YQ Chen et al. Use the Hungarian method implemented by Cong Ma, 2016 "https://github.com/mcximing/hungarian-algorithm-cpp" adapted from the matlab implementation by Markus Buehren "https://fr.mathworks.com/matlabcentral/fileexchange/6543-functions-for-the-rectangular-assignment-problem".
-  * @param[in] prevPos Vector of objects at t minus one.
-	* @param[in] pos Vector of objects parameters at t that we want to reorder in order to conserve objects identity.
-	* @param[in] LENGTH Maximal displacement of an object between two frames in pixels.
-	* @param[in] ANGLE Maximal difference in orientation an object between two frames in radians.
-	* @param[in] WEIGHT Weight between distance and direction in the computation of the cost function. Close to 0 the cost function used the distance, close to one it will be used the direction. 
-	* @param[in] LO Maximal occlusion distance of objects between two frames in pixels.
-	* @return The assignment vector containing the new index position to sort the pos vector. 
+  * @brief Computes a cost function and use a global optimization association to associate targets between images. Method adapted from: "An effective and robust method for Tracking multiple fish in video image based on fish head detection" YQ Chen et al. Uses the Hungarian method implemented by Cong Ma, 2016 "https://github.com/mcximing/hungarian-algorithm-cpp" adapted from the Matlab implementation by Markus Buehren "https://fr.mathworks.com/matlabcentral/fileexchange/6543-functions-for-the-rectangular-assignment-problem".
+  * @param[in] prevPos The vector of objects parameters at the previous image.
+  * @param[in] pos The vector of objects parameters at the current image that we want to sort in order to conserve objects identity.
+  * @param[in] LENGTH The maximal displacement of an object between two images in pixels.
+  * @param[in] ANGLE The maximal change in direction of an object between two images in radians.
+  * @param[in] WEIGHT The weight between distance and direction in the computation of the cost function. 0: change in distance, 1: change in orientation.
+  * @param[in] LO The maximal assignment distance in pixels.
+  * @return The assignment vector containing the new index position to sort the pos vector. 
 */
 vector<int> Tracking::costFunc(const vector<Point3d> &prevPos, const vector<Point3d> &pos, double LENGTH, double ANGLE, double WEIGHT, double LO){
 
@@ -465,9 +461,9 @@ vector<int> Tracking::costFunc(const vector<Point3d> &prevPos, const vector<Poin
 
 
 /**
-  * @brief Finds the identity of the object that are occluded during the tracking.
-  * @param[in] assignment Vector with the new index that will be used to sort the input vector.
-  * @return The vector with the index of occluded objects.
+  * @brief Finds the objects that are occluded during the tracking.
+  * @param[in] assignment The vector with the new indexes that will be used to sort the input vector.
+  * @return The vector with the indexes of occluded objects.
 */
 vector<int> Tracking::findOcclusion(vector<int> assignment) { 
   
@@ -484,10 +480,10 @@ vector<int> Tracking::findOcclusion(vector<int> assignment) {
 
 
 /**
-  * @brief Sorts a vector accordingly to a new index. The sorted vector at index i is the input at index assignment at index i.
-  * @param[in] past Vector at t minus one.
-  * @param[in] input Vector at t of size m <= n to be sorted.
-  * @param[in] assignment Vector with the new index that will be used to sort the input vector.
+  * @brief Sorts a vector accordingly to a new set of indexes. The sorted vector at index i is the input at index assignment[i].
+  * @param[in] past The vector at the previous image.
+  * @param[in] input The vector at current image of size m <= n to be sorted.
+  * @param[in] assignment The vector with the new indexes that will be used to sort the input vector.
   * @return The sorted vector.
 */
 vector<Point3d> Tracking::reassignment(const vector<Point3d> &past, const vector<Point3d> &input, const vector<int> &assignment){
@@ -529,10 +525,10 @@ vector<Point3d> Tracking::reassignment(const vector<Point3d> &past, const vector
 
 
 /**
-  * @brief Predicts the next position of an object from previous position.
-  * @param past Previous parameters.
-  * @param present: Current parameters.
-  * @return Output vector of size n.
+  * @brief Predicts the next position of an object from the previous position.
+  * @param past The previous position parameters.
+  * @param present: The current position parameters.
+  * @return The predicted positions.
 */
 vector<Point3d> Tracking::prevision(vector<Point3d> past, vector<Point3d> present){
 
@@ -561,8 +557,8 @@ vector<Point3d> Tracking::prevision(vector<Point3d> past, vector<Point3d> presen
 
 /**
   * @brief Computes a random set of colors.
-  * @param[in] number Number of color to generate.
-  * @return The vector containing n colors in RGB.
+  * @param[in] number The number of colors to generate.
+  * @return The vector containing the n colors.
 */
 vector<Point3d> Tracking::color(int number){
 
@@ -585,12 +581,11 @@ vector<Point3d> Tracking::color(int number){
 
 
 /**
-  * @brief Processes an image from an images sequence and tracks and matchs object according to previous image in the sequence.
-  * @details Takes a new image from the sequence, substract the background, binarises the image and crop according to defined region of interest. Detects all the objects in the image, extracts the object features. Then match detected object with objects from the previous frame. This function emit a signal to display the image in the user interface.
+  * @brief Processes an image from an images sequence and tracks and matchs objects according to the previous image in the sequence. Takes a new image from the image sequence, substracts the background, binarises the image and crops according to the defined region of interest. Detects all the objects in the image and extracts the object features. Then matches detected objects with objects from the previous frame. This function emits a signal to display the images in the user interface.
 */
 void Tracking::imageProcessing(){
 
-    // Reads the next image in the image sequence and applies the image processing work flow
+    // Reads the next image in the image sequence and applies the image processing workflow
     imread(m_files.at(m_im), IMREAD_GRAYSCALE).copyTo(m_visuFrame);
     if(statusRegistration){
       registration(m_background, m_visuFrame);
@@ -610,17 +605,17 @@ void Tracking::imageProcessing(){
       m_visuFrame = m_visuFrame(m_ROI);
     }
 
-    // Detects objects and extracts  parameters
+    // Detects the objects and extracts  parameters
     m_out = objectPosition(m_binaryFrame, param_minArea, param_maxArea);
 
-    // Associates objets with the previous image
+    // Associates the objets with the previous image
     vector<int> identity = costFunc(m_outPrev.at(param_spot), m_out.at(param_spot), param_len, param_angle, param_weight, param_lo);
     vector<int> occluded = findOcclusion(identity);
     for (size_t i = 0; i < m_out.size(); i++) {
       m_out.at(i) = reassignment(m_outPrev.at(i), m_out.at(i), identity);
     }
 
-    // Saves objects parameters in text file and display tracking result in the display panel
+    // Saves the parameters of the objects in a text file and displays the tracking results in the display panel
     cvtColor(m_visuFrame, m_visuFrame, COLOR_GRAY2RGB);
 
     // Draws lines and arrows on the image in the display panel
@@ -645,7 +640,7 @@ void Tracking::imageProcessing(){
           }
           m_savefile << m_im << '\n';
         }
-        // No tracking data available due to an occlusion event
+        // No tracking data are available due to an occlusion event
         else {
 
           m_savefile << "NaN" << '\n';
@@ -676,7 +671,7 @@ void Tracking::imageProcessing(){
 
 /**
   * @brief Constructs the tracking object from a path to an image sequence.
-  * @param[in] path path to a folder where images are stocked.
+  * @param[in] path The path to a folder where images are stocked.
 */
 Tracking::Tracking(string path) {
   m_path = path;
@@ -686,12 +681,11 @@ Tracking::Tracking(string path) {
 
 
 /**
-  * @brief Initializes a tracking analysis and trigerred its execution.
-  * @details From the path to a folder where the images sequence is stored, detects the image format and process the fist frame to detect objects. First it computes the background by averaging images from the sequence, then it substracts the background from the first frame and then binarises the resulting image. It detect the object by contour analysis and extracts features by computing the object moments. Finally it triggers the analysis of the second image of the sequence.
+  * @brief Initializes a tracking analysis and triggers its execution. Constructs from the path to a folder where the image sequence is stored, detects the image format and processes the first image to detect objects. First, it computes the background by averaging images from the sequence, then it subtracts  the background from the first image and then binarizes the resulting image. It detects the objects by contour analysis and extracts features by computing the object moments. It triggers the analysis of the second image of the sequence.
 */
 void Tracking::startProcess() {
   
-  // Find image format
+  // Finds image format
   QList<QString> extensions = { "pgm", "png", "jpeg", "jpg", "tiff", "tif", "bmp", "dib", "jpe", "jp2", "webp", "pbm", "ppm", "sr", "ras", "tif" };
   QDirIterator it(QString::fromStdString(m_path), QStringList(), QDir::NoFilter);
   QString extension;
@@ -750,7 +744,7 @@ void Tracking::startProcess() {
     
   cvtColor(m_visuFrame, m_visuFrame, COLOR_GRAY2RGB);
   
-  // Initialize output file and stream
+  // Initializes output file and stream
   m_outputFile.setFileName(QString::fromStdString(m_path).section("*",0,0) + "Tracking_Result" + QDir::separator() + "tracking.txt" );
   if(!m_outputFile.open(QFile::WriteOnly | QFile::Text)){
     qInfo() << "Error opening folder";
@@ -794,8 +788,8 @@ void Tracking::startProcess() {
 
 
 /**
-  * @brief Updates private member from external parameters. This function links the tracking logic with the graphical user interface.
-  * @param[in] parameterList List of all parameters used in the tracking.
+  * @brief Updates the private members from the external parameters. This function links the tracking logic with the graphical user interface.
+  * @param[in] parameterList The list of all the parameters used in the tracking.
 */
 void Tracking::updatingParameters(const QMap<QString, QString> &parameterList) {
 
@@ -822,6 +816,8 @@ void Tracking::updatingParameters(const QMap<QString, QString> &parameterList) {
 
 }
 
-
+/**
+  * @brief Destructs the tracking object.
+*/
 Tracking::~Tracking() {
 }
