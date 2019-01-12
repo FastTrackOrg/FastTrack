@@ -156,7 +156,7 @@
       <orderedlist numeration="arabic" spacing="compact">
         <listitem>
           <para> Click on the (1) open folder button to select a folder where an image sequence to
-            analyze is stored.  The path can directly be copied into the (2) path bar. </para>
+            analyze is stored.  The path can directly be pasted or dragged into the (2) path bar. </para>
         </listitem>
         <listitem>
           <para> Click on the (3) add path button to add the path to the list of image sequences to
@@ -480,7 +480,7 @@
             <para> Click on the (1) open folder button to open a folder where an image sequence
               previously analyzed is stored (if no tracking data are detected, the software will
               display only the image sequence). Be careful to open the image sequence folder and not
-              the tracking_result folder. </para>
+              the tracking_result folder. You can also past or drag the folder's path to  the (11) path edit bar. </para>
           </listitem>
           <listitem>
             <para> The image sequence is displayed in the (6) display screen and can be played by

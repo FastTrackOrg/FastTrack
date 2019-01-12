@@ -83,6 +83,10 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->replaySave->setIcon(img);
     ui->replaySave->setIconSize(QSize(ui->replaySave->width(), ui->replaySave->height()));
     
+    img = QIcon(":/buttons/refresh.png");
+    ui->replayRefresh->setIcon(img);
+    ui->replayRefresh->setIconSize(QSize(ui->replayRefresh->width(), ui->replayRefresh->height()));
+    
     setupWindow = new SetupWindow(this);
     connect(ui->setupWindow, &QPushButton::clicked, [this]() {
       setupWindow->show();
@@ -177,10 +181,14 @@ MainWindow::MainWindow(QWidget *parent) :
 ////////////////////////////Replay panel/////////////////////////////////////////////
     isReplayable = false;
     framerate = new QTimer();
-    connect(ui->replayOpen, &QPushButton::clicked, this, &MainWindow::loadReplayFolder);
+    connect(ui->replayOpen, &QPushButton::clicked, this, &MainWindow::openReplayFolder);
+    connect(ui->replayPath, &QLineEdit::textChanged, this, &MainWindow::loadReplayFolder);
     connect(ui->replaySlider, &QSlider::valueChanged, this, &MainWindow::loadFrame);
     connect(ui->replaySlider, &QSlider::valueChanged, [this](const int &newValue) {
       ui->replayNumber->setText(QString::number(newValue));
+    });
+    connect(ui->replayRefresh, &QPushButton::clicked, [this]() {
+      loadReplayFolder(ui->replayPath->text());
     });
     connect(ui->swapReplay, &QPushButton::clicked, this, &MainWindow::correctTracking);
     
@@ -245,7 +253,7 @@ void MainWindow::openPathFolder() {
 */
 void MainWindow::addPath() {
     int row = ui->tablePath->rowCount();
-    QString path = ui->textPathAdd->toPlainText();
+    QString path = ui->textPathAdd->text();
     ui->tablePath->insertRow(row);
     ui->tablePath->setItem(row, 0, new QTableWidgetItem(path));
     pathList.append(path);
@@ -387,10 +395,17 @@ void MainWindow::saveSettings() {
                                   Replay panel
 \*******************************************************************************************/
 
+void MainWindow::openReplayFolder() {
+    QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"), "/home", QFileDialog::ShowDirsOnly);
+    ui->replayPath->setText(dir + QDir::separator());
+}
+
+
 /**
   * @brief Loads a folder containing an image sequence and the tracking data if it exists. Triggerred when ui->pathButton is pressed.
+  * @arg[in] dir Path to the folder where the image sequence is stored.
 */
-void MainWindow::loadReplayFolder() {
+void MainWindow::loadReplayFolder(QString dir) {
 
     // Delete existing data
     replayTracking.clear();
@@ -400,9 +415,7 @@ void MainWindow::loadReplayFolder() {
     ui->object2Replay->clear();
     framerate->stop();
     object = true;
-    QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"), "/home", QFileDialog::ShowDirsOnly);
     if (dir.length()) {
-        ui->replayPath->setText(dir + QDir::separator());
 
         // Finds image format
         QList<QString> extensions = { "pgm", "png", "jpeg", "jpg", "tiff", "tif", "bmp", "dib", "jpe", "jp2", "webp", "pbm", "ppm", "sr", "ras", "tif" };

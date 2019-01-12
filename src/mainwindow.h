@@ -122,7 +122,8 @@ public slots:
     void addPath();
     void removePath();
     void display(UMat&, UMat&);
-    void loadReplayFolder();
+    void openReplayFolder();
+    void loadReplayFolder(QString dir);
     void loadFrame(int frameIndex);
     void toggleReplayPlay();
     void mousePressEvent(QMouseEvent* event);
