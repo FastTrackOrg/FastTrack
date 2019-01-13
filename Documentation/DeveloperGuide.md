@@ -114,7 +114,7 @@ SOURCES += \
 
 QMAKE_CXXFLAGS += -std=c++11 -O3 -fopenmp
 
-INCLUDEPATH += C:/opencv/sources/include
+INCLUDEPATH += C:/opencv/build/include
 
 
 LIBS += C:/opencv/sources/build/install/x64/mingw/bin/libopencv_core401.dll

@@ -21,7 +21,6 @@ This file is part of Fishy Tracking.
 #include "mainwindow.h"
 
 
-
 using namespace cv;
 using namespace std;
 
