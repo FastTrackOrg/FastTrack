@@ -295,6 +295,7 @@ vector<vector<Point3d>> Tracking::objectPosition(const UMat &frame, int minSize,
 	vector<Point3d> positionFull;
 	vector<Point3d> ellipseHead;
 	vector<Point3d> ellipseTail;
+	vector<Point3d> ellipseBody;
 	vector<Point3d> globalParam;
 	UMat dst;
 	Rect roiFull, bbox;
@@ -398,6 +399,7 @@ vector<vector<Point3d>> Tracking::objectPosition(const UMat &frame, int minSize,
 						positionFull.push_back(Point3d(parameter.at(0) + roiFull.tl().x, parameter.at(1) + roiFull.tl().y, parameter.at(2)));
             ellipseHead.push_back(Point3d(parameterHead.at(3), parameterHead.at(4), 0));
             ellipseTail.push_back(Point3d(parameterTail.at(3), parameterTail.at(4), 0));
+            ellipseBody.push_back(Point3d(parameter.at(3), parameter.at(4), 0));
 
 						globalParam.push_back(Point3d(curv, 0, 0));
 						}
@@ -407,7 +409,7 @@ vector<vector<Point3d>> Tracking::objectPosition(const UMat &frame, int minSize,
       }
    }
 
-	vector<vector<Point3d>> out = {positionHead, positionTail, positionFull, globalParam, ellipseHead, ellipseTail};
+	vector<vector<Point3d>> out = {positionHead, positionTail, positionFull, globalParam, ellipseHead, ellipseTail, ellipseBody};
 	return out;
 }
 
@@ -754,7 +756,7 @@ void Tracking::startProcess() {
   // Saving
 
   // File header
-  m_savefile << "xHead" << '\t' << "yHead" << '\t' << "tHead" << '\t'  << "xTail" << '\t' << "yTail" << '\t' << "tTail"   << '\t'  << "xBody" << '\t' << "yBody" << '\t' << "tBody"   << '\t'  << "curvature"  << '\t' << "Reserved" << '\t' << "Reserved" << '\t' << "headMajorAxisLength" << '\t' << "headMinorAxisLength" << '\t' << "Reserved" << '\t' << "tailMajorAxisLength" << '\t' << "tailMinorAxisLength" << '\t' << "Reserved" << '\t'  << "imageNumber" << "\n";
+  m_savefile << "xHead" << '\t' << "yHead" << '\t' << "tHead" << '\t'  << "xTail" << '\t' << "yTail" << '\t' << "tTail"   << '\t'  << "xBody" << '\t' << "yBody" << '\t' << "tBody"   << '\t'  << "curvature"  << '\t' << "Reserved" << '\t' << "Reserved" << '\t' << "headMajorAxisLength" << '\t' << "headMinorAxisLength" << '\t' << "Reserved" << '\t' << "tailMajorAxisLength" << '\t' << "tailMinorAxisLength" << '\t' << "Reserved" << '\t'<< "bodyMajorAxisLength" << '\t' << "bodyMinorAxisLength" << '\t' << "Reserved" << '\t' << "imageNumber" << "\n";
   
   // Draws lines and arrows on the image in the display panel
   for(size_t l = 0; l < m_out.at(0).size(); l++){

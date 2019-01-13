@@ -181,6 +181,9 @@ MainWindow::MainWindow(QWidget *parent) :
 ////////////////////////////Replay panel/////////////////////////////////////////////
     isReplayable = false;
     framerate = new QTimer();
+    ui->ellipseBox->addItems({"Head + Tail", "Head", "Tail", "Body"});
+    ui->arrowBox->addItems({"Head + Tail", "Head", "Tail", "Body"});
+
     connect(ui->replayOpen, &QPushButton::clicked, this, &MainWindow::openReplayFolder);
     connect(ui->replayPath, &QLineEdit::textChanged, this, &MainWindow::loadReplayFolder);
     connect(ui->replaySlider, &QSlider::valueChanged, this, &MainWindow::loadFrame);
@@ -510,7 +513,7 @@ void MainWindow::loadFrame(int frameIndex) {
       int scale = ui->replaySize->value();
      
       // Takes the tracking data corresponding to the replayed frame and parse data to display
-      // arrow on tracked objects.
+      // arrow on the tracked objects.
       for (int i = frameIndex*replayNumberObject; i < frameIndex*replayNumberObject + replayNumberObject; i++) {
         
         if (replayTracking.at(i) == "NaN") {
@@ -520,16 +523,66 @@ void MainWindow::loadFrame(int frameIndex) {
         QStringList coordinate = replayTracking.at(i).split('\t', QString::SkipEmptyParts);
 
         if (ui->replayEllipses->isChecked()) {
-        cv::ellipse(frame, Point( coordinate.at(0).toDouble(), coordinate.at(1).toDouble() ), Size( coordinate.at(12).toDouble(), coordinate.at(13).toDouble() ), 180 - (coordinate.at(2).toDouble()*180)/M_PI, 0, 360,  Scalar(colorMap.at(i - frameIndex*replayNumberObject).x, colorMap.at(i - frameIndex*replayNumberObject).y, colorMap.at(i - frameIndex*replayNumberObject).z), scale, 8 );
-          cv::ellipse(frame, Point( coordinate.at(3).toDouble(), coordinate.at(4).toDouble() ), Size( coordinate.at(15).toDouble(), coordinate.at(16).toDouble() ), 180 - (coordinate.at(5).toDouble()*180)/M_PI, 0, 360,  Scalar(colorMap.at(i - frameIndex*replayNumberObject).x, colorMap.at(i - frameIndex*replayNumberObject).y, colorMap.at(i - frameIndex*replayNumberObject).z), scale, cv::LINE_AA );
+
+          switch(ui->ellipseBox->currentIndex()) {
+            
+            case 0 : // Head + Tail
+              cv::ellipse(frame, Point( coordinate.at(0).toDouble(), coordinate.at(1).toDouble() ), Size( coordinate.at(12).toDouble(), coordinate.at(13).toDouble() ), 180 - (coordinate.at(2).toDouble()*180)/M_PI, 0, 360,  Scalar(colorMap.at(i - frameIndex*replayNumberObject).x, colorMap.at(i - frameIndex*replayNumberObject).y, colorMap.at(i - frameIndex*replayNumberObject).z), scale, 8 );
+              cv::ellipse(frame, Point( coordinate.at(3).toDouble(), coordinate.at(4).toDouble() ), Size( coordinate.at(15).toDouble(), coordinate.at(16).toDouble() ), 180 - (coordinate.at(5).toDouble()*180)/M_PI, 0, 360,  Scalar(colorMap.at(i - frameIndex*replayNumberObject).x, colorMap.at(i - frameIndex*replayNumberObject).y, colorMap.at(i - frameIndex*replayNumberObject).z), scale, cv::LINE_AA );
+              break;
+
+            case 1 : // Head
+              cv::ellipse(frame, Point( coordinate.at(0).toDouble(), coordinate.at(1).toDouble() ), Size( coordinate.at(12).toDouble(), coordinate.at(13).toDouble() ), 180 - (coordinate.at(2).toDouble()*180)/M_PI, 0, 360,  Scalar(colorMap.at(i - frameIndex*replayNumberObject).x, colorMap.at(i - frameIndex*replayNumberObject).y, colorMap.at(i - frameIndex*replayNumberObject).z), scale, 8 );
+              break;
+
+            case 2 : // Tail
+              cv::ellipse(frame, Point( coordinate.at(3).toDouble(), coordinate.at(4).toDouble() ), Size( coordinate.at(15).toDouble(), coordinate.at(16).toDouble() ), 180 - (coordinate.at(5).toDouble()*180)/M_PI, 0, 360,  Scalar(colorMap.at(i - frameIndex*replayNumberObject).x, colorMap.at(i - frameIndex*replayNumberObject).y, colorMap.at(i - frameIndex*replayNumberObject).z), scale, cv::LINE_AA );
+              break;
+
+            case 3 : // Body
+              cv::ellipse(frame, Point( coordinate.at(6).toDouble(), coordinate.at(7).toDouble() ), Size( coordinate.at(18).toDouble(), coordinate.at(19).toDouble() ), 180 - (coordinate.at(8).toDouble()*180)/M_PI, 0, 360,  Scalar(colorMap.at(i - frameIndex*replayNumberObject).x, colorMap.at(i - frameIndex*replayNumberObject).y, colorMap.at(i - frameIndex*replayNumberObject).z), scale, 8 );
+              break;
+          }
         }
 
         if (ui->replayArrows->isChecked()) {
-          cv::arrowedLine(frame, Point(coordinate.at(0).toDouble(), coordinate.at(1).toDouble()), Point(coordinate.at(0).toDouble() + coordinate.at(10).toDouble()*cos(coordinate.at(2).toDouble()), coordinate.at(1).toDouble() - coordinate.at(10).toDouble()*sin(coordinate.at(2).toDouble())), Scalar(colorMap.at(i - frameIndex*replayNumberObject).x, colorMap.at(i - frameIndex*replayNumberObject).y, colorMap.at(i - frameIndex*replayNumberObject).z), scale, cv::LINE_AA, 0, double(scale)/10);
+          
+          switch(ui->arrowBox->currentIndex()) {
+          
+          case 0 :
+            cv::arrowedLine(frame, Point(coordinate.at(0).toDouble(), coordinate.at(1).toDouble()), Point(coordinate.at(0).toDouble() + coordinate.at(12).toDouble()*cos(coordinate.at(2).toDouble()), coordinate.at(1).toDouble() - coordinate.at(12).toDouble()*sin(coordinate.at(2).toDouble())), Scalar(colorMap.at(i - frameIndex*replayNumberObject).x, colorMap.at(i - frameIndex*replayNumberObject).y, colorMap.at(i - frameIndex*replayNumberObject).z), scale, cv::LINE_AA, 0, double(scale)/10);
+            cv::arrowedLine(frame, Point(coordinate.at(3).toDouble(), coordinate.at(4).toDouble()), Point(coordinate.at(3).toDouble() + coordinate.at(15).toDouble()*cos(coordinate.at(5).toDouble()), coordinate.at(4).toDouble() - coordinate.at(15).toDouble()*sin(coordinate.at(5).toDouble())), Scalar(colorMap.at(i - frameIndex*replayNumberObject).x, colorMap.at(i - frameIndex*replayNumberObject).y, colorMap.at(i - frameIndex*replayNumberObject).z), scale, cv::LINE_AA, 0, double(scale)/10);
+            break;
+
+          case 1 :
+            cv::arrowedLine(frame, Point(coordinate.at(0).toDouble(), coordinate.at(1).toDouble()), Point(coordinate.at(0).toDouble() + coordinate.at(12).toDouble()*cos(coordinate.at(2).toDouble()), coordinate.at(1).toDouble() - coordinate.at(12).toDouble()*sin(coordinate.at(2).toDouble())), Scalar(colorMap.at(i - frameIndex*replayNumberObject).x, colorMap.at(i - frameIndex*replayNumberObject).y, colorMap.at(i - frameIndex*replayNumberObject).z), scale, cv::LINE_AA, 0, double(scale)/10);
+            break;
+
+          case 2 :
+            cv::arrowedLine(frame, Point(coordinate.at(3).toDouble(), coordinate.at(4).toDouble()), Point(coordinate.at(3).toDouble() + coordinate.at(15).toDouble()*cos(coordinate.at(5).toDouble()), coordinate.at(4).toDouble() - coordinate.at(15).toDouble()*sin(coordinate.at(5).toDouble())), Scalar(colorMap.at(i - frameIndex*replayNumberObject).x, colorMap.at(i - frameIndex*replayNumberObject).y, colorMap.at(i - frameIndex*replayNumberObject).z), scale, cv::LINE_AA, 0, double(scale)/10);
+            break;
+
+          case 3 :
+            cv::arrowedLine(frame, Point(coordinate.at(6).toDouble(), coordinate.at(7).toDouble()), Point(coordinate.at(6).toDouble() + coordinate.at(18).toDouble()*cos(coordinate.at(8).toDouble()), coordinate.at(7).toDouble() - coordinate.at(18).toDouble()*sin(coordinate.at(8).toDouble())), Scalar(colorMap.at(i - frameIndex*replayNumberObject).x, colorMap.at(i - frameIndex*replayNumberObject).y, colorMap.at(i - frameIndex*replayNumberObject).z), scale, cv::LINE_AA, 0, double(scale)/10);
+            break;
+
+          }
         }
         
         if (ui->replayNumbers->isChecked()) {
           cv::putText(frame, to_string(i - frameIndex*replayNumberObject), Point(coordinate.at(0).toDouble() + coordinate.at(10).toDouble()*cos(coordinate.at(2).toDouble()), coordinate.at(1).toDouble() - coordinate.at(10).toDouble()*sin(coordinate.at(2).toDouble()) ), cv::FONT_HERSHEY_SIMPLEX, double(scale)*0.5, Scalar(colorMap.at(i - frameIndex*replayNumberObject).x, colorMap.at(i - frameIndex*replayNumberObject).y, colorMap.at(i - frameIndex*replayNumberObject).z), scale*1.2, cv::LINE_AA);
+        }
+        
+        if (ui->replayTrace->isChecked()) {
+          // Gets the 20 previous cordinates to display the trajectory trace
+          vector<Point> memory;
+          for (int j = i - 20*replayNumberObject; j < i; j += replayNumberObject) {
+            if (j > 0 && replayTracking.at(j) != "NaN") {
+              QStringList coordinateMemory = replayTracking.at(j).split('\t', QString::SkipEmptyParts);
+              memory.push_back(Point(coordinateMemory.at(6).toDouble(), coordinateMemory.at(7).toDouble()));
+            }
+          }
+          cv::polylines(frame, memory, false, Scalar(colorMap.at(i - frameIndex*replayNumberObject).x, colorMap.at(i - frameIndex*replayNumberObject).y, colorMap.at(i - frameIndex*replayNumberObject).z), scale*1.2, cv::LINE_AA);
         }
       }
       
@@ -654,7 +707,7 @@ void MainWindow::correctTracking() {
     QFile file(ui->replayPath->text()+ QDir::separator() + "Tracking_Result" + QDir::separator() + "tracking.txt");
     if (file.open(QFile::WriteOnly | QFile::Text)) {
       QTextStream out(&file);
-      out << "xHead" << '\t' << "yHead" << '\t' << "tHead" << '\t'  << "xTail" << '\t' << "yTail      " << '\t' << "tTail"   << '\t'  << "xBody" << '\t' << "yBody" << '\t' << "tBody"   << '\t'  << "curvature" << '\t' << "headMajorAxisLength" << '\t' << "headMinorAxisLength" << '\t' << "tailMajorAxis" << '\t' << "tailMinorAxis" << '\t'  << "imageNumber" << endl; 
+      out << "xHead" << '\t' << "yHead" << '\t' << "tHead" << '\t'  << "xTail" << '\t' << "yTail" << '\t' << "tTail"   << '\t'  << "xBody" << '\t' << "yBody" << '\t' << "tBody"   << '\t'  << "curvature"  << '\t' << "Reserved" << '\t' << "Reserved" << '\t' << "headMajorAxisLength" << '\t' << "headMinorAxisLength" << '\t' << "Reserved" << '\t' << "tailMajorAxisLength" << '\t' << "tailMinorAxisLength" << '\t' << "Reserved" << '\t'<< "bodyMajorAxisLength" << '\t' << "bodyMinorAxisLength" << '\t' << "Reserved" << '\t' << "imageNumber" << endl;
       for(auto& a: replayTracking) {
         out << a << endl;
       }
@@ -712,19 +765,70 @@ void MainWindow::saveTrackedMovie() {
           }
 
           QStringList coordinate = replayTracking.at(i).split('\t', QString::SkipEmptyParts);
-
+          
           if (ui->replayEllipses->isChecked()) {
-            cv::ellipse(frame, Point( coordinate.at(0).toDouble(), coordinate.at(1).toDouble() ), Size( coordinate.at(12).toDouble(), coordinate.at(13).toDouble() ), 180 - (coordinate.at(2).toDouble()*180)/M_PI, 0, 360,  Scalar(colorMap.at(i - frameIndex*replayNumberObject).x, colorMap.at(i - frameIndex*replayNumberObject).y, colorMap.at(i - frameIndex*replayNumberObject).z), scale, 8 );
-            cv::ellipse(frame, Point( coordinate.at(3).toDouble(), coordinate.at(4).toDouble() ), Size( coordinate.at(15).toDouble(), coordinate.at(16).toDouble() ), 180 - (coordinate.at(5).toDouble()*180)/M_PI, 0, 360,  Scalar(colorMap.at(i - frameIndex*replayNumberObject).x, colorMap.at(i - frameIndex*replayNumberObject).y, colorMap.at(i - frameIndex*replayNumberObject).z), scale, cv::LINE_AA );
+
+            switch(ui->ellipseBox->currentIndex()) {
+              
+              case 0 : // Head + Tail
+                cv::ellipse(frame, Point( coordinate.at(0).toDouble(), coordinate.at(1).toDouble() ), Size( coordinate.at(12).toDouble(), coordinate.at(13).toDouble() ), 180 - (coordinate.at(2).toDouble()*180)/M_PI, 0, 360,  Scalar(colorMap.at(i - frameIndex*replayNumberObject).x, colorMap.at(i - frameIndex*replayNumberObject).y, colorMap.at(i - frameIndex*replayNumberObject).z), scale, 8 );
+                cv::ellipse(frame, Point( coordinate.at(3).toDouble(), coordinate.at(4).toDouble() ), Size( coordinate.at(15).toDouble(), coordinate.at(16).toDouble() ), 180 - (coordinate.at(5).toDouble()*180)/M_PI, 0, 360,  Scalar(colorMap.at(i - frameIndex*replayNumberObject).x, colorMap.at(i - frameIndex*replayNumberObject).y, colorMap.at(i - frameIndex*replayNumberObject).z), scale, cv::LINE_AA );
+                break;
+
+              case 1 : // Head
+                cv::ellipse(frame, Point( coordinate.at(0).toDouble(), coordinate.at(1).toDouble() ), Size( coordinate.at(12).toDouble(), coordinate.at(13).toDouble() ), 180 - (coordinate.at(2).toDouble()*180)/M_PI, 0, 360,  Scalar(colorMap.at(i - frameIndex*replayNumberObject).x, colorMap.at(i - frameIndex*replayNumberObject).y, colorMap.at(i - frameIndex*replayNumberObject).z), scale, 8 );
+                break;
+
+              case 2 : // Tail
+                cv::ellipse(frame, Point( coordinate.at(3).toDouble(), coordinate.at(4).toDouble() ), Size( coordinate.at(15).toDouble(), coordinate.at(16).toDouble() ), 180 - (coordinate.at(5).toDouble()*180)/M_PI, 0, 360,  Scalar(colorMap.at(i - frameIndex*replayNumberObject).x, colorMap.at(i - frameIndex*replayNumberObject).y, colorMap.at(i - frameIndex*replayNumberObject).z), scale, cv::LINE_AA );
+                break;
+
+              case 3 : // Body
+                cv::ellipse(frame, Point( coordinate.at(6).toDouble(), coordinate.at(7).toDouble() ), Size( coordinate.at(18).toDouble(), coordinate.at(19).toDouble() ), 180 - (coordinate.at(8).toDouble()*180)/M_PI, 0, 360,  Scalar(colorMap.at(i - frameIndex*replayNumberObject).x, colorMap.at(i - frameIndex*replayNumberObject).y, colorMap.at(i - frameIndex*replayNumberObject).z), scale, 8 );
+                break;
+            }
           }
 
           if (ui->replayArrows->isChecked()) {
-            cv::arrowedLine(frame, Point(coordinate.at(0).toDouble(), coordinate.at(1).toDouble()), Point(coordinate.at(0).toDouble() + coordinate.at(10).toDouble()*cos(coordinate.at(2).toDouble()), coordinate.at(1).toDouble() - coordinate.at(10).toDouble()*sin(coordinate.at(2).toDouble())), Scalar(colorMap.at(i - frameIndex*replayNumberObject).x, colorMap.at(i - frameIndex*replayNumberObject).y, colorMap.at(i - frameIndex*replayNumberObject).z), scale, cv::LINE_AA, 0, double(scale)/10);
+            
+            switch(ui->arrowBox->currentIndex()) {
+            
+            case 0 :
+              cv::arrowedLine(frame, Point(coordinate.at(0).toDouble(), coordinate.at(1).toDouble()), Point(coordinate.at(0).toDouble() + coordinate.at(12).toDouble()*cos(coordinate.at(2).toDouble()), coordinate.at(1).toDouble() - coordinate.at(12).toDouble()*sin(coordinate.at(2).toDouble())), Scalar(colorMap.at(i - frameIndex*replayNumberObject).x, colorMap.at(i - frameIndex*replayNumberObject).y, colorMap.at(i - frameIndex*replayNumberObject).z), scale, cv::LINE_AA, 0, double(scale)/10);
+              cv::arrowedLine(frame, Point(coordinate.at(3).toDouble(), coordinate.at(4).toDouble()), Point(coordinate.at(3).toDouble() + coordinate.at(15).toDouble()*cos(coordinate.at(5).toDouble()), coordinate.at(4).toDouble() - coordinate.at(15).toDouble()*sin(coordinate.at(5).toDouble())), Scalar(colorMap.at(i - frameIndex*replayNumberObject).x, colorMap.at(i - frameIndex*replayNumberObject).y, colorMap.at(i - frameIndex*replayNumberObject).z), scale, cv::LINE_AA, 0, double(scale)/10);
+              break;
+
+            case 1 :
+              cv::arrowedLine(frame, Point(coordinate.at(0).toDouble(), coordinate.at(1).toDouble()), Point(coordinate.at(0).toDouble() + coordinate.at(12).toDouble()*cos(coordinate.at(2).toDouble()), coordinate.at(1).toDouble() - coordinate.at(12).toDouble()*sin(coordinate.at(2).toDouble())), Scalar(colorMap.at(i - frameIndex*replayNumberObject).x, colorMap.at(i - frameIndex*replayNumberObject).y, colorMap.at(i - frameIndex*replayNumberObject).z), scale, cv::LINE_AA, 0, double(scale)/10);
+              break;
+
+            case 2 :
+              cv::arrowedLine(frame, Point(coordinate.at(3).toDouble(), coordinate.at(4).toDouble()), Point(coordinate.at(3).toDouble() + coordinate.at(15).toDouble()*cos(coordinate.at(5).toDouble()), coordinate.at(4).toDouble() - coordinate.at(15).toDouble()*sin(coordinate.at(5).toDouble())), Scalar(colorMap.at(i - frameIndex*replayNumberObject).x, colorMap.at(i - frameIndex*replayNumberObject).y, colorMap.at(i - frameIndex*replayNumberObject).z), scale, cv::LINE_AA, 0, double(scale)/10);
+              break;
+
+            case 3 :
+              cv::arrowedLine(frame, Point(coordinate.at(6).toDouble(), coordinate.at(7).toDouble()), Point(coordinate.at(6).toDouble() + coordinate.at(18).toDouble()*cos(coordinate.at(8).toDouble()), coordinate.at(7).toDouble() - coordinate.at(18).toDouble()*sin(coordinate.at(8).toDouble())), Scalar(colorMap.at(i - frameIndex*replayNumberObject).x, colorMap.at(i - frameIndex*replayNumberObject).y, colorMap.at(i - frameIndex*replayNumberObject).z), scale, cv::LINE_AA, 0, double(scale)/10);
+              break;
+
+            }
           }
           
           if (ui->replayNumbers->isChecked()) {
             cv::putText(frame, to_string(i - frameIndex*replayNumberObject), Point(coordinate.at(0).toDouble() + coordinate.at(10).toDouble()*cos(coordinate.at(2).toDouble()), coordinate.at(1).toDouble() - coordinate.at(10).toDouble()*sin(coordinate.at(2).toDouble()) ), cv::FONT_HERSHEY_SIMPLEX, double(scale)*0.5, Scalar(colorMap.at(i - frameIndex*replayNumberObject).x, colorMap.at(i - frameIndex*replayNumberObject).y, colorMap.at(i - frameIndex*replayNumberObject).z), scale*1.2, cv::LINE_AA);
           }
+          
+          if (ui->replayTrace->isChecked()) {
+            // Gets the 20 previous cordinates to display the trajectory trace
+            vector<Point> memory;
+            for (unsigned int j = i - 20*replayNumberObject; j < i; j += replayNumberObject) {
+              if (j > 0 && replayTracking.at(j) != "NaN") {
+                QStringList coordinateMemory = replayTracking.at(j).split('\t', QString::SkipEmptyParts);
+                memory.push_back(Point(coordinateMemory.at(6).toDouble(), coordinateMemory.at(7).toDouble()));
+              }
+            }
+            cv::polylines(frame, memory, false, Scalar(colorMap.at(i - frameIndex*replayNumberObject).x, colorMap.at(i - frameIndex*replayNumberObject).y, colorMap.at(i - frameIndex*replayNumberObject).z), scale*1.2, cv::LINE_AA);
+          }
+
         }
       outputVideo.write(frame);
       ui->replaySlider->setValue(frameIndex);
