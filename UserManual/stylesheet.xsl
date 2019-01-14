@@ -3,5 +3,6 @@
     version="1.0">
     <xsl:import href="http://docbook.sourceforge.net/release/xsl/current/fo/docbook.xsl"/>
     <xsl:param name="chapter.autolabel" select="0"/>
+    <xsl:param name="section.autolabel" select="1"/>
     <xsl:param name="body.font.family" select="sans-serif"></xsl:param>   
 </xsl:stylesheet>

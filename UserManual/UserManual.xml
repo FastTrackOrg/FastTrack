@@ -4,7 +4,8 @@
   <title>Fishy Tracking user manual</title>
   <titleabbrev>User Manual</titleabbrev>
   <bookinfo>
-    <legalnotice><para>
+    <legalnotice>
+      <para>
       This file is part of Fishy Tracking.
       Fishy Tracking is free software: you can redistribute it and/or modify
       it under the terms of the GNU General Public License as published by
@@ -17,7 +18,9 @@
       GNU General Public License for more details.
       
       You should have received a copy of the GNU General Public License
-      along with Foobar.  If not, see https://www.gnu.org/licenses/.</para></legalnotice>
+      along with Foobar.  If not, see https://www.gnu.org/licenses/.
+      </para>
+    </legalnotice>
     <author>
       <firstname>Benjamin</firstname>
       <surname>Gallois</surname>
@@ -25,18 +28,15 @@
   </bookinfo>
   <chapter xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="general-information">
     <title>General information</title>
-    <para>
-      Fishy Tracking is an application that allows the user to track multiple animals in video recording.
-      Fishy Tracking can operate on Linux, Mac, and Windows systems.
-    </para>
-    <para>
-      Two mains features are implemented in the software:
-    </para>
+    <para>Welcome to the user manual of Fishy Tracking 4.0.0.</para>
+    <para> Fishy Tracking is a cross-platform application designed to track multiple animals in
+      video recording. Stable versions of the software are available for Linux, Mac and Windows. The
+      development version and the source code can be downloaded at https://git.benjamin-gallois.fr. </para>
+    <para> Two main features are implemented in the software: </para>
     <itemizedlist spacing="compact">
       <listitem>
-        <para>
-          An automatic tracking algorithm that can detect objects and maintain objects identity.
-        </para>
+        <para> An automatic tracking algorithm that can detect and track objects (conserving the
+          objects identities across the video recording). </para>
       </listitem>
       <listitem>
         <para>
@@ -50,9 +50,9 @@
     <title>Getting started</title>
     <section xml:id="download">
       <title>Download</title>
-      <para>
-        Stable versions of Fishy Tracking are released for Linux (as AppImage), MacOs (as dmg) and Windows (installer). The development version is accessible from source and can be compiled on Linux, Mac, and Windows (see the developer guide for more information).
-      </para>
+      <para> Stable versions of Fishy Tracking are released for Linux (as AppImage), Mac (as dmg)
+        and Windows (installer). The development version is accessible from source and can be
+        compiled for Linux, Mac, and Windows (see the developer guide for more information). </para>
       <orderedlist numeration="arabic" spacing="compact">
         <listitem>
           <para>
@@ -72,9 +72,8 @@
           </para>
           <itemizedlist spacing="compact">
             <listitem>
-              <para>
-                Please refers to the developer guide at the link http://fishytracking.benjamin-gallois.fr/API/index.html.
-              </para>
+              <para> Please refers to the developer guide at
+                http://fishytracking.benjamin-gallois.fr/API/index.html. </para>
             </listitem>
           </itemizedlist>
         </listitem>
@@ -99,9 +98,7 @@
           <para>
             For Linux:
           </para>
-          <para>
-            Allow FishyTracking.appimage to be executed:
-          </para>
+          <para> Allow FishyTracking.AppImage to be executed: </para>
           <itemizedlist spacing="compact">
             <listitem>
               <para>
@@ -148,6 +145,49 @@
   
   <chapter xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="software-overview">
     <title>How to use Fishy Tracking</title>
+    <section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="input-files">
+      <title>Image sequence</title>
+      <para> Fishy Tracking can only analyze image sequences. The images must follow the zeroes
+        padding naming convention (name00000.extension, name00001.extension, name00002.extension …).
+          <quote>pgm</quote>, <quote>png</quote>, <quote>jpeg</quote>, <quote>jpg</quote>,
+          <quote>tiff</quote>, <quote>tif</quote>, <quote>bmp</quote>, <quote>dib</quote>,
+          <quote>jpe</quote>, <quote>jp2</quote>, <quote>webp</quote>, <quote>pbm</quote>,
+          <quote>ppm</quote>, <quote>sr</quote>, <quote>ras</quote>, <quote>tif</quote> image
+        formats are supported. </para>
+      <para> If you have a recording in a video format, you need to convert it into an image
+        sequence: </para>
+      <orderedlist numeration="arabic" spacing="compact">
+        <listitem>
+          <para>
+            For Linux, Windows, and MacOs in command lines:
+          </para>
+          <itemizedlist spacing="compact">
+            <listitem>
+              <para>
+                Install ffmpeg.
+              </para>
+            </listitem>
+            <listitem>
+              <para>
+                In a terminal type: ffmpeg -i video.webm image-%03d.png
+              </para>
+            </listitem>
+          </itemizedlist>
+        </listitem>
+        <listitem>
+          <para>
+            For Linux, Windows, and MacOs in graphical:
+          </para>
+          <itemizedlist spacing="compact">
+            <listitem>
+              <para>
+                Use Handbrake: https://handbrake.fr/ or ImageJ.
+              </para>
+            </listitem>
+          </itemizedlist>
+        </listitem>
+      </orderedlist>
+    </section>
     <section xml:id="files-panel">
       <title>Start an analysis</title>
       <para>
@@ -156,23 +196,28 @@
       <orderedlist numeration="arabic" spacing="compact">
         <listitem>
           <para> Click on the (1) open folder button to select a folder where an image sequence to
-            analyze is stored.  The path can directly be pasted or dragged into the (2) path bar. </para>
+            analyze is stored. The path can be directly pasted or dragged into the (2) path bar. </para>
         </listitem>
         <listitem>
-          <para> Click on the (3) add path button to add the path to the list of image sequences to
-            analyze, visible in the (5) paths table. </para>
+            <para>(Optional) Click on the (3) open background image button to select a background
+            image. If no background image is selected, the program will compute a background image
+            by averaging the selected number of images (see <xref linkend="parameters-panel"/>) .
+            The path can be directly pasted or dragged into the (4) background path bar. </para>
         </listitem>
         <listitem>
-          <para>The added path is now visible in the (5) table.</para>
+          <para> Click on the (6) Add path button to add the path into the analysis queue visibles
+            in the (7) paths table. </para>
         </listitem>
         <listitem>
-          <para> If necessary you can remove a path from the (5) paths table by clicking on the
-            path, it will become highlighted in blue. Finally, click on the (4) remove path button
-            to remove the path from the (5) paths table. </para>
+          <para>The added path is now visible in the (7) paths table.</para>
         </listitem>
         <listitem>
-          <para> Start the analysis by clicking on the (6) button start. The path will be deleted
-            from the (5) paths table when the tracking analysis is finished.</para>
+          <para> If necessary you can remove a path from the (7) paths table by clicking on the
+            path, it will become highlighted in blue, and by clicking on the (5) Remove path button. </para>
+        </listitem>
+        <listitem>
+          <para> Start the analysis by clicking on the (8) start tracking button. The analysis can
+            not be paused or stopped until the queue is empty.</para>
         </listitem>
       </orderedlist>
       <figure>
@@ -183,16 +228,30 @@
           </imageobject>
         </mediaobject>
         <caption>
-          <para> 1: Open folder button. 2: path bar. 3: Add path button. 4 Remove path button. 5:
-            Paths table. 6: Start tracking button.</para>
+          <para> 1: Open folder button. 2: Path bar. 3: Open background image. 4: Background path
+            bar. 6: Add path button. 5 Remove path button. 7: Paths table. 8: Start tracking
+            button.</para>
         </caption>
       </figure>
     </section>
     <section xml:id="display-panel">
       <title>See current analysis</title>
       <para> The display panel shows the current analysis process by displaying the binary image (1)
-        and the tracking image (2). Note that the tracking can be extremely fast, to review the
+        and the grayscale image (2). Note that the tracking can be extremely fast, to review the
         tracking please see <xref linkend="replay-panel"/>. </para>
+        <figure>
+          <title>The display panel</title>
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="Display_Panel.png" width="150mm" align="center"/>
+            </imageobject>
+          </mediaobject>
+          <caption>
+            <para> 1: Open folder button. 2: Path bar. 3: Open background image. 4: Background path
+              bar. 6: Add path button. 5 Remove path button. 7: Paths table. 8: Start tracking
+              button.</para>
+          </caption>
+        </figure>
     </section>
     <section xml:id="parameters-panel">
       <title>Change parameters</title>
@@ -473,6 +532,22 @@
         tracking analysis and to correct the tracking if errors are
         detected.
       </para>
+      <figure>
+        <title>The replay panel</title>
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="Replay_Panel.png" width="150mm" align="center"/>
+          </imageobject>
+          <textobject><phrase>Replay_Panel</phrase></textobject>
+        </mediaobject>
+        <caption>
+          <para>1: Open folder button. 2: Folder path bar. 3: Reload button. 4: Save button. 5:
+            Next occlusion. 6: Previous occlusion.  7: Display screen. 8: Draw ellipse options. 9:
+            Draw arrow options. 10: Display number. 11: Draw trajectory trace. 12: Size option.
+            13: Fps box. 14: Play button. 15: First object selected. 16: Second object selected.
+            17: Swap button. 18: Keyboard shortcuts help. 19: Display cursor.</para>
+        </caption>
+      </figure>
       <section xml:id="open-a-tracking-analysis">
         <title>Open a tracking analysis</title>
         <orderedlist numeration="arabic" spacing="compact">
@@ -494,9 +569,7 @@
       </section>
       <section xml:id="correct-errors">
         <title>Correct errors</title>
-        <para>
-          To correct a tracking error (mismatching between two objects):
-        </para>
+        <para> To correct a tracking error (mismatching between two objects during the tracking): </para>
         <orderedlist numeration="arabic" spacing="compact">
           <listitem>
             <para>
@@ -504,28 +577,26 @@
             </para>
             <itemizedlist spacing="compact">
               <listitem>
-                <para>
-                  By playing the image sequence and visually identify
-                  errors.
-                </para>
+                <para> By playing the image sequence with the (19) display cursor and the (14) play
+                  button and visually identify errors. </para>
               </listitem>
               <listitem>
-                <para> By clicking on (4) occlusion buttons to go to the previous and the next
-                  occlusion event where mismatchings are the most probable to occurs. </para>
+                <para> By clicking on (5) and (6) occlusion buttons to go to the previous and the
+                  next occlusion event where mismatchings are the most probable to occurs. </para>
               </listitem>
             </itemizedlist>
           </listitem>
           <listitem>
             <para> Left click on the first object or select the number of the first object in the
-              (3) swap boxes. The box displays the number and the color of the selected object. </para>
+              (15) swap box. The box displays the number and the color of the selected object. </para>
           </listitem>
           <listitem>
             <para> Left click on the second object or select the number of the second object in the
-              (3) swaps boxes. The box displays the number and the color of the selected object. </para>
+              (16) swap box. The box displays the number and the color of the selected object. </para>
           </listitem>
           <listitem>
-            <para> Right click on the (6) display screen or click on the (3) swap button to swap the
-              two objects from the image displayed to the end of the image sequence. </para>
+            <para> Right click on the (7) display screen or click on the (17) swap button to swap
+              the two objects from the image displayed to the end of the image sequence. </para>
           </listitem>
         </orderedlist>
       </section>
@@ -625,355 +696,197 @@
           the frame rate desired and click on the (8) save button. The movie will be saved in a .avi
           container with the MJPEG codec. In case of errors, check that you have the MJPEG codec
           available on your system. </para>
-        <figure>
-          <title>The replay panel</title>
-          <mediaobject>
-            <imageobject>
-              <imagedata fileref="Replay_Panel.png" width="150mm" align="center"/>
-            </imageobject>
-            <textobject><phrase>Replay_Panel</phrase></textobject>
-          </mediaobject>
-          <caption>
-            <para>1:  Open folder button. 2: Option boxes. 3: Swap boxes and swap button. 4:
-              Occlusion buttons. 5: Play button. 6: Display screen. 7: Fps box. 8: Save button. 9:
-              Play button. 10: Keyboard shortcuts help.</para>
-          </caption>
-        </figure>
       </section>
     </section>
   </chapter>
-  <chapter xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="input-files">
-    <title>Input files</title>
-    <para> Fishy Tracking analyzes only image sequence with zeroes padding naming convention.
-        <quote>pgm</quote>, <quote>png</quote>, <quote>jpeg</quote>, <quote>jpg</quote>,
-        <quote>tiff</quote>, <quote>tif</quote>, <quote>bmp</quote>, <quote>dib</quote>,
-        <quote>jpe</quote>, <quote>jp2</quote>, <quote>webp</quote>, <quote>pbm</quote>,
-        <quote>ppm</quote>, <quote>sr</quote>, <quote>ras</quote>, <quote>tif</quote> image formats
-      are supported. </para>
-    <para> If you have a recording in a video format, you need to convert it into an image sequence. </para>
-    <orderedlist numeration="arabic" spacing="compact">
-      <listitem>
-        <para>
-          For Linux, Windows, and MacOs in command lines:
-        </para>
-        <itemizedlist spacing="compact">
-          <listitem>
-            <para>
-              Install ffmpeg.
-            </para>
-          </listitem>
-          <listitem>
-            <para>
-              In a terminal type: ffmpeg -i video.webm image-%03d.png
-            </para>
-          </listitem>
-        </itemizedlist>
-      </listitem>
-      <listitem>
-        <para>
-          For Linux, Windows, and MacOs in graphical:
-        </para>
-        <itemizedlist spacing="compact">
-          <listitem>
-            <para>
-              Use Handbrake: https://handbrake.fr/ or ImageJ.
-            </para>
-          </listitem>
-        </itemizedlist>
-      </listitem>
-    </orderedlist>
-  </chapter>
   <chapter xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="output-files">
     <title>Output files</title>
-    <para>
-      When an analysis is started, Fishy Tracking creates a folder named
-      Tracking_Result containing:
-    </para>
-    <itemizedlist>
-      <listitem>
-        <para> tracking.txt containing the tracking data (in the frame of reference of the full
-          image with the origin in the top left corner) as follows: </para>
-        <informaltable>
-          <tgroup cols="15">
-            <colspec colwidth="6*" align="left"/>
-            <colspec colwidth="6*" align="left"/>
-            <colspec colwidth="4*" align="left"/>
-            <colspec colwidth="6*" align="left"/>
-            <colspec colwidth="6*" align="left"/>
-            <colspec colwidth="4*" align="left"/>
-            <colspec colwidth="6*" align="left"/>
-            <colspec colwidth="6*" align="left"/>
-            <colspec colwidth="4*" align="left"/>
-            <colspec colwidth="3*" align="left"/>
-            <colspec colwidth="3*" align="left"/>
-            <colspec colwidth="10*" align="left"/>
-            <colspec colwidth="10*" align="left"/>
-            <colspec colwidth="10*" align="left"/>
-            <colspec colwidth="10*" align="left"/>
-            <thead>
-              <row>
-                <entry>
-                  xHead
-                </entry>
-                <entry>
-                  yHead
-                </entry>
-                <entry>
-                  tHead
-                </entry>
-                <entry>
-                  xTail
-                </entry>
-                <entry>
-                  yTail
-                </entry>
-                <entry>
-                  tTail
-                </entry>
-                <entry>
-                  xBody
-                </entry>
-                <entry>
-                  yBody
-                </entry>
-                <entry>
-                  tBody
-                </entry>
-                <entry>
-                  Curvature
-                </entry>
-                <entry>
-                  ImageNumber
-                </entry>
-                <entry>
-                  headMajorAxisLength
-                </entry>
-                <entry>
-                  headMinorAxisLength
-                </entry>
-                <entry>
-                  tailMajorAxisLength
-                </entry>
-                <entry>
-                  tailMinorAxisLength
-                </entry>
-              </row>
-            </thead>
-            <tbody>
-              <row>
-                <entry>
-                  x coordinate of the head. Object 1
-                </entry>
-                <entry>
-                  y coordinate of the head. Object 1
-                </entry>
-                <entry>
-                  Angle of the head. Object 1
-                </entry>
-                <entry>
-                  x coordinate of the tail. Object 1
-                </entry>
-                <entry>
-                  y coordinate of the tail. Object 1
-                </entry>
-                <entry>
-                  Angle of the tail. Object 1
-                </entry>
-                <entry>
-                  x coordinate of the body. Object 1
-                </entry>
-                <entry>
-                  y coordinate of the body. Object 1
-                </entry>
-                <entry>
-                  Angle of the body. Object 1
-                </entry>
-                <entry>
-                  Curvature. Object 1
-                </entry>
-                <entry>
-                  Image number. Object 1
-                </entry>
-                <entry>
-                  Length of the major axis of the head equivalent
-                  ellipse. Object 1.
-                </entry>
-                <entry>
-                  Length of the minor axis of the head equivalent
-                  ellipse. Object 1.
-                </entry>
-                <entry>
-                  Length of the major axis of the tail equivalent
-                  ellipse. Object 1.
-                </entry>
-                <entry>
-                  Length of the minor axis of the tail equivalent
-                  ellipse. Object 1.
-                </entry>
-              </row>
-              <row>
-                <entry>
-                  x coordinate of the head. Object 2
-                </entry>
-                <entry>
-                  y coordinate of the head. Object 2
-                </entry>
-                <entry>
-                  Angle of the head. Object 2
-                </entry>
-                <entry>
-                  x coordinate of the tail. Object 2
-                </entry>
-                <entry>
-                  y coordinate of the tail. Object 2
-                </entry>
-                <entry>
-                  Angle of the tail. Object 2
-                </entry>
-                <entry>
-                  x coordinate of the body. Object 2
-                </entry>
-                <entry>
-                  y coordinate of the body. Object 2
-                </entry>
-                <entry>
-                  Angle of the body. Object 2
-                </entry>
-                <entry>
-                  Curvature. Object 2
-                </entry>
-                <entry>
-                  Image number. Object 2
-                </entry>
-                <entry>
-                  Length of the major axis of the head equivalent
-                  ellipse. Object 2.
-                </entry>
-                <entry>
-                  Length of the minor axis of the head equivalent
-                  ellipse. Object 2.
-                </entry>
-                <entry>
-                  Length of the major axis of the tail equivalent
-                  ellipse. Object 2.
-                </entry>
-                <entry>
-                  Length of the minor axis of the tail equivalent
-                  ellipse. Object 2.
-                </entry>
-              </row>
-              <row>
-                <entry>
-                  x coordinate of the head. Object 1
-                </entry>
-                <entry>
-                  y coordinate of the head. Object 1
-                </entry>
-                <entry>
-                  Angle of the head. Object 1
-                </entry>
-                <entry>
-                  x coordinate of the tail. Object 1
-                </entry>
-                <entry>
-                  y coordinate of the tail. Object 1
-                </entry>
-                <entry>
-                  Angle of the tail. Object 1
-                </entry>
-                <entry>
-                  x coordinate of the body. Object 1
-                </entry>
-                <entry>
-                  y coordinate of the body. Object 1
-                </entry>
-                <entry>
-                  Angle of the body. Object 1
-                </entry>
-                <entry>
-                  Curvature. Object 1
-                </entry>
-                <entry>
-                  Image number. Object 1
-                </entry>
-                <entry>
-                  Length of the major axis of the head equivalent
-                  ellipse. Object 1.
-                </entry>
-                <entry>
-                  Length of the minor axis of the head equivalent
-                  ellipse. Object 1.
-                </entry>
-                <entry>
-                  Length of the major axis of the tail equivalent
-                  ellipse. Object 1.
-                </entry>
-                <entry>
-                  Length of the minor axis of the tail equivalent
-                  ellipse. Object 1.
-                </entry>
-              </row>
-              <row>
-                <entry>
-                  …
-                </entry>
-                <entry>
-                  …
-                </entry>
-                <entry>
-                  …
-                </entry>
-                <entry>
-                  …
-                </entry>
-                <entry>
-                  …
-                </entry>
-                <entry>
-                  …
-                </entry>
-                <entry>
-                  …
-                </entry>
-                <entry>
-                  …
-                </entry>
-                <entry>
-                  …
-                </entry>
-                <entry>
-                  …
-                </entry>
-                <entry>
-                  …
-                </entry>
-                <entry>
-                </entry>
-                <entry>
-                </entry>
-                <entry>
-                </entry>
-                <entry>
-                </entry>
-              </row>
-            </tbody>
-          </tgroup>
-        </informaltable>
-        <para>
-          Note: if you want to extract the data for a particular object:
-          <emphasis>d</emphasis><emphasis>a</emphasis><emphasis>t</emphasis><emphasis>a</emphasis><subscript><emphasis>i</emphasis></subscript> = (<emphasis>o</emphasis><emphasis>b</emphasis><emphasis>j</emphasis><emphasis>e</emphasis><emphasis>c</emphasis><emphasis>t</emphasis><emphasis>N</emphasis><emphasis>u</emphasis><emphasis>m</emphasis><emphasis>b</emphasis><emphasis>e</emphasis><emphasis>r</emphasis>) * <emphasis>i</emphasis><emphasis>m</emphasis><emphasis>a</emphasis><emphasis>g</emphasis><emphasis>e</emphasis><emphasis>N</emphasis><emphasis>u</emphasis><emphasis>m</emphasis><emphasis>b</emphasis><emphasis>e</emphasis><emphasis>r</emphasis> + <emphasis>o</emphasis><emphasis>b</emphasis><emphasis>j</emphasis><emphasis>e</emphasis><emphasis>c</emphasis><emphasis>t</emphasis><emphasis>N</emphasis><emphasis>u</emphasis><emphasis>m</emphasis><emphasis>b</emphasis><emphasis>e</emphasis><emphasis>r</emphasis>
-          with objectNumber the object number {1, 2, 3, …}, imageNumber
-          the image number {0, 1, 2, …}.
-        </para>
-      </listitem>
-      <listitem>
-        <para>
-          parameters.txt containing the set of parameters at the
-          beginning of the analysis, changes during the analysis are not
-          saved.
-        </para>
-      </listitem>
-    </itemizedlist>
+    <section>
+      <title>Introduction</title>
+     <para>
+       When an analysis is started, Fishy Tracking creates a folder named
+       Tracking_Result containing:
+     </para>
+     <itemizedlist>
+       <listitem>
+         <para> A text file tracking.txt containing the tracking data (in the frame of reference of
+           the full image with the origin in the top left corner).</para>
+       </listitem>
+       <listitem>
+         <para> A text file parameters.txt containing the set of parameters saves at the beginning
+            of the analysis, changes during the analysis are not saved. </para>
+       </listitem>
+     </itemizedlist>
+    </section>
+    <section>
+      <title>Data keys</title>
+      <informaltable>
+        <tgroup cols="2">
+          <colspec colwidth="20*" align="left"/>
+          <colspec colwidth="33*" align="left"/>
+          <thead>
+            <row>
+              <entry> Parameter </entry>
+              <entry> Description </entry>
+            </row>
+          </thead>
+          <tbody>
+            <row>
+              <entry>xHead </entry>
+              <entry>The x-coordinate of the center of mass of the head ellipse. The frame of
+                reference origin is in the top left corner.</entry>
+            </row>
+            <row>
+              <entry>yHead </entry>
+              <entry>The y-coordinate of the center of mass of the head ellipse. The frame of
+                reference origin is in the top left corner.</entry>
+            </row>
+            <row>
+              <entry>tHead </entry>
+              <entry>The orientation of the head ellipse in radians (between 0-2*pi, no negative
+                angle).</entry>
+            </row>
+            <row>
+              <entry>xTail </entry>
+              <entry>The x-coordinate of the center of mass of the tail ellipse. The frame of
+                reference origin is in the top left corner. </entry>
+            </row>
+            <row>
+              <entry>yTail</entry>
+              <entry>The y-coordinate of the center of mass of the tail ellipse. The frame of
+                reference origin is in the top left corner. </entry>
+            </row>
+            <row>
+              <entry>tTail</entry>
+              <entry>The orientation of the tail ellipse in degrees (between 0-360, no negative
+                angle).</entry>
+            </row>
+            <row>
+              <entry>xBody </entry>
+              <entry>The x-coordinate of the center of mass of the body ellipse. The frame of
+                reference origin is in the top left corner.</entry>
+            </row>
+            <row>
+              <entry>yBody </entry>
+              <entry>The y-coordinate of the center of mass of the body ellipse. The frame of
+                reference origin is in the top left corner.</entry>
+            </row>
+            <row>
+              <entry>tBody</entry>
+              <entry>The orientation of the body ellipse in degrees (between 0-360, no negative
+                angle).</entry>
+            </row>
+            <row>
+              <entry>curvature </entry>
+              <entry>Curvature of the body (in px^-1).</entry>
+            </row>
+            <row>
+              <entry>areaBody</entry>
+              <entry>Area of the body (in px).</entry>
+            </row>
+            <row>
+              <entry>perimeterBody </entry>
+              <entry>Perimeter of the body (in px)</entry>
+            </row>
+            <row>
+              <entry>headMajorAxisLength</entry>
+              <entry>The major axis length of the head ellipse. </entry>
+            </row>
+            <row>
+              <entry>headMinorAxisLength </entry>
+              <entry>The minor axis length of the head ellipse. </entry>
+            </row>
+            <row>
+              <entry>headExcentricity </entry>
+              <entry>The excentricity of the head ellipse.</entry>
+            </row>
+            <row>
+              <entry>tailMajorAxisLength </entry>
+              <entry>The major axis length of the tail ellipse. </entry>
+            </row>
+            <row>
+              <entry>tailMinorAxisLength </entry>
+              <entry>The minor axis length of the tail ellipse.  </entry>
+            </row>
+            <row>
+              <entry>tailExcentricity </entry>
+              <entry>The excentricity of the tail ellipse.</entry>
+            </row>
+            <row>
+              <entry>bodyMajorAxisLength </entry>
+              <entry>The major axis length of the body ellipse. </entry>
+            </row>
+            <row>
+              <entry>bodyMinorAxisLength </entry>
+              <entry>The minor axis length of the body ellipse. </entry>
+            </row>
+            <row>
+              <entry>bodyExcentricity</entry>
+              <entry>The excentricity of the body ellipse.</entry>
+            </row>
+            <row>
+              <entry>imageNumber</entry>
+              <entry>The image number.</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </informaltable>
+    </section>
+    <section>
+      <title>The tracking.txt file</title>
+      <para>The file tracking.txt can be opened with any spreadsheet softwares or common analysis
+        packages like Python and Matlab. </para>
+      <section>
+        <title>Opening tracking.txt with a spreadsheet software</title>
+        <para>Open the file with your favorite spreadsheet sofware, it would normally autodectect the delimiter, if no, select Tab as the delimiter.</para>
+        <figure>
+        <title>Opening tracking.txt with a spreadsheet software</title>
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="Spreadsheet1.png" width="150mm" align="center"/>
+          </imageobject>
+          <textobject><phrase>Opening tracking.txt with a spreadsheet software</phrase></textobject>
+        </mediaobject>
+        <caption>
+          <para>Opening tracking.txt with a spreadsheet software.</para>
+        </caption>
+        </figure>
+        <figure>
+          <title>Opening tracking.txt with a spreadsheet software</title>
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="Spreadsheet2.png" width="150mm" align="center"/>
+            </imageobject>
+            <textobject><phrase>Opening tracking.txt with a spreadsheet software</phrase></textobject>
+          </mediaobject>
+          <caption>
+            <para>Opening tracking.txt with a spreadsheet software.</para>
+          </caption>
+        </figure>
+      </section>
+      <section>
+        <title>Opening tracking.txt with Python</title>
+        <para>The file tracking.txt can be opened with Python using the Pandas library:
+          pandas.read_csv("tracking.txt", delimiter='\t'). </para>
+        <figure>
+          <title>Opening tracking.txt with Python</title>
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="Python.png" width="150mm" align="center"/>
+            </imageobject>
+            <textobject><phrase>Opening tracking.txt with Python</phrase></textobject>
+          </mediaobject>
+          <caption>
+            <para>Opening tracking.txt with Python.</para>
+          </caption>
+        </figure>
+      </section>
+      <section>
+        <title>Opening tracking.txt with Matlab</title>
+        <para>The file tracking.txt can be opened with Matlab using the command: data =
+          readtable('tracking.txt', 'Delimiter', '\t'). </para>
+      </section>
+    </section>
   </chapter>
   <chapter xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="for-developers">
     <title>For developers</title>

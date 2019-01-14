@@ -30,7 +30,7 @@ using namespace std;
 /**
  * @class Tracking
  *
- * @brief This class is intended to execute a tracking analysis on an image sequence. It is initialized with the path to the folder where images are stored. This class can be used inside an application by creating a new thread and calling the method startProcess. The tracking workflow can be changed by reimplementing the method startProcess and imageProcessing. This class can also be used as a library by constructing Tracking tracking("") to access the public class members and builds a new workflow.
+ * @brief This class is intended to execute a tracking analysis on an image sequence. It is initialized with the path to the folder where images are stored. This class can be used inside an application by creating a new thread and calling the method startProcess. The tracking workflow can be changed by reimplementing the method startProcess and imageProcessing. This class can also be used as a library by constructing Tracking tracking("", "") to access the public class members and builds a new workflow.
  *
  * @author Benjamin Gallois
  *
@@ -236,7 +236,6 @@ UMat Tracking::backgroundExtraction(const vector<String> &files, double n){
         count ++;
 	}
   background.convertTo(background, CV_8U, 1./count);
-
 	return background;
 }
 
@@ -313,7 +312,8 @@ vector<vector<Point3d>> Tracking::objectPosition(const UMat &frame, int minSize,
 
 	for (size_t i = 0; i < contours.size(); i++){
 			
-      if(contourArea(contours[i]) > minSize && contourArea(contours[i]) < maxSize){ // Only selects objects minArea << objectArea <<maxArea
+      double a = contourArea(contours[i]);
+      if(a > minSize && a < maxSize){ // Only selects objects minArea << objectArea <<maxArea
 
             // Draws the object in a temporary black image to avoid selecting a 
             // part of another object if two objects are very close.
@@ -400,11 +400,11 @@ vector<vector<Point3d>> Tracking::objectPosition(const UMat &frame, int minSize,
 						positionHead.push_back(Point3d(xHead + m_ROI.tl().x, yHead + m_ROI.tl().y, angleHead));
 						positionTail.push_back(Point3d(xTail + m_ROI.tl().x, yTail + m_ROI.tl().y, angleTail));
 						positionFull.push_back(Point3d(parameter.at(0) + roiFull.tl().x, parameter.at(1) + roiFull.tl().y, parameter.at(2)));
-            ellipseHead.push_back(Point3d(parameterHead.at(3), parameterHead.at(4), 0));
-            ellipseTail.push_back(Point3d(parameterTail.at(3), parameterTail.at(4), 0));
-            ellipseBody.push_back(Point3d(parameter.at(3), parameter.at(4), 0));
+            ellipseHead.push_back(Point3d(parameterHead.at(3), parameterHead.at(4), pow( 1 - (parameterHead.at(4)*parameterHead.at(4)) / (parameterHead.at(3)*parameterHead.at(3)), 0.5) ));
+            ellipseTail.push_back(Point3d(parameterTail.at(3), parameterTail.at(4), pow( 1 - (parameterTail.at(4)*parameterTail.at(4)) / (parameterTail.at(3)*parameterTail.at(3)), 0.5) ));
+            ellipseBody.push_back(Point3d(parameter.at(3), parameter.at(4), pow( 1 - (parameter.at(4)*parameter.at(4)) / (parameter.at(3)*parameter.at(3)), 0.5) ));
 
-						globalParam.push_back(Point3d(curv, 0, 0));
+						globalParam.push_back( Point3d( curv, a, arcLength(contours[i], true) ) );
 						}
       
       else if(contourArea(contours[i]) >= maxSize && contourArea(contours[i]) < 3*maxSize) {
@@ -597,7 +597,6 @@ void Tracking::imageProcessing(){
     }
 
     (statusBinarisation) ? (subtract(m_background, m_visuFrame, m_binaryFrame)) : (subtract(m_visuFrame, m_background, m_binaryFrame));
-
     binarisation(m_binaryFrame, 'b', param_thresh);
 
     if (param_dilatation != 0) {
@@ -675,11 +674,13 @@ void Tracking::imageProcessing(){
 
 
 /**
-  * @brief Constructs the tracking object from a path to an image sequence.
+  * @brief Constructs the tracking object from a path to an image sequence and an optional path to a background image.
   * @param[in] path The path to a folder where images are stocked.
+  * @param[in] backgroundPath The path to a background image.
 */
-Tracking::Tracking(string path) {
+Tracking::Tracking(string path, string backgroundPath) {
   m_path = path;
+  m_backgroundPath = backgroundPath;
 }
 
 
@@ -711,7 +712,23 @@ void Tracking::startProcess() {
   }
   sort(m_files.begin(), m_files.end());
 
-  m_background = backgroundExtraction(m_files, param_nBackground);
+  // Loads the background image is provided and check if the image is of the correct size
+  if (m_backgroundPath.empty()) {
+    m_background = backgroundExtraction(m_files, param_nBackground);
+  }
+  else if (!m_backgroundPath.empty()) {
+    try{
+      imread(m_backgroundPath, IMREAD_GRAYSCALE).copyTo(m_background);
+      UMat test;
+      imread(m_files.at(0), IMREAD_GRAYSCALE).copyTo(test);
+      subtract(test, m_background, test);
+    }
+    catch(...){
+      m_background = backgroundExtraction(m_files, param_nBackground);
+      emit(error(0));
+    }
+  }
+
   m_colorMap = color(param_n);
   m_memory = vector<vector<Point>>(param_n, vector<Point>());
   // First frame
@@ -759,7 +776,7 @@ void Tracking::startProcess() {
   // Saving
 
   // File header
-  m_savefile << "xHead" << '\t' << "yHead" << '\t' << "tHead" << '\t'  << "xTail" << '\t' << "yTail" << '\t' << "tTail"   << '\t'  << "xBody" << '\t' << "yBody" << '\t' << "tBody"   << '\t'  << "curvature"  << '\t' << "Reserved" << '\t' << "Reserved" << '\t' << "headMajorAxisLength" << '\t' << "headMinorAxisLength" << '\t' << "Reserved" << '\t' << "tailMajorAxisLength" << '\t' << "tailMinorAxisLength" << '\t' << "Reserved" << '\t'<< "bodyMajorAxisLength" << '\t' << "bodyMinorAxisLength" << '\t' << "Reserved" << '\t' << "imageNumber" << "\n";
+  m_savefile << "xHead" << '\t' << "yHead" << '\t' << "tHead" << '\t'  << "xTail" << '\t' << "yTail" << '\t' << "tTail"   << '\t'  << "xBody" << '\t' << "yBody" << '\t' << "tBody"   << '\t'  << "curvature"  << '\t' << "areaBody" << '\t' << "perimeterBody" << '\t' << "headMajorAxisLength" << '\t' << "headMinorAxisLength" << '\t' << "headExcentricity" << '\t' << "tailMajorAxisLength" << '\t' << "tailMinorAxisLength" << '\t' << "tailExcentricity" << '\t'<< "bodyMajorAxisLength" << '\t' << "bodyMinorAxisLength" << '\t' << "bodyExcentricity" << '\t' << "imageNumber" << endl;
   
   // Draws lines and arrows on the image in the display panel
   for(size_t l = 0; l < m_out.at(0).size(); l++){

@@ -86,6 +86,10 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->replayRefresh->setIcon(img);
     ui->replayRefresh->setIconSize(QSize(ui->replayRefresh->width(), ui->replayRefresh->height()));
     
+    img = QIcon(":/buttons/openImage.png");
+    ui->openBackground->setIcon(img);
+    ui->openBackground->setIconSize(QSize(ui->openBackground->width(), ui->openBackground->height()));
+
     setupWindow = new SetupWindow(this);
     connect(ui->setupWindow, &QPushButton::clicked, [this]() {
       setupWindow->show();
@@ -160,7 +164,7 @@ MainWindow::MainWindow(QWidget *parent) :
       ui->tableParameters->setItem(i, 2, new QTableWidgetItem(parameterAttributs.at(1)));
       ui->tableParameters->item(i, 2)->setFlags(ui->tableParameters->item(i, 2)->flags() & ~Qt::ItemIsEditable);
       parameterList.insert(parameterName, parameterAttributs.at(0));
-      ui->tableParameters->setRowHeight(i, 96);
+      ui->tableParameters->setRowHeight(i, 60);
      }
 
     connect(ui->tableParameters, SIGNAL(itemChanged(QTableWidgetItem*)), this, SLOT(updateParameterList(QTableWidgetItem*)));
@@ -169,6 +173,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tablePath->horizontalHeader()->setStretchLastSection(true);
     ui->tablePath->setSortingEnabled(false);
     connect(ui->openPath, &QPushButton::clicked, this, &MainWindow::openPathFolder);
+    connect(ui->openBackground, &QPushButton::clicked, this, &MainWindow::openPathBackground);
     connect(ui->addPath, &QPushButton::clicked, this, &MainWindow::addPath);
     connect(ui->removePath, &QPushButton::clicked, this, &MainWindow::removePath);
     connect(ui->startButton, &QPushButton::clicked, this, &MainWindow::startTracking);
@@ -244,9 +249,20 @@ void MainWindow::updateParameterList(QTableWidgetItem* item) {
   * @brief Opens a dialogue window to select a folder and updates ui->textPathAdd. Triggered when ui->openPath is clicked.
 */
 void MainWindow::openPathFolder() {
+    ui->textBackgroundAdd->clear();
     QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"), "/home", QFileDialog::ShowDirsOnly);
     if (dir.length()) {
         ui->textPathAdd->setText(dir);
+    }
+}
+
+/**
+  * @brief Opens a dialogue window to select a background image and updates ui->textBackgroundAdd. Triggered when ui->openBackground is clicked.
+*/
+void MainWindow::openPathBackground() {
+    QString image = QFileDialog::getOpenFileName(this, tr("Open Image"), "/home");
+    if (image.length()) {
+        ui->textBackgroundAdd->setText(image);
     }
 }
 
@@ -256,10 +272,14 @@ void MainWindow::openPathFolder() {
 void MainWindow::addPath() {
     int row = ui->tablePath->rowCount();
     QString path = ui->textPathAdd->text();
+    QString background = ui->textBackgroundAdd->text();
     ui->tablePath->insertRow(row);
     ui->tablePath->setItem(row, 0, new QTableWidgetItem(path));
+    ui->tablePath->setItem(row, 1, new QTableWidgetItem(background));
     pathList.append(path);
+    backgroundList.append(background);
     ui->textPathAdd->clear();
+    ui->textBackgroundAdd->clear();
 }
 
 
@@ -270,6 +290,7 @@ void MainWindow::removePath() {
     int row = ui->tablePath->currentRow();
     if ( row != -1) { 
       pathList.remove(row);
+      backgroundList.remove(row);
       ui->tablePath->removeRow(row);
     }
 }
@@ -291,6 +312,7 @@ void MainWindow::startTracking() {
 
       if (QDir(pathList.at(0)).exists()) {      
         string path = (pathList.at(0) + QDir::separator()).toStdString();
+        string backgroundPath = backgroundList.at(0).toStdString();
         QDir().mkdir( QString::fromStdString(path) + QDir::separator() + "Tracking_Result" );
         
 
@@ -310,7 +332,7 @@ void MainWindow::startTracking() {
       
       
         thread = new QThread;
-        tracking = new Tracking(path);
+        tracking = new Tracking(path, backgroundPath);
         tracking->moveToThread(thread);
       
         connect(thread, &QThread::started, tracking, &Tracking::startProcess);
@@ -318,11 +340,13 @@ void MainWindow::startTracking() {
         // When the analysis is finished, clears the path in the ui and removes it from the pathList
         connect(tracking, &Tracking::finished, [this]() {
           pathList.removeFirst();
+          backgroundList.removeFirst();
           ui->tablePath->removeRow(0);
         });
 
         connect(tracking, &Tracking::finished, this, &MainWindow::next);
         connect(tracking, &Tracking::newImageToDisplay, this, &MainWindow::display);
+        connect(tracking, &Tracking::error, this, &MainWindow::errors);
         connect(tracking, &Tracking::finished, thread, &QThread::quit);
         connect(tracking, &Tracking::finished, tracking, &Tracking::deleteLater);
         connect(thread, &QThread::finished, thread, &QThread::deleteLater);
@@ -332,8 +356,9 @@ void MainWindow::startTracking() {
     }
     else {
         pathList.removeFirst();
+        backgroundList.removeFirst();
         ui->tablePath->removeRow(0);
-        QMessageBox errorBox;
+        QMessageBox errorBox(this);
         errorBox.setText("Wrong path");
         errorBox.exec();
     }
@@ -706,7 +731,7 @@ void MainWindow::correctTracking() {
     QFile file(ui->replayPath->text()+ QDir::separator() + "Tracking_Result" + QDir::separator() + "tracking.txt");
     if (file.open(QFile::WriteOnly | QFile::Text)) {
       QTextStream out(&file);
-      out << "xHead" << '\t' << "yHead" << '\t' << "tHead" << '\t'  << "xTail" << '\t' << "yTail" << '\t' << "tTail"   << '\t'  << "xBody" << '\t' << "yBody" << '\t' << "tBody"   << '\t'  << "curvature"  << '\t' << "Reserved" << '\t' << "Reserved" << '\t' << "headMajorAxisLength" << '\t' << "headMinorAxisLength" << '\t' << "Reserved" << '\t' << "tailMajorAxisLength" << '\t' << "tailMinorAxisLength" << '\t' << "Reserved" << '\t'<< "bodyMajorAxisLength" << '\t' << "bodyMinorAxisLength" << '\t' << "Reserved" << '\t' << "imageNumber" << endl;
+      out << "xHead" << '\t' << "yHead" << '\t' << "tHead" << '\t'  << "xTail" << '\t' << "yTail" << '\t' << "tTail"   << '\t'  << "xBody" << '\t' << "yBody" << '\t' << "tBody"   << '\t'  << "curvature"  << '\t' << "areaBody" << '\t' << "perimeterBody" << '\t' << "headMajorAxisLength" << '\t' << "headMinorAxisLength" << '\t' << "headExcentricity" << '\t' << "tailMajorAxisLength" << '\t' << "tailMinorAxisLength" << '\t' << "tailExcentricity" << '\t'<< "bodyMajorAxisLength" << '\t' << "bodyMinorAxisLength" << '\t' << "bodyExcentricity" << '\t' << "imageNumber" << endl;
       for(auto& a: replayTracking) {
         out << a << endl;
       }
@@ -836,6 +861,17 @@ void MainWindow::saveTrackedMovie() {
     }
 }
 
+/**
+  * @brief Displays an error message.  
+*/
+void MainWindow::errors(int code) {
+    QMessageBox errorBox(this);
+    errorBox.setText("An error occurs during the tracking\n");
+    switch(code) {
+      case 0 : errorBox.setText("Error message: provided background image is not correct. New background image is calculated instead.");
+    }
+    errorBox.exec();
+}
 
 /**
   * @brief Destructs the MainWindow object and saves the previous set of parameters.  

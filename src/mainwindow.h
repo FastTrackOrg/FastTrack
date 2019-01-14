@@ -91,7 +91,8 @@ private:
     QShortcut *aShortcut;   /*!< Keyboard shortcut to previous frame. */
     QShortcut *dShortcut;   /*!< Keyboard shortcut to next frame. */
 
-    QVector<QString> pathList;   /*!< Paths to images sequences to analyze. */
+    QVector<QString> pathList;   /*!< Paths to the images sequences to analyze. */
+    QVector<QString> backgroundList;   /*!< Paths the background images. */
 
     SetupWindow *setupWindow;   /*!< QMainWindow to display interactive setting of parameters. */
 
@@ -119,6 +120,7 @@ public slots:
     void updateParameterList(QTableWidgetItem* item);
     void startTracking();
     void openPathFolder();
+    void openPathBackground();
     void addPath();
     void removePath();
     void display(UMat&, UMat&);
@@ -132,6 +134,7 @@ public slots:
     void nextOcclusionEvent();
     void previousOcclusionEvent();
     void saveTrackedMovie();
+    void errors(int code);
 signals:
   /**
   * @brief Emitted when a parameter is changed.

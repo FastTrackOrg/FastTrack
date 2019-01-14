@@ -10,6 +10,7 @@
 #include <numeric>
 #include <stdlib.h>
 #include <QObject>
+#include <QMessageBox>
 #include <QMap>
 #include <QDebug>
 #include <QThread>
@@ -35,6 +36,7 @@ class Tracking : public QObject {
   QElapsedTimer *timer;   /*!< Timer that measured the time during the analysis execution. */
 
   UMat m_background;   /*!< Background image CV_8U. */
+
   
   bool statusRegistration;    /*!< Enable registration. */
   bool statusBinarisation;   /*!< True if wite objects on dark background, flase otherwise. */
@@ -48,8 +50,9 @@ class Tracking : public QObject {
   vector<Point3d> m_colorMap;   /*!< Vector containing RBG color. */
   vector<vector<Point>> m_memory;   /*!< Vector containing the last 50 tracking data. */
 
-  string m_path;   /*!< Binary image CV_8U */
-  int m_displayTime;   /*!< Binary image CV_8U */
+  string m_path;   /*!< Path to an image sequence. */
+  string m_backgroundPath;   /*!< Path to an image background. */
+  int m_displayTime;   /*!< Binary image CV_8U. */
   
   int param_n;   /*!< Number of objects. */
   int param_maxArea;   /*!< Maximal area of an object. */
@@ -72,7 +75,7 @@ class Tracking : public QObject {
 
 
   public:
-  Tracking(string path);
+  Tracking(string path, string background);
   ~Tracking();
 
   Point2d curvatureCenter(const Point3d &tail, const Point3d &head);
@@ -122,6 +125,10 @@ class Tracking : public QObject {
   */
   void finished();
 
+  /**
+  * @brief Emitted when an error occurs.
+  */
+  void error(int code);
 };  
 
 

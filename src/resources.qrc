@@ -12,5 +12,6 @@
         <file>buttons/save.png</file>
         <file>buttons/helpImg.png</file>
         <file>buttons/refresh.png</file>
+        <file>buttons/openImage.png</file>
     </qresource>
 </RCC>
