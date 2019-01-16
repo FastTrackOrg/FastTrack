@@ -31,7 +31,7 @@ TEST_F(TrackingTest, Registration) {
   
   UMat imageReference, registered, diff;
   Mat H;
-  imread("../dataSet/lena.jpg", IMREAD_GRAYSCALE).copyTo(imageReference);
+  imread("../dataSet/len_full.jpg", IMREAD_GRAYSCALE).copyTo(imageReference);
 
   // Adds padding to avoid cropping
   UMat padded(imageReference.rows + 100, imageReference.cols + 100, imageReference.depth());
