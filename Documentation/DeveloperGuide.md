@@ -1,4 +1,4 @@
-# Fishy Tracking developer guide
+# Fast Track developer guide
 
 [TOC]
 
@@ -6,7 +6,7 @@
 
 ## Introduction
 
-Fishy Tracking is developed to be embedded in existing C++/Qt projects. It can also be adapted to every project by re-implementing the existing software.
+Fast Track is developed to be embedded in existing C++/Qt projects. It can also be adapted to every project by re-implementing the existing software.
 
 ## Installation of the development environment
 
@@ -79,16 +79,16 @@ Fishy Tracking is developed to be embedded in existing C++/Qt projects. It can a
   ![](ressources/Path2_Dial.png)
 
 
-#### Configure FishyTracking
+#### Configure FastTrack
 
-Replace **Fishy.pro** by:
+Replace **FastTrack.pro** by:
 
 ```bash
 QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = FishyTracking
+TARGET = FastTrack
 TEMPLATE = app
 
 QMAKE_LFLAGS_RELEASE += -O3
@@ -156,10 +156,10 @@ RESOURCES += resources.qrc
   sudo make install
   ```
 
-- Compile FishyTracking 
+- Compile FastTrack 
 
   ```bash
-  cd FishyTracking
+  cd FastTrack
   ./run full                // Compiles from scratch
   ./run partial             // Compiles changes
   ./run debug               // Compiles for debugging
@@ -169,9 +169,9 @@ RESOURCES += resources.qrc
 
 
 
-## Adapt Fishy Tracking for our project
+## Adapt Fast Track for our project
 
-To adapt Fishy Tracking for our project, you must re-implement the **startProcess()** and **imageAnalysis()** method from the Tracking class with our own image analysis workflow.
+To adapt Fast Track for our project, you must re-implement the **startProcess()** and **imageAnalysis()** method from the Tracking class with our own image analysis workflow.
 
 ### startProcess() method
 
@@ -208,11 +208,11 @@ The **imageAnalysis()** method will emit a signal with images to display and tri
 
 
 
-## Embedded Fishy Tracking in our project
+## Embedded Fast Track in our project
 
 ### Video tracking
 
-To embedded Fishy Tracking in an existing project, you must first create a thread where the Tracking class will live.
+To embedded Fast Track in an existing project, you must first create a thread where the Tracking class will live.
 
 ```C++ 
 thread = new QThread; // Creates a new QThread
@@ -234,7 +234,7 @@ The tracking analysis will be running in the thread and destroy itself at the en
 
 ### Real-time tracking (not fully supported in 4.0.0 version)
 
-Fishy Tracking supports live tracking analysis. Be sure to test the program on a video before to see if the analysis frame rate is lower or equal to the tracking analysis frame rate.
+Fast Track supports live tracking analysis. Be sure to test the program on a video before to see if the analysis frame rate is lower or equal to the tracking analysis frame rate.
 
 Creates an acquisition image thread with an object Camera that sends a signal newImage(UMat) when a new image is available. 
 
@@ -269,7 +269,7 @@ The documentation can be generated in HTML and PDF format with Doxygen. Install 
 
 ## Test
 
-FishyTracking have a test script that allows to test the code after changes. To use the test script, install gcode.
+FastTrack have a test script that allows to test the code after changes. To use the test script, install gcode.
 
 ```
 ./test

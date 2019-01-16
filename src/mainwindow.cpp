@@ -1,18 +1,18 @@
 /*
-This file is part of Fishy Tracking.
+This file is part of Fast Track.
 
-    FishyTracking is free software: you can redistribute it and/or modify
+    FastTrack is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    FishyTracking is distributed in the hope that it will be useful,
+    FastTrack is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with FishyTracking.  If not, see <https://www.gnu.org/licenses/>.
+    along with FastTrack.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 
@@ -20,6 +20,9 @@ This file is part of Fishy Tracking.
 
 #include "mainwindow.h"
 
+#ifndef M_PI
+    #define M_PI 3.14159265358979323846
+#endif
 
 using namespace cv;
 using namespace std;
@@ -52,7 +55,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QDir::setCurrent(QCoreApplication::applicationDirPath());
     ui->setupUi(this);
     setWindowState(Qt::WindowMaximized);
-    setWindowTitle("Fishy Tracking");
+    setWindowTitle("Fast Track");
     ui->tableParameters->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     ui->tablePath->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     
@@ -395,7 +398,7 @@ void MainWindow::display(UMat &visu, UMat &cameraFrame){
 */
 void MainWindow::loadSettings() {
 
-    settingsFile = new QSettings("FishyTracking", "Benjamin Gallois", this);
+    settingsFile = new QSettings("FastTrack", "Benjamin Gallois", this);
     settingsFile->setFallbacksEnabled(false); // Shadows global variables added in MacOs system
     QStringList keyList = settingsFile->allKeys();
 

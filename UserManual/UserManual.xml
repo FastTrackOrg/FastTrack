@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!DOCTYPE book>
 <book xmlns="http://docbook.org/ns/docbook" version="5.0">
-  <title>Fishy Tracking user manual</title>
+  <title>Fast Track user manual</title>
   <titleabbrev>User Manual</titleabbrev>
   <bookinfo>
     <legalnotice>
       <para>
-      This file is part of Fishy Tracking.
-      Fishy Tracking is free software: you can redistribute it and/or modify
+      This file is part of Fast Track.
+      Fast Track is free software: you can redistribute it and/or modify
       it under the terms of the GNU General Public License as published by
       the Free Software Foundation, either version 3 of the License, or
       (at your option) any later version.
       
-      Fishy Tracking is distributed in the hope that it will be useful,
+      Fast Track is distributed in the hope that it will be useful,
       but WITHOUT ANY WARRANTY; without even the implied warranty of
       MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
       GNU General Public License for more details.
@@ -28,8 +28,8 @@
   </bookinfo>
   <chapter xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="general-information">
     <title>General information</title>
-    <para>Welcome to the user manual of Fishy Tracking 4.0.0.</para>
-    <para> Fishy Tracking is a cross-platform application designed to track multiple animals in
+    <para>Welcome to the user manual of Fast Track 4.0.0.</para>
+    <para> Fast Track is a cross-platform application designed to track multiple animals in
       video recording. Stable versions of the software are available for Linux, Mac and Windows. The
       development version and the source code can be downloaded at https://git.benjamin-gallois.fr. </para>
     <para> Two main features are implemented in the software: </para>
@@ -50,7 +50,7 @@
     <title>Getting started</title>
     <section xml:id="download">
       <title>Download</title>
-      <para> Stable versions of Fishy Tracking are released for Linux (as AppImage), Mac (as dmg)
+      <para> Stable versions of Fast Track are released for Linux (as AppImage), Mac (as dmg)
         and Windows (installer). The development version is accessible from source and can be
         compiled for Linux, Mac, and Windows (see the developer guide for more information). </para>
       <orderedlist numeration="arabic" spacing="compact">
@@ -98,7 +98,7 @@
           <para>
             For Linux:
           </para>
-          <para> Allow FishyTracking.AppImage to be executed: </para>
+          <para> Allow FastTrack.AppImage to be executed: </para>
           <itemizedlist spacing="compact">
             <listitem>
               <para>
@@ -144,10 +144,10 @@
   </chapter>
   
   <chapter xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="software-overview">
-    <title>How to use Fishy Tracking</title>
+    <title>How to use Fast Track</title>
     <section xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xml:id="input-files">
       <title>Image sequence</title>
-      <para> Fishy Tracking can only analyze image sequences. The images must follow the zeroes
+      <para> Fast Track can only analyze image sequences. The images must follow the zeroes
         padding naming convention (name00000.extension, name00001.extension, name00002.extension …).
           <quote>pgm</quote>, <quote>png</quote>, <quote>jpeg</quote>, <quote>jpg</quote>,
           <quote>tiff</quote>, <quote>tif</quote>, <quote>bmp</quote>, <quote>dib</quote>,
@@ -704,7 +704,7 @@
     <section>
       <title>Introduction</title>
      <para>
-       When an analysis is started, Fishy Tracking creates a folder named
+       When an analysis is started, Fast Track creates a folder named
        Tracking_Result containing:
      </para>
      <itemizedlist>
@@ -892,7 +892,7 @@
     <title>For developers</title>
     <para>
       A complete API and developer documentation is available. It can be
-      generated for the latest version of Fishy Tracking by executing
+      generated for the latest version of Fast Track by executing
       ./generateDocumentation.sh. A folder Documentation is created with
       the developer documentation.
     </para>
