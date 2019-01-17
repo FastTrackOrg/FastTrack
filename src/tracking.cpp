@@ -646,8 +646,10 @@ void Tracking::imageProcessing(){
         }
         // No tracking data are available due to an occlusion event
         else {
-
-          m_savefile << "NaN" << '\n';
+          for (unsigned int i = 0; i < m_out.size()*3; i++) {
+            m_savefile << "NaN" << '\t';
+          }
+          m_savefile << m_im << '\n';
         }
       }
   

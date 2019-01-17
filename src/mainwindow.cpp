@@ -494,10 +494,10 @@ void MainWindow::loadReplayFolder(QString dir) {
               }
             }
             // Finds occlusion events, ie line where the value is equal to "NaN"
-            int occlusionEventIndex = replayTracking.indexOf("NaN");
-            while ( occlusionEventIndex != -1 ) {
-              occlusionEvents.append(occlusionEventIndex / replayNumberObject);
-              occlusionEventIndex = replayTracking.indexOf("NaN", occlusionEventIndex + 1);
+            for(int i = 0; i < replayTracking.size(); i++) {
+              if(replayTracking.at(i).split('\t', QString::SkipEmptyParts).at(0) == "NaN") {
+                occlusionEvents.append( i / replayNumberObject);
+              }
             }
             auto last = std::unique(occlusionEvents.begin(), occlusionEvents.end());
             occlusionEvents.erase(last, occlusionEvents.end());
@@ -543,7 +543,7 @@ void MainWindow::loadFrame(int frameIndex) {
       // arrow on the tracked objects.
       for (int i = frameIndex*replayNumberObject; i < frameIndex*replayNumberObject + replayNumberObject; i++) {
         
-        if (replayTracking.at(i) == "NaN") {
+        if (replayTracking.at(i).split('\t', QString::SkipEmptyParts).at(0) == "NaN") {
           continue;
         }
 
@@ -597,14 +597,14 @@ void MainWindow::loadFrame(int frameIndex) {
         }
         
         if (ui->replayNumbers->isChecked()) {
-          cv::putText(frame, to_string(i - frameIndex*replayNumberObject), Point(coordinate.at(0).toDouble() + coordinate.at(10).toDouble()*cos(coordinate.at(2).toDouble()), coordinate.at(1).toDouble() - coordinate.at(10).toDouble()*sin(coordinate.at(2).toDouble()) ), cv::FONT_HERSHEY_SIMPLEX, double(scale)*0.5, Scalar(colorMap.at(i - frameIndex*replayNumberObject).x, colorMap.at(i - frameIndex*replayNumberObject).y, colorMap.at(i - frameIndex*replayNumberObject).z), scale*1.2, cv::LINE_AA);
+          cv::putText(frame, to_string(i - frameIndex*replayNumberObject), Point(coordinate.at(0).toDouble() + coordinate.at(12).toDouble()*cos(coordinate.at(2).toDouble()), coordinate.at(1).toDouble() - coordinate.at(12).toDouble()*sin(coordinate.at(2).toDouble()) ), cv::FONT_HERSHEY_SIMPLEX, double(scale)*0.5, Scalar(colorMap.at(i - frameIndex*replayNumberObject).x, colorMap.at(i - frameIndex*replayNumberObject).y, colorMap.at(i - frameIndex*replayNumberObject).z), scale*1.2, cv::LINE_AA);
         }
         
         if (ui->replayTrace->isChecked()) {
           // Gets the 20 previous cordinates to display the trajectory trace
           vector<Point> memory;
           for (int j = i - 20*replayNumberObject; j < i; j += replayNumberObject) {
-            if (j > 0 && replayTracking.at(j) != "NaN") {
+            if (j > 0 && replayTracking.at(j).split('\t', QString::SkipEmptyParts).at(0) != "NaN") {
               QStringList coordinateMemory = replayTracking.at(j).split('\t', QString::SkipEmptyParts);
               memory.push_back(Point(coordinateMemory.at(6).toDouble(), coordinateMemory.at(7).toDouble()));
             }
@@ -787,7 +787,7 @@ void MainWindow::saveTrackedMovie() {
         // arrows on tracked objects.
         for (size_t i = frameIndex*replayNumberObject; i < frameIndex*replayNumberObject + replayNumberObject; i++) {
           
-          if (replayTracking.at(i) == "NaN") {
+          if (replayTracking.at(i).split('\t', QString::SkipEmptyParts).at(0) == "NaN") {
             continue;
           }
 
@@ -841,14 +841,14 @@ void MainWindow::saveTrackedMovie() {
           }
           
           if (ui->replayNumbers->isChecked()) {
-            cv::putText(frame, to_string(i - frameIndex*replayNumberObject), Point(coordinate.at(0).toDouble() + coordinate.at(10).toDouble()*cos(coordinate.at(2).toDouble()), coordinate.at(1).toDouble() - coordinate.at(10).toDouble()*sin(coordinate.at(2).toDouble()) ), cv::FONT_HERSHEY_SIMPLEX, double(scale)*0.5, Scalar(colorMap.at(i - frameIndex*replayNumberObject).x, colorMap.at(i - frameIndex*replayNumberObject).y, colorMap.at(i - frameIndex*replayNumberObject).z), scale*1.2, cv::LINE_AA);
+            cv::putText(frame, to_string(i - frameIndex*replayNumberObject), Point(coordinate.at(0).toDouble() + coordinate.at(12).toDouble()*cos(coordinate.at(2).toDouble()), coordinate.at(1).toDouble() - coordinate.at(12).toDouble()*sin(coordinate.at(2).toDouble()) ), cv::FONT_HERSHEY_SIMPLEX, double(scale)*0.5, Scalar(colorMap.at(i - frameIndex*replayNumberObject).x, colorMap.at(i - frameIndex*replayNumberObject).y, colorMap.at(i - frameIndex*replayNumberObject).z), scale*1.2, cv::LINE_AA);
           }
           
           if (ui->replayTrace->isChecked()) {
             // Gets the 20 previous cordinates to display the trajectory trace
             vector<Point> memory;
             for (unsigned int j = i - 20*replayNumberObject; j < i; j += replayNumberObject) {
-              if (j > 0 && replayTracking.at(j) != "NaN") {
+              if (j > 0 && replayTracking.at(j).split('\t', QString::SkipEmptyParts).at(0) != "NaN") {
                 QStringList coordinateMemory = replayTracking.at(j).split('\t', QString::SkipEmptyParts);
                 memory.push_back(Point(coordinateMemory.at(6).toDouble(), coordinateMemory.at(7).toDouble()));
               }
