@@ -49,6 +49,9 @@
           <property name="text">
            <string>Add</string>
           </property>
+          <property name="shortcut">
+           <string>I</string>
+          </property>
          </widget>
         </item>
         <item row="6" column="0" colspan="2">
@@ -68,6 +71,9 @@
           </property>
           <property name="text">
            <string/>
+          </property>
+          <property name="shortcut">
+           <string>O</string>
           </property>
          </widget>
         </item>
@@ -102,6 +108,9 @@
           <property name="text">
            <string>Remove</string>
           </property>
+          <property name="shortcut">
+           <string>R</string>
+          </property>
          </widget>
         </item>
         <item row="3" column="0" rowspan="3">
@@ -123,6 +132,9 @@
           <property name="text">
            <string>Start tracking</string>
           </property>
+          <property name="shortcut">
+           <string>Space</string>
+          </property>
          </widget>
         </item>
         <item row="2" column="0" colspan="2">
@@ -142,6 +154,9 @@
           </property>
           <property name="text">
            <string/>
+          </property>
+          <property name="shortcut">
+           <string>B</string>
           </property>
          </widget>
         </item>

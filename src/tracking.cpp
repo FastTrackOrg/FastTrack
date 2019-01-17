@@ -129,7 +129,7 @@ double Tracking::angleDifference(double alpha, double beta) {
 
 
 /**
-  * @brief Computes the equivalent ellipse of an object by computing the moments of the image.
+  * @brief Computes the equivalent ellipse of an object by computing the moments of the image. If the image is a circle, return nan as the orientation.
   * @param[in] image Binary image CV_8U.
   * @return The equivalent ellipse parameters: the object center of mass coordinate and its orientation.
   * @note: This function computes the object orientation, not its direction.
@@ -144,7 +144,6 @@ vector<double> Tracking::objectInformation(const UMat &image) {
     double i = moment.mu20;
     double j = moment.mu11;
     double k = moment.mu02;
-
 
     double orientation = 0.5 * atan((2*j)/(i-k)) + (i<k)*(M_PI*0.5);
   	orientation += 2*M_PI*(orientation<0);
@@ -213,6 +212,11 @@ bool Tracking::objectDirection(const UMat &image, Point center, vector<double> &
   * @return The background image.
 */
 UMat Tracking::backgroundExtraction(const vector<String> &files, double n){
+
+    
+    if (static_cast<unsigned int>(n) > files.size()) {
+      n = double(files.size());
+    }
 
     UMat background;
     UMat img0;
@@ -327,9 +331,13 @@ vector<vector<Point3d>> Tracking::objectPosition(const UMat &frame, int minSize,
 						RoiFull = dst(roiFull);
 						parameter = objectInformation(RoiFull);
             
+            // Checks if the direction is defined. In the case of a perfect circle the direction can be computed and arbitrary set to 0
+            if (parameter.at(2) != parameter.at(2)) {
+              parameter.at(2) = 0; 
+            }
 
-            // Rotates the image without cropping and computes the direction of the object.
-            Point center = Point(0.5*RoiFull.cols, 0.5*RoiFull.rows);
+            // Rotates the image without cropping to have the object orientation as the x axis
+            Point2f center = Point2f(0.5*RoiFull.cols, 0.5*RoiFull.rows);
             rotMatrix = getRotationMatrix2D(center, -(parameter.at(2)*180)/M_PI, 1);
             bbox = RotatedRect(center, RoiFull.size(), -(parameter.at(2)*180)/M_PI).boundingRect();
             rotMatrix.at<double>(0,2) += bbox.width*0.5 - center.x;

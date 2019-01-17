@@ -180,6 +180,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->addPath, &QPushButton::clicked, this, &MainWindow::addPath);
     connect(ui->removePath, &QPushButton::clicked, this, &MainWindow::removePath);
     connect(ui->startButton, &QPushButton::clicked, this, &MainWindow::startTracking);
+    connect(ui->textPathAdd, &QLineEdit::textEdited, [this]() {
+      ui->textBackgroundAdd->clear();
+    });
     connect(this, &MainWindow::next, this, &MainWindow::startTracking);
 
 
@@ -361,6 +364,7 @@ void MainWindow::startTracking() {
         pathList.removeFirst();
         backgroundList.removeFirst();
         ui->tablePath->removeRow(0);
+        ui->startButton->setDisabled(false);
         QMessageBox errorBox(this);
         errorBox.setText("Wrong path");
         errorBox.exec();

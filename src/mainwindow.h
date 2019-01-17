@@ -87,7 +87,7 @@ private:
     QThread* thread;   /*!< Thread where lives the Tracking object. */
     Tracking* tracking;   /*!< Objects that track images sequence. */
 
-    QShortcut *wShortcut;   /*!< Keyboard shortcut to next occlusion event. */
+    QShortcut *wShortcut;   /*!< Keyboard shortcut to next occlusion. */
     QShortcut *qShortcut;   /*!< Keyboard shortcut to previous frame. */
     QShortcut *aShortcut;   /*!< Keyboard shortcut to previous frame. */
     QShortcut *dShortcut;   /*!< Keyboard shortcut to next frame. */
