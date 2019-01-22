@@ -256,7 +256,7 @@ void MainWindow::updateParameterList(QTableWidgetItem* item) {
 */
 void MainWindow::openPathFolder() {
     ui->textBackgroundAdd->clear();
-    QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"), "/home", QFileDialog::ShowDirsOnly);
+    QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"), memoryDir, QFileDialog::ShowDirsOnly);
     if (dir.length()) {
         ui->textPathAdd->setText(dir);
     }
@@ -266,7 +266,7 @@ void MainWindow::openPathFolder() {
   * @brief Opens a dialogue window to select a background image and updates ui->textBackgroundAdd. Triggered when ui->openBackground is clicked.
 */
 void MainWindow::openPathBackground() {
-    QString image = QFileDialog::getOpenFileName(this, tr("Open Image"), "/home");
+    QString image = QFileDialog::getOpenFileName(this, tr("Open Image"), memoryDir);
     if (image.length()) {
         ui->textBackgroundAdd->setText(image);
     }
@@ -430,7 +430,7 @@ void MainWindow::saveSettings() {
 \*******************************************************************************************/
 
 void MainWindow::openReplayFolder() {
-    QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"), "/home", QFileDialog::ShowDirsOnly);
+    QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"), memoryDir, QFileDialog::ShowDirsOnly);
     ui->replayPath->setText(dir + QDir::separator());
 }
 

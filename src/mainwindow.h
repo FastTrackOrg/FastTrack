@@ -101,6 +101,7 @@ private:
     void loadSettings();
     void saveSettings();
     QSettings *settingsFile;   /*!< Saves parameters in a settings.ini file.*/
+    QString memoryDir;   /*!< Saves the path of the last opened folder.*/
 
 
     // Replay panel

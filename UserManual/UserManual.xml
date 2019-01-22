@@ -196,24 +196,27 @@
       <orderedlist numeration="arabic" spacing="compact">
         <listitem>
           <para> Click on the (1) open folder button to select a folder where an image sequence to
-            analyze is stored. The path can be directly pasted or dragged into the (2) path bar. </para>
+            analyze is stored. The path can be directly pasted or dragged into the (2) path bar, or
+            you can use the keyboard shortcut "o" to open the dialogue.</para>
         </listitem>
         <listitem>
             <para>(Optional) Click on the (3) open background image button to select a background
             image. If no background image is selected, the program will compute a background image
             by averaging the selected number of images (see <xref linkend="parameters-panel"/>) .
-            The path can be directly pasted or dragged into the (4) background path bar. </para>
+            The path can be directly pasted or dragged into the (4) background path bar, or you can
+            use the keyboard shortcut "b" to open the dialogue.</para>
         </listitem>
         <listitem>
-          <para> Click on the (6) Add path button to add the path into the analysis queue visibles
-            in the (7) paths table. </para>
+          <para> Click on the (6) Add path button, or you can use the keyboard shortcut "i", to add
+            the path into the analysis queue visibles in the (7) paths table. </para>
         </listitem>
         <listitem>
           <para>The added path is now visible in the (7) paths table.</para>
         </listitem>
         <listitem>
           <para> If necessary you can remove a path from the (7) paths table by clicking on the
-            path, it will become highlighted in blue, and by clicking on the (5) Remove path button. </para>
+            path, it will become highlighted in blue, and by clicking on the (5) Remove path button,
+            or you can use the keyboard shortcut "r". </para>
         </listitem>
         <listitem>
           <para> Start the analysis by clicking on the (8) start tracking button. The analysis can
