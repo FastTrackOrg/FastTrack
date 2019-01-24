@@ -125,6 +125,9 @@ public slots:
     void openPathBackground();
     void addPath();
     void removePath();
+    void updateParameterTable();
+    void loadParameterFile(QString path);
+    void openParameterFile();
     void display(UMat&, UMat&);
     void openReplayFolder();
     void loadReplayFolder(QString dir);

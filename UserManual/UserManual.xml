@@ -266,6 +266,9 @@
         optimal set of parameters is found, restart the analysis. An interactive help to determine
         some parameters is available by clicking on the help button (1).
       </para>
+      <para>
+      You can load a set of parameters saved during a previous tracking analysis by clicking on the Load parameter file.
+      </para>
       <informaltable>
         <tgroup cols="3">
           <colspec colwidth="20*" align="left"/>

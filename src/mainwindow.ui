@@ -200,7 +200,7 @@
         <string>Parameters</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_3">
-        <item row="1" column="0">
+        <item row="2" column="0">
          <widget class="QPushButton" name="setupWindow">
           <property name="text">
            <string>Setup help</string>
@@ -232,6 +232,13 @@
             </font>
            </property>
           </column>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QPushButton" name="loadSettings">
+          <property name="text">
+           <string>Load settings file</string>
+          </property>
          </widget>
         </item>
        </layout>

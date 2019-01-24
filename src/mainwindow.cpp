@@ -171,6 +171,7 @@ MainWindow::MainWindow(QWidget *parent) :
      }
 
     connect(ui->tableParameters, SIGNAL(itemChanged(QTableWidgetItem*)), this, SLOT(updateParameterList(QTableWidgetItem*)));
+    connect(ui->loadSettings, &QPushButton::pressed, this, &MainWindow::openParameterFile);
 
 ////////////////////////////Path panel/////////////////////////////////////////////
     ui->tablePath->horizontalHeader()->setStretchLastSection(true);
@@ -238,18 +239,6 @@ MainWindow::MainWindow(QWidget *parent) :
 /*******************************************************************************************\
                                     Path panel
 \*******************************************************************************************/
-
-/**
-  * @brief Updates the parameterList vector with the new parameter when users changes a parameter in the QTableWidget of parameters. Triggered when ui->tableParameters is modified. Emits the updated parameters QMap.
-  * @param[in] item QTableWidgetItem from a QTableWidget.
-*/
-void MainWindow::updateParameterList(QTableWidgetItem* item) {
-    int row = item->row();
-    QString parameterName = ui->tableParameters->item(row, 0)->text();
-    QString parameterValue = ui->tableParameters->item(row, 1)->text();
-    parameterList.insert(parameterName, parameterValue);
-    emit(newParameterList(parameterList));
-}
 
 /**
   * @brief Opens a dialogue window to select a folder and updates ui->textPathAdd. Triggered when ui->openPath is clicked.
@@ -322,8 +311,8 @@ void MainWindow::startTracking() {
         QDir().mkdir( QString::fromStdString(path) + QDir::separator() + "Tracking_Result" );
         
 
-        // Saves the parameters in a file named "parameter.txt"
-        QFile parameterFile(QString::fromStdString(path) + QDir::separator() +  "Tracking_Result" + QDir::separator() + "parameter.txt" );
+        // Saves the parameters in a file named "parameter.param"
+        QFile parameterFile(QString::fromStdString(path) + QDir::separator() +  "Tracking_Result" + QDir::separator() + "parameter.param" );
         if(!parameterFile.open(QFile::WriteOnly | QFile::Text)){
           QMessageBox errorBox(this);
           errorBox.setText("You don't have the right to write in the selected folder!");
@@ -398,6 +387,19 @@ void MainWindow::display(UMat &visu, UMat &cameraFrame){
 \*******************************************************************************************/
 
 /**
+  * @brief Updates the parameterList vector with the new parameter when users changes a parameter in the QTableWidget of parameters. Triggered when ui->tableParameters is modified. Emits the updated parameters QMap.
+  * @param[in] item QTableWidgetItem from a QTableWidget.
+*/
+void MainWindow::updateParameterList(QTableWidgetItem* item) {
+    int row = item->row();
+    QString parameterName = ui->tableParameters->item(row, 0)->text();
+    QString parameterValue = ui->tableParameters->item(row, 1)->text();
+    parameterList.insert(parameterName, parameterValue);
+    saveSettings();
+    emit(newParameterList(parameterList));
+}
+
+/**
   * @brief Loads the settings file at the startup of the program and updates the ui->parameterTable with the new parameters.
 */
 void MainWindow::loadSettings() {
@@ -425,10 +427,56 @@ void MainWindow::saveSettings() {
 }
 
 
+/**
+  * @brief Opens a dialogue to select a parameter file.
+*/
+void MainWindow::openParameterFile(){
+    
+    QString file = QFileDialog::getOpenFileName(this, tr("Open parameter file"), memoryDir, tr("Parameter file (*.param)"));
+    if (!file.isEmpty()) {
+      loadParameterFile(file);
+      updateParameterTable();
+    }
+}
+
+
+/**
+  * @brief Reads a parameter file, updates parameters.
+*/
+void MainWindow::loadParameterFile(QString path) {
+  
+  QFile parameterFile(path);
+  if (parameterFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+    QTextStream in(&parameterFile);
+    QString line;
+    QStringList parameters;
+    while (in.readLineInto(&line)) {
+      parameters = line.split(" = ", QString::SkipEmptyParts);
+      parameterList.insert(parameters.at(0), parameters.at(1));
+    }
+  }
+  parameterFile.close();
+}
+
+
+/**
+  * @brief Takes the QMap parameterList and updates the parameters panel table..
+*/
+void MainWindow::updateParameterTable() {
+    for (int i = 0; i < ui->tableParameters->rowCount(); i++) {
+      QString label = ui->tableParameters->item(i, 0)->text();
+      ui->tableParameters->item(i, 1)->setText(parameterList.value(label));
+      qInfo()<<ui->tableParameters->item(i, 0)->text();
+    }
+}
+
 /*******************************************************************************************\
                                   Replay panel
 \*******************************************************************************************/
 
+/**
+  * @brief Opens a dialogue to select a folder.
+*/
 void MainWindow::openReplayFolder() {
     QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"), memoryDir, QFileDialog::ShowDirsOnly);
     ui->replayPath->setText(dir + QDir::separator());
@@ -486,7 +534,7 @@ void MainWindow::loadReplayFolder(QString dir) {
             replayTracking.removeFirst(); // Deletes header line
 
 
-            QFile parameterFile( dir + QDir::separator() + "Tracking_Result" + QDir::separator() + "parameter.txt");
+            QFile parameterFile( dir + QDir::separator() + "Tracking_Result" + QDir::separator() + "parameter.param");
             if (parameterFile.open(QIODevice::ReadOnly)) {
               QTextStream input(&parameterFile);
               QString line;
