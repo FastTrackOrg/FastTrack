@@ -516,6 +516,22 @@ vector<Point3d> Tracking::reassignment(const vector<Point3d> &past, const vector
 		for(unsigned int i = 0; i < n; i++){
 			tmp.at(i) = input.at(assignment.at(i));
 		}
+
+    // Adds the surnumeral element to the tracked object
+    bool stat;
+    for (int j = 0; j < int(m); j++ ){
+      stat = false;
+      for (auto &a: assignment) {
+        if (j == a) {
+          stat = true;
+          break;
+        }
+      }
+      if (!stat) {
+        tmp.push_back(input.at(j));
+      }
+    }
+
 	}
 
 	else if(m < n){// Fewer target in current frame than in the previous one
@@ -722,7 +738,7 @@ void Tracking::startProcess() {
   }
   sort(m_files.begin(), m_files.end());
 
-  // Loads the background image is provided and check if the image is of the correct size
+  // Loads the background image is provided and check if the image has the correct size
   if (m_backgroundPath.empty()) {
     m_background = backgroundExtraction(m_files, param_nBackground);
   }

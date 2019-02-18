@@ -96,7 +96,7 @@ TEST_F(TrackingTest, AngleDifferrence) {
 TEST_F(TrackingTest, Reassignement) {
   Tracking tracking("test", "");
   
-  vector<Point3d> past, input;
+  vector<Point3d> past, input, comp;
   vector<int> order;
   
   past = { Point3d(1), Point3d(2), Point3d(3) };
@@ -104,22 +104,33 @@ TEST_F(TrackingTest, Reassignement) {
   order = { 2, 1, 0 };
   EXPECT_EQ(tracking.reassignment(past, input, order), past);
 
+
   past = { Point3d(1), Point3d(2), Point3d(3) };
   input = { Point3d(3), Point3d(2) };
   order = { -1, 1, 0 };
   EXPECT_EQ(tracking.reassignment(past, input, order), past);
 
+
   past = { Point3d(1), Point3d(2), Point3d(3) };
   input = { Point3d(3), Point3d(2), Point3d(4), Point3d(1) };
   order = { 3, 1, 0 };
-  EXPECT_EQ(tracking.reassignment(past, input, order), past);
+  comp  = { Point3d(1), Point3d(2), Point3d(3), Point3d(4) };
+  EXPECT_EQ(tracking.reassignment(past, input, order), comp);
+
+
+  past = { Point3d(1), Point3d(2) };
+  input = { Point3d(3), Point3d(2), Point3d(4), Point3d(1) };
+  order = { 3, 1 };
+  comp  = { Point3d(1), Point3d(2), Point3d(3), Point3d(4) };
+  EXPECT_EQ(tracking.reassignment(past, input, order), comp);
+
 }
 
 
 TEST_F(TrackingTest, Occlusion) {
   Tracking tracking("test", "");
   
-  vector<Point3d> past, input;
+  vector<Point3d> past, input, comp;
   vector<int> order;
   vector<int> occlusion;
   
@@ -146,10 +157,12 @@ TEST_F(TrackingTest, Occlusion) {
   
   past = { Point3d(1), Point3d(2), Point3d(3) };
   input = { Point3d(3), Point3d(2), Point3d(4), Point3d(1) };
+  comp = { Point3d(1), Point3d(2), Point3d(3), Point3d(4) };
   order = { 3, 1, 0 };
   occlusion = { };
-  EXPECT_EQ(tracking.reassignment(past, input, order), past);
+  EXPECT_EQ(tracking.reassignment(past, input, order), comp);
   EXPECT_EQ(tracking.findOcclusion(order), occlusion);
+  
 }
 
 TEST_F(TrackingTest, Information) {
