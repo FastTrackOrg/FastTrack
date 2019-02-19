@@ -1,6 +1,7 @@
 #include "gtest/gtest.h"
 #include "../src/tracking.cpp"
 #include "../src/mainwindow.cpp"
+#include "../src/data.cpp"
 #include <string>
 
 using namespace std;
@@ -97,7 +98,7 @@ TEST_F(TrackingTest, Reassignement) {
   Tracking tracking("test", "");
   
   vector<Point3d> past, input, comp;
-  vector<int> order;
+  vector<int> order, id, lost, idComp, lostComp;
   
   past = { Point3d(1), Point3d(2), Point3d(3) };
   input = { Point3d(3), Point3d(2), Point3d(1) };
@@ -121,7 +122,6 @@ TEST_F(TrackingTest, Reassignement) {
   past = { Point3d(1), Point3d(2) };
   input = { Point3d(3), Point3d(2), Point3d(4), Point3d(1) };
   order = { 3, 1 };
-  comp  = { Point3d(1), Point3d(2), Point3d(3), Point3d(4) };
   EXPECT_EQ(tracking.reassignment(past, input, order), comp);
 
 }
@@ -164,6 +164,80 @@ TEST_F(TrackingTest, Occlusion) {
   EXPECT_EQ(tracking.findOcclusion(order), occlusion);
   
 }
+
+
+TEST_F(TrackingTest, Cleaning) {
+  
+  Tracking tracking("test", "");
+  
+  vector<vector<Point3d>> input, comp;
+  vector<int> occlusion, lost, id, lostComp, idComp;
+  
+  input = { { Point3d(3) }, { Point3d(2), }, { Point3d(1), } };
+  comp = { { Point3d(3), }, { Point3d(2), }, { Point3d(1), } };
+  id = {0, 1, 2};
+  idComp = {0, 1, 2};
+  lost = {0, 0, 0};
+  lostComp = {0, 0, 0};
+  occlusion = { };
+  tracking.cleaning(occlusion, lost, id, input, 10);
+  EXPECT_EQ(input, comp);
+  EXPECT_EQ(id, idComp);
+  EXPECT_EQ(lost, lostComp);
+
+
+  input = { { Point3d(3) }, { Point3d(2), }, { Point3d(1), } };
+  comp = { { Point3d(3) }, { Point3d(2), }, { Point3d(1), } };
+  id = {0, 1, 2};
+  idComp = {0, 1, 2};
+  lost = {0, 0, 0};
+  lostComp = {0, 1, 0};
+  occlusion = { 1 };
+  tracking.cleaning(occlusion, lost, id, input, 10);
+  EXPECT_EQ(input, comp);
+  EXPECT_EQ(id, idComp);
+  EXPECT_EQ(lost, lostComp);
+
+
+  input = { { Point3d(3) }, { Point3d(2), }, { Point3d(1), } };
+  comp = { { Point3d(3) }, { Point3d(2), }, { Point3d(1), } };
+  id = {0, 1, 2};
+  idComp = {0, 1, 2};
+  lost = {0, 0, 0};
+  lostComp = {1, 1, 0};
+  occlusion = {0, 1 };
+  tracking.cleaning(occlusion, lost, id, input, 10);
+  EXPECT_EQ(input, comp);
+  EXPECT_EQ(id, idComp);
+  EXPECT_EQ(lost, lostComp);
+
+
+  input = { { Point3d(3) }, { Point3d(2), }, { Point3d(1), } };
+  comp = { { Point3d(2), }, { Point3d(1), } };
+  id = {0, 1, 2};
+  idComp = {1, 2};
+  lost = {10, 0, 0};
+  lostComp = {0, 0};
+  occlusion = { 0 };
+  tracking.cleaning(occlusion, lost, id, input, 10);
+  EXPECT_EQ(input, comp);
+  EXPECT_EQ(id, idComp);
+  EXPECT_EQ(lost, lostComp);
+
+
+  input = { { Point3d(3) }, { Point3d(2), }, { Point3d(1), } };
+  comp = { { Point3d(2), } };
+  id = {0, 1, 2};
+  idComp = {1};
+  lost = {10, 5, 10};
+  lostComp = {0};
+  occlusion = { 0, 2 };
+  tracking.cleaning(occlusion, lost, id, input, 10);
+  EXPECT_EQ(input, comp);
+  EXPECT_EQ(id, idComp);
+  EXPECT_EQ(lost, lostComp);
+}
+
 
 TEST_F(TrackingTest, Information) {
   Tracking tracking("test", "");

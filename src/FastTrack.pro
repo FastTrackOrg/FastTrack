@@ -37,7 +37,11 @@ SOURCES += \
         mainwindow.cpp \
         tracking.cpp \
         setupwindow.cpp \
-        Hungarian.cpp
+        Hungarian.cpp \
+        replay.cpp \
+        batch.cpp \
+        interactive.cpp \
+        data.cpp \
 
 QMAKE_CXXFLAGS += -std=c++11 -O3 -fopenmp -g
 
@@ -47,11 +51,19 @@ HEADERS += \
         mainwindow.h\
         tracking.h \
         setupwindow.h \
-        Hungarian.h
+        Hungarian.h \
+        replay.h \
+        batch.h \
+        interactive.h \
+        data.h \
 
 
-FORMS += mainwindow.ui \
-        setupwindow.ui 
+FORMS += \ 
+        mainwindow.ui \
+        setupwindow.ui \
+        replay.ui \ 
+        batch.ui \ 
+        interactive.ui \ 
 
 RESOURCES += resources.qrc
 

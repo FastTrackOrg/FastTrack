@@ -61,12 +61,16 @@ class Tracking : public QObject {
   bool statusPath;   /*!< True if the path is correct, ie the path folder contains an images sequence. */
 
   int m_im;   /*!< Index of the next image to process in the m_files list. */
+  int m_startImage;   /*!< Index of the next image to process in the m_files list. */
+  int m_stopImage;   /*!< Index of the next image to process in the m_files list. */
   Rect m_ROI;   /*!< Rectangular region of interrest. */
   QTextStream m_savefile;   /*!< Stream to output tracking data. */
   QFile m_outputFile;   /*!< Path to the file where to save tracking data. */
   vector<cv::String> m_files;   /*!< Vector containing the path for each image in the images sequence. */
   vector<Point3d> m_colorMap;   /*!< Vector containing RBG color. */
   vector<vector<Point>> m_memory;   /*!< Vector containing the last 50 tracking data. */
+  vector<int> m_id;   /*!< Vector containing the objets Id. */
+  vector<int> m_lost;   /*!< Vector containing the lost objects. */
 
   string m_path;   /*!< Path to an image sequence. */
   string m_backgroundPath;   /*!< Path to an image background. */
@@ -80,6 +84,7 @@ class Tracking : public QObject {
   double param_angle;   /*!< Maximal change in direction of an object between two images. */
   double param_weight;   /*!< Weight between distance and direction in the cost function.  */
   double param_lo;   /*!< Maximal distance allowed by an object to travel during an occlusion event. */
+  double param_to;   /*!< Maximal time. */
   int param_arrowSize;   /*!< Size of the arrow in the displayed image. */
   int param_thresh;   /*!< Value of the threshold to binarize the image. */
   double param_nBackground;   /*!< Number of images to average to compute the background. */
@@ -93,7 +98,7 @@ class Tracking : public QObject {
 
 
   public:
-  Tracking(string path, string background);
+  Tracking(string path, string background, int startImage = 0, int stopImage = -1);
   ~Tracking();
 
   Point2d curvatureCenter(const Point3d &tail, const Point3d &head);
@@ -103,11 +108,12 @@ class Tracking : public QObject {
   bool objectDirection(const UMat &image, Point center, vector<double> &information);
   vector<double> objectInformation(const UMat &image);
   vector<Point3d> reassignment(const vector<Point3d> &past, const vector<Point3d> &input, const vector<int> &assignment);
-  UMat backgroundExtraction(const vector<String> &files, double n);
+  UMat backgroundExtraction(const vector<String> &files, double n, int type);
   void registration(UMat imageReference, UMat& frame);
   void binarisation(UMat& frame, char backgroundColor, int value);
   vector<vector<Point3d> > objectPosition(const UMat &frame, int minSize, int maxSize);
   vector<int> costFunc(const vector<Point3d> &prevPos, const vector<Point3d> &pos, double LENGHT, double ANGLE, double WEIGHT, double LO);
+  void cleaning(const vector<int> &occluded, vector<int> &lostCounter, vector<int> &id, vector<vector<Point3d>> &input, double param_maximalTime);
   vector<Point3d> prevision(vector<Point3d> past, vector<Point3d> present);
   vector<Point3d> color(int number);
   vector<int> findOcclusion(vector<int> assignment); 

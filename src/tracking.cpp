@@ -209,9 +209,10 @@ bool Tracking::objectDirection(const UMat &image, Point center, vector<double> &
   * @brief Computes the background of an image sequence by averaging n images.
   * @param[in] files List of paths to each image in the images sequence.
   * @param[in] n The number of images to average to computes the background.
+  * @param[in] Method 0: minimal projection, 1: maximal projection, 2: average projection.
   * @return The background image.
 */
-UMat Tracking::backgroundExtraction(const vector<String> &files, double n){
+UMat Tracking::backgroundExtraction(const vector<String> &files, double n, int method = 2){
 
     
     if (static_cast<unsigned int>(n) > files.size()) {
@@ -497,6 +498,8 @@ vector<int> Tracking::findOcclusion(vector<int> assignment) {
   * @param[in] past The vector at the previous image.
   * @param[in] input The vector at current image of size m <= n to be sorted.
   * @param[in] assignment The vector with the new indexes that will be used to sort the input vector.
+  * @param[in] lostCounter The vector with the number of times each objects are lost consecutively.
+  * @param[in] id The vector with the id of the objects.
   * @return The sorted vector.
 */
 vector<Point3d> Tracking::reassignment(const vector<Point3d> &past, const vector<Point3d> &input, const vector<int> &assignment){
@@ -516,8 +519,8 @@ vector<Point3d> Tracking::reassignment(const vector<Point3d> &past, const vector
 		for(unsigned int i = 0; i < n; i++){
 			tmp.at(i) = input.at(assignment.at(i));
 		}
-
     // Adds the surnumeral element to the tracked object
+    //TO DO: sortir de la boucle pour améliorer les performances.
     bool stat;
     for (int j = 0; j < int(m); j++ ){
       stat = false;
@@ -534,7 +537,7 @@ vector<Point3d> Tracking::reassignment(const vector<Point3d> &past, const vector
 
 	}
 
-	else if(m < n){// Fewer target in current frame than in the previous one
+	else if(m < n){ // Fewer target in current frame than in the previous one
 		for(unsigned int i = 0; i < n; i++){
 			if(assignment.at(i) != -1){
 				tmp.at(i) = input.at(assignment.at(i));
@@ -549,7 +552,42 @@ vector<Point3d> Tracking::reassignment(const vector<Point3d> &past, const vector
 
 	return tmp;
 }
+  
 
+
+/**
+  * @brief Cleans the data if an object is lost more than a certain time.
+  * @param[in] occluded The vector with the index of object missing in the current image.
+  * @param[in] input The vector at current image of size m <= n to be sorted.
+  * @param[in] lostCounter The vector with the number of times each objects are lost consecutively.
+  * @param[in] id The vector with the id of the objects.
+  * @param[in] param_maximalTime 
+  * @return The sorted vector.
+*/
+void Tracking::cleaning(const vector<int> &occluded, vector<int> &lostCounter, vector<int> &id, vector<vector<Point3d>> &input, double param_maximalTime) {
+
+  vector<int> counter(lostCounter.size(), 0);
+  
+  // Increment the lost counter
+  for (auto &a: occluded) {
+    counter.at(a) = lostCounter.at(a) + 1 ;
+  }
+
+  // Cleans the data
+  for (size_t i = counter.size(); i > 0; i --) {
+    if (counter.at(i - 1) > param_maximalTime) {
+      counter.erase(counter.begin() + i - 1);
+      id.erase(id.begin() + i - 1);
+      for (auto &a: input) {
+        a.erase(a.begin() + i - 1);
+      }
+      qInfo() << "TT";
+    }
+  }
+
+  lostCounter = counter;
+
+}
 
 
 
@@ -639,10 +677,18 @@ void Tracking::imageProcessing(){
     // Associates the objets with the previous image
     vector<int> identity = costFunc(m_outPrev.at(param_spot), m_out.at(param_spot), param_len, param_angle, param_weight, param_lo);
     vector<int> occluded = findOcclusion(identity);
+qInfo() << m_outPrev.at(0).size() << m_out.at(0).size() << identity.size();
+
     for (size_t i = 0; i < m_out.size(); i++) {
       m_out.at(i) = reassignment(m_outPrev.at(i), m_out.at(i), identity);
     }
 
+    while ( m_out.size() - m_id.size() != 0 ) {
+      m_id.push_back(int(*max_element(m_id.begin(), m_id.end()) + 1));
+      m_lost.push_back(0);
+    }
+    
+    cleaning(occluded, m_lost, m_id, m_out, param_to);
     // Saves the parameters of the objects in a text file and displays the tracking results in the display panel
     cvtColor(m_visuFrame, m_visuFrame, COLOR_GRAY2RGB);
 
@@ -666,14 +712,8 @@ void Tracking::imageProcessing(){
             m_savefile << a.at(l).z; 
             m_savefile << '\t';
           }
-          m_savefile << m_im << '\n';
-        }
-        // No tracking data are available due to an occlusion event
-        else {
-          for (unsigned int i = 0; i < m_out.size()*3; i++) {
-            m_savefile << "NaN" << '\t';
-          }
-          m_savefile << m_im << '\n';
+          m_savefile << m_im << '\t';
+          m_savefile << m_id.at(l) << '\n';
         }
       }
   
@@ -685,7 +725,7 @@ void Tracking::imageProcessing(){
         emit(newImageToDisplay(m_visuFrame, m_binaryFrame));
        m_displayTime = timer->elapsed();
       }
-      if(m_im + 1 > int(m_files.size())){
+      if(m_im + 1 > m_stopImage){
         m_savefile.flush();
         m_outputFile.close();
         emit(finished());
@@ -704,9 +744,11 @@ void Tracking::imageProcessing(){
   * @param[in] path The path to a folder where images are stocked.
   * @param[in] backgroundPath The path to a background image.
 */
-Tracking::Tracking(string path, string backgroundPath) {
+Tracking::Tracking(string path, string backgroundPath, int startImage, int stopImage) {
   m_path = path;
   m_backgroundPath = backgroundPath;
+  m_startImage = startImage;
+  m_stopImage = stopImage;
 }
 
 
@@ -730,7 +772,8 @@ void Tracking::startProcess() {
     m_path += + "*." + extension.toStdString();
     glob(m_path, m_files, false); // Get all path to frames
     statusPath = true;
-    m_im = 0;
+    m_im = m_startImage;
+    (m_stopImage == -1) ? (m_stopImage = m_files.size()) : ( m_stopImage = m_stopImage);
   }
   catch(...){
     statusPath = false;
@@ -755,8 +798,8 @@ void Tracking::startProcess() {
     }
   }
 
-  m_colorMap = color(param_n);
-  m_memory = vector<vector<Point>>(param_n, vector<Point>());
+  m_colorMap = color(500);
+  m_memory = vector<vector<Point>>(500, vector<Point>());
   // First frame
   imread(m_files.at(0), IMREAD_GRAYSCALE).copyTo(m_visuFrame);
   
@@ -774,22 +817,13 @@ void Tracking::startProcess() {
     m_visuFrame = m_visuFrame(m_ROI);
   }
 
-  m_out= objectPosition(m_binaryFrame, param_minArea, param_maxArea);
+  m_out = objectPosition(m_binaryFrame, param_minArea, param_maxArea);
   
-  // if less objects detected than indicated
-  while( (int(m_out.at(0).size()) - param_n) < 0 ){
-      for(unsigned int i = 0; i < m_out.size(); i++){
-        m_out.at(i).push_back(Point3d(0,0,0));
-      }
+  for (size_t i = 0; i < m_out.size(); i++) {
+    m_id.push_back(i);
+    m_lost.push_back(0);
   }
-
-  // if more objects detected than indicated
-  while( (m_out.at(0).size() - param_n) > 0 ){
-      for(unsigned int i = 0; i < m_out.size(); i++){
-        m_out.at(i).pop_back();
-      }
-  }
-    
+      
   cvtColor(m_visuFrame, m_visuFrame, COLOR_GRAY2RGB);
   
   // Initializes output file and stream
@@ -802,7 +836,7 @@ void Tracking::startProcess() {
   // Saving
 
   // File header
-  m_savefile << "xHead" << '\t' << "yHead" << '\t' << "tHead" << '\t'  << "xTail" << '\t' << "yTail" << '\t' << "tTail"   << '\t'  << "xBody" << '\t' << "yBody" << '\t' << "tBody"   << '\t'  << "curvature"  << '\t' << "areaBody" << '\t' << "perimeterBody" << '\t' << "headMajorAxisLength" << '\t' << "headMinorAxisLength" << '\t' << "headExcentricity" << '\t' << "tailMajorAxisLength" << '\t' << "tailMinorAxisLength" << '\t' << "tailExcentricity" << '\t'<< "bodyMajorAxisLength" << '\t' << "bodyMinorAxisLength" << '\t' << "bodyExcentricity" << '\t' << "imageNumber" << endl;
+  m_savefile << "xHead" << '\t' << "yHead" << '\t' << "tHead" << '\t'  << "xTail" << '\t' << "yTail" << '\t' << "tTail"   << '\t'  << "xBody" << '\t' << "yBody" << '\t' << "tBody"   << '\t'  << "curvature"  << '\t' << "areaBody" << '\t' << "perimeterBody" << '\t' << "headMajorAxisLength" << '\t' << "headMinorAxisLength" << '\t' << "headExcentricity" << '\t' << "tailMajorAxisLength" << '\t' << "tailMinorAxisLength" << '\t' << "tailExcentricity" << '\t'<< "bodyMajorAxisLength" << '\t' << "bodyMinorAxisLength" << '\t' << "bodyExcentricity" << '\t' << "imageNumber" << '\t' << "id" << endl;
   
   // Draws lines and arrows on the image in the display panel
   for(size_t l = 0; l < m_out.at(0).size(); l++){
@@ -817,7 +851,8 @@ void Tracking::startProcess() {
       m_savefile << a.at(l).z; 
       m_savefile << '\t';
     }
-    m_savefile << m_im << '\n';
+    m_savefile << m_im << '\t';
+    m_savefile << m_id.at(l) << '\n';
 
   }
   m_outPrev = m_out;
@@ -841,7 +876,6 @@ void Tracking::startProcess() {
 */
 void Tracking::updatingParameters(const QMap<QString, QString> &parameterList) {
 
-  param_n = parameterList.value("Object number").toInt();
   param_maxArea = parameterList.value("Maximal size").toInt();
   param_minArea = parameterList.value("Minimal size").toInt();
   param_spot = parameterList.value("Spot to track").toInt();
@@ -849,6 +883,7 @@ void Tracking::updatingParameters(const QMap<QString, QString> &parameterList) {
   param_angle = parameterList.value("Maximal angle").toDouble();
   param_weight = parameterList.value("Weight").toDouble();
   param_lo = parameterList.value("Maximal occlusion").toDouble();
+  param_to = parameterList.value("Maximal time").toDouble();
   param_arrowSize = parameterList.value("Arrow size").toInt();
 
   param_thresh = parameterList.value("Binary threshold").toInt();
@@ -861,7 +896,6 @@ void Tracking::updatingParameters(const QMap<QString, QString> &parameterList) {
   statusRegistration = (parameterList.value("Registration") == "yes") ? true : false;
   statusBinarisation = (parameterList.value("Light background") == "yes") ? true : false;
   param_dilatation = parameterList.value("Dilatation").toInt();
-
 }
 
 /**
