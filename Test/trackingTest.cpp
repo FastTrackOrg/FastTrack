@@ -1,7 +1,5 @@
 #include "gtest/gtest.h"
 #include "../src/tracking.cpp"
-#include "../src/mainwindow.cpp"
-#include "../src/data.cpp"
 #include <string>
 
 using namespace std;
@@ -212,8 +210,8 @@ TEST_F(TrackingTest, Cleaning) {
   EXPECT_EQ(lost, lostComp);
 
 
-  input = { { Point3d(3) }, { Point3d(2), }, { Point3d(1), } };
-  comp = { { Point3d(2), }, { Point3d(1), } };
+  input = { { Point3d(0), Point3d(1) }, { Point3d(0), Point3d(1) }, { Point3d(0), Point3d(1) } };
+  comp = { { Point3d(1) }, { Point3d(1) }, { Point3d(1) } };
   id = {0, 1, 2};
   idComp = {1, 2};
   lost = {10, 0, 0};
@@ -225,13 +223,13 @@ TEST_F(TrackingTest, Cleaning) {
   EXPECT_EQ(lost, lostComp);
 
 
-  input = { { Point3d(3) }, { Point3d(2), }, { Point3d(1), } };
-  comp = { { Point3d(2), } };
-  id = {0, 1, 2};
-  idComp = {1};
-  lost = {10, 5, 10};
-  lostComp = {0};
-  occlusion = { 0, 2 };
+  input = { { Point3d(0), Point3d(1) }, { Point3d(0), Point3d(1) }, { Point3d(0), Point3d(1) } };
+  comp = { {  }, {  }, {  } };
+  id = {0, 1};
+  idComp = {};
+  lost = {10, 10};
+  lostComp = {};
+  occlusion = { 0, 1 };
   tracking.cleaning(occlusion, lost, id, input, 10);
   EXPECT_EQ(input, comp);
   EXPECT_EQ(id, idComp);
@@ -338,17 +336,6 @@ TEST_F(TrackingTest, costFunction) {
 }
 }
 
-namespace{
-class MainWindowTest : public ::testing::Test {
- protected:
-	  virtual void SetUp() {
-	  }
-	 
-	  virtual void TearDown() {
-	  }
-};
-
-}
 
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);

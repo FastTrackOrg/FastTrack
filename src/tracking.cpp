@@ -212,24 +212,23 @@ bool Tracking::objectDirection(const UMat &image, Point center, vector<double> &
   * @param[in] Method 0: minimal projection, 1: maximal projection, 2: average projection.
   * @return The background image.
 */
-UMat Tracking::backgroundExtraction(const vector<String> &files, double n, int method = 2){
+UMat Tracking::backgroundExtraction(const vector<String> &files, double n, const int method){
 
     
-    if (static_cast<unsigned int>(n) > files.size()) {
-      n = double(files.size());
-    }
+  if (static_cast<unsigned int>(n) > files.size()) {
+    n = double(files.size());
+  }
 
-    UMat background;
-    UMat img0;
-    imread(files[0], IMREAD_GRAYSCALE).copyTo(background);
-    background.setTo(0);
-    imread(files[0], IMREAD_GRAYSCALE).copyTo(img0);
-    background.convertTo(background, CV_32FC1);
-    img0.convertTo(img0, CV_32FC1);
-    int step = files.size()/n;
-    UMat cameraFrameReg;
-    Mat H;
-    int count = 0;
+  UMat background;
+  UMat img0;
+  imread(files[0], IMREAD_GRAYSCALE).copyTo(background);
+  imread(files[0], IMREAD_GRAYSCALE).copyTo(img0);
+  background.convertTo(background, CV_32FC1);
+  img0.convertTo(img0, CV_32FC1);
+  int step = files.size()/(n-1);
+  UMat cameraFrameReg;
+  Mat H;
+  int count = 1;
 
 	for(size_t i = 0; i < files.size(); i += step){
         imread(files[i], IMREAD_GRAYSCALE).copyTo(cameraFrameReg);
@@ -237,10 +236,31 @@ UMat Tracking::backgroundExtraction(const vector<String> &files, double n, int m
         Point2d shift = phaseCorrelate(cameraFrameReg, img0);
         H = (Mat_<float>(2, 3) << 1.0, 0.0, shift.x, 0.0, 1.0, shift.y);
 				warpAffine(cameraFrameReg, cameraFrameReg, H, cameraFrameReg.size());
-				accumulate(cameraFrameReg, background);
+
+        switch (method) {
+          case 0:
+            cv::min(background, cameraFrameReg, background);  
+            break;
+
+          case 1:
+            cv::max(background, cameraFrameReg, background);  
+            break;
+
+          case 2:
+              accumulate(cameraFrameReg, background);
+              break;
+          default:
+              cv::max(background, cameraFrameReg, background);  
+        }
+
         count ++;
 	}
-  background.convertTo(background, CV_8U, 1./count);
+  if (method == 2) {
+    background.convertTo(background, CV_8U, 1./count);
+  }
+  else {
+    background.convertTo(background, CV_8U);
+  }
 	return background;
 }
 
@@ -573,15 +593,14 @@ void Tracking::cleaning(const vector<int> &occluded, vector<int> &lostCounter, v
     counter.at(a) = lostCounter.at(a) + 1 ;
   }
 
-  // Cleans the data
+  // Cleans the data beginning at the start of the vector to keep index in place in the vectors
   for (size_t i = counter.size(); i > 0; i --) {
     if (counter.at(i - 1) > param_maximalTime) {
       counter.erase(counter.begin() + i - 1);
       id.erase(id.begin() + i - 1);
-      for (auto &a: input) {
-        a.erase(a.begin() + i - 1);
+      for (size_t j = 0; j < input.size(); j++) {
+        input.at(j).erase(input.at(j).begin() + i - 1);
       }
-      qInfo() << "TT";
     }
   }
 
@@ -651,7 +670,6 @@ vector<Point3d> Tracking::color(int number){
   * @brief Processes an image from an images sequence and tracks and matchs objects according to the previous image in the sequence. Takes a new image from the image sequence, substracts the background, binarises the image and crops according to the defined region of interest. Detects all the objects in the image and extracts the object features. Then matches detected objects with objects from the previous frame. This function emits a signal to display the images in the user interface.
 */
 void Tracking::imageProcessing(){
-
     // Reads the next image in the image sequence and applies the image processing workflow
     imread(m_files.at(m_im), IMREAD_GRAYSCALE).copyTo(m_visuFrame);
     if(statusRegistration){
@@ -677,7 +695,6 @@ void Tracking::imageProcessing(){
     // Associates the objets with the previous image
     vector<int> identity = costFunc(m_outPrev.at(param_spot), m_out.at(param_spot), param_len, param_angle, param_weight, param_lo);
     vector<int> occluded = findOcclusion(identity);
-qInfo() << m_outPrev.at(0).size() << m_out.at(0).size() << identity.size();
 
     for (size_t i = 0; i < m_out.size(); i++) {
       m_out.at(i) = reassignment(m_outPrev.at(i), m_out.at(i), identity);
@@ -783,9 +800,9 @@ void Tracking::startProcess() {
 
   // Loads the background image is provided and check if the image has the correct size
   if (m_backgroundPath.empty()) {
-    m_background = backgroundExtraction(m_files, param_nBackground);
+    m_background = backgroundExtraction(m_files, param_nBackground, param_methodBackground);
   }
-  else if (!m_backgroundPath.empty()) {
+  else {
     try{
       imread(m_backgroundPath, IMREAD_GRAYSCALE).copyTo(m_background);
       UMat test;
@@ -793,7 +810,7 @@ void Tracking::startProcess() {
       subtract(test, m_background, test);
     }
     catch(...){
-      m_background = backgroundExtraction(m_files, param_nBackground);
+      m_background = backgroundExtraction(m_files, param_nBackground, param_methodBackground);
       emit(error(0));
     }
   }
@@ -806,7 +823,6 @@ void Tracking::startProcess() {
   (statusBinarisation) ? (subtract(m_background, m_visuFrame, m_binaryFrame)) : (subtract(m_visuFrame, m_background, m_binaryFrame));
 
   binarisation(m_binaryFrame, 'b', param_thresh);
-
   if (param_dilatation != 0) {
     Mat element = getStructuringElement( MORPH_ELLIPSE, Size( 2*param_dilatation + 1, 2*param_dilatation + 1 ), Point( param_dilatation, param_dilatation ) );
     dilate(m_binaryFrame, m_binaryFrame, element);
@@ -888,6 +904,7 @@ void Tracking::updatingParameters(const QMap<QString, QString> &parameterList) {
 
   param_thresh = parameterList.value("Binary threshold").toInt();
   param_nBackground = parameterList.value("Number of images background").toDouble();
+  param_methodBackground = parameterList.value("Background method").toInt();
   param_x1 = parameterList.value("ROI top x").toInt();
   param_y1 = parameterList.value("ROI top y").toInt();
   param_x2 = parameterList.value("ROI bottom x").toInt();

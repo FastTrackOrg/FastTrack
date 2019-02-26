@@ -88,6 +88,7 @@ class Tracking : public QObject {
   int param_arrowSize;   /*!< Size of the arrow in the displayed image. */
   int param_thresh;   /*!< Value of the threshold to binarize the image. */
   double param_nBackground;   /*!< Number of images to average to compute the background. */
+  int param_methodBackground;   /*!< The method used to compute the background. */
   int param_x1;   /*!< Top x corner of the region of interest. */
   int param_y1;   /*!< Top y corner of the region of interest. */
   int param_x2;   /*!< Bottom x corner of the region of interest. */
@@ -108,7 +109,7 @@ class Tracking : public QObject {
   bool objectDirection(const UMat &image, Point center, vector<double> &information);
   vector<double> objectInformation(const UMat &image);
   vector<Point3d> reassignment(const vector<Point3d> &past, const vector<Point3d> &input, const vector<int> &assignment);
-  UMat backgroundExtraction(const vector<String> &files, double n, int type);
+  UMat backgroundExtraction(const vector<String> &files, double n, const int method);
   void registration(UMat imageReference, UMat& frame);
   void binarisation(UMat& frame, char backgroundColor, int value);
   vector<vector<Point3d> > objectPosition(const UMat &frame, int minSize, int maxSize);
