@@ -670,6 +670,7 @@ vector<Point3d> Tracking::color(int number){
   * @brief Processes an image from an images sequence and tracks and matchs objects according to the previous image in the sequence. Takes a new image from the image sequence, substracts the background, binarises the image and crops according to the defined region of interest. Detects all the objects in the image and extracts the object features. Then matches detected objects with objects from the previous frame. This function emits a signal to display the images in the user interface.
 */
 void Tracking::imageProcessing(){
+  qInfo() << m_im;
     // Reads the next image in the image sequence and applies the image processing workflow
     imread(m_files.at(m_im), IMREAD_GRAYSCALE).copyTo(m_visuFrame);
     if(statusRegistration){
@@ -683,6 +684,12 @@ void Tracking::imageProcessing(){
       Mat element = getStructuringElement( MORPH_ELLIPSE, Size( 2*param_dilatation + 1, 2*param_dilatation + 1 ), Point( param_dilatation, param_dilatation ) );
       dilate(m_binaryFrame, m_binaryFrame, element);
     }
+    
+    if (param_erosion != 0) {
+      Mat element = getStructuringElement( MORPH_ELLIPSE, Size( 2*param_erosion + 1, 2*param_erosion + 1 ), Point( param_erosion, param_erosion ) );
+      erode(m_binaryFrame, m_binaryFrame, element);
+    }
+
 
     if(m_ROI.width != 0 || m_ROI.height != 0 ) {
       m_binaryFrame = m_binaryFrame(m_ROI);
@@ -700,24 +707,17 @@ void Tracking::imageProcessing(){
       m_out.at(i) = reassignment(m_outPrev.at(i), m_out.at(i), identity);
     }
 
-    while ( m_out.size() - m_id.size() != 0 ) {
+    while ( m_out.at(0).size() - m_id.size() != 0 ) {
       m_id.push_back(int(*max_element(m_id.begin(), m_id.end()) + 1));
       m_lost.push_back(0);
     }
     
+  qInfo() << m_out.at(0).size() << m_out.size() ;
     cleaning(occluded, m_lost, m_id, m_out, param_to);
-    // Saves the parameters of the objects in a text file and displays the tracking results in the display panel
-    cvtColor(m_visuFrame, m_visuFrame, COLOR_GRAY2RGB);
+  qInfo() << "TET" << m_out.at(0).size() << m_out.size() ;
 
     // Draws lines and arrows on the image in the display panel
     for(size_t l = 0; l < m_out.at(0).size(); l++){
-      m_memory.at(l).push_back( Point( m_out.at(param_spot).at(l).x, m_out.at(param_spot).at(l).y ) );
-      arrowedLine(m_visuFrame, Point(m_out.at(param_spot).at(l).x, m_out.at(param_spot).at(l).y), Point(m_out.at(param_spot).at(l).x + 5*param_arrowSize*cos(m_out.at(param_spot).at(l).z), m_out.at(param_spot).at(l).y - 5*param_arrowSize*sin(m_out.at(param_spot).at(l).z)), Scalar(m_colorMap.at(l).x, m_colorMap.at(l).y, m_colorMap.at(l).z), param_arrowSize + 2, 10*param_arrowSize, 0);
-      polylines(m_visuFrame, m_memory.at(l), false, Scalar(m_colorMap.at(l).x, m_colorMap.at(l).y, m_colorMap.at(l).z), param_arrowSize + 2, 8, 0);
-
-      if(m_memory.at(l).size() > 10){
-          m_memory.at(l).erase(m_memory.at(l).begin());
-        }
 
         // Tracking data are available
         if ( find(occluded.begin(), occluded.end(), int(l)) == occluded.end() ) {
@@ -734,14 +734,10 @@ void Tracking::imageProcessing(){
         }
       }
   
+  qInfo() << "test0";
       m_im ++;
       m_outPrev = m_out;
     
-      // Sending rate of images to display
-      if ( (timer->elapsed() - m_displayTime) > 40) {
-        emit(newImageToDisplay(m_visuFrame, m_binaryFrame));
-       m_displayTime = timer->elapsed();
-      }
       if(m_im + 1 > m_stopImage){
         m_savefile.flush();
         m_outputFile.close();
@@ -828,6 +824,11 @@ void Tracking::startProcess() {
     dilate(m_binaryFrame, m_binaryFrame, element);
   }
 
+  if (param_erosion != 0) {
+    Mat element = getStructuringElement( MORPH_ELLIPSE, Size( 2*param_erosion + 1, 2*param_erosion + 1 ), Point( param_erosion, param_erosion ) );
+    erode(m_binaryFrame, m_binaryFrame, element);
+  }
+
   if (m_ROI.width != 0){
     m_binaryFrame = m_binaryFrame(m_ROI);
     m_visuFrame = m_visuFrame(m_ROI);
@@ -835,12 +836,11 @@ void Tracking::startProcess() {
 
   m_out = objectPosition(m_binaryFrame, param_minArea, param_maxArea);
   
-  for (size_t i = 0; i < m_out.size(); i++) {
+  for (size_t i = 0; i < m_out.at(0).size(); i++) {
     m_id.push_back(i);
     m_lost.push_back(0);
   }
       
-  cvtColor(m_visuFrame, m_visuFrame, COLOR_GRAY2RGB);
   
   // Initializes output file and stream
   m_outputFile.setFileName(QString::fromStdString(m_path).section("*",0,0) + "Tracking_Result" + QDir::separator() + "tracking.txt" );
@@ -856,9 +856,8 @@ void Tracking::startProcess() {
   
   // Draws lines and arrows on the image in the display panel
   for(size_t l = 0; l < m_out.at(0).size(); l++){
-    arrowedLine(m_visuFrame, Point(m_out.at(param_spot).at(l).x, m_out.at(param_spot).at(l).y), Point(m_out.at(param_spot).at(l).x + 5*param_arrowSize*cos(m_out.at(param_spot).at(l).z), m_out.at(param_spot).at(l).y - 5*param_arrowSize*sin(m_out.at(param_spot).at(l).z)), Scalar(m_colorMap.at(l).x, m_colorMap.at(l).y, m_colorMap.at(l).z), param_arrowSize + 2, 10*param_arrowSize, 0);
-    m_memory.at(l).push_back( Point( m_out.at(param_spot).at(l).x, m_out.at(param_spot).at(l).y ) );
 
+  // Draws lines and arrows on the image in the display panel
     for (auto const &a: m_out) {
       m_savefile << a.at(l).x; 
       m_savefile << '\t';
@@ -874,12 +873,10 @@ void Tracking::startProcess() {
   m_outPrev = m_out;
   m_im ++;
   connect(this, SIGNAL(finishedProcessFrame()), this, SLOT(imageProcessing()));
+  
+  qInfo() << "End the initialization";
   timer = new QElapsedTimer();
-
-
   timer->start();
-  m_displayTime = 0;
-  emit(newImageToDisplay(m_visuFrame, m_binaryFrame));
   emit(finishedProcessFrame());
 }
 
@@ -891,7 +888,7 @@ void Tracking::startProcess() {
   * @param[in] parameterList The list of all the parameters used in the tracking.
 */
 void Tracking::updatingParameters(const QMap<QString, QString> &parameterList) {
-
+  qInfo() << parameterList;
   param_maxArea = parameterList.value("Maximal size").toInt();
   param_minArea = parameterList.value("Minimal size").toInt();
   param_spot = parameterList.value("Spot to track").toInt();
@@ -913,6 +910,7 @@ void Tracking::updatingParameters(const QMap<QString, QString> &parameterList) {
   statusRegistration = (parameterList.value("Registration") == "yes") ? true : false;
   statusBinarisation = (parameterList.value("Light background") == "yes") ? true : false;
   param_dilatation = parameterList.value("Dilatation").toInt();
+  param_erosion = parameterList.value("Erosion").toInt();
 }
 
 /**
