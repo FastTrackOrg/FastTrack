@@ -95,6 +95,7 @@ class Tracking : public QObject {
   int param_y2;   /*!< Bottom y corner of the region of interest. */
   int param_dilatation;   /*!< Dilatation coefficient to dilate binary image. */
   int param_erosion;   /*!< Erosion coefficient to dilate binary image. */
+  QMap<QString, QString> parameters;  /*!< map of all the parameters for the tracking. */
 
 
 

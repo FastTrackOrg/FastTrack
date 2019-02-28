@@ -670,7 +670,6 @@ vector<Point3d> Tracking::color(int number){
   * @brief Processes an image from an images sequence and tracks and matchs objects according to the previous image in the sequence. Takes a new image from the image sequence, substracts the background, binarises the image and crops according to the defined region of interest. Detects all the objects in the image and extracts the object features. Then matches detected objects with objects from the previous frame. This function emits a signal to display the images in the user interface.
 */
 void Tracking::imageProcessing(){
-  qInfo() << m_im;
     // Reads the next image in the image sequence and applies the image processing workflow
     imread(m_files.at(m_im), IMREAD_GRAYSCALE).copyTo(m_visuFrame);
     if(statusRegistration){
@@ -712,9 +711,7 @@ void Tracking::imageProcessing(){
       m_lost.push_back(0);
     }
     
-  qInfo() << m_out.at(0).size() << m_out.size() ;
     cleaning(occluded, m_lost, m_id, m_out, param_to);
-  qInfo() << "TET" << m_out.at(0).size() << m_out.size() ;
 
     // Draws lines and arrows on the image in the display panel
     for(size_t l = 0; l < m_out.at(0).size(); l++){
@@ -734,7 +731,6 @@ void Tracking::imageProcessing(){
         }
       }
   
-  qInfo() << "test0";
       m_im ++;
       m_outPrev = m_out;
     
@@ -842,11 +838,33 @@ void Tracking::startProcess() {
   }
       
   
-  // Initializes output file and stream
-  m_outputFile.setFileName(QString::fromStdString(m_path).section("*",0,0) + "Tracking_Result" + QDir::separator() + "tracking.txt" );
-  if(!m_outputFile.open(QFile::WriteOnly | QFile::Text)){
-    qInfo() << "Error opening folder";
+  //  Creates the folder to save result, parameter and background image
+  QString savingPath = QString::fromStdString(m_path).section("*",0,0) + QDir::separator() + "Tracking_Result" + QDir::separator(); 
+  QDir().mkdir( savingPath);
+  
+  QFile parameterFile(savingPath + "parameter.param" );
+  if(!parameterFile.open(QFile::WriteOnly | QFile::Text)){
+    QMessageBox errorBox;
+    errorBox.setText("You don't have the right to write in the selected folder!");
+    errorBox.exec();
   }
+  else {
+    QTextStream out(&parameterFile);
+    QList<QString> keyList = parameters.keys();
+    for(auto a: keyList) {
+      out << a << " = " << parameters.value(a) << endl;
+    }
+  }
+
+  imwrite(savingPath.toStdString() + "background.pgm", m_background);
+
+  m_outputFile.setFileName(savingPath + "tracking.txt" );
+  if(!m_outputFile.open(QFile::WriteOnly | QFile::Text)){
+    QMessageBox msgBox;
+    msgBox.setText("Permission denied to write in the folder");
+    msgBox.exec();
+  }
+
   m_savefile.setDevice(&m_outputFile);
 
   // Saving
@@ -874,7 +892,6 @@ void Tracking::startProcess() {
   m_im ++;
   connect(this, SIGNAL(finishedProcessFrame()), this, SLOT(imageProcessing()));
   
-  qInfo() << "End the initialization";
   timer = new QElapsedTimer();
   timer->start();
   emit(finishedProcessFrame());
@@ -888,7 +905,7 @@ void Tracking::startProcess() {
   * @param[in] parameterList The list of all the parameters used in the tracking.
 */
 void Tracking::updatingParameters(const QMap<QString, QString> &parameterList) {
-  qInfo() << parameterList;
+  parameters = parameterList;
   param_maxArea = parameterList.value("Maximal size").toInt();
   param_minArea = parameterList.value("Minimal size").toInt();
   param_spot = parameterList.value("Spot to track").toInt();

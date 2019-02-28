@@ -35,7 +35,6 @@
 #include <QDebug>
 #include <QTableWidgetItem>
 #include "tracking.h"
-#include "ui_batch.h"
 #include <QDebug>
 #include <QTimer>
 #include <QFile>

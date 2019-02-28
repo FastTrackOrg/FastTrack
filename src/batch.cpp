@@ -61,13 +61,6 @@ Batch::Batch(QWidget *parent) :
     qRegisterMetaType<QMap<QString, QString>>("QMap<QString, QString>");
     cv::ocl::setUseOpenCL(false);
     
-    // Setup style
-    QFile stylesheet(":/theme.qss");
-
-    if(stylesheet.open(QIODevice::ReadOnly | QIODevice::Text)) { // Read the theme file
-        qApp->setStyleSheet(stylesheet.readAll());
-        stylesheet.close();
-    }
 
 ////////////////////////////Parameters panel/////////////////////////////////////////////
     
@@ -80,6 +73,7 @@ Batch::Batch(QWidget *parent) :
     parameterList.insert("Dilatation", "0|Dilates the image. Sets to 0 for no dilatation.");
     parameterList.insert("Maximal time", "50|.");
     parameterList.insert("Registration", "no|Sets to yes to activate registration.");
+    parameterList.insert("Background method", "3|");
     parameterList.insert("Light background", "yes|Sets to yes if objects are dark on light background. Sets to no if objects are light on dark background.");
     parameterList.insert("ROI bottom y", "0|Bottom corner y coordinate of the region of interest. Sets to 0 for keeping the full image.");
     parameterList.insert("ROI bottom x", "0|Bottom corner x coordinate of the region of interest. Sets to 0 for keeping the full image.");
@@ -217,24 +211,7 @@ void Batch::startTracking() {
       if ( QDir(processList.at(0).path).exists() ) {      
         string path = (processList.at(0).path + QDir::separator()).toStdString();
         string backgroundPath = processList.at(0).backgroundPath.toStdString();
-        QDir().mkdir( QString::fromStdString(path) + QDir::separator() + "Tracking_Result" );
         
-
-        // Saves the parameters in a file named "parameter.param"
-        QFile parameterFile(QString::fromStdString(path) + QDir::separator() +  "Tracking_Result" + QDir::separator() + "parameter.param" );
-        if(!parameterFile.open(QFile::WriteOnly | QFile::Text)){
-          QMessageBox errorBox(this);
-          errorBox.setText("You don't have the right to write in the selected folder!");
-          errorBox.exec();
-        }
-        QTextStream out(&parameterFile);
-        QList<QString> keyList = processList.at(0).trackingParameters.keys();
-        for(auto a: keyList) {
-          out << a << " = " << processList.at(0).trackingParameters.value(a) << endl;
-        }
-     
-      
-      
         thread = new QThread;
         tracking = new Tracking(path, backgroundPath);
         tracking->moveToThread(thread);
