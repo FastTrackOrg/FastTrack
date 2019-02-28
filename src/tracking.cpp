@@ -703,7 +703,7 @@ void Tracking::imageProcessing(){
 
     // Detects the objects and extracts  parameters
     m_out = objectPosition(m_binaryFrame, param_minArea, param_maxArea);
-    qInfo() << m_out.at(0).size() << m_outPrev.at(0).size(); 
+    
     // Associates the objets with the previous image
     vector<int> identity = costFunc(m_outPrev.at(param_spot), m_out.at(param_spot), param_len, param_angle, param_weight, param_lo);
     vector<int> occluded = findOcclusion(identity);

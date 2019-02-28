@@ -54,6 +54,14 @@ MainWindow::MainWindow(QWidget *parent) :
     setWindowState(Qt::WindowMaximized);
     setWindowTitle("Fast Track");
     
+    // Setup style
+    QFile stylesheet(":/theme.qss");
+
+    if(stylesheet.open(QIODevice::ReadOnly | QIODevice::Text)) { // Read the theme file
+        qApp->setStyleSheet(stylesheet.readAll());
+        stylesheet.close();
+    }
+
     interactive = new Interactive(this);
     ui->tabWidget->addTab(interactive, tr("Interactive tracking"));
 

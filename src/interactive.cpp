@@ -81,7 +81,7 @@ Interactive::Interactive(QWidget *parent) :
       QMessageBox::StandardButton reply;
       reply = QMessageBox::question(this, "Confirmation", "You are going to start a full tracking analysis. That can be take some time, are you sure?", QMessageBox::Yes|QMessageBox::No);
       if (reply == QMessageBox::Yes) {
-        track();
+          track();
       }
     });
     connect(ui->cropButton, &QPushButton::clicked, this, &Interactive::crop); 
@@ -109,7 +109,8 @@ Interactive::Interactive(QWidget *parent) :
 void Interactive::openFolder() {
     
     dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"), memoryDir, QFileDialog::ShowDirsOnly);
-    
+    backgroundPath.clear();
+     
     if (dir.length()) {
 
         // Finds image format
@@ -244,10 +245,12 @@ void Interactive::computeBackground() {
 */
 void Interactive::selectBackground() {
     
-  dir = QFileDialog::getExistingDirectory(this, tr("Open Background Image"), memoryDir);
+  QString dir = QFileDialog::getOpenFileName(this, tr("Open Background Image"), memoryDir);
     
   if (dir.length()) {
     backgroundPath = dir;
+    imread(backgroundPath.toStdString(), IMREAD_GRAYSCALE).copyTo(background);
+    display(background);
   }
 }
 
@@ -293,12 +296,16 @@ void Interactive::previewTracking() {
 
     connect(thread, &QThread::started, tracking, &Tracking::startProcess);
     connect(tracking, &Tracking::finished, thread, &QThread::quit);
+    connect(tracking, &Tracking::finished, [this]() {
+      ui->slider->setDisabled(false);
+    });
     connect(tracking, &Tracking::finished, tracking, &Tracking::deleteLater);
     connect(thread, &QThread::finished, thread, &QThread::deleteLater);
 
     getParameters();
     tracking->updatingParameters(parameters);
     thread->start();
+    ui->slider->setDisabled(true);
     ui->isTracked->setChecked(true);
   }
 
@@ -316,14 +323,16 @@ void Interactive::track() {
 
     connect(thread, &QThread::started, tracking, &Tracking::startProcess);
     connect(tracking, &Tracking::finished, thread, &QThread::quit);
+    connect(tracking, &Tracking::finished, [this]() {
+      ui->slider->setDisabled(false);
+    });
     connect(tracking, &Tracking::finished, tracking, &Tracking::deleteLater);
     connect(thread, &QThread::finished, thread, &QThread::deleteLater);
-    connect(tracking, &Tracking::newImageToDisplay, [this](UMat& binary, UMat& visu) {
-    });
 
     getParameters();
     tracking->updatingParameters(parameters);
     thread->start();
+    ui->slider->setDisabled(true);
     ui->isTracked->setChecked(true);
   }
 }

@@ -36,7 +36,6 @@ SOURCES += \
         main.cpp \
         mainwindow.cpp \
         tracking.cpp \
-        setupwindow.cpp \
         Hungarian.cpp \
         replay.cpp \
         batch.cpp \
@@ -50,7 +49,6 @@ LIBS += -L /usr/local/lib64/  -lopencv_core -lopencv_imgproc -lopencv_highgui -l
 HEADERS += \
         mainwindow.h\
         tracking.h \
-        setupwindow.h \
         Hungarian.h \
         replay.h \
         batch.h \
@@ -60,7 +58,6 @@ HEADERS += \
 
 FORMS += \ 
         mainwindow.ui \
-        setupwindow.ui \
         replay.ui \ 
         batch.ui \ 
         interactive.ui \ 

@@ -129,6 +129,7 @@ Replay::~Replay()
 */
 void Replay::openReplayFolder() {
     QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"), memoryDir, QFileDialog::ShowDirsOnly);
+    memoryDir = dir;
     ui->replayPath->setText(dir + QDir::separator());
 }
 
