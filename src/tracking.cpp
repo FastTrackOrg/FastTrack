@@ -428,7 +428,7 @@ vector<vector<Point3d>> Tracking::objectPosition(const UMat &frame, int minSize,
 
 						positionHead.push_back(Point3d(xHead + m_ROI.tl().x, yHead + m_ROI.tl().y, angleHead));
 						positionTail.push_back(Point3d(xTail + m_ROI.tl().x, yTail + m_ROI.tl().y, angleTail));
-						positionFull.push_back(Point3d(parameter.at(0) + roiFull.tl().x, parameter.at(1) + roiFull.tl().y, parameter.at(2)));
+						positionFull.push_back(Point3d(parameter.at(0) + roiFull.tl().x + m_ROI.tl().x, parameter.at(1) + roiFull.tl().y + m_ROI.tl().y, parameter.at(2)));
             ellipseHead.push_back(Point3d(parameterHead.at(3), parameterHead.at(4), pow( 1 - (parameterHead.at(4)*parameterHead.at(4)) / (parameterHead.at(3)*parameterHead.at(3)), 0.5) ));
             ellipseTail.push_back(Point3d(parameterTail.at(3), parameterTail.at(4), pow( 1 - (parameterTail.at(4)*parameterTail.at(4)) / (parameterTail.at(3)*parameterTail.at(3)), 0.5) ));
             ellipseBody.push_back(Point3d(parameter.at(3), parameter.at(4), pow( 1 - (parameter.at(4)*parameter.at(4)) / (parameter.at(3)*parameter.at(3)), 0.5) ));

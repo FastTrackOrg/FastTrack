@@ -273,10 +273,10 @@ void Interactive::getParameters() {
   parameters.insert("Binary threshold", QString::number(ui->threshBox->value()));
   parameters.insert("Number of images background", QString::number(ui->nBack->value()));
   parameters.insert("Background method", QString::number(ui->back->currentIndex()));
-  parameters.insert("ROI top x", QString::number(ui->x1->value()));
-  parameters.insert("ROI top y", QString::number(ui->y1->value()));
-  parameters.insert("ROI bottom x", QString::number(ui->x2->value()));
-  parameters.insert("ROI bottom y", QString::number(ui->y2->value()));
+  parameters.insert("ROI top x", QString::number(roi.tl().x));
+  parameters.insert("ROI top y", QString::number(roi.tl().y));
+  parameters.insert("ROI bottom x", QString::number(roi.br().x));
+  parameters.insert("ROI bottom y", QString::number(roi.br().y));
   parameters.insert("Registration", QString(ui->reg->currentText()));
   (QString(ui->backColor->currentText()) == "Dark background") ? parameters.insert("Light background", "no"): parameters.insert("Light background", "yes");
   parameters.insert("Dilatation", QString::number(ui->dilatation->value()));
