@@ -98,6 +98,13 @@ TEST_F(TrackingTest, Reassignement) {
   vector<Point3d> past, input, comp;
   vector<int> order, id, lost, idComp, lostComp;
   
+
+  past = { Point3d(1), Point3d(2), Point3d(3) };
+  input = {  };
+  order = { -1, -1, -1 };
+  EXPECT_EQ(tracking.reassignment(past, input, order), past);
+  
+  
   past = { Point3d(1), Point3d(2), Point3d(3) };
   input = { Point3d(3), Point3d(2), Point3d(1) };
   order = { 2, 1, 0 };
@@ -276,6 +283,33 @@ TEST_F(TrackingTest, costFunction) {
   vector<Point3d> past, current;
   vector<int> order, test;
 
+
+  // Empty current vector
+  past = { Point3d(10, 10, 0), Point3d(30, 40, 0), Point3d(50, 60, 0) };
+  current = { };
+  order = tracking.costFunc(past, current, 10, 90, 1, 20);
+  test = {-1, -1, -1};
+  EXPECT_EQ(order, test);
+  EXPECT_EQ(tracking.reassignment(past, current, order), past);
+ 
+  
+  // Empty past vector
+  current = { Point3d(10, 10, 0), Point3d(30, 40, 0), Point3d(50, 60, 0) };
+  past = { };
+  order = tracking.costFunc(past, current, 10, 90, 1, 20);
+  test = {};
+  EXPECT_EQ(order, test);
+  EXPECT_EQ(tracking.reassignment(past, current, order), current);
+
+
+  current = { };
+  past = { };
+  order = tracking.costFunc(past, current, 10, 90, 1, 20);
+  test = {};
+  EXPECT_EQ(order, test);
+  EXPECT_EQ(tracking.reassignment(past, current, order), current);
+
+  
   // Only translation
   past = { Point3d(10, 10, 0), Point3d(30, 40, 0), Point3d(50, 60, 0) };
   current = { Point3d(50, 60, 0), Point3d(10, 10, 0), Point3d(30, 40, 0) };

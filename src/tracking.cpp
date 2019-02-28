@@ -464,30 +464,36 @@ vector<int> Tracking::costFunc(const vector<Point3d> &prevPos, const vector<Poin
 
 	int n = prevPos.size();
 	int m = pos.size();
-	double c = -1;
-	vector<vector<double>> costMatrix(n, vector<double>(m));
+  vector<int> assignment;
+  
+  if (n == 0) {
+    assignment = {};
+  }
+  else {
+    double c = -1;
+    vector<vector<double>> costMatrix(n, vector<double>(m));
 
-	for(int i = 0; i < n; ++i){
+    for(int i = 0; i < n; ++i){
 
-		Point3d prevCoord = prevPos.at(i);
-		for(int j = 0; j < m; ++j){
-			Point3d coord = pos.at(j);
-      double d = pow(pow(prevCoord.x - coord.x, 2) + pow(prevCoord.y - coord.y, 2), 0.5);
-      if(d < LO){
-        c = WEIGHT*(d/LENGTH) + (1 - WEIGHT)*abs(angleDifference(prevCoord.z, coord.z)/ANGLE); //cost function
-				costMatrix[i][j] = c;
-			}
-      else {
-				costMatrix[i][j] = 2e307;
-			}
+      Point3d prevCoord = prevPos.at(i);
+      for(int j = 0; j < m; ++j){
+        Point3d coord = pos.at(j);
+        double d = pow(pow(prevCoord.x - coord.x, 2) + pow(prevCoord.y - coord.y, 2), 0.5);
+        if(d < LO){
+          c = WEIGHT*(d/LENGTH) + (1 - WEIGHT)*abs(angleDifference(prevCoord.z, coord.z)/ANGLE); //cost function
+          costMatrix[i][j] = c;
+        }
+        else {
+          costMatrix[i][j] = 2e307;
+        }
 
-		}
-	}
+      }
+    }
 
-	// Hungarian algorithm to solve the assignment problem O(n**3)
-	HungarianAlgorithm HungAlgo;
-	vector<int> assignment;
-	HungAlgo.Solve(costMatrix, assignment);
+    // Hungarian algorithm to solve the assignment problem O(n**3)
+    HungarianAlgorithm HungAlgo;
+    HungAlgo.Solve(costMatrix, assignment);
+  }
 
 	return assignment;
 }
@@ -697,15 +703,17 @@ void Tracking::imageProcessing(){
 
     // Detects the objects and extracts  parameters
     m_out = objectPosition(m_binaryFrame, param_minArea, param_maxArea);
-
+    qInfo() << m_out.at(0).size() << m_outPrev.at(0).size(); 
     // Associates the objets with the previous image
     vector<int> identity = costFunc(m_outPrev.at(param_spot), m_out.at(param_spot), param_len, param_angle, param_weight, param_lo);
     vector<int> occluded = findOcclusion(identity);
 
+    // Reassignes the m_out vector regarding the identities of the objects
     for (size_t i = 0; i < m_out.size(); i++) {
       m_out.at(i) = reassignment(m_outPrev.at(i), m_out.at(i), identity);
     }
 
+    // Updates id and lost counter
     while ( m_out.at(0).size() - m_id.size() != 0 ) {
       m_id.push_back(int(*max_element(m_id.begin(), m_id.end()) + 1));
       m_lost.push_back(0);
@@ -729,11 +737,10 @@ void Tracking::imageProcessing(){
           m_savefile << m_im << '\t';
           m_savefile << m_id.at(l) << '\n';
         }
-      }
+    }
   
       m_im ++;
       m_outPrev = m_out;
-    
       if(m_im + 1 > m_stopImage){
         m_savefile.flush();
         m_outputFile.close();
@@ -782,7 +789,7 @@ void Tracking::startProcess() {
     glob(m_path, m_files, false); // Get all path to frames
     statusPath = true;
     m_im = m_startImage;
-    (m_stopImage == -1) ? (m_stopImage = m_files.size()) : ( m_stopImage = m_stopImage);
+    (m_stopImage == -1) ? (m_stopImage = int(m_files.size())) : ( m_stopImage = m_stopImage);
   }
   catch(...){
     statusPath = false;
