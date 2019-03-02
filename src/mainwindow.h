@@ -20,6 +20,11 @@ This file is part of Fast Track.
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QUrl>
+#include <QNetworkRequest>
+#include <QNetworkReply>
+#include <QByteArray>
+#include <QNetworkAccessManager>
 #include "interactive.h"
 #include "batch.h"
 #include "replay.h"
@@ -39,7 +44,7 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
-
+      QByteArray version = "4.2.0";
 
 private:
     Ui::MainWindow *ui;    /*!< ui file from Qt designer. */

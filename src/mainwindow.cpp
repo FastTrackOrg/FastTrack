@@ -62,6 +62,22 @@ MainWindow::MainWindow(QWidget *parent) :
         stylesheet.close();
     }
 
+    QNetworkAccessManager *manager = new QNetworkAccessManager(this);
+    connect(manager, &QNetworkAccessManager::finished, [this] (QNetworkReply *reply) {
+      QByteArray downloadedData = reply->readAll();
+      reply->deleteLater();
+      QByteArray lastVersion = downloadedData.mid(downloadedData.indexOf("</Version>") -5, 5);
+      if (lastVersion != version) {
+        QMessageBox msgBox;
+        msgBox.setTextFormat(Qt::RichText);
+        msgBox.setText("FastTrack version " + lastVersion + " is available! <br> Please update. <br> <a href='http://fasttrack.benjamin-gallois.fr/update.html'>How to update help.</a>");
+        msgBox.exec();
+      }
+    });
+
+    manager->get(QNetworkRequest(QUrl("http://fasttrack.benjamin-gallois.fr/download/FastTrack/Updates.xml")));
+
+
     interactive = new Interactive(this);
     ui->tabWidget->addTab(interactive, tr("Interactive tracking"));
 
