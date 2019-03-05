@@ -105,7 +105,7 @@ Interactive::Interactive(QWidget *parent) :
     colorMap;
     double a,b,c;
     srand (time(NULL));
-    for (int j = 0; j < 500 ; ++j)  {
+    for (int j = 0; j < 9000 ; ++j)  {
       a = rand() % 255;
       b = rand() % 255;
       c = rand() % 255;

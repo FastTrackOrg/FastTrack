@@ -57,8 +57,12 @@ QMap<QString, double> Data::getData(int imageIndex, int id) {
   for(auto &a: objects) {
     if (a.id == id) {
       return a.data;
+      break;
     }
   }
+  QMap<QString, double> tmp;
+  tmp.insert("NAN", -1);
+  return tmp;
 }
 
 
