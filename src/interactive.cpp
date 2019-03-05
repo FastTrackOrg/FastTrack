@@ -150,6 +150,7 @@ void Interactive::openFolder() {
           ui->y2->setMaximum(frame.rows);
           isBackground = false;
           path = dir.toStdString();
+          reset();
           display(0);
         }
         catch(...){
@@ -400,7 +401,8 @@ void Interactive::mouseMoveEvent(QMouseEvent* event) {
       QPixmap tmpImage = resizedPix;
       QPainter paint(&tmpImage);
       paint.setPen(QColor(0, 230, 0, 255));
-      paint.drawRect(QRect(clicks.first.x(), clicks.first.y(), clicks.second.x() - clicks.first.x(), clicks.second.y() - clicks.first.y())); 
+      QRect roiRect = QRect(clicks.first.x(), clicks.first.y(), clicks.second.x() - clicks.first.x(), clicks.second.y() - clicks.first.y());
+      paint.drawRect(roiRect); 
       ui->display->setPixmap(tmpImage);
 
       // Updates ui value
@@ -416,13 +418,27 @@ void Interactive::mouseMoveEvent(QMouseEvent* event) {
 void Interactive::crop() {
  
   // Converts clicks from display widget frame of reference to original image frame of reference 
-  double xTop = double(clicks.first.x())*double(originalImageSize.height()) / double(resizedFrame.height()) + roi.tl().x ;
-  double yTop = double(clicks.first.y())*double(originalImageSize.height()) / double(resizedFrame.height()) + roi.tl().y;
-  double xBottom = double(clicks.second.x())*double(originalImageSize.height()) / double(resizedFrame.height()) + roi.tl().x;
-  double yBottom = double(clicks.second.y())*double(originalImageSize.height()) / double(resizedFrame.height()) + roi.tl().y;
-  roi = Rect(xTop, yTop, xBottom - xTop, yBottom - yTop);
-  originalImageSize.setWidth(roi.width);
-  originalImageSize.setHeight(roi.height);
+  int xTop = int(double(clicks.first.x())*double(cropedImageSize.height()) / double(resizedFrame.height()) + roi.tl().x);
+  int yTop = int(double(clicks.first.y())*double(cropedImageSize.height()) / double(resizedFrame.height()) + roi.tl().y);
+  int xBottom = int(double(clicks.second.x())*double(cropedImageSize.height()) / double(resizedFrame.height()) + roi.tl().x);
+  int yBottom = int(double(clicks.second.y())*double(cropedImageSize.height()) / double(resizedFrame.height()) + roi.tl().y);
+ 
+  int width = xBottom - xTop;
+  int height = yBottom - yTop;
+  
+  // Find the true left corner of the rectangle  
+  if (width < 0) {
+    xTop += width;
+    width = - width;
+  }
+  if(height < 0) {
+    yTop += height;
+    height = - height;
+  }
+  
+  roi = Rect(xTop, yTop, width, height);
+  cropedImageSize.setWidth(roi.width);
+  cropedImageSize.setHeight(roi.height);
   display(ui->slider->value());
  }
  
@@ -432,11 +448,13 @@ void Interactive::crop() {
    * @brief Reset the region of interest. Triggered by the ui->reset
  */
 void Interactive::reset() {
+  cropedImageSize.setWidth(originalImageSize.width());
+  cropedImageSize.setHeight(originalImageSize.height());
   ui->x1->setValue(0);
   ui->y1->setValue(0); 
   ui->x2->setValue(originalImageSize.width());
   ui->y2->setValue(originalImageSize.height()); 
-  roi = Rect(0, 0, originalImageSize.width(), originalImageSize.height());
+  roi = Rect(0, 0, 0, 0);
   display(ui->slider->value());
  }
 

@@ -73,7 +73,8 @@ private:
     QString memoryDir;   /*!< Saves the path to the last opened folder in dialog. */
     vector<String> framePath;   /*!< Path to all the image of the image sequence to display. */
     QSize resizedFrame;   /*!< Size of the resized image in the display QWidget. */
-    QSize originalImageSize;   /*!< Size of the originla image. */
+    QSize originalImageSize;   /*!< Size of the original image. */
+    QSize cropedImageSize;   /*!< Size of the croped image. */
     QMap<QString, QString> parameters;   /*!< Tracking parameters. */
     QString path;   /*!< */
     QString backgroundPath;   /*!< Path to the background image. */
