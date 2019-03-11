@@ -65,11 +65,22 @@ Interactive::Interactive(QWidget *parent) :
       ui->y1->setMinimum(0);
     });
 
-    // Morphological operations updat
+    // Morphological operations update
     connect(ui->erosion, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [this]() {
+      ui->isBin->setChecked(true);
       display(ui->slider->value());
     });
     connect(ui->dilatation, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [this]() {
+      ui->isBin->setChecked(true);
+      display(ui->slider->value());
+    });
+
+    connect(ui->minSize, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [this]() {
+      ui->isBin->setChecked(true);
+      display(ui->slider->value());
+    });
+    connect(ui->maxSize, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [this]() {
+      ui->isBin->setChecked(true);
       display(ui->slider->value());
     });
     
@@ -156,6 +167,7 @@ void Interactive::display(int index) {
     
     UMat image;
     imread(framePath.at(index), IMREAD_GRAYSCALE).copyTo(image);
+    vector<vector<Point>> displayContours;
 
     
     // Computes the image with the background subtracted
@@ -171,12 +183,29 @@ void Interactive::display(int index) {
       dilate(image, image, element);
       element = getStructuringElement( MORPH_ELLIPSE, Size( 2*ui->erosion->value() + 1, 2*ui->erosion->value() + 1 ), Point( ui->erosion->value(), ui->erosion->value() ) );
       erode(image, image, element);
+      
+      // Keeps only right sized object.
+      vector<vector<Point>> contours;
+      findContours(image, contours, RETR_LIST, CHAIN_APPROX_NONE);
+
+      double min = ui->minSize->value();
+      double max = ui->maxSize->value();
+
+      for(auto const &a: contours) {
+        double size = contourArea(a);
+        if(size > min && size < max) {
+          displayContours.push_back(a); 
+        }
+      }
     }
 
 
     // Displays the image in the QLabel
     Mat frame = image.getMat(ACCESS_READ);
     cvtColor(frame, frame, COLOR_GRAY2RGB);  
+    if( ui->isBin->isChecked() ) {
+      drawContours(frame, displayContours, -1, Scalar(0, 255, 0), FILLED, 8);
+    }
     if ( ui->isTracked->isChecked() ) {
       Data *trackingData = new Data(dir);
       QList<int> idList = trackingData->getId(index);
