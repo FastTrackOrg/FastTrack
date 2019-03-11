@@ -10,10 +10,10 @@
 #include <QString>
 #include <QDebug>
 
-  struct object {
-    int id;
-    QMap<QString, double> data;
-  };
+struct object {
+  int id;
+  QMap<QString, double> data;
+};
 
 class Data {
 

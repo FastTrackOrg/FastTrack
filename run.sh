@@ -39,3 +39,14 @@ if [ "$1" = "profile" ]; then
   cd ..
   gprof build/FastTrack build/gmon.out > profiling.txt
 fi
+
+if [ "$1" = "intel" ]; then
+  set -e
+  qmake CONFIG+=released src/FastTrack.pro -spec linux-icc
+  make clean
+  make
+  cd build
+  ./FastTrack
+  cd ..
+  make clean
+fi
