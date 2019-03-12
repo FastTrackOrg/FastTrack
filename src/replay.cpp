@@ -481,17 +481,19 @@ void Replay::saveTrackedMovie() {
           cv::putText(frame, to_string(id), Point(coordinate.value("xHead") + coordinate.value("headMajorAxisLength")*cos(coordinate.value("tHead")), coordinate.value("yHead") - coordinate.value("headMajorAxisLength")*sin(coordinate.value("tHead")) ), cv::FONT_HERSHEY_SIMPLEX, double(scale)*0.5, Scalar(colorMap.at(id).x, colorMap.at(id).y, colorMap.at(id).z), scale*1.2, cv::LINE_AA);
         }
 
-        /*if (ui->replayTrace->isChecked()) {
-          // Gets the 20 previous cordinates to display the trajectory trace
+        if (ui->replayTrace->isChecked()) {
           vector<Point> memory;
-          for (int j = i - 20*replayNumberObject; j < i; j += replayNumberObject) {
-              QStringList coordinateMemory = replayTracking.at(j).split('\t', QString::SkipEmptyParts);
-              memory.push_back(Point(coordinateMemory.value("xBody"), coordinateMemory.value("yBody")));
-            }
+          for (int j = frameIndex - 50; j < frameIndex; j++) {
+            if (j > 0) {
+                QMap<QString, double> coordinate = trackingData->getData(j, a);
+                if (coordinate.contains("xBody")) {
+                  memory.push_back(Point(coordinate.value("xBody"), coordinate.value("yBody")));
+                }
+              }
           }
           cv::polylines(frame, memory, false, Scalar(colorMap.at(id).x, colorMap.at(id).y, colorMap.at(id).z), scale*1.2, cv::LINE_AA);
+        }
           
-        //}*/
       }
       outputVideo.write(frame);
       ui->replaySlider->setValue(frameIndex);

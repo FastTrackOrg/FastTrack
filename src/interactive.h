@@ -87,6 +87,8 @@ private:
 
     Rect roi;
     QPixmap resizedPix;
+
+    Data *trackingData;
     
     vector<Point3f> colorMap;
 };

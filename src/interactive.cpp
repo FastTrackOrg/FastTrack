@@ -166,28 +166,27 @@ void Interactive::display(int index) {
   
   if ( !framePath.empty() ) {
     
-    UMat image;
-    imread(framePath.at(index), IMREAD_GRAYSCALE).copyTo(image);
+    UMat frame;
+    imread(framePath.at(index), IMREAD_GRAYSCALE).copyTo(frame);
     vector<vector<Point>> displayContours;
 
-    
     // Computes the image with the background subtracted
     if ( ui->isSub->isChecked() && isBackground ) {
-      (ui->backColor->currentText() == "Light background") ? (subtract(background, image, image)) : (subtract(image, background, image));
+      (ui->backColor->currentText() == "Light background") ? (subtract(background, frame, frame)) : (subtract(frame, background, frame));
     }
     
-    // Computes the binary image
+    // Computes the binary image an applies morphological operation
     if ( ui->isBin->isChecked() && isBackground ) {
-      (ui->backColor->currentText() == "Light background") ? (subtract(background, image, image)) : (subtract(image, background, image));
-      tracking->binarisation(image, 'b', ui->threshBox->value());
+      (ui->backColor->currentText() == "Light background") ? (subtract(background, frame, frame)) : (subtract(frame, background, frame));
+      tracking->binarisation(frame, 'b', ui->threshBox->value());
       Mat element = getStructuringElement( MORPH_ELLIPSE, Size( 2*ui->dilatation->value() + 1, 2*ui->dilatation->value() + 1 ), Point( ui->dilatation->value(), ui->dilatation->value() ) );
-      dilate(image, image, element);
+      dilate(frame, frame, element);
       element = getStructuringElement( MORPH_ELLIPSE, Size( 2*ui->erosion->value() + 1, 2*ui->erosion->value() + 1 ), Point( ui->erosion->value(), ui->erosion->value() ) );
-      erode(image, image, element);
+      erode(frame, frame, element);
       
       // Keeps only right sized object.
       vector<vector<Point>> contours;
-      findContours(image, contours, RETR_LIST, CHAIN_APPROX_NONE);
+      findContours(frame, contours, RETR_LIST, CHAIN_APPROX_NONE);
 
       double min = ui->minSize->value();
       double max = ui->maxSize->value();
@@ -200,15 +199,12 @@ void Interactive::display(int index) {
       }
     }
 
-
     // Displays the image in the QLabel
-    Mat frame = image.getMat(ACCESS_READ);
     cvtColor(frame, frame, COLOR_GRAY2RGB);  
     if( ui->isBin->isChecked() ) {
       drawContours(frame, displayContours, -1, Scalar(0, 255, 0), FILLED, 8);
     }
     if ( ui->isTracked->isChecked() ) {
-      Data *trackingData = new Data(dir);
       QList<int> idList = trackingData->getId(index);
         
       double scale = 2;
@@ -226,7 +222,8 @@ void Interactive::display(int index) {
     }
     double w = ui->display->width();
     double h = ui->display->height();
-    resizedPix = (QPixmap::fromImage(QImage(frame.data, frame.cols, frame.rows, frame.step, QImage::Format_RGB888)).scaled(w, h, Qt::KeepAspectRatio));
+    Mat image = frame.getMat(ACCESS_READ);
+    resizedPix = (QPixmap::fromImage(QImage(image.data, image.cols, image.rows, image.step, QImage::Format_RGB888)).scaled(w, h, Qt::KeepAspectRatio));
     ui->display->setPixmap(resizedPix);
     resizedFrame.setWidth(resizedPix.width());
     resizedFrame.setHeight(resizedPix.height());
@@ -328,6 +325,7 @@ void Interactive::previewTracking() {
     connect(tracking, &Tracking::finished, thread, &QThread::quit);
     connect(tracking, &Tracking::finished, [this]() {
       ui->slider->setDisabled(false);
+      trackingData = new Data(dir);
     });
     connect(tracking, &Tracking::finished, tracking, &Tracking::deleteLater);
     connect(thread, &QThread::finished, thread, &QThread::deleteLater);
@@ -355,6 +353,7 @@ void Interactive::track() {
     connect(tracking, &Tracking::finished, thread, &QThread::quit);
     connect(tracking, &Tracking::finished, [this]() {
       ui->slider->setDisabled(false);
+      trackingData = new Data(dir);
     });
     connect(tracking, &Tracking::finished, tracking, &Tracking::deleteLater);
     connect(thread, &QThread::finished, thread, &QThread::deleteLater);
