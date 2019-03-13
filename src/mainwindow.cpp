@@ -77,7 +77,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     manager->get(QNetworkRequest(QUrl("http://fasttrack.benjamin-gallois.fr/download/FastTrack/Updates.xml")));
 
-
     interactive = new Interactive(this);
     ui->tabWidget->addTab(interactive, tr("Interactive tracking"));
 

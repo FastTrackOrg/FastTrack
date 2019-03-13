@@ -46,6 +46,12 @@ Interactive::Interactive(QWidget *parent) :
     // Menu bar
     connect(ui->actionOpen, &QAction::triggered, this, &Interactive::openFolder);
     connect(ui->slider, &QSlider::valueChanged, this, static_cast<void (Interactive::*)(int)>(&Interactive::display));
+    connect(ui->actionbenchmark, &QAction::triggered, this, &Interactive::benchmark);
+    connect(this, &Interactive::message, this, [this](QString msg) {
+      QMessageBox msgBox;
+      msgBox.setText(msg);
+      msgBox.exec();
+    });
     
     // Threshold slider and combobox linking
     connect(ui->threshSlider, &QSlider::valueChanged, ui->threshBox, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::setValue));
@@ -457,6 +463,81 @@ void Interactive::reset() {
   display(ui->slider->value());
  }
 
+
+ /**
+
+ */
+void Interactive::benchmark() {
+    
+    QNetworkAccessManager *manager = new QNetworkAccessManager(this);
+    connect(manager, &QNetworkAccessManager::finished, [this] (QNetworkReply *reply) {
+      
+      QFile file(QDir::homePath() + "/benchmark.zip");
+      if (!file.open(QIODevice::WriteOnly)){
+        qInfo() << "error"; 
+        return;
+      }
+
+      file.write(reply->readAll());
+      reply->deleteLater();
+      QStringList tmp = JlCompress::extractDir(QDir::homePath() + "/benchmark.zip", QDir::homePath());
+      
+
+      //Loads parameters
+      QMap<QString, QString> params;
+      QFile parameterFile(QDir::homePath() + "/Juvenil_Zebrafish_2/Tracking_Result/parameter.param");
+      if (parameterFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        QTextStream in(&parameterFile);
+        QString line;
+        QStringList parameters;
+        while (in.readLineInto(&line)) {
+          parameters = line.split(" = ", QString::SkipEmptyParts);
+          params.insert(parameters.at(0), parameters.at(1));
+        }
+      }
+      parameterFile.close();
+      benchmarkCount = 0;
+      benchmarkAnalysis(params); 
+    });
+
+    manager->get(QNetworkRequest(QUrl("http://fasttrack.benjamin-gallois.fr/download/Benchmark.zip")));
+ }
+
+
+void Interactive::benchmarkAnalysis(QMap<QString, QString> params) {
+      
+      QElapsedTimer timer;
+
+      QThread *thread = new QThread;
+      Tracking *tracking = new Tracking((QDir::homePath() + "/Juvenil_Zebrafish_2/").toStdString(), "");
+      tracking->moveToThread(thread);
+
+      connect(thread, &QThread::started, tracking, &Tracking::startProcess);
+      connect(thread, &QThread::started, [this, &timer] () {
+        timer.start();
+      });
+      connect(tracking, &Tracking::finished, thread, &QThread::quit);
+      connect(tracking, &Tracking::finished, [this, &timer, params]() {
+        this->benchmarkTime.append(timer.elapsed());
+      
+        if (benchmarkCount < 10) {
+          this->benchmarkAnalysis(params); 
+          this->benchmarkCount+= 1;
+        }
+        else {
+          int mean = 0;
+          for(auto &a: benchmarkTime) {
+            mean += a;
+          }
+          mean /= benchmarkTime.size();
+          emit(message("Benchmark result: " + QString::number(mean)));
+        }
+      });
+      connect(tracking, &Tracking::finished, tracking, &Tracking::deleteLater);
+      connect(thread, &QThread::finished, thread, &QThread::deleteLater);
+      tracking->updatingParameters(params);
+      thread->start();
+}
 /**
   * @brief Destructors.
 */

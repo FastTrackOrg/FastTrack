@@ -24,13 +24,22 @@ This file is part of Fast Track.
 #include <QMessageBox>
 #include <QAction>
 #include <QMap>
+#include <QDir>
+#include <QUrl>
+#include <QNetworkRequest>
+#include <QNetworkReply>
+#include <QNetworkAccessManager>
 #include <QString>
 #include <QDirIterator>
 #include <QPainter>
+#include <QFile>
+#include <QElapsedTimer>
+#include <QEventLoop>
 #include "opencv2/imgproc/imgproc.hpp"
 #include "opencv2/highgui/highgui.hpp"
 #include "tracking.h"
 #include "data.h"
+#include <quazip/JlCompress.h>
 
 
 using namespace std;
@@ -68,6 +77,9 @@ private slots:
     void crop();
     void reset();
 
+    void benchmark();
+    void benchmarkAnalysis(QMap<QString, QString>);
+
 private:
     Ui::Interactive *ui;
     QString memoryDir;   /*!< Saves the path to the last opened folder in dialog. */
@@ -82,15 +94,17 @@ private:
     Tracking *tracking;   /*!< Tracking object. */
     UMat background;   /*!< Background image. */
     bool isBackground;   /*!< Is the background computed. */
-
     QPair<QPoint, QPoint> clicks;
-
     Rect roi;
     QPixmap resizedPix;
-
     Data *trackingData;
-    
     vector<Point3f> colorMap;
+    QVector<int> benchmarkTime;
+    int benchmarkCount;
+
+signals:
+    void message(QString message);
+
 };
 
 #endif // INTERACTIVE_H

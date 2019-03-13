@@ -778,9 +778,16 @@ corner</string>
     </property>
     <addaction name="actionImageParam"/>
    </widget>
+   <widget class="QMenu" name="menuDevelopper">
+    <property name="title">
+     <string>Developper</string>
+    </property>
+    <addaction name="actionbenchmark"/>
+   </widget>
    <addaction name="menuOpen"/>
    <addaction name="menuHelp"/>
    <addaction name="menuView"/>
+   <addaction name="menuDevelopper"/>
   </widget>
   <widget class="QDockWidget" name="controlOptions">
    <property name="minimumSize">
@@ -905,6 +912,11 @@ corner</string>
   <action name="actionImageParam">
    <property name="text">
     <string>&amp;Image parameters</string>
+   </property>
+  </action>
+  <action name="actionbenchmark">
+   <property name="text">
+    <string>Benchmark</string>
    </property>
   </action>
  </widget>
