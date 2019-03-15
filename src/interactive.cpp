@@ -157,6 +157,7 @@ void Interactive::openFolder() {
           isBackground = false;
           path = dir.toStdString();
           reset();
+          trackingData = new Data("");
           display(0);
         }
         catch(...){
