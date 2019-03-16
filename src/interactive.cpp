@@ -22,11 +22,11 @@ This file is part of Fast Track.
 /**
  * @class Interactive
  *
- * @brief The Interactive widget provides an environment to use the FastTrack Tracking widget in an interactive environment.
+ * @brief The Interactive widget provides an environment to use the tracking widget in an interactive environment.
  *
  * @author Benjamin Gallois
  *
- * @version $Revision: 4.1 $
+ * @version $Revision: 421 $
  *
  * Contact: gallois.benjamin08@gmail.com
  *
@@ -35,7 +35,7 @@ This file is part of Fast Track.
 
 
 /**
-  * @brief Constructs the interactive object.
+  * @brief Constructs the interactive object derived from a QMainWindow object.
 */
 Interactive::Interactive(QWidget *parent) :
     QMainWindow(parent),
@@ -89,6 +89,26 @@ Interactive::Interactive(QWidget *parent) :
       ui->isBin->setChecked(true);
       display(ui->slider->value());
     });
+    connect(ui->backColor, static_cast<void(QComboBox::*)(int)>(&QComboBox::activated),[this](){
+      ui->isBin->setChecked(true);
+      display(ui->slider->value());
+    });
+
+    connect(ui->isBin, &QRadioButton::clicked,[this](){
+      display(ui->slider->value());
+    });
+    connect(ui->isOriginal, &QRadioButton::clicked,[this](){
+      display(ui->slider->value());
+    });
+    connect(ui->isSub, &QRadioButton::clicked,[this](){
+      display(ui->slider->value());
+    });
+    connect(ui->isNone, &QRadioButton::clicked,[this](){
+      display(ui->slider->value());
+    });
+    connect(ui->isTracked, &QRadioButton::clicked,[this](){
+      display(ui->slider->value());
+    });
     
     // Ui buttons connects
     connect(ui->backgroundSelectButton, &QPushButton::clicked, this, &Interactive::selectBackground);
@@ -121,16 +141,35 @@ Interactive::Interactive(QWidget *parent) :
 
 
 /**
-  * @brief Gets the path to a folder where an image sequence is stored. Triggered when open button from menu bar is clicked.
+  * @brief Gets the path to a folder where an image sequence is stored. Triggered when the open button from menu bar is clicked.
 */
 void Interactive::openFolder() {
     
-    dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"), memoryDir, QFileDialog::ShowDirsOnly);
+    // Reset the ui
     backgroundPath.clear();
+    reset();
+    trackingData = new Data("");
+    background.release();
+    memoryDir.clear();
+    framePath.clear();
+    ui->display->clear();
+
+    ui->isNone->setChecked(true);
+    ui->isBin->setCheckable(false);
+    ui->isSub->setCheckable(false);
+
+    ui->isOriginal->setChecked(true);
+    ui->isTracked->setCheckable(false);
+    
+    dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"), memoryDir, QFileDialog::ShowDirsOnly);
+
+    if(dir.right(15) == "Tracking_Result") {
+      dir.truncate(dir.size() - 15);
+    }
      
     if (dir.length()) {
 
-        // Finds image format
+        // Finds the image format
         QList<QString> extensions = { "pgm", "png", "jpeg", "jpg", "tiff", "tif", "bmp", "dib", "jpe", "jp2", "webp", "pbm", "ppm", "sr", "ras", "tif" };
         QDirIterator it(dir, QStringList(), QDir::NoFilter);
         QString extension;
@@ -139,35 +178,33 @@ void Interactive::openFolder() {
           if( extensions.contains(extension) ) break;
         }
 
-        try{
 
-          // Gets the paths to all the frames in the folder and puts it in a vector.
-          // Setups the ui by setting maximum and minimum of the slider bar.
+        try{
           string path = (dir + QDir::separator() + "*." + extension).toStdString();
           memoryDir = dir;
-          glob(path, framePath, false); // Gets all the paths to frames
+          glob(path, framePath, false);
+          Mat frame = imread(framePath.at(0), IMREAD_COLOR);
           ui->slider->setMinimum(0);
           ui->slider->setMaximum(framePath.size() - 1);
+          ui->nBack->setValue(framePath.size() - 1);
           ui->nBack->setMaximum(framePath.size() - 1);
-          Mat frame = imread(framePath.at(0), IMREAD_COLOR);
           originalImageSize.setWidth(frame.cols);
           originalImageSize.setHeight(frame.rows);
           ui->x2->setMaximum(frame.cols);
           ui->y2->setMaximum(frame.rows);
-          isBackground = false;
           path = dir.toStdString();
-          reset();
-          trackingData = new Data("");
+          isBackground = false;
           display(0);
         }
         catch(...){
+          emit(message("No images found."));
         }
     }
 }
 
 
 /**
-  * @brief Displays the image at index in the image sequence in the ui->display..
+  * @brief Displays the image at index in the image sequence in the ui->display.
 */
 void Interactive::display(int index) {
   
@@ -182,7 +219,7 @@ void Interactive::display(int index) {
       (ui->backColor->currentText() == "Light background") ? (subtract(background, frame, frame)) : (subtract(frame, background, frame));
     }
     
-    // Computes the binary image an applies morphological operation
+    // Computes the binary image an applies morphological operations
     if ( ui->isBin->isChecked() && isBackground ) {
       (ui->backColor->currentText() == "Light background") ? (subtract(background, frame, frame)) : (subtract(frame, background, frame));
       tracking->binarisation(frame, 'b', ui->threshBox->value());
@@ -238,6 +275,7 @@ void Interactive::display(int index) {
   
 }
 
+
 /**
   * @brief This is an overloaded function to display an image UMat in the ui->display.
 */
@@ -266,6 +304,8 @@ void Interactive::computeBackground() {
     background = tracking->backgroundExtraction(framePath, nBack, method); 
     display(background);
     isBackground = true;
+    ui->isBin->setCheckable(true);
+    ui->isSub->setCheckable(true);
  }
  else {
     imread(backgroundPath.toStdString(), IMREAD_GRAYSCALE).copyTo(background);
@@ -341,6 +381,7 @@ void Interactive::previewTracking() {
     tracking->updatingParameters(parameters);
     thread->start();
     ui->slider->setDisabled(true);
+    ui->isTracked->setCheckable(true);
     ui->isTracked->setChecked(true);
   }
 
@@ -369,6 +410,7 @@ void Interactive::track() {
     tracking->updatingParameters(parameters);
     thread->start();
     ui->slider->setDisabled(true);
+    ui->isTracked->setCheckable(true);
     ui->isTracked->setChecked(true);
   }
 }

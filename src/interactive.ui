@@ -792,7 +792,7 @@ corner</string>
   <widget class="QDockWidget" name="controlOptions">
    <property name="minimumSize">
     <size>
-     <width>431</width>
+     <width>434</width>
      <height>224</height>
     </size>
    </property>
@@ -816,9 +816,12 @@ corner</string>
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
-       <widget class="QGroupBox" name="groupBox">
+       <widget class="QGroupBox" name="imageDisplayGroup">
         <property name="title">
          <string>Image Display</string>
+        </property>
+        <property name="checkable">
+         <bool>false</bool>
         </property>
         <layout class="QGridLayout" name="gridLayout_12">
          <item row="0" column="0">
@@ -828,10 +831,13 @@ corner</string>
              <property name="text">
               <string>Backgro&amp;und Subtracted</string>
              </property>
+             <property name="checkable">
+              <bool>false</bool>
+             </property>
             </widget>
            </item>
            <item row="0" column="0">
-            <widget class="QRadioButton" name="radioButton">
+            <widget class="QRadioButton" name="isOriginal">
              <property name="text">
               <string>Ori&amp;ginal</string>
              </property>
@@ -845,21 +851,37 @@ corner</string>
              <property name="text">
               <string>Binar&amp;y</string>
              </property>
+             <property name="checkable">
+              <bool>false</bool>
+             </property>
             </widget>
            </item>
           </layout>
          </item>
         </layout>
        </widget>
-       <widget class="QGroupBox" name="groupBox_2">
+       <widget class="QGroupBox" name="trackingOverlayGroup">
         <property name="title">
-         <string>Tracking Display</string>
+         <string>Tracking Overlay</string>
         </property>
         <layout class="QGridLayout" name="gridLayout_13">
-         <item row="0" column="0">
+         <item row="1" column="0">
           <widget class="QRadioButton" name="isTracked">
            <property name="text">
-            <string>Trac&amp;ked</string>
+            <string>Tracking</string>
+           </property>
+           <property name="checkable">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <widget class="QRadioButton" name="isNone">
+           <property name="text">
+            <string>None</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
            </property>
           </widget>
          </item>
