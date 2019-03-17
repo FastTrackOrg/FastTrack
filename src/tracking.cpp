@@ -745,7 +745,7 @@ void Tracking::imageProcessing(){
         m_savefile.flush();
         m_outputFile.close();
         emit(finished());
-      qInfo() << timer->elapsed() << endl;
+        emit(statistic(timer->elapsed()));
       }
       else {
       QTimer::singleShot(0, this, SLOT(imageProcessing()));
@@ -775,6 +775,8 @@ Tracking::Tracking(string path, string backgroundPath, int startImage, int stopI
 */
 void Tracking::startProcess() {
   
+  timer = new QElapsedTimer();
+  timer->start();
   // Finds image format
   QList<QString> extensions = { "pgm", "png", "jpeg", "jpg", "tiff", "tif", "bmp", "dib", "jpe", "jp2", "webp", "pbm", "ppm", "sr", "ras", "tif" };
   QDirIterator it(QString::fromStdString(m_path), QStringList(), QDir::NoFilter);
@@ -899,8 +901,6 @@ void Tracking::startProcess() {
   m_im ++;
   connect(this, SIGNAL(finishedProcessFrame()), this, SLOT(imageProcessing()));
   
-  timer = new QElapsedTimer();
-  timer->start();
   emit(finishedProcessFrame());
 }
 

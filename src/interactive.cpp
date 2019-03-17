@@ -514,8 +514,13 @@ void Interactive::benchmark() {
     
     QNetworkAccessManager *manager = new QNetworkAccessManager(this);
     connect(manager, &QNetworkAccessManager::finished, [this] (QNetworkReply *reply) {
-      
-      QFile file(QDir::homePath() + "/benchmark.zip");
+     
+      if( QDir(QDir::homePath() + "/FastTrackBenchmarkTmp").exists() ) {
+        return;
+        }
+
+      QDir().mkdir(QDir::homePath() + "/FastTrackBenchmarkTmp"); 
+      QFile file(QDir::homePath() + "/FastTrackBenchmarkTmp/benchmark.zip");
       if (!file.open(QIODevice::WriteOnly)){
         qInfo() << "error"; 
         return;
@@ -523,12 +528,12 @@ void Interactive::benchmark() {
 
       file.write(reply->readAll());
       reply->deleteLater();
-      QStringList tmp = JlCompress::extractDir(QDir::homePath() + "/benchmark.zip", QDir::homePath());
+      QStringList tmp = JlCompress::extractDir(QDir::homePath() + "/FastTrackBenchmarkTmp/benchmark.zip", QDir::homePath() + "/FastTrackBenchmarkTmp/");
       
 
       //Loads parameters
       QMap<QString, QString> params;
-      QFile parameterFile(QDir::homePath() + "/Juvenil_Zebrafish_2/Tracking_Result/parameter.param");
+      QFile parameterFile(QDir::homePath() + "/FastTrackBenchmarkTmp/Juvenil_Zebrafish_2/Tracking_Result/parameter.param");
       if (parameterFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
         QTextStream in(&parameterFile);
         QString line;
@@ -549,22 +554,17 @@ void Interactive::benchmark() {
 
 void Interactive::benchmarkAnalysis(QMap<QString, QString> params) {
       
-      QElapsedTimer timer;
-
       QThread *thread = new QThread;
-      Tracking *tracking = new Tracking((QDir::homePath() + "/Juvenil_Zebrafish_2/").toStdString(), "");
+      Tracking *tracking = new Tracking((QDir::homePath() + "/FastTrackBenchmarkTmp/Juvenil_Zebrafish_2/").toStdString(), "");
       tracking->moveToThread(thread);
 
       connect(thread, &QThread::started, tracking, &Tracking::startProcess);
-      connect(thread, &QThread::started, [this, &timer] () {
-        timer.start();
-      });
       connect(tracking, &Tracking::finished, thread, &QThread::quit);
-      connect(tracking, &Tracking::finished, [this, &timer, params]() {
-        this->benchmarkTime.append(timer.elapsed());
-      
-        if (benchmarkCount < 10) {
-          this->benchmarkAnalysis(params); 
+      connect(tracking, &Tracking::finished, tracking, &Tracking::deleteLater);
+      connect(tracking, &Tracking::statistic, [this, params](int time) {
+        if (benchmarkCount < 20) {
+          benchmarkAnalysis(params);
+          benchmarkTime.append(time); 
           this->benchmarkCount+= 1;
         }
         else {
@@ -573,10 +573,11 @@ void Interactive::benchmarkAnalysis(QMap<QString, QString> params) {
             mean += a;
           }
           mean /= benchmarkTime.size();
+          qInfo() << benchmarkTime << benchmarkTime.size();
           emit(message("Benchmark result: " + QString::number(mean)));
+          QDir(QDir::homePath() + "/FastTrackBenchmarkTmp").QDir::removeRecursively();
         }
       });
-      connect(tracking, &Tracking::finished, tracking, &Tracking::deleteLater);
       connect(thread, &QThread::finished, thread, &QThread::deleteLater);
       tracking->updatingParameters(params);
       thread->start();

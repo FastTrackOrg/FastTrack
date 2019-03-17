@@ -156,6 +156,11 @@ class Tracking : public QObject {
   * @brief Emitted when an error occurs.
   */
   void error(int code);
+
+  /**
+  * @brief Emitted at the end of the analysis.
+  */
+  void statistic(int time);
 };  
 
 
