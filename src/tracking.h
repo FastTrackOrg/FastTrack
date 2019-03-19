@@ -63,7 +63,7 @@ class Tracking : public QObject {
   int m_im;   /*!< Index of the next image to process in the m_files list. */
   int m_startImage;   /*!< Index of the next image to process in the m_files list. */
   int m_stopImage;   /*!< Index of the next image to process in the m_files list. */
-  Rect m_ROI;   /*!< Rectangular region of interrest. */
+  Rect m_ROI;   /*!< Rectangular region of interest. */
   QTextStream m_savefile;   /*!< Stream to output tracking data. */
   QFile m_outputFile;   /*!< Path to the file where to save tracking data. */
   vector<cv::String> m_files;   /*!< Vector containing the path for each image in the images sequence. */
@@ -134,11 +134,10 @@ class Tracking : public QObject {
 
   signals:
   /**
-  * @brief Emitted when images are available to display. The framerate can't be more than 20 fps.
-  * @param m_binaryFrame Binary image CV_8U.
-  * @param m_visuFrame Image CV_8UC3 containing the tracking visualisation.
+  * @brief Emitted when an image is processed.
+  * @param int Index of the processed image.
   */
-  void newImageToDisplay(UMat& m_binaryFrame, UMat& m_visuFrame);
+  void progress(int);
   
   
   /**

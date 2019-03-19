@@ -748,6 +748,7 @@ void Tracking::imageProcessing(){
         emit(statistic(timer->elapsed()));
       }
       else {
+      emit(progress(m_im));
       QTimer::singleShot(0, this, SLOT(imageProcessing()));
       }
 }

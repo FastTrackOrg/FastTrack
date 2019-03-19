@@ -298,18 +298,13 @@ void Interactive::display(UMat image) {
 */
 void Interactive::computeBackground() {
 
-  if ( !framePath.empty() ) { 
-    double nBack = double(ui->nBack->value());
-    int method = ui->back->currentIndex();
-    background = tracking->backgroundExtraction(framePath, nBack, method); 
-    display(background);
-    isBackground = true;
-    ui->isBin->setCheckable(true);
-    ui->isSub->setCheckable(true);
- }
- else {
-    imread(backgroundPath.toStdString(), IMREAD_GRAYSCALE).copyTo(background);
- }
+  double nBack = double(ui->nBack->value());
+  int method = ui->back->currentIndex();
+  background = tracking->backgroundExtraction(framePath, nBack, method); 
+  display(background);
+  isBackground = true;
+  ui->isBin->setCheckable(true);
+  ui->isSub->setCheckable(true);
 
 }
 
@@ -324,6 +319,9 @@ void Interactive::selectBackground() {
   if (dir.length()) {
     backgroundPath = dir;
     imread(backgroundPath.toStdString(), IMREAD_GRAYSCALE).copyTo(background);
+    isBackground = true;
+    ui->isBin->setCheckable(true);
+    ui->isSub->setCheckable(true);
     display(background);
   }
 }
@@ -364,14 +362,22 @@ void Interactive::getParameters() {
 */
 void Interactive::previewTracking() {
   if(!framePath.empty()) {
+    ui->progressBar->setRange(ui->startImage->value(), ui->stopImage->value() - ui->startImage->value());
+    ui->progressBar->setValue(0);
+    ui->previewButton->setDisabled(true);
+    ui->trackButton->setDisabled(true);
+
     QThread *thread = new QThread;
     Tracking *tracking = new Tracking((dir + QDir::separator()).toStdString(), backgroundPath.toStdString(), ui->startImage->value(), ui->startImage->value() + ui->stopImage->value());
     tracking->moveToThread(thread);
 
     connect(thread, &QThread::started, tracking, &Tracking::startProcess);
+    connect(tracking, &Tracking::progress, ui->progressBar, &QProgressBar::setValue);
     connect(tracking, &Tracking::finished, thread, &QThread::quit);
     connect(tracking, &Tracking::finished, [this]() {
       ui->slider->setDisabled(false);
+      ui->previewButton->setDisabled(false);
+      ui->trackButton->setDisabled(false);
       trackingData = new Data(dir);
     });
     connect(tracking, &Tracking::finished, tracking, &Tracking::deleteLater);
@@ -393,14 +399,22 @@ void Interactive::previewTracking() {
 */
 void Interactive::track() {
   if(!framePath.empty()) {
+    ui->progressBar->setRange(0, framePath.size());
+    ui->progressBar->setValue(0);
+    ui->previewButton->setDisabled(true);
+    ui->trackButton->setDisabled(true);
+
     QThread *thread = new QThread;
     Tracking *tracking = new Tracking((dir + QDir::separator()).toStdString(), backgroundPath.toStdString());
     tracking->moveToThread(thread);
 
     connect(thread, &QThread::started, tracking, &Tracking::startProcess);
+    connect(tracking, &Tracking::progress, ui->progressBar, &QProgressBar::setValue);
     connect(tracking, &Tracking::finished, thread, &QThread::quit);
     connect(tracking, &Tracking::finished, [this]() {
       ui->slider->setDisabled(false);
+      ui->previewButton->setDisabled(false);
+      ui->trackButton->setDisabled(false);
       trackingData = new Data(dir);
     });
     connect(tracking, &Tracking::finished, tracking, &Tracking::deleteLater);
