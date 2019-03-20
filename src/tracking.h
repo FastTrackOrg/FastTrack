@@ -58,7 +58,6 @@ class Tracking : public QObject {
   
   bool statusRegistration;    /*!< Enable registration. */
   bool statusBinarisation;   /*!< True if wite objects on dark background, flase otherwise. */
-  bool statusPath;   /*!< True if the path is correct, ie the path folder contains an images sequence. */
 
   int m_im;   /*!< Index of the next image to process in the m_files list. */
   int m_startImage;   /*!< Index of the next image to process in the m_files list. */
@@ -102,6 +101,7 @@ class Tracking : public QObject {
 
   public:
   Tracking(string path, string background, int startImage = 0, int stopImage = -1);
+  Tracking(vector<String> imagePath, UMat background, int startImage = 0, int stopImage = -1);
   ~Tracking();
 
   Point2d curvatureCenter(const Point3d &tail, const Point3d &head);

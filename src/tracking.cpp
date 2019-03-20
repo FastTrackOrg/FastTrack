@@ -760,6 +760,8 @@ void Tracking::imageProcessing(){
   * @brief Constructs the tracking object from a path to an image sequence and an optional path to a background image.
   * @param[in] path The path to a folder where images are stocked.
   * @param[in] backgroundPath The path to a background image.
+  * @param[in] startImage Index of the beginning image.
+  * @param[in] stopImage Index of the ending image.
 */
 Tracking::Tracking(string path, string backgroundPath, int startImage, int stopImage) {
   m_path = path;
@@ -769,6 +771,22 @@ Tracking::Tracking(string path, string backgroundPath, int startImage, int stopI
 }
 
 
+/**
+  * @brief Constructs the tracking object from a list of path, a background image and a range of image.
+  * @param[in] imagePath List of path to the images.
+  * @param[in] background A background image.
+  * @param[in] startImage Index of the beginning image.
+  * @param[in] stopImage Index of the ending image.
+*/
+Tracking::Tracking(vector<String> imagePath, UMat background, int startImage, int stopImage) {
+  m_files = imagePath;
+  m_background = background;
+  m_startImage = startImage;
+  m_stopImage = stopImage;
+
+  size_t separator = m_files.at(0).find_last_of("/\\");
+  m_path = m_files.at(0).substr(0, separator + 1);
+}
 
 
 /**
@@ -788,23 +806,23 @@ void Tracking::startProcess() {
   }
   
   try{
-    m_path += + "*." + extension.toStdString();
-    glob(m_path, m_files, false); // Get all path to frames
-    statusPath = true;
+    if(m_files.empty()) {
+      m_path += + "*." + extension.toStdString();
+      glob(m_path, m_files, false); // Get all path to frames
+    }
     m_im = m_startImage;
     (m_stopImage == -1) ? (m_stopImage = int(m_files.size())) : ( m_stopImage = m_stopImage);
   }
   catch(...){
-    statusPath = false;
     emit(finished());
   }
   sort(m_files.begin(), m_files.end());
 
   // Loads the background image is provided and check if the image has the correct size
-  if (m_backgroundPath.empty()) {
+  if ( m_background.empty() && m_backgroundPath.empty()) {
     m_background = backgroundExtraction(m_files, param_nBackground, param_methodBackground);
   }
-  else {
+  else if (m_background.empty()) {
     try{
       imread(m_backgroundPath, IMREAD_GRAYSCALE).copyTo(m_background);
       UMat test;

@@ -186,8 +186,8 @@ void Interactive::openFolder() {
           Mat frame = imread(framePath.at(0), IMREAD_COLOR);
           ui->slider->setMinimum(0);
           ui->slider->setMaximum(framePath.size() - 1);
-          ui->nBack->setValue(framePath.size() - 1);
           ui->nBack->setMaximum(framePath.size() - 1);
+          ui->nBack->setValue(framePath.size() - 1);
           originalImageSize.setWidth(frame.cols);
           originalImageSize.setHeight(frame.rows);
           ui->x2->setMaximum(frame.cols);
@@ -362,13 +362,13 @@ void Interactive::getParameters() {
 */
 void Interactive::previewTracking() {
   if(!framePath.empty()) {
-    ui->progressBar->setRange(ui->startImage->value(), ui->stopImage->value() - ui->startImage->value());
+    ui->progressBar->setRange(ui->startImage->value(), ui->stopImage->value() - ui->startImage->value() - 1);
     ui->progressBar->setValue(0);
     ui->previewButton->setDisabled(true);
     ui->trackButton->setDisabled(true);
 
     QThread *thread = new QThread;
-    Tracking *tracking = new Tracking((dir + QDir::separator()).toStdString(), backgroundPath.toStdString(), ui->startImage->value(), ui->startImage->value() + ui->stopImage->value());
+    Tracking *tracking = new Tracking(framePath, background, ui->startImage->value(), ui->startImage->value() + ui->stopImage->value());
     tracking->moveToThread(thread);
 
     connect(thread, &QThread::started, tracking, &Tracking::startProcess);
@@ -395,17 +395,17 @@ void Interactive::previewTracking() {
 
 
 /**
-  * @brief Does a tracking analysis. Triggered when previewButton is clicked.
+  * @brief Does a tracking analysis. Triggered when the trackButton is clicked.
 */
 void Interactive::track() {
   if(!framePath.empty()) {
-    ui->progressBar->setRange(0, framePath.size());
+    ui->progressBar->setRange(0, framePath.size() - 1);
     ui->progressBar->setValue(0);
     ui->previewButton->setDisabled(true);
     ui->trackButton->setDisabled(true);
 
     QThread *thread = new QThread;
-    Tracking *tracking = new Tracking((dir + QDir::separator()).toStdString(), backgroundPath.toStdString());
+    Tracking *tracking = new Tracking(framePath, background);
     tracking->moveToThread(thread);
 
     connect(thread, &QThread::started, tracking, &Tracking::startProcess);
