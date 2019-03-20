@@ -194,6 +194,7 @@ void Interactive::openFolder() {
           ui->y2->setMaximum(frame.rows);
           path = dir.toStdString();
           isBackground = false;
+          reset();
           display(0);
         }
         catch(...){

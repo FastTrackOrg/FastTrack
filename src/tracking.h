@@ -30,6 +30,7 @@ This file is part of Fast Track.
 #include <QObject>
 #include <QMessageBox>
 #include <QMap>
+#include <QVector>
 #include <QDebug>
 #include <QThread>
 #include <QString>

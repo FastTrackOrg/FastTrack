@@ -472,9 +472,10 @@ vector<int> Tracking::costFunc(const vector<Point3d> &prevPos, const vector<Poin
   else {
     double c = -1;
     vector<vector<double>> costMatrix(n, vector<double>(m));
+    vector<int> sum(m, 0);
 
     for(int i = 0; i < n; ++i){
-
+      
       Point3d prevCoord = prevPos.at(i);
       for(int j = 0; j < m; ++j){
         Point3d coord = pos.at(j);
@@ -485,14 +486,20 @@ vector<int> Tracking::costFunc(const vector<Point3d> &prevPos, const vector<Poin
         }
         else {
           costMatrix[i][j] = 2e307;
+          sum[j] += 1;
         }
-
       }
     }
 
     // Hungarian algorithm to solve the assignment problem O(n**3)
     HungarianAlgorithm HungAlgo;
     HungAlgo.Solve(costMatrix, assignment);
+
+    auto iterator = find(sum.begin(), sum.end(), n);
+    while (iterator != sum.end()) {
+        replace(assignment.begin(), assignment.end(), int(distance(sum.begin(), iterator)), -1);
+        iterator = find(iterator + 1, sum.end(), n);
+    }
   }
 
 	return assignment;
@@ -508,11 +515,10 @@ vector<int> Tracking::costFunc(const vector<Point3d> &prevPos, const vector<Poin
 vector<int> Tracking::findOcclusion(vector<int> assignment) { 
   
   vector<int> occlusion;
-  vector<int>::iterator index = find(assignment.begin(), assignment.end(), - 1);
+  vector<int>::iterator index = find(assignment.begin(), assignment.end(), -1);
   while ( index != assignment.end() ) {
     occlusion.push_back(index - assignment.begin());
-    assignment.at(index - assignment.begin()) = -2;
-    index = find(assignment.begin(), assignment.end(), - 1);
+    index = find(index + 1, assignment.end(), -1);
   }
   return occlusion;
 }
@@ -530,50 +536,29 @@ vector<int> Tracking::findOcclusion(vector<int> assignment) {
 */
 vector<Point3d> Tracking::reassignment(const vector<Point3d> &past, const vector<Point3d> &input, const vector<int> &assignment){
 
-	vector<Point3d> tmp = past;
+	vector<Point3d> tmp = past ;
 	unsigned int n = past.size();
 	unsigned int m = input.size();
-
-
-	if(m == n){ // Same number of targets in two consecutive frames
-		for(unsigned int i = 0; i < n; i++){
-			tmp.at(i) = input.at(assignment.at(i));
-		}
-	}
-
-	else if(m > n){// More target in current frame than in previous one
-		for(unsigned int i = 0; i < n; i++){
-			tmp.at(i) = input.at(assignment.at(i));
-		}
-    // Adds the surnumeral element to the tracked object
-    //TO DO: sortir de la boucle pour améliorer les performances.
-    bool stat;
-    for (int j = 0; j < int(m); j++ ){
-      stat = false;
-      for (auto &a: assignment) {
-        if (j == a) {
-          stat = true;
-          break;
-        }
-      }
-      if (!stat) {
-        tmp.push_back(input.at(j));
+  for(unsigned int i = 0; i < n; i++){
+    if(assignment.at(i) != -1){
+      tmp.at(i) = input.at(assignment.at(i));
+    }
+  }
+  // Adds the surnumeral element to the tracked object
+  //TO DO: sortir de la boucle pour améliorer les performances.
+  bool stat;
+  for (int j = 0; j < int(m); j++ ){
+    stat = false;
+    for (auto &a: assignment) {
+      if (j == a) {
+        stat = true;
+        break;
       }
     }
-
-	}
-
-	else if(m < n){ // Fewer target in current frame than in the previous one
-		for(unsigned int i = 0; i < n; i++){
-			if(assignment.at(i) != -1){
-				tmp.at(i) = input.at(assignment.at(i));
-			}
-		}
-	}
-
-	else{
-		qInfo() << "association error" << endl;
-	}
+    if (!stat) {
+      tmp.push_back(input.at(j));
+    }
+  }
 
 
 	return tmp;
