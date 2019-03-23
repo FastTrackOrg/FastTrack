@@ -486,10 +486,19 @@ void Interactive::crop() {
   int xBottom = int(double(clicks.second.x())*double(cropedImageSize.height()) / double(resizedFrame.height()) + roi.tl().x);
   int yBottom = int(double(clicks.second.y())*double(cropedImageSize.height()) / double(resizedFrame.height()) + roi.tl().y);
  
-  int width = xBottom - xTop;
-  int height = yBottom - yTop;
+  //Checks for wrong values
+  if( xTop < 0 ) xTop = 0;
+  if( xBottom < 0 ) xBottom = 0;
+  if( yTop < 0 ) yTop = 0;
+  if( yBottom < 0 ) yBottom = 0;
+  if( xTop > cropedImageSize.width() ) xTop = cropedImageSize.width();
+  if( xBottom > cropedImageSize.width()) xBottom = cropedImageSize.width();
+  if( yTop > cropedImageSize.height()) yTop = cropedImageSize.height();
+  if( yBottom > cropedImageSize.height()) yBottom = cropedImageSize.height();
   
   // Find the true left corner of the rectangle  
+  int width = xBottom - xTop;
+  int height = yBottom - yTop;
   if (width < 0) {
     xTop += width;
     width = - width;
