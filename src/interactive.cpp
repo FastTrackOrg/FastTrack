@@ -145,7 +145,7 @@ Interactive::Interactive(QWidget *parent) :
 */
 void Interactive::openFolder() {
     
-    // Reset the ui
+    // Reset the class members
     backgroundPath.clear();
     reset();
     trackingData = new Data("");
@@ -154,52 +154,56 @@ void Interactive::openFolder() {
     framePath.clear();
     ui->display->clear();
 
+    // Reset the ui display
     ui->isNone->setChecked(true);
     ui->isBin->setCheckable(false);
     ui->isSub->setCheckable(false);
-
     ui->isOriginal->setChecked(true);
     ui->isTracked->setCheckable(false);
     
+
     dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"), memoryDir, QFileDialog::ShowDirsOnly);
 
+    // If Tracking_Result folder selectionned, get the path to the top directory
     if(dir.right(15) == "Tracking_Result") {
       dir.truncate(dir.size() - 15);
     }
      
     if (dir.length()) {
 
-        // Finds the image format
-        QList<QString> extensions = { "pgm", "png", "jpeg", "jpg", "tiff", "tif", "bmp", "dib", "jpe", "jp2", "webp", "pbm", "ppm", "sr", "ras", "tif" };
-        QDirIterator it(dir, QStringList(), QDir::NoFilter);
-        QString extension;
-        while (it.hasNext()) {
-          extension = it.next().section('.', -1);
-          if( extensions.contains(extension) ) break;
-        }
+      // Finds the image format
+      QList<QString> extensions = { "pgm", "png", "jpeg", "jpg", "tiff", "tif", "bmp", "dib", "jpe", "jp2", "webp", "pbm", "ppm", "sr", "ras", "tif" };
+      QDirIterator it(dir, QStringList(), QDir::NoFilter);
+      QString extension;
+      while (it.hasNext()) {
+        extension = it.next().section('.', -1);
+        if( extensions.contains(extension) ) break;
+      }
 
+      // Setups the class member
+      try{
+        string path = (dir + QDir::separator() + "*." + extension).toStdString();
+        memoryDir = dir;
+        glob(path, framePath, false);
 
-        try{
-          string path = (dir + QDir::separator() + "*." + extension).toStdString();
-          memoryDir = dir;
-          glob(path, framePath, false);
-          Mat frame = imread(framePath.at(0), IMREAD_COLOR);
-          ui->slider->setMinimum(0);
-          ui->slider->setMaximum(framePath.size() - 1);
-          ui->nBack->setMaximum(framePath.size() - 1);
-          ui->nBack->setValue(framePath.size() - 1);
-          originalImageSize.setWidth(frame.cols);
-          originalImageSize.setHeight(frame.rows);
-          ui->x2->setMaximum(frame.cols);
-          ui->y2->setMaximum(frame.rows);
-          path = dir.toStdString();
-          isBackground = false;
-          reset();
-          display(0);
-        }
-        catch(...){
-          emit(message("No images found."));
-        }
+        ui->slider->setMinimum(0);
+        ui->slider->setMaximum(framePath.size() - 1);
+        ui->nBack->setMaximum(framePath.size() - 1);
+        ui->nBack->setValue(framePath.size() - 1);
+
+        Mat frame = imread(framePath.at(0), IMREAD_COLOR);
+        originalImageSize.setWidth(frame.cols);
+        originalImageSize.setHeight(frame.rows);
+        ui->x2->setMaximum(frame.cols);
+        ui->y2->setMaximum(frame.rows);
+
+        isBackground = false;
+        reset();
+        display(0);
+      }
+      catch(...){
+        emit(message("No image found."));
+      }
     }
 }
 
@@ -214,6 +218,7 @@ void Interactive::display(int index) {
     UMat frame;
     imread(framePath.at(index), IMREAD_GRAYSCALE).copyTo(frame);
     vector<vector<Point>> displayContours;
+    vector<vector<Point>> rejectedContours;
 
     // Computes the image with the background subtracted
     if ( ui->isSub->isChecked() && isBackground ) {
@@ -231,7 +236,7 @@ void Interactive::display(int index) {
       
       // Keeps only right sized object.
       vector<vector<Point>> contours;
-      findContours(frame, contours, RETR_LIST, CHAIN_APPROX_NONE);
+      findContours(frame, contours, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
 
       double min = ui->minSize->value();
       double max = ui->maxSize->value();
@@ -241,6 +246,9 @@ void Interactive::display(int index) {
         if(size > min && size < max) {
           displayContours.push_back(a); 
         }
+        else{
+          rejectedContours.push_back(a);
+        }
       }
     }
 
@@ -248,6 +256,7 @@ void Interactive::display(int index) {
     cvtColor(frame, frame, COLOR_GRAY2RGB);  
     if( ui->isBin->isChecked() ) {
       drawContours(frame, displayContours, -1, Scalar(0, 255, 0), FILLED, 8);
+      drawContours(frame, rejectedContours, -1, Scalar(255, 0, 0), FILLED, 8);
     }
     if ( ui->isTracked->isChecked() ) {
       QList<int> idList = trackingData->getId(index);
@@ -507,7 +516,8 @@ void Interactive::crop() {
     yTop += height;
     height = - height;
   }
-  
+
+   
   roi = Rect(xTop, yTop, width, height);
   cropedImageSize.setWidth(roi.width);
   cropedImageSize.setHeight(roi.height);
@@ -606,6 +616,7 @@ void Interactive::benchmarkAnalysis(QMap<QString, QString> params) {
       tracking->updatingParameters(params);
       thread->start();
 }
+
 /**
   * @brief Destructors.
 */

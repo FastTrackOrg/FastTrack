@@ -333,7 +333,7 @@ vector<vector<Point3d>> Tracking::objectPosition(const UMat &frame, int minSize,
 	vector<double> parameterTail;
 	Point2d radiusCurv;
 
-	findContours(frame, contours, RETR_LIST, CHAIN_APPROX_NONE);
+	findContours(frame, contours, RETR_EXTERNAL, CHAIN_APPROX_NONE);
 
 	for (size_t i = 0; i < contours.size(); i++){
 			
