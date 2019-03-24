@@ -55,15 +55,15 @@
      <item row="0" column="0">
       <widget class="QToolBox" name="toolBox_2">
        <property name="currentIndex">
-        <number>1</number>
+        <number>0</number>
        </property>
        <widget class="QWidget" name="page_10">
         <property name="geometry">
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>276</width>
-          <height>593</height>
+          <width>261</width>
+          <height>551</height>
          </rect>
         </property>
         <attribute name="label">
@@ -255,7 +255,7 @@
           <x>0</x>
           <y>0</y>
           <width>261</width>
-          <height>593</height>
+          <height>551</height>
          </rect>
         </property>
         <attribute name="label">
@@ -275,6 +275,9 @@
             <widget class="QSpinBox" name="startImage">
              <property name="maximum">
               <number>9999999</number>
+             </property>
+             <property name="value">
+              <number>1</number>
              </property>
             </widget>
            </item>
@@ -375,7 +378,7 @@
           <x>0</x>
           <y>0</y>
           <width>190</width>
-          <height>497</height>
+          <height>455</height>
          </rect>
         </property>
         <attribute name="label">
@@ -482,7 +485,7 @@
           <x>0</x>
           <y>0</y>
           <width>190</width>
-          <height>497</height>
+          <height>455</height>
          </rect>
         </property>
         <attribute name="label">
@@ -517,10 +520,18 @@ corner: </string>
             </widget>
            </item>
            <item>
-            <widget class="QSpinBox" name="x1"/>
+            <widget class="QSpinBox" name="x1">
+             <property name="readOnly">
+              <bool>true</bool>
+             </property>
+            </widget>
            </item>
            <item>
-            <widget class="QSpinBox" name="y1"/>
+            <widget class="QSpinBox" name="y1">
+             <property name="readOnly">
+              <bool>true</bool>
+             </property>
+            </widget>
            </item>
           </layout>
          </item>
@@ -535,10 +546,18 @@ corner</string>
             </widget>
            </item>
            <item>
-            <widget class="QSpinBox" name="x2"/>
+            <widget class="QSpinBox" name="x2">
+             <property name="readOnly">
+              <bool>true</bool>
+             </property>
+            </widget>
            </item>
            <item>
-            <widget class="QSpinBox" name="y2"/>
+            <widget class="QSpinBox" name="y2">
+             <property name="readOnly">
+              <bool>true</bool>
+             </property>
+            </widget>
            </item>
           </layout>
          </item>
@@ -563,7 +582,7 @@ corner</string>
           <x>0</x>
           <y>0</y>
           <width>211</width>
-          <height>497</height>
+          <height>455</height>
          </rect>
         </property>
         <attribute name="label">
@@ -653,7 +672,7 @@ corner</string>
           <x>0</x>
           <y>0</y>
           <width>190</width>
-          <height>497</height>
+          <height>455</height>
          </rect>
         </property>
         <attribute name="label">
@@ -709,7 +728,7 @@ corner</string>
           <x>0</x>
           <y>0</y>
           <width>195</width>
-          <height>497</height>
+          <height>455</height>
          </rect>
         </property>
         <attribute name="label">
@@ -818,8 +837,8 @@ corner</string>
   <widget class="QDockWidget" name="controlOptions">
    <property name="minimumSize">
     <size>
-     <width>434</width>
-     <height>224</height>
+     <width>791</width>
+     <height>266</height>
     </size>
    </property>
    <property name="features">
@@ -835,10 +854,31 @@ corner</string>
     <layout class="QGridLayout" name="gridLayout_14">
      <item row="2" column="0" rowspan="2">
       <widget class="QSplitter" name="splitter">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="midLineWidth">
+        <number>1</number>
+       </property>
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
+       <property name="opaqueResize">
+        <bool>true</bool>
+       </property>
+       <property name="handleWidth">
+        <number>10</number>
+       </property>
        <widget class="QGroupBox" name="imageDisplayGroup">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+          <horstretch>1</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="title">
          <string>Image Display</string>
         </property>
@@ -848,6 +888,16 @@ corner</string>
         <layout class="QGridLayout" name="gridLayout_12">
          <item row="0" column="0">
           <layout class="QGridLayout" name="gridLayout_3">
+           <item row="2" column="0">
+            <widget class="QRadioButton" name="isBin">
+             <property name="text">
+              <string>Binar&amp;y</string>
+             </property>
+             <property name="checkable">
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
            <item row="1" column="0">
             <widget class="QRadioButton" name="isSub">
              <property name="text">
@@ -868,43 +918,298 @@ corner</string>
              </property>
             </widget>
            </item>
-           <item row="2" column="0">
-            <widget class="QRadioButton" name="isBin">
-             <property name="text">
-              <string>Binar&amp;y</string>
-             </property>
-             <property name="checkable">
-              <bool>false</bool>
-             </property>
-            </widget>
-           </item>
           </layout>
          </item>
         </layout>
        </widget>
        <widget class="QGroupBox" name="trackingOverlayGroup">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+          <horstretch>1</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="title">
          <string>Tracking Overlay</string>
         </property>
+        <widget class="QRadioButton" name="isTracked">
+         <property name="geometry">
+          <rect>
+           <x>12</x>
+           <y>89</y>
+           <width>77</width>
+           <height>24</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Tracking</string>
+         </property>
+         <property name="checkable">
+          <bool>false</bool>
+         </property>
+        </widget>
+        <widget class="QRadioButton" name="isNone">
+         <property name="geometry">
+          <rect>
+           <x>12</x>
+           <y>46</y>
+           <width>59</width>
+           <height>24</height>
+          </rect>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>None</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </widget>
+       <widget class="QGroupBox" name="groupBox">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="title">
+         <string>Information</string>
+        </property>
         <layout class="QGridLayout" name="gridLayout_13">
-         <item row="1" column="0">
-          <widget class="QRadioButton" name="isTracked">
-           <property name="text">
-            <string>Tracking</string>
-           </property>
-           <property name="checkable">
-            <bool>false</bool>
-           </property>
-          </widget>
-         </item>
          <item row="0" column="0">
-          <widget class="QRadioButton" name="isNone">
-           <property name="text">
-            <string>None</string>
+          <widget class="QTableWidget" name="informationTable">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
            </property>
-           <property name="checked">
+           <property name="minimumSize">
+            <size>
+             <width>317</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="frameShape">
+            <enum>QFrame::NoFrame</enum>
+           </property>
+           <property name="frameShadow">
+            <enum>QFrame::Sunken</enum>
+           </property>
+           <property name="midLineWidth">
+            <number>1</number>
+           </property>
+           <property name="sizeAdjustPolicy">
+            <enum>QAbstractScrollArea::AdjustToContents</enum>
+           </property>
+           <property name="editTriggers">
+            <set>QAbstractItemView::AnyKeyPressed|QAbstractItemView::DoubleClicked|QAbstractItemView::EditKeyPressed</set>
+           </property>
+           <property name="textElideMode">
+            <enum>Qt::ElideNone</enum>
+           </property>
+           <property name="showGrid">
             <bool>true</bool>
            </property>
+           <property name="gridStyle">
+            <enum>Qt::SolidLine</enum>
+           </property>
+           <attribute name="horizontalHeaderVisible">
+            <bool>false</bool>
+           </attribute>
+           <attribute name="verticalHeaderVisible">
+            <bool>false</bool>
+           </attribute>
+           <attribute name="verticalHeaderCascadingSectionResizes">
+            <bool>false</bool>
+           </attribute>
+           <attribute name="verticalHeaderStretchLastSection">
+            <bool>true</bool>
+           </attribute>
+           <row>
+            <property name="text">
+             <string>Path</string>
+            </property>
+           </row>
+           <row>
+            <property name="text">
+             <string>Image number</string>
+            </property>
+           </row>
+           <row>
+            <property name="text">
+             <string>Image width</string>
+            </property>
+           </row>
+           <row>
+            <property name="text">
+             <string>Image height</string>
+            </property>
+           </row>
+           <row>
+            <property name="text">
+             <string>Analysis rate (fps)</string>
+            </property>
+           </row>
+           <column>
+            <property name="text">
+             <string>Parameter</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>Value</string>
+            </property>
+            <property name="textAlignment">
+             <set>AlignCenter</set>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>Unit</string>
+            </property>
+           </column>
+           <item row="0" column="0">
+            <property name="text">
+             <string>Path</string>
+            </property>
+            <property name="flags">
+             <set>NoItemFlags</set>
+            </property>
+           </item>
+           <item row="0" column="1">
+            <property name="text">
+             <string> </string>
+            </property>
+            <property name="flags">
+             <set>NoItemFlags</set>
+            </property>
+           </item>
+           <item row="0" column="2">
+            <property name="flags">
+             <set>NoItemFlags</set>
+            </property>
+           </item>
+           <item row="1" column="0">
+            <property name="text">
+             <string>Image number</string>
+            </property>
+            <property name="flags">
+             <set>NoItemFlags</set>
+            </property>
+           </item>
+           <item row="1" column="1">
+            <property name="text">
+             <string>0</string>
+            </property>
+            <property name="textAlignment">
+             <set>AlignCenter</set>
+            </property>
+            <property name="flags">
+             <set>NoItemFlags</set>
+            </property>
+           </item>
+           <item row="1" column="2">
+            <property name="text">
+             <string/>
+            </property>
+            <property name="textAlignment">
+             <set>AlignCenter</set>
+            </property>
+            <property name="flags">
+             <set>NoItemFlags</set>
+            </property>
+           </item>
+           <item row="2" column="0">
+            <property name="text">
+             <string>Image width</string>
+            </property>
+            <property name="flags">
+             <set>NoItemFlags</set>
+            </property>
+           </item>
+           <item row="2" column="1">
+            <property name="text">
+             <string>0</string>
+            </property>
+            <property name="textAlignment">
+             <set>AlignCenter</set>
+            </property>
+            <property name="flags">
+             <set>NoItemFlags</set>
+            </property>
+           </item>
+           <item row="2" column="2">
+            <property name="text">
+             <string>px</string>
+            </property>
+            <property name="textAlignment">
+             <set>AlignLeading|AlignVCenter</set>
+            </property>
+            <property name="flags">
+             <set>NoItemFlags</set>
+            </property>
+           </item>
+           <item row="3" column="0">
+            <property name="text">
+             <string>Image height</string>
+            </property>
+            <property name="flags">
+             <set>NoItemFlags</set>
+            </property>
+           </item>
+           <item row="3" column="1">
+            <property name="text">
+             <string>0</string>
+            </property>
+            <property name="textAlignment">
+             <set>AlignCenter</set>
+            </property>
+            <property name="flags">
+             <set>NoItemFlags</set>
+            </property>
+           </item>
+           <item row="3" column="2">
+            <property name="text">
+             <string>px</string>
+            </property>
+            <property name="flags">
+             <set>NoItemFlags</set>
+            </property>
+           </item>
+           <item row="4" column="0">
+            <property name="text">
+             <string>Analysis rate</string>
+            </property>
+            <property name="flags">
+             <set>NoItemFlags</set>
+            </property>
+           </item>
+           <item row="4" column="1">
+            <property name="text">
+             <string>0</string>
+            </property>
+            <property name="textAlignment">
+             <set>AlignCenter</set>
+            </property>
+            <property name="flags">
+             <set>NoItemFlags</set>
+            </property>
+           </item>
+           <item row="4" column="2">
+            <property name="text">
+             <string>frame / second</string>
+            </property>
+            <property name="flags">
+             <set>NoItemFlags</set>
+            </property>
+           </item>
           </widget>
          </item>
         </layout>
@@ -925,17 +1230,17 @@ corner</string>
        </property>
       </widget>
      </item>
-     <item row="0" column="0" colspan="2">
-      <widget class="QSlider" name="slider">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-      </widget>
-     </item>
      <item row="1" column="0" colspan="2">
       <widget class="QProgressBar" name="progressBar">
        <property name="value">
         <number>0</number>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0" colspan="2">
+      <widget class="QSlider" name="slider">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
        </property>
       </widget>
      </item>

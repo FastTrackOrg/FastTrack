@@ -53,7 +53,7 @@ Interactive::Interactive(QWidget *parent) :
       msgBox.exec();
     });
     
-    // Threshold slider and combobox linking
+    // Threshold slider and combobox
     connect(ui->threshSlider, &QSlider::valueChanged, ui->threshBox, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::setValue));
     connect(ui->threshBox, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), ui->threshSlider, &QSlider::setValue);
     connect(ui->threshBox, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [this]() {
@@ -71,7 +71,7 @@ Interactive::Interactive(QWidget *parent) :
       ui->y1->setMinimum(0);
     });
 
-    // Morphological operations update
+    // Update after operations
     connect(ui->erosion, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [this]() {
       ui->isBin->setChecked(true);
       display(ui->slider->value());
@@ -93,7 +93,6 @@ Interactive::Interactive(QWidget *parent) :
       ui->isBin->setChecked(true);
       display(ui->slider->value());
     });
-
     connect(ui->isBin, &QRadioButton::clicked,[this](){
       display(ui->slider->value());
     });
@@ -109,6 +108,12 @@ Interactive::Interactive(QWidget *parent) :
     connect(ui->isTracked, &QRadioButton::clicked,[this](){
       display(ui->slider->value());
     });
+
+    // Set image preview limits
+    connect(ui->startImage, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [this](int startImage){
+      ui->stopImage->setRange(0, framePath.size() - startImage); 
+    });
+
     
     // Ui buttons connects
     connect(ui->backgroundSelectButton, &QPushButton::clicked, this, &Interactive::selectBackground);
@@ -116,7 +121,7 @@ Interactive::Interactive(QWidget *parent) :
     connect(ui->previewButton, &QPushButton::clicked, this, &Interactive::previewTracking); 
     connect(ui->trackButton, &QPushButton::clicked, [this]() {
       QMessageBox::StandardButton reply;
-      reply = QMessageBox::question(this, "Confirmation", "You are going to start a full tracking analysis. That can be take some time, are you sure?", QMessageBox::Yes|QMessageBox::No);
+      reply = QMessageBox::question(this, "Confirmation", "You are going to start a full tracking analysis. That can take some time, are you sure?", QMessageBox::Yes|QMessageBox::No);
       if (reply == QMessageBox::Yes) {
           track();
       }
@@ -128,10 +133,9 @@ Interactive::Interactive(QWidget *parent) :
     isBackground = false;
     tracking = new Tracking("", "");
 
-    colorMap;
     double a,b,c;
     srand (time(NULL));
-    for (int j = 0; j < 9000 ; ++j)  {
+    for (int j = 0; j < 90000 ; ++j)  {
       a = rand() % 255;
       b = rand() % 255;
       c = rand() % 255;
@@ -190,6 +194,8 @@ void Interactive::openFolder() {
         ui->slider->setMaximum(framePath.size() - 1);
         ui->nBack->setMaximum(framePath.size() - 1);
         ui->nBack->setValue(framePath.size() - 1);
+        ui->startImage->setRange(0, framePath.size() - 1);
+        ui->startImage->setValue(0);
 
         Mat frame = imread(framePath.at(0), IMREAD_COLOR);
         originalImageSize.setWidth(frame.cols);
@@ -197,11 +203,20 @@ void Interactive::openFolder() {
         ui->x2->setMaximum(frame.cols);
         ui->y2->setMaximum(frame.rows);
 
+        ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Path", Qt::MatchExactly).at(0)), 1)->setText(dir);
+        ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Image number", Qt::MatchExactly).at(0)), 1)->setText(QString::number(framePath.size()));
+        ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Image width", Qt::MatchExactly).at(0)), 1)->setText(QString::number(frame.cols));
+        ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Image height", Qt::MatchExactly).at(0)), 1)->setText(QString::number(frame.rows));
+
         isBackground = false;
         reset();
         display(0);
       }
       catch(...){
+        ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Path", Qt::MatchExactly).at(0)), 1)->setText("");
+        ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Image number", Qt::MatchExactly).at(0)), 1)->setText("0");
+        ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Image width", Qt::MatchExactly).at(0)), 1)->setText("0");
+        ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Image height", Qt::MatchExactly).at(0)), 1)->setText("0");
         emit(message("No image found."));
       }
     }
@@ -267,8 +282,7 @@ void Interactive::display(int index) {
 
         QMap<QString, double> coordinate = trackingData->getData(index, a);
         int id = a;
-        cv::ellipse(frame, Point( coordinate.value("xHead"), coordinate.value("yHead") ), Size( coordinate.value("headMajorAxisLength"), coordinate.value("headMinorAxisLength") ), 180 - (coordinate.value("tHead")*180)/M_PI, 0, 360,  Scalar(colorMap.at(id).x, colorMap.at(id).y, colorMap.at(id).z), scale, 8 );
-        cv::ellipse(frame, Point( coordinate.value("xTail"), coordinate.value("yTail") ), Size( coordinate.value("tailMajorAxisLength"), coordinate.value("tailMinorAxisLength") ), 180 - (coordinate.value("tTail")*180)/M_PI, 0, 360,  Scalar(colorMap.at(id).x, colorMap.at(id).y, colorMap.at(id).z), scale, cv::LINE_AA );
+        cv::ellipse(frame, Point( coordinate.value("xBody"), coordinate.value("yBody") ), Size( coordinate.value("bodyMajorAxisLength"), coordinate.value("bodyMinorAxisLength") ), 180 - (coordinate.value("tBody")*180)/M_PI, 0, 360,  Scalar(colorMap.at(id).x, colorMap.at(id).y, colorMap.at(id).z), scale, 8 );
       }
     }
     if(roi.width != 0 || roi.height != 0 ) {
@@ -383,6 +397,9 @@ void Interactive::previewTracking() {
 
     connect(thread, &QThread::started, tracking, &Tracking::startProcess);
     connect(tracking, &Tracking::progress, ui->progressBar, &QProgressBar::setValue);
+    connect(tracking, &Tracking::statistic, [this](int time) {
+      ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Analysis rate", Qt::MatchExactly).at(0)), 1)->setText(QString::number(double(ui->stopImage->value()*1000)/double(time)));
+    });
     connect(tracking, &Tracking::finished, thread, &QThread::quit);
     connect(tracking, &Tracking::finished, [this]() {
       ui->slider->setDisabled(false);
@@ -420,6 +437,9 @@ void Interactive::track() {
 
     connect(thread, &QThread::started, tracking, &Tracking::startProcess);
     connect(tracking, &Tracking::progress, ui->progressBar, &QProgressBar::setValue);
+    connect(tracking, &Tracking::statistic, [this](int time) {
+      ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Analysis rate", Qt::MatchExactly).at(0)), 1)->setText(QString::number(double(framePath.size()*1000)/double(time)));
+    });
     connect(tracking, &Tracking::finished, thread, &QThread::quit);
     connect(tracking, &Tracking::finished, [this]() {
       ui->slider->setDisabled(false);
@@ -521,6 +541,8 @@ void Interactive::crop() {
   roi = Rect(xTop, yTop, width, height);
   cropedImageSize.setWidth(roi.width);
   cropedImageSize.setHeight(roi.height);
+  ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Image width", Qt::MatchExactly).at(0)), 1)->setText(QString::number(roi.width));
+  ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Image height", Qt::MatchExactly).at(0)), 1)->setText(QString::number(roi.height));
   display(ui->slider->value());
  }
  
@@ -536,6 +558,8 @@ void Interactive::reset() {
   ui->y1->setValue(0); 
   ui->x2->setValue(originalImageSize.width());
   ui->y2->setValue(originalImageSize.height()); 
+  ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Image width", Qt::MatchExactly).at(0)), 1)->setText(QString::number(originalImageSize.width()));
+  ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Image height", Qt::MatchExactly).at(0)), 1)->setText(QString::number(originalImageSize.height()));
   roi = Rect(0, 0, 0, 0);
   display(ui->slider->value());
  }

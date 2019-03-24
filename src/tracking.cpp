@@ -820,10 +820,10 @@ void Tracking::startProcess() {
     }
   }
 
-  m_colorMap = color(500);
-  m_memory = vector<vector<Point>>(500, vector<Point>());
+  m_colorMap = color(9000);
+  m_memory = vector<vector<Point>>(9000, vector<Point>());
   // First frame
-  imread(m_files.at(0), IMREAD_GRAYSCALE).copyTo(m_visuFrame);
+  imread(m_files.at(m_im), IMREAD_GRAYSCALE).copyTo(m_visuFrame);
   
   (statusBinarisation) ? (subtract(m_background, m_visuFrame, m_binaryFrame)) : (subtract(m_visuFrame, m_background, m_binaryFrame));
 

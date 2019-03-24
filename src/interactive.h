@@ -31,6 +31,8 @@ This file is part of Fast Track.
 #include <QNetworkAccessManager>
 #include <QString>
 #include <QDirIterator>
+#include <QTableWidget>
+#include <QTableWidgetItem>
 #include <QPainter>
 #include <QFile>
 #include <QElapsedTimer>
