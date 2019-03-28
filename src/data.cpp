@@ -19,7 +19,7 @@ Data::Data(QString dataPath) {
     }
 
     // Gets the header to construct the QMap data
-    QStringList header = replayTracking.at(0).split('\t', QString::SkipEmptyParts);
+    QStringList header = replayTracking[0].split('\t', QString::SkipEmptyParts);
     replayTracking.removeFirst();
 
     for(auto &a: replayTracking) {
@@ -29,12 +29,12 @@ Data::Data(QString dataPath) {
       QMap<QString, double> objectData; // Map data keys to data value
 
       QStringList dat = a.split('\t', QString::SkipEmptyParts);
-      int frameIndex = dat.at(21).toInt();
-      int id = dat.at(22).toInt();
+      int frameIndex = dat[21].toInt();
+      int id = dat[22].toInt();
       dat.removeAt(22);
 
       for(int j = 0; j < dat.size(); j++) {
-        objectData.insert(header.at(j), dat.at(j).toDouble());
+        objectData.insert(header[j], dat[j].toDouble());
       }
 
       tmpVector = data.value(frameIndex);
@@ -93,7 +93,7 @@ void Data::swapData(int firstObject, int secondObject, int from) {
            
           for(int j = 0; j < objects.size(); j++) {
         
-            int id = objects.at(j).id;
+            int id = objects[j].id;
             int changed = -1;
         
             if (id == firstObject && j != changed) {

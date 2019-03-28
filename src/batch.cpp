@@ -98,14 +98,14 @@ Batch::Batch(QWidget *parent) :
     for(int i = 0; i < parameterList.keys().length(); i++) {
       ui->tableParameters->setSortingEnabled(false);
       ui->tableParameters->insertRow(i);
-      QString parameterName = parameterList.keys().at(i);
+      QString parameterName = parameterList.keys()[i];
       ui->tableParameters->setItem(i, 0, new QTableWidgetItem(parameterName));
       ui->tableParameters->item(i, 0)->setFlags(ui->tableParameters->item(i, 0)->flags() & ~Qt::ItemIsEditable);
       QStringList parameterAttributs = parameterList.value(parameterName).split('|');
-      ui->tableParameters->setItem(i, 1, new QTableWidgetItem(parameterAttributs.at(0)));
-      ui->tableParameters->setItem(i, 2, new QTableWidgetItem(parameterAttributs.at(1)));
+      ui->tableParameters->setItem(i, 1, new QTableWidgetItem(parameterAttributs[0]));
+      ui->tableParameters->setItem(i, 2, new QTableWidgetItem(parameterAttributs[1]));
       ui->tableParameters->item(i, 2)->setFlags(ui->tableParameters->item(i, 2)->flags() & ~Qt::ItemIsEditable);
-      parameterList.insert(parameterName, parameterAttributs.at(0));
+      parameterList.insert(parameterName, parameterAttributs[0]);
       ui->tableParameters->setRowHeight(i, 60);
      }
 
@@ -208,9 +208,9 @@ void Batch::startTracking() {
       
       ui->startButton->setDisabled(true);
 
-      if ( QDir(processList.at(0).path).exists() ) {      
-        string path = (processList.at(0).path + QDir::separator()).toStdString();
-        string backgroundPath = processList.at(0).backgroundPath.toStdString();
+      if ( QDir(processList[0].path).exists() ) {      
+        string path = (processList[0].path + QDir::separator()).toStdString();
+        string backgroundPath = processList[0].backgroundPath.toStdString();
         
         thread = new QThread;
         tracking = new Tracking(path, backgroundPath);
@@ -230,7 +230,7 @@ void Batch::startTracking() {
         connect(tracking, &Tracking::finished, tracking, &Tracking::deleteLater);
         connect(thread, &QThread::finished, thread, &QThread::deleteLater);
         
-        tracking->updatingParameters(processList.at(0).trackingParameters);
+        tracking->updatingParameters(processList[0].trackingParameters);
         thread->start();
     }
     else {
@@ -276,7 +276,7 @@ void Batch::loadSettings() {
 
     for(auto a: keyList) {
       QStringList parameterDescription = parameterList.value(a).split('|');
-      QString valueDescription = QString( settingsFile->value(a).toString()+ "|" + parameterDescription.at(1)); 
+      QString valueDescription = QString( settingsFile->value(a).toString()+ "|" + parameterDescription[1]); 
       parameterList.insert(a, valueDescription);
     }
 }
@@ -319,7 +319,7 @@ void Batch::loadParameterFile(QString path) {
     QStringList parameters;
     while (in.readLineInto(&line)) {
       parameters = line.split(" = ", QString::SkipEmptyParts);
-      parameterList.insert(parameters.at(0), parameters.at(1));
+      parameterList.insert(parameters[0], parameters[1]);
     }
   }
   parameterFile.close();

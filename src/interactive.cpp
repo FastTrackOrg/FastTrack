@@ -197,26 +197,26 @@ void Interactive::openFolder() {
         ui->startImage->setRange(0, framePath.size() - 1);
         ui->startImage->setValue(0);
 
-        Mat frame = imread(framePath.at(0), IMREAD_COLOR);
+        Mat frame = imread(framePath[0], IMREAD_COLOR);
         originalImageSize.setWidth(frame.cols);
         originalImageSize.setHeight(frame.rows);
         ui->x2->setMaximum(frame.cols);
         ui->y2->setMaximum(frame.rows);
 
-        ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Path", Qt::MatchExactly).at(0)), 1)->setText(dir);
-        ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Image number", Qt::MatchExactly).at(0)), 1)->setText(QString::number(framePath.size()));
-        ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Image width", Qt::MatchExactly).at(0)), 1)->setText(QString::number(frame.cols));
-        ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Image height", Qt::MatchExactly).at(0)), 1)->setText(QString::number(frame.rows));
+        ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Path", Qt::MatchExactly)[0]), 1)->setText(dir);
+        ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Image number", Qt::MatchExactly)[0]), 1)->setText(QString::number(framePath.size()));
+        ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Image width", Qt::MatchExactly)[0]), 1)->setText(QString::number(frame.cols));
+        ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Image height", Qt::MatchExactly)[0]), 1)->setText(QString::number(frame.rows));
 
         isBackground = false;
         reset();
         display(0);
       }
       catch(...){
-        ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Path", Qt::MatchExactly).at(0)), 1)->setText("");
-        ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Image number", Qt::MatchExactly).at(0)), 1)->setText("0");
-        ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Image width", Qt::MatchExactly).at(0)), 1)->setText("0");
-        ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Image height", Qt::MatchExactly).at(0)), 1)->setText("0");
+        ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Path", Qt::MatchExactly)[0]), 1)->setText("");
+        ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Image number", Qt::MatchExactly)[0]), 1)->setText("0");
+        ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Image width", Qt::MatchExactly)[0]), 1)->setText("0");
+        ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Image height", Qt::MatchExactly)[0]), 1)->setText("0");
         emit(message("No image found."));
       }
     }
@@ -231,7 +231,7 @@ void Interactive::display(int index) {
   if ( !framePath.empty() ) {
     
     UMat frame;
-    imread(framePath.at(index), IMREAD_GRAYSCALE).copyTo(frame);
+    imread(framePath[index], IMREAD_GRAYSCALE).copyTo(frame);
     vector<vector<Point>> displayContours;
     vector<vector<Point>> rejectedContours;
 
@@ -282,7 +282,7 @@ void Interactive::display(int index) {
 
         QMap<QString, double> coordinate = trackingData->getData(index, a);
         int id = a;
-        cv::ellipse(frame, Point( coordinate.value("xBody"), coordinate.value("yBody") ), Size( coordinate.value("bodyMajorAxisLength"), coordinate.value("bodyMinorAxisLength") ), 180 - (coordinate.value("tBody")*180)/M_PI, 0, 360,  Scalar(colorMap.at(id).x, colorMap.at(id).y, colorMap.at(id).z), scale, 8 );
+        cv::ellipse(frame, Point( coordinate.value("xBody"), coordinate.value("yBody") ), Size( coordinate.value("bodyMajorAxisLength"), coordinate.value("bodyMinorAxisLength") ), 180 - (coordinate.value("tBody")*180)/M_PI, 0, 360,  Scalar(colorMap[id].x, colorMap[id].y, colorMap[id].z), scale, 8 );
       }
     }
     if(roi.width != 0 || roi.height != 0 ) {
@@ -398,7 +398,7 @@ void Interactive::previewTracking() {
     connect(thread, &QThread::started, tracking, &Tracking::startProcess);
     connect(tracking, &Tracking::progress, ui->progressBar, &QProgressBar::setValue);
     connect(tracking, &Tracking::statistic, [this](int time) {
-      ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Analysis rate", Qt::MatchExactly).at(0)), 1)->setText(QString::number(double(ui->stopImage->value()*1000)/double(time)));
+      ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Analysis rate", Qt::MatchExactly)[0]), 1)->setText(QString::number(double(ui->stopImage->value()*1000)/double(time)));
     });
     connect(tracking, &Tracking::finished, thread, &QThread::quit);
     connect(tracking, &Tracking::finished, [this]() {
@@ -438,7 +438,7 @@ void Interactive::track() {
     connect(thread, &QThread::started, tracking, &Tracking::startProcess);
     connect(tracking, &Tracking::progress, ui->progressBar, &QProgressBar::setValue);
     connect(tracking, &Tracking::statistic, [this](int time) {
-      ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Analysis rate", Qt::MatchExactly).at(0)), 1)->setText(QString::number(double(framePath.size()*1000)/double(time)));
+      ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Analysis rate", Qt::MatchExactly)[0]), 1)->setText(QString::number(double(framePath.size()*1000)/double(time)));
     });
     connect(tracking, &Tracking::finished, thread, &QThread::quit);
     connect(tracking, &Tracking::finished, [this]() {
@@ -541,8 +541,8 @@ void Interactive::crop() {
   roi = Rect(xTop, yTop, width, height);
   cropedImageSize.setWidth(roi.width);
   cropedImageSize.setHeight(roi.height);
-  ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Image width", Qt::MatchExactly).at(0)), 1)->setText(QString::number(roi.width));
-  ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Image height", Qt::MatchExactly).at(0)), 1)->setText(QString::number(roi.height));
+  ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Image width", Qt::MatchExactly)[0]), 1)->setText(QString::number(roi.width));
+  ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Image height", Qt::MatchExactly)[0]), 1)->setText(QString::number(roi.height));
   display(ui->slider->value());
  }
  
@@ -558,8 +558,8 @@ void Interactive::reset() {
   ui->y1->setValue(0); 
   ui->x2->setValue(originalImageSize.width());
   ui->y2->setValue(originalImageSize.height()); 
-  ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Image width", Qt::MatchExactly).at(0)), 1)->setText(QString::number(originalImageSize.width()));
-  ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Image height", Qt::MatchExactly).at(0)), 1)->setText(QString::number(originalImageSize.height()));
+  ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Image width", Qt::MatchExactly)[0]), 1)->setText(QString::number(originalImageSize.width()));
+  ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Image height", Qt::MatchExactly)[0]), 1)->setText(QString::number(originalImageSize.height()));
   roi = Rect(0, 0, 0, 0);
   display(ui->slider->value());
  }
@@ -598,7 +598,7 @@ void Interactive::benchmark() {
         QStringList parameters;
         while (in.readLineInto(&line)) {
           parameters = line.split(" = ", QString::SkipEmptyParts);
-          params.insert(parameters.at(0), parameters.at(1));
+          params.insert(parameters[0], parameters[1]);
         }
       }
       parameterFile.close();

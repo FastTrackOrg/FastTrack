@@ -177,7 +177,7 @@ bool Tracking::objectDirection(const UMat &image, Point center, vector<double> &
     vector<double> distribution; //tmp
     double ccMax = *max_element(projection.begin(), projection.end()) / 100;
     for (size_t it = 0; it < projection.size(); ++it){
-      int cc = projection.at(it);
+      int cc = projection[it];
       for (int jt = 0; jt < cc/ccMax; ++jt){
         distribution.push_back((double)(it+1));
       }
@@ -188,15 +188,15 @@ bool Tracking::objectDirection(const UMat &image, Point center, vector<double> &
     double sd = 0 , skew = 0;
 
     for(size_t it = 0; it < distribution.size(); ++it){
-      sd += pow(distribution.at(it) - mean, 2);
-      skew += pow(distribution.at(it) - mean, 3);
+      sd += pow(distribution[it] - mean, 2);
+      skew += pow(distribution[it] - mean, 3);
     }
 
     sd = pow(sd/((double)distribution.size()-1), 0.5);
     skew *= (1/(((double)distribution.size() - 1)*pow(sd, 3)));
 
     if(skew > 0){
-			information.at(2) = modul(information.at(2) - M_PI);
+			information[2] = modul(information[2] - M_PI);
       return true;
 		}
     return false;
@@ -335,6 +335,15 @@ vector<vector<Point3d>> Tracking::objectPosition(const UMat &frame, int minSize,
 
 	findContours(frame, contours, RETR_EXTERNAL, CHAIN_APPROX_NONE);
 
+  size_t reserve = contours.size();
+  positionHead.reserve(reserve);
+  positionTail.reserve(reserve);
+  positionFull.reserve(reserve);
+  ellipseHead.reserve(reserve);
+  ellipseTail.reserve(reserve);
+  ellipseBody.reserve(reserve);
+  globalParam.reserve(reserve);
+
 	for (size_t i = 0; i < contours.size(); i++){
 			
       double a = contourArea(contours[i]);
@@ -353,14 +362,14 @@ vector<vector<Point3d>> Tracking::objectPosition(const UMat &frame, int minSize,
 						parameter = objectInformation(RoiFull);
             
             // Checks if the direction is defined. In the case of a perfect circle the direction can be computed and arbitrary set to 0
-            if (parameter.at(2) != parameter.at(2)) {
-              parameter.at(2) = 0; 
+            if (parameter[2] != parameter[2]) {
+              parameter[2] = 0; 
             }
 
             // Rotates the image without cropping to have the object orientation as the x axis
             Point2f center = Point2f(0.5*RoiFull.cols, 0.5*RoiFull.rows);
-            rotMatrix = getRotationMatrix2D(center, -(parameter.at(2)*180)/M_PI, 1);
-            bbox = RotatedRect(center, RoiFull.size(), -(parameter.at(2)*180)/M_PI).boundingRect();
+            rotMatrix = getRotationMatrix2D(center, -(parameter[2]*180)/M_PI, 1);
+            bbox = RotatedRect(center, RoiFull.size(), -(parameter[2]*180)/M_PI).boundingRect();
             rotMatrix.at<double>(0,2) += bbox.width*0.5 - center.x;
             rotMatrix.at<double>(1,2) += bbox.height*0.5 - center.y;
             warpAffine(RoiFull, rotate, rotMatrix, bbox.size());
@@ -368,7 +377,7 @@ vector<vector<Point3d>> Tracking::objectPosition(const UMat &frame, int minSize,
 
            // Computes the coordinate of the center of mass of the object in the rotated
            // image frame of reference.
-            p = (Mat_<double>(3,1) << parameter.at(0), parameter.at(1), 1);
+            p = (Mat_<double>(3,1) << parameter[0], parameter[1], 1);
             pp = rotMatrix * p;
 
 					
@@ -403,20 +412,20 @@ vector<vector<Point3d>> Tracking::objectPosition(const UMat &frame, int minSize,
 
             // Gets all the parameters in the frame of reference of RoiFull image.
 						invertAffineTransform(rotMatrix, rotMatrix);
-						p = (Mat_<double>(3,1) << parameterHead.at(0) + roiHead.tl().x,parameterHead.at(1) + roiHead.tl().y, 1);
+						p = (Mat_<double>(3,1) << parameterHead[0] + roiHead.tl().x,parameterHead[1] + roiHead.tl().y, 1);
 						pp = rotMatrix * p;
 
 						double xHead = pp.at<double>(0,0) + roiFull.tl().x;
 						double yHead = pp.at<double>(1,0) + roiFull.tl().y;
-						double angleHead = parameterHead.at(2) - M_PI*(parameterHead.at(2) > M_PI);
-						angleHead = modul(angleHead + parameter.at(2) + M_PI*(abs(angleHead) > 0.5*M_PI)); // Computes the direction
+						double angleHead = parameterHead[2] - M_PI*(parameterHead[2] > M_PI);
+						angleHead = modul(angleHead + parameter[2] + M_PI*(abs(angleHead) > 0.5*M_PI)); // Computes the direction
 
-						p = (Mat_<double>(3,1) << parameterTail.at(0) + roiTail.tl().x, parameterTail.at(1) + roiTail.tl().y, 1);
+						p = (Mat_<double>(3,1) << parameterTail[0] + roiTail.tl().x, parameterTail[1] + roiTail.tl().y, 1);
 						pp = rotMatrix * p;
 						double xTail = pp.at<double>(0,0) + roiFull.tl().x;
 						double yTail = pp.at<double>(1,0) + roiFull.tl().y;
-						double angleTail = parameterTail.at(2) - M_PI*(parameterTail.at(2) > M_PI);
-						angleTail = modul(angleTail + parameter.at(2) + M_PI*(abs(angleTail) > 0.5*M_PI)); // Computes the direction
+						double angleTail = parameterTail[2] - M_PI*(parameterTail[2] > M_PI);
+						angleTail = modul(angleTail + parameter[2] + M_PI*(abs(angleTail) > 0.5*M_PI)); // Computes the direction
 
 						// Computes the curvature of the object
 						double curv = 1./1e-16;
@@ -428,10 +437,10 @@ vector<vector<Point3d>> Tracking::objectPosition(const UMat &frame, int minSize,
 
 						positionHead.push_back(Point3d(xHead + m_ROI.tl().x, yHead + m_ROI.tl().y, angleHead));
 						positionTail.push_back(Point3d(xTail + m_ROI.tl().x, yTail + m_ROI.tl().y, angleTail));
-						positionFull.push_back(Point3d(parameter.at(0) + roiFull.tl().x + m_ROI.tl().x, parameter.at(1) + roiFull.tl().y + m_ROI.tl().y, parameter.at(2)));
-            ellipseHead.push_back(Point3d(parameterHead.at(3), parameterHead.at(4), pow( 1 - (parameterHead.at(4)*parameterHead.at(4)) / (parameterHead.at(3)*parameterHead.at(3)), 0.5) ));
-            ellipseTail.push_back(Point3d(parameterTail.at(3), parameterTail.at(4), pow( 1 - (parameterTail.at(4)*parameterTail.at(4)) / (parameterTail.at(3)*parameterTail.at(3)), 0.5) ));
-            ellipseBody.push_back(Point3d(parameter.at(3), parameter.at(4), pow( 1 - (parameter.at(4)*parameter.at(4)) / (parameter.at(3)*parameter.at(3)), 0.5) ));
+						positionFull.push_back(Point3d(parameter[0] + roiFull.tl().x + m_ROI.tl().x, parameter[1] + roiFull.tl().y + m_ROI.tl().y, parameter[2]));
+            ellipseHead.push_back(Point3d(parameterHead[3], parameterHead[4], pow( 1 - (parameterHead[4]*parameterHead[4]) / (parameterHead[3]*parameterHead[3]), 0.5) ));
+            ellipseTail.push_back(Point3d(parameterTail[3], parameterTail[4], pow( 1 - (parameterTail[4]*parameterTail[4]) / (parameterTail[3]*parameterTail[3]), 0.5) ));
+            ellipseBody.push_back(Point3d(parameter[3], parameter[4], pow( 1 - (parameter[4]*parameter[4]) / (parameter[3]*parameter[3]), 0.5) ));
 
 						globalParam.push_back( Point3d( curv, a, arcLength(contours[i], true) ) );
 						}
@@ -476,9 +485,9 @@ vector<int> Tracking::costFunc(const vector<Point3d> &prevPos, const vector<Poin
 
     for(int i = 0; i < n; ++i){
       
-      Point3d prevCoord = prevPos.at(i);
+      Point3d prevCoord = prevPos[i];
       for(int j = 0; j < m; ++j){
-        Point3d coord = pos.at(j);
+        Point3d coord = pos[j];
         double d = pow(pow(prevCoord.x - coord.x, 2) + pow(prevCoord.y - coord.y, 2), 0.5);
         if(d < LO){
           c = WEIGHT*(d/LENGTH) + (1 - WEIGHT)*abs(angleDifference(prevCoord.z, coord.z)/ANGLE); //cost function
@@ -543,8 +552,8 @@ vector<Point3d> Tracking::reassignment(const vector<Point3d> &past, const vector
   
   // Reassignes matched object
   for(unsigned int i = 0; i < past.size(); i++){
-    if(assignment.at(i) != -1){
-      tmp.at(i) = input.at(assignment.at(i));
+    if(assignment[i] != -1){
+      tmp[i] = input[assignment[i]];
     }
   }
   
@@ -559,7 +568,7 @@ vector<Point3d> Tracking::reassignment(const vector<Point3d> &past, const vector
       }
     }
     if (!stat) {
-      tmp.push_back(input.at(j));
+      tmp.push_back(input[j]);
     }
   }
 
@@ -584,7 +593,7 @@ void Tracking::cleaning(const vector<int> &occluded, vector<int> &lostCounter, v
   
   // Increment the lost counter
   for (auto &a: occluded) {
-    counter.at(a) = lostCounter.at(a) + 1 ;
+    counter[a] = lostCounter[a] + 1 ;
   }
 
   // Cleans the data beginning at the start of the vector to keep index in place in the vectors
@@ -593,7 +602,7 @@ void Tracking::cleaning(const vector<int> &occluded, vector<int> &lostCounter, v
       counter.erase(counter.begin() + i - 1);
       id.erase(id.begin() + i - 1);
       for (size_t j = 0; j < input.size(); j++) {
-        input.at(j).erase(input.at(j).begin() + i - 1);
+        input[j].erase(input[j].begin() + i - 1);
       }
     }
   }
@@ -614,8 +623,8 @@ vector<Point3d> Tracking::prevision(vector<Point3d> past, vector<Point3d> presen
 
 	double l = 0;
 	for(unsigned int i = 0; i < past.size(); i++){
-		if(past.at(i) != present.at(i)){
-			l = pow(pow(past.at(i).x - present.at(i).x, 2) + pow(past.at(i).y - present.at(i).y, 2), 0.5);
+		if(past[i] != present[i]){
+			l = pow(pow(past[i].x - present[i].x, 2) + pow(past[i].y - present[i].y, 2), 0.5);
 			break;
 		}
 	}
@@ -623,9 +632,9 @@ vector<Point3d> Tracking::prevision(vector<Point3d> past, vector<Point3d> presen
 
 
 	for(unsigned int i = 0; i < past.size(); i++){
-		if(past.at(i) == present.at(i)){
-			present.at(i).x += l*cos(present.at(i).z);
-			present.at(i).y -= l*sin(present.at(i).z);
+		if(past[i] == present[i]){
+			present[i].x += l*cos(present[i].z);
+			present[i].y -= l*sin(present[i].z);
 		}
 	}
 	return present;
@@ -665,7 +674,7 @@ vector<Point3d> Tracking::color(int number){
 */
 void Tracking::imageProcessing(){
     // Reads the next image in the image sequence and applies the image processing workflow
-    imread(m_files.at(m_im), IMREAD_GRAYSCALE).copyTo(m_visuFrame);
+    imread(m_files[m_im], IMREAD_GRAYSCALE).copyTo(m_visuFrame);
     if(statusRegistration){
       registration(m_background, m_visuFrame);
     }
@@ -693,16 +702,16 @@ void Tracking::imageProcessing(){
     m_out = objectPosition(m_binaryFrame, param_minArea, param_maxArea);
     
     // Associates the objets with the previous image
-    vector<int> identity = costFunc(m_outPrev.at(param_spot), m_out.at(param_spot), param_len, param_angle, param_weight, param_lo);
+    vector<int> identity = costFunc(m_outPrev[param_spot], m_out[param_spot], param_len, param_angle, param_weight, param_lo);
     vector<int> occluded = findOcclusion(identity);
 
     // Reassignes the m_out vector regarding the identities of the objects
     for (size_t i = 0; i < m_out.size(); i++) {
-      m_out.at(i) = reassignment(m_outPrev.at(i), m_out.at(i), identity);
+      m_out[i] = reassignment(m_outPrev[i], m_out[i], identity);
     }
 
     // Updates id and lost counter
-    while ( m_out.at(0).size() - m_id.size() != 0 ) {
+    while ( m_out[0].size() - m_id.size() != 0 ) {
       m_idMax++;
       m_id.push_back(m_idMax);
       m_lost.push_back(0);
@@ -710,20 +719,20 @@ void Tracking::imageProcessing(){
     
 
     // Draws lines and arrows on the image in the display panel
-    for(size_t l = 0; l < m_out.at(0).size(); l++){
+    for(size_t l = 0; l < m_out[0].size(); l++){
 
         // Tracking data are available
         if ( find(occluded.begin(), occluded.end(), int(l)) == occluded.end() ) {
           for (auto const &a: m_out) {
-            m_savefile << a.at(l).x; 
+            m_savefile << a[l].x; 
             m_savefile << '\t';
-            m_savefile << a.at(l).y; 
+            m_savefile << a[l].y; 
             m_savefile << '\t';
-            m_savefile << a.at(l).z; 
+            m_savefile << a[l].z; 
             m_savefile << '\t';
           }
           m_savefile << m_im << '\t';
-          m_savefile << m_id.at(l) << '\n';
+          m_savefile << m_id[l] << '\n';
         }
     }
   
@@ -773,8 +782,8 @@ Tracking::Tracking(vector<String> imagePath, UMat background, int startImage, in
   m_startImage = startImage;
   m_stopImage = stopImage;
 
-  size_t separator = m_files.at(0).find_last_of("/\\");
-  m_path = m_files.at(0).substr(0, separator + 1);
+  size_t separator = m_files[0].find_last_of("/\\");
+  m_path = m_files[0].substr(0, separator + 1);
 }
 
 
@@ -815,7 +824,7 @@ void Tracking::startProcess() {
     try{
       imread(m_backgroundPath, IMREAD_GRAYSCALE).copyTo(m_background);
       UMat test;
-      imread(m_files.at(0), IMREAD_GRAYSCALE).copyTo(test);
+      imread(m_files[0], IMREAD_GRAYSCALE).copyTo(test);
       subtract(test, m_background, test);
     }
     catch(...){
@@ -827,7 +836,7 @@ void Tracking::startProcess() {
   m_colorMap = color(9000);
   m_memory = vector<vector<Point>>(9000, vector<Point>());
   // First frame
-  imread(m_files.at(m_im), IMREAD_GRAYSCALE).copyTo(m_visuFrame);
+  imread(m_files[m_im], IMREAD_GRAYSCALE).copyTo(m_visuFrame);
   
   (statusBinarisation) ? (subtract(m_background, m_visuFrame, m_binaryFrame)) : (subtract(m_visuFrame, m_background, m_binaryFrame));
 
@@ -849,7 +858,7 @@ void Tracking::startProcess() {
 
   m_out = objectPosition(m_binaryFrame, param_minArea, param_maxArea);
   
-  for (size_t i = 0; i < m_out.at(0).size(); i++) {
+  for (size_t i = 0; i < m_out[0].size(); i++) {
     m_id.push_back(i);
     m_lost.push_back(0);
   }
@@ -891,19 +900,19 @@ void Tracking::startProcess() {
   m_savefile << "xHead" << '\t' << "yHead" << '\t' << "tHead" << '\t'  << "xTail" << '\t' << "yTail" << '\t' << "tTail"   << '\t'  << "xBody" << '\t' << "yBody" << '\t' << "tBody"   << '\t'  << "curvature"  << '\t' << "areaBody" << '\t' << "perimeterBody" << '\t' << "headMajorAxisLength" << '\t' << "headMinorAxisLength" << '\t' << "headExcentricity" << '\t' << "tailMajorAxisLength" << '\t' << "tailMinorAxisLength" << '\t' << "tailExcentricity" << '\t'<< "bodyMajorAxisLength" << '\t' << "bodyMinorAxisLength" << '\t' << "bodyExcentricity" << '\t' << "imageNumber" << '\t' << "id" << endl;
   
   // Draws lines and arrows on the image in the display panel
-  for(size_t l = 0; l < m_out.at(0).size(); l++){
+  for(size_t l = 0; l < m_out[0].size(); l++){
 
   // Draws lines and arrows on the image in the display panel
     for (auto const &a: m_out) {
-      m_savefile << a.at(l).x; 
+      m_savefile << a[l].x; 
       m_savefile << '\t';
-      m_savefile << a.at(l).y; 
+      m_savefile << a[l].y; 
       m_savefile << '\t';
-      m_savefile << a.at(l).z; 
+      m_savefile << a[l].z; 
       m_savefile << '\t';
     }
     m_savefile << m_im << '\t';
-    m_savefile << m_id.at(l) << '\n';
+    m_savefile << m_id[l] << '\n';
 
   }
   m_outPrev = m_out;
