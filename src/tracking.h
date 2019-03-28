@@ -71,6 +71,7 @@ class Tracking : public QObject {
   vector<vector<Point>> m_memory;   /*!< Vector containing the last 50 tracking data. */
   vector<int> m_id;   /*!< Vector containing the objets Id. */
   vector<int> m_lost;   /*!< Vector containing the lost objects. */
+  int m_idMax;
 
   string m_path;   /*!< Path to an image sequence. */
   string m_backgroundPath;   /*!< Path to an image background. */

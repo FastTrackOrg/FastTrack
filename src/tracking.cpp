@@ -495,6 +495,8 @@ vector<int> Tracking::costFunc(const vector<Point3d> &prevPos, const vector<Poin
     HungarianAlgorithm HungAlgo;
     HungAlgo.Solve(costMatrix, assignment);
 
+    // Finds object that are above the LO limit (+inf columns in the cost matrix
+    // Puts the assignment number at -1 to signal new objects
     auto iterator = find(sum.begin(), sum.end(), n);
     while (iterator != sum.end()) {
         replace(assignment.begin(), assignment.end(), int(distance(sum.begin(), iterator)), -1);
@@ -537,17 +539,17 @@ vector<int> Tracking::findOcclusion(vector<int> assignment) {
 vector<Point3d> Tracking::reassignment(const vector<Point3d> &past, const vector<Point3d> &input, const vector<int> &assignment){
 
 	vector<Point3d> tmp = past ;
-	unsigned int n = past.size();
-	unsigned int m = input.size();
-  for(unsigned int i = 0; i < n; i++){
+  
+  // Reassignes matched object
+  for(unsigned int i = 0; i < past.size(); i++){
     if(assignment.at(i) != -1){
       tmp.at(i) = input.at(assignment.at(i));
     }
   }
-  // Adds the surnumeral element to the tracked object
-  //TO DO: sortir de la boucle pour améliorer les performances.
+  
+  // Adds the new objects
   bool stat;
-  for (int j = 0; j < int(m); j++ ){
+  for (int j = 0; j < int(input.size()); j++ ){
     stat = false;
     for (auto &a: assignment) {
       if (j == a) {
@@ -700,7 +702,8 @@ void Tracking::imageProcessing(){
 
     // Updates id and lost counter
     while ( m_out.at(0).size() - m_id.size() != 0 ) {
-      m_id.push_back(int(*max_element(m_id.begin(), m_id.end()) + 1));
+      m_idMax++;
+      m_id.push_back(m_idMax);
       m_lost.push_back(0);
     }
     
@@ -850,6 +853,7 @@ void Tracking::startProcess() {
     m_lost.push_back(0);
   }
       
+  m_idMax = int(*max_element(m_id.begin(), m_id.end()));
   
   //  Creates the folder to save result, parameter and background image
   QString savingPath = QString::fromStdString(m_path).section("*",0,0) + QDir::separator() + "Tracking_Result" + QDir::separator(); 
