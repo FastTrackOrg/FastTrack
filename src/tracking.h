@@ -22,6 +22,9 @@ This file is part of Fast Track.
 #include <opencv2/imgproc/imgproc.hpp>
 #include <iostream>
 #include <string>
+#include <algorithm>
+#include <utility>
+#include <tuple>
 #include <time.h>
 #include <fstream>
 #include <math.h>

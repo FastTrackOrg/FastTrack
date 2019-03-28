@@ -472,8 +472,7 @@ vector<int> Tracking::costFunc(const vector<Point3d> &prevPos, const vector<Poin
   else {
     double c = -1;
     vector<vector<double>> costMatrix(n, vector<double>(m));
-    vector<int> sumRow(n, 0);
-    vector<int> sumCol(m, 0);
+    vector<pair<int, int>> distances;
 
     for(int i = 0; i < n; ++i){
       
@@ -484,11 +483,10 @@ vector<int> Tracking::costFunc(const vector<Point3d> &prevPos, const vector<Poin
         if(d < LO){
           c = WEIGHT*(d/LENGTH) + (1 - WEIGHT)*abs(angleDifference(prevCoord.z, coord.z)/ANGLE); //cost function
           costMatrix[i][j] = c;
+          distances.push_back( {i, j} );
         }
         else {
           costMatrix[i][j] = 2e307;
-          sumRow[i] += 1;
-          sumCol[j] += 1;
         }
       }
     }
@@ -499,16 +497,11 @@ vector<int> Tracking::costFunc(const vector<Point3d> &prevPos, const vector<Poin
 
     // Finds object that are above the LO limit (+inf columns in the cost matrix
     // Puts the assignment number at -1 to signal new objects
-    auto iterator = find(sumRow.begin(), sumRow.end(), m);
-    while (iterator != sumRow.end()) {
-        //replace(assignment.begin(), assignment.end(), int(distance(sum.begin(), iterator)), -1);
-        assignment.at(int(distance(sumRow.begin(), iterator))) = -1; 
-        iterator = find(iterator + 1, sumRow.end(), m);
-    }
-    iterator = find(sumCol.begin(), sumCol.end(), n);
-    while (iterator != sumCol.end()) {
-        replace(assignment.begin(), assignment.end(), int(distance(sumCol.begin(), iterator)), -1);
-        iterator = find(iterator + 1, sumCol.end(), n);
+    for(size_t i = 0; i < assignment.size(); i++) {
+      pair<int, int> p = make_pair(i, assignment[i]);
+      if (find(distances.begin(), distances.end(), p ) == distances.end()) {
+        assignment[i] = -1;
+      }
     }
   }
 
