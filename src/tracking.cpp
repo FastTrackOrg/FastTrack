@@ -575,7 +575,7 @@ vector<Point3d> Tracking::reassignment(const vector<Point3d> &past, const vector
   * @param[in] param_maximalTime 
   * @return The sorted vector.
 */
-void Tracking::cleaning(const vector<int> &occluded, vector<int> &lostCounter, vector<int> &id, vector<vector<Point3d>> &input, double param_maximalTime) {
+void Tracking::cleaning(const vector<int> &occluded, vector<int> &lostCounter, vector<int> &id, vector<vector<Point3d>> &input, int param_maximalTime) {
 
   vector<int> counter(lostCounter.size(), 0);
   
@@ -704,7 +704,6 @@ void Tracking::imageProcessing(){
       m_lost.push_back(0);
     }
     
-    cleaning(occluded, m_lost, m_id, m_out, param_to);
 
     // Draws lines and arrows on the image in the display panel
     for(size_t l = 0; l < m_out.at(0).size(); l++){
@@ -724,8 +723,9 @@ void Tracking::imageProcessing(){
         }
     }
   
-      m_im ++;
+      cleaning(occluded, m_lost, m_id, m_out, param_to);
       m_outPrev = m_out;
+      m_im ++;
       if(m_im + 1 > m_stopImage){
         m_savefile.flush();
         m_outputFile.close();

@@ -117,7 +117,7 @@ class Tracking : public QObject {
   void binarisation(UMat& frame, char backgroundColor, int value);
   vector<vector<Point3d> > objectPosition(const UMat &frame, int minSize, int maxSize);
   vector<int> costFunc(const vector<Point3d> &prevPos, const vector<Point3d> &pos, double LENGHT, double ANGLE, double WEIGHT, double LO);
-  void cleaning(const vector<int> &occluded, vector<int> &lostCounter, vector<int> &id, vector<vector<Point3d>> &input, double param_maximalTime);
+  void cleaning(const vector<int> &occluded, vector<int> &lostCounter, vector<int> &id, vector<vector<Point3d>> &input, int param_maximalTime);
   vector<Point3d> prevision(vector<Point3d> past, vector<Point3d> present);
   vector<Point3d> color(int number);
   vector<int> findOcclusion(vector<int> assignment); 
