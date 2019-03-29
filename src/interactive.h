@@ -26,6 +26,8 @@ This file is part of Fast Track.
 #include <QMap>
 #include <QDir>
 #include <QUrl>
+#include <QFuture>
+#include <QtConcurrent/QtConcurrentRun>
 #include <QNetworkRequest>
 #include <QNetworkReply>
 #include <QNetworkAccessManager>

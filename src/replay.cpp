@@ -323,7 +323,7 @@ void Replay::toggleReplayPlay() {
 void Replay::mousePressEvent(QMouseEvent* event) {
 
     // Left click event
-    if (event->buttons() == Qt::LeftButton) {
+    if (event->buttons() == Qt::LeftButton && isReplayable) {
 
 
       // Finds user click coordinate
@@ -360,7 +360,7 @@ void Replay::mousePressEvent(QMouseEvent* event) {
   }
 
   // Right click event
-  else if (event->buttons() == Qt::RightButton) {
+  else if (event->buttons() == Qt::RightButton && isReplayable) {
     ui->swapReplay->animateClick();
     ui->object1Replay->setStyleSheet("QComboBox { background-color: white; }");
     ui->object2Replay->setStyleSheet("QComboBox { background-color: white; }");

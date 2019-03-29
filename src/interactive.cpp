@@ -128,7 +128,8 @@ Interactive::Interactive(QWidget *parent) :
     });
     connect(ui->cropButton, &QPushButton::clicked, this, &Interactive::crop); 
     connect(ui->resetButton, &QPushButton::clicked, this, &Interactive::reset); 
-    
+
+    ui->informationTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);    
     
     isBackground = false;
     tracking = new Tracking("", "");
@@ -322,14 +323,18 @@ void Interactive::display(UMat image) {
 */
 void Interactive::computeBackground() {
 
-  double nBack = double(ui->nBack->value());
-  int method = ui->back->currentIndex();
-  background = tracking->backgroundExtraction(framePath, nBack, method); 
-  display(background);
-  isBackground = true;
-  ui->isBin->setCheckable(true);
-  ui->isSub->setCheckable(true);
-
+  if(!framePath.empty()) {
+    double nBack = double(ui->nBack->value());
+    int method = ui->back->currentIndex();
+    // Computes the background without blocking the ui
+    QFuture<void> future = QtConcurrent::run([=]() {
+      background = tracking->backgroundExtraction(framePath, nBack, method);
+      display(background);
+      isBackground = true;
+      ui->isBin->setCheckable(true);
+      ui->isSub->setCheckable(true);
+    });
+  }
 }
 
 

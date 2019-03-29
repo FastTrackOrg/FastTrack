@@ -259,7 +259,7 @@
      </property>
      <property name="minimumSize">
       <size>
-       <width>79</width>
+       <width>0</width>
        <height>25</height>
       </size>
      </property>
@@ -463,18 +463,18 @@
     <widget class="QLabel" name="replayNumber">
      <property name="minimumSize">
       <size>
-       <width>35</width>
+       <width>45</width>
        <height>20</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
-       <width>35</width>
-       <height>21</height>
+       <width>45</width>
+       <height>16777215</height>
       </size>
      </property>
      <property name="text">
-      <string>00000</string>
+      <string>0000000</string>
      </property>
     </widget>
    </item>
