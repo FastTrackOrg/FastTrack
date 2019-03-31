@@ -329,10 +329,21 @@ void Interactive::computeBackground() {
     // Computes the background without blocking the ui
     QFuture<void> future = QtConcurrent::run([=]() {
       background = tracking->backgroundExtraction(framePath, nBack, method);
-      display(background);
       isBackground = true;
+      
       ui->isBin->setCheckable(true);
       ui->isSub->setCheckable(true);
+      
+      // Automatic background type selection based on image mean
+      int meanValue = int(mean(background)[0]);
+      if(meanValue >128) {
+        ui->backColor->setCurrentIndex(0);
+      }
+      else{
+        ui->backColor->setCurrentIndex(1);
+      }
+      
+      display(background);
     });
   }
 }
@@ -349,8 +360,19 @@ void Interactive::selectBackground() {
     backgroundPath = dir;
     imread(backgroundPath.toStdString(), IMREAD_GRAYSCALE).copyTo(background);
     isBackground = true;
+
     ui->isBin->setCheckable(true);
     ui->isSub->setCheckable(true);
+
+    // Automatic background type selection based on image mean
+    int meanValue = int(mean(background)[0]);
+    if(meanValue >  128) {
+      ui->backColor->setCurrentIndex(0);
+    }
+    else{
+      ui->backColor->setCurrentIndex(1);
+    }
+
     display(background);
   }
 }
