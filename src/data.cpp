@@ -112,6 +112,31 @@ void Data::swapData(int firstObject, int secondObject, int from) {
 }
 
 
+/**
+  * @brief In the tracking data, one object from a selected index to the end.
+  * @arg[in] objectId The object id.
+  * @arg[in] from Start index from which the data will be swapped.
+*/
+void Data::deleteData(int objectId, int from) {
+
+      QMapIterator<int, QVector<object> > i(data);
+      while (i.hasNext()) {
+        i.next();
+        if(i.key() >= from) { 
+          QVector<object> objects = i.value();
+           
+          for(int j = 0; j < objects.size(); j++) {
+        
+            if( objects[j].id == objectId) {
+              objects.remove(j);              
+            }
+          }
+          data.insert(i.key(), objects);
+        }
+      }
+}
+
+
 void Data::save() {
 
   QFile file(dir + QDir::separator() + "Tracking_Result" + QDir::separator() + "tracking.txt");

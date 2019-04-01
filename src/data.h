@@ -32,6 +32,7 @@ public:
   QMap<QString, double> getData(int imageIndex, int id);
   QList<int> getId(int imageIndex);
   void swapData(int firstObject, int secondObject, int from);
+  void deleteData(int objectId, int from);
   void save();
 };
 

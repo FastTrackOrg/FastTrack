@@ -107,6 +107,14 @@ Replay::Replay(QWidget *parent) :
 
         connect(ui->replayNext, &QPushButton::clicked, this, &Replay::nextOcclusionEvent);
         connect(ui->replayPrevious, &QPushButton::clicked, this, &Replay::previousOcclusionEvent);
+        connect(ui->deleteData, &QPushButton::clicked, [this]() {
+          if(isReplayable){
+             trackingData->deleteData(ui->object1Replay->currentText().toInt(), ui->replaySlider->value());
+            // Saves new tracking data
+            trackingData->save();
+            loadFrame(ui->replaySlider->value());
+          }
+        });
 
         connect(ui->replaySave, &QPushButton::clicked, this, &Replay::saveTrackedMovie);
 
@@ -372,16 +380,17 @@ void Replay::mousePressEvent(QMouseEvent* event) {
   * @brief Gets the index of the two selected objects, the start index, swaps the data from the start index to the end, and saves the new tracking data. Triggered when ui->swapButton is pressed or a right-click event is registered inside the replayDisplay.
 */
 void Replay::correctTracking() {
+    if(isReplayable){
+      // Swaps the data
+      int firstObject = ui->object1Replay->currentText().toInt();
+      int secondObject = ui->object2Replay->currentText().toInt();
+      int start = ui->replaySlider->value();
+      trackingData->swapData(firstObject, secondObject, start);
 
-    // Swaps the data
-    int firstObject = ui->object1Replay->currentText().toInt();
-    int secondObject = ui->object2Replay->currentText().toInt();
-    int start = ui->replaySlider->value();
-    trackingData->swapData(firstObject, secondObject, start);
-
-    // Saves new tracking data
-    trackingData->save();
-    loadFrame(ui->replaySlider->value());
+      // Saves new tracking data
+      trackingData->save();
+      loadFrame(ui->replaySlider->value());
+    }
 }
 
 

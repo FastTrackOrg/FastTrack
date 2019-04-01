@@ -19,6 +19,10 @@ This file is part of Fast Track.
 #include "interactive.h"
 #include "ui_interactive.h"
 
+#ifndef M_PI
+    #define M_PI 3.14159265358979323846
+#endif
+
 /**
  * @class Interactive
  *
