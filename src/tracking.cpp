@@ -863,7 +863,7 @@ void Tracking::startProcess() {
     m_lost.push_back(0);
   }
       
-  m_idMax = int(*max_element(m_id.begin(), m_id.end()));
+  if (!m_id.empty()) m_idMax = int(*max_element(m_id.begin(), m_id.end()));
   
   //  Creates the folder to save result, parameter and background image
   QString savingPath = QString::fromStdString(m_path).section("*",0,0) + QDir::separator() + "Tracking_Result" + QDir::separator(); 
