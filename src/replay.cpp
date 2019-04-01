@@ -27,34 +27,34 @@ Replay::Replay(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    QIcon img = QIcon(":/buttons/open.png");
+    QIcon img = QIcon(":/assets/buttons/open.png");
         ui->replayOpen->setIcon(img);
 
-        img = QIcon(":/buttons/play.png");
+        img = QIcon(":/assets/buttons/play.png");
         ui->playReplay->setIcon(img);
         ui->playReplay->setIconSize(QSize(ui->playReplay->width(), ui->playReplay->height()));
 
-        img = QIcon(":/buttons/open.png");
+        img = QIcon(":/assets/buttons/open.png");
         ui->replayOpen->setIcon(img);
         ui->replayOpen->setIconSize(QSize(ui->replayOpen->width(), ui->replayOpen->height()));
 
-        img = QIcon(":/buttons/next.png");
+        img = QIcon(":/assets/buttons/next.png");
         ui->replayNext->setIcon(img);
         ui->replayNext->setIconSize(QSize(ui->replayNext->width(), ui->replayNext->height()));
 
-        img = QIcon(":/buttons/previous.png");
+        img = QIcon(":/assets/buttons/previous.png");
         ui->replayPrevious->setIcon(img);
         ui->replayPrevious->setIconSize(QSize(ui->replayPrevious->width(), ui->replayPrevious->height()));
 
-        img = QIcon(":/buttons/help.png");
+        img = QIcon(":/assets/buttons/help.png");
         ui->replayHelp->setIcon(img);
         ui->replayHelp->setIconSize(QSize(ui->replayHelp->width(), ui->replayHelp->height()));
 
-        img = QIcon(":/buttons/save.png");
+        img = QIcon(":/assets/buttons/save.png");
         ui->replaySave->setIcon(img);
         ui->replaySave->setIconSize(QSize(ui->replaySave->width(), ui->replaySave->height()));
 
-        img = QIcon(":/buttons/refresh.png");
+        img = QIcon(":/assets/buttons/refresh.png");
         ui->replayRefresh->setIcon(img);
         ui->replayRefresh->setIconSize(QSize(ui->replayRefresh->width(), ui->replayRefresh->height()));
 
@@ -120,7 +120,7 @@ Replay::Replay(QWidget *parent) :
 
         connect(ui->replayHelp, &QPushButton::clicked, [this]() {
               QMessageBox helpBox(this);
-              helpBox.setIconPixmap(QPixmap(":/buttons/helpImg.png"));
+              helpBox.setIconPixmap(QPixmap(":/assets/buttons/helpImg.png"));
               helpBox.exec();
         });
 
@@ -309,14 +309,14 @@ void Replay::loadFrame(int frameIndex) {
 void Replay::toggleReplayPlay() {
 
     if (isReplayable && ui->playReplay->isChecked()) {
-      QIcon img(":/buttons/pause.png");
+      QIcon img(":/assets/buttons/pause.png");
       ui->playReplay->setIcon(img);
       ui->playReplay->setIconSize(QSize(ui->playReplay->width(), ui->playReplay->height()));
       framerate->start(1000/ui->replayFps->value());
       autoPlayerIndex = ui->replaySlider->value();
     }
     else if (isReplayable && !ui->playReplay->isChecked()) {
-      QIcon img(":/buttons/resume.png");
+      QIcon img(":/assets/buttons/resume.png");
       ui->playReplay->setIcon(img);
       ui->playReplay->setIconSize(QSize(ui->playReplay->width(), ui->playReplay->height()));
       framerate->stop();

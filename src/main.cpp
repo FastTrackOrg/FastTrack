@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
   a.setApplicationName("Fast Track");
   a.setOrganizationName("Benjamin Gallois");
   a.setOrganizationDomain("fasttrack.benjamin-gallois.fr");
-  w.setWindowIcon(QIcon(":/icon.png")); 
+  w.setWindowIcon(QIcon(":/assets/icon.png")); 
   w.show();
   a.exec();
 }

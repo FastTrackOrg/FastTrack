@@ -41,17 +41,17 @@ Batch::Batch(QWidget *parent) :
     ui->tablePath->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     
     
-    QIcon img = QIcon(":/buttons/open.png");
+    QIcon img = QIcon(":/assets/buttons/open.png");
     ui->openPath->setIcon(img);
     ui->openPath->setIconSize(QSize(ui->openPath->width(), ui->openPath->height()));
     
     
-    img = QIcon(":/buttons/openImage.png");
+    img = QIcon(":/assets/buttons/openImage.png");
     ui->openBackground->setIcon(img);
     ui->openBackground->setIconSize(QSize(ui->openBackground->width(), ui->openBackground->height()));
     
     
-    img = QIcon(":/buttons/openFile.png");
+    img = QIcon(":/assets/buttons/openFile.png");
     ui->loadSettings->setIcon(img);
     ui->loadSettings->setIconSize(QSize(ui->openBackground->width(), ui->openBackground->height()));
 

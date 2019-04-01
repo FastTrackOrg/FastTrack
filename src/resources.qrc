@@ -1,18 +1,18 @@
 <!DOCTYPE RCC><RCC version="1.0">
     <qresource prefix='/'>
         <file>theme.qss</file>
-        <file>icon.png</file>
-        <file>buttons/play.png</file>
-        <file>buttons/pause.png</file>
-        <file>buttons/resume.png</file>
-        <file>buttons/open.png</file>
-        <file>buttons/previous.png</file>
-        <file>buttons/next.png</file>
-        <file>buttons/help.png</file>
-        <file>buttons/save.png</file>
-        <file>buttons/helpImg.png</file>
-        <file>buttons/refresh.png</file>
-        <file>buttons/openImage.png</file>
-        <file>buttons/openFile.png</file>
+        <file>assets/icon.png</file>
+        <file>assets/buttons/play.png</file>
+        <file>assets/buttons/pause.png</file>
+        <file>assets/buttons/resume.png</file>
+        <file>assets/buttons/open.png</file>
+        <file>assets/buttons/previous.png</file>
+        <file>assets/buttons/next.png</file>
+        <file>assets/buttons/help.png</file>
+        <file>assets/buttons/save.png</file>
+        <file>assets/buttons/helpImg.png</file>
+        <file>assets/buttons/refresh.png</file>
+        <file>assets/buttons/openImage.png</file>
+        <file>assets/buttons/openFile.png</file>
     </qresource>
 </RCC>
