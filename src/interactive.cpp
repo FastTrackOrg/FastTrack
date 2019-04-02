@@ -156,7 +156,7 @@ void Interactive::openFolder() {
     
     // Reset the class members
     backgroundPath.clear();
-    reset();
+    isBackground = false;
     trackingData = new Data("");
     background.release();
     memoryDir.clear();
@@ -363,7 +363,8 @@ void Interactive::selectBackground() {
   if (dir.length()) {
     backgroundPath = dir;
     imread(backgroundPath.toStdString(), IMREAD_GRAYSCALE).copyTo(background);
-    isBackground = true;
+    if(background.cols == originalImageSize.width() && background.rows == originalImageSize.height()) {  
+      isBackground = true;
 
     ui->isBin->setCheckable(true);
     ui->isSub->setCheckable(true);
@@ -378,6 +379,11 @@ void Interactive::selectBackground() {
     }
 
     display(background);
+    }
+    else {
+      isBackground = false;
+      emit(message("No image found."));
+    }
   }
 }
 
@@ -546,16 +552,6 @@ void Interactive::crop() {
   int xBottom = int(double(clicks.second.x())*double(cropedImageSize.height()) / double(resizedFrame.height()) + roi.tl().x);
   int yBottom = int(double(clicks.second.y())*double(cropedImageSize.height()) / double(resizedFrame.height()) + roi.tl().y);
  
-  //Checks for wrong values
-  if( xTop < 0 ) xTop = 0;
-  if( xBottom < 0 ) xBottom = 0;
-  if( yTop < 0 ) yTop = 0;
-  if( yBottom < 0 ) yBottom = 0;
-  if( xTop > cropedImageSize.width() ) xTop = cropedImageSize.width();
-  if( xBottom > cropedImageSize.width()) xBottom = cropedImageSize.width();
-  if( yTop > cropedImageSize.height()) yTop = cropedImageSize.height();
-  if( yBottom > cropedImageSize.height()) yBottom = cropedImageSize.height();
-  
   // Find the true left corner of the rectangle  
   int width = xBottom - xTop;
   int height = yBottom - yTop;
@@ -567,6 +563,12 @@ void Interactive::crop() {
     yTop += height;
     height = - height;
   }
+
+  //Checks for wrong values
+  if( xTop < 0 ) xTop = roi.tl().x;
+  if( yTop < 0 ) yTop = roi.tl().y;
+  if(width > cropedImageSize.width()) width = cropedImageSize.width();
+  if(height > cropedImageSize.height()) height = cropedImageSize.height();
 
    
   roi = Rect(xTop, yTop, width, height);
