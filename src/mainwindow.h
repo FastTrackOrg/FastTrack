@@ -44,7 +44,7 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
-      QByteArray version = "4.4.1";
+      QByteArray version = "4.5.0";
 
 private:
     Ui::MainWindow *ui;    /*!< ui file from Qt designer. */

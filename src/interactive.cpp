@@ -50,6 +50,9 @@ Interactive::Interactive(QWidget *parent) :
     // Menu bar
     connect(ui->actionOpen, &QAction::triggered, this, &Interactive::openFolder);
     connect(ui->slider, &QSlider::valueChanged, this, static_cast<void (Interactive::*)(int)>(&Interactive::display));
+    connect(ui->slider, &QSlider::valueChanged, [this](const int &newValue) {
+      ui->replayNumber->setText(QString::number(newValue));
+    });
     connect(ui->actionbenchmark, &QAction::triggered, this, &Interactive::benchmark);
     connect(this, &Interactive::message, this, [this](QString msg) {
       QMessageBox msgBox;

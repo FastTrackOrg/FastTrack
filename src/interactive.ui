@@ -852,6 +852,26 @@ corner</string>
    </attribute>
    <widget class="QWidget" name="dockWidgetContents_2">
     <layout class="QGridLayout" name="gridLayout_14">
+     <item row="0" column="0">
+      <widget class="QSlider" name="slider">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QLabel" name="replayNumber">
+       <property name="text">
+        <string>000000</string>
+       </property>
+       <property name="scaledContents">
+        <bool>false</bool>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+     </item>
      <item row="2" column="0" rowspan="2">
       <widget class="QSplitter" name="splitter">
        <property name="sizePolicy">
@@ -1240,13 +1260,6 @@ corner</string>
       <widget class="QProgressBar" name="progressBar">
        <property name="value">
         <number>0</number>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="0" colspan="2">
-      <widget class="QSlider" name="slider">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
        </property>
       </widget>
      </item>
