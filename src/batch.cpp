@@ -89,7 +89,6 @@ Batch::Batch(QWidget *parent) :
     parameterList.insert("Binary threshold", "70|The threshold value (0 to 255) to separate objects from the background.");
     parameterList.insert("Minimal size", "50|The minimal size of an object in pixels.");
     parameterList.insert("Maximal size", "5000|The maximal size of an object to in pixels.");
-    parameterList.insert("Object number", "1|The number of objects to track.");
 
     loadSettings();
 
@@ -143,9 +142,25 @@ Batch::Batch(QWidget *parent) :
 */
 void Batch::openPathFolder() {
     ui->textBackgroundAdd->clear();
+    ui->textPathAdd->clear();
+    ui->textLoadSettings->clear();
     QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"), memoryDir, QFileDialog::ShowDirsOnly);
+
+    // If Tracking_Result folder selectionned, get the path to the top directory
+    if(dir.right(15) == "Tracking_Result") {
+      dir.truncate(dir.size() - 15);
+    }
+
     if (dir.length()) {
-        ui->textPathAdd->setText(dir);
+      ui->textPathAdd->setText(dir);
+      // Autoloads  background and tracking if auto is checked
+      if (ui->isAuto->isChecked()) {
+        ui->textBackgroundAdd->setText(dir + "Tracking_Result/background.pgm");
+        if (loadParameterFile(dir + "Tracking_Result/parameter.param")) {
+          ui->textLoadSettings->setText(dir + "Tracking_Result/parameter.param");
+          updateParameterTable();
+        }
+      }
     }
 }
 
@@ -179,6 +194,7 @@ void Batch::addPath() {
 
     ui->textPathAdd->clear();
     ui->textBackgroundAdd->clear();
+    ui->textLoadSettings->clear();
 }
 
 
@@ -310,7 +326,7 @@ void Batch::openParameterFile(){
 /**
   * @brief Reads a parameter file, updates parameters.
 */
-void Batch::loadParameterFile(QString path) {
+bool Batch::loadParameterFile(QString path) {
   
   QFile parameterFile(path);
   if (parameterFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -322,7 +338,9 @@ void Batch::loadParameterFile(QString path) {
       parameterList.insert(parameters[0], parameters[1]);
     }
   }
+  else return false;
   parameterFile.close();
+  return true;
 }
 
 
@@ -333,7 +351,6 @@ void Batch::updateParameterTable() {
     for (int i = 0; i < ui->tableParameters->rowCount(); i++) {
       QString label = ui->tableParameters->item(i, 0)->text();
       ui->tableParameters->item(i, 1)->setText(parameterList.value(label));
-      qInfo()<<ui->tableParameters->item(i, 0)->text();
     }
 }
 

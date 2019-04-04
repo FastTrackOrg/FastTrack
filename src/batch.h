@@ -95,7 +95,7 @@ public slots:
     void addPath();
     void removePath();
     void updateParameterTable();
-    void loadParameterFile(QString path);
+    bool loadParameterFile(QString path);
     void openParameterFile();
 
     void errors(int code);
