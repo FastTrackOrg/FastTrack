@@ -73,6 +73,16 @@ Replay::Replay(QWidget *parent) :
         connect(dShortcut, &QShortcut::activated, [this](){ ui->replaySlider->setValue(ui->replaySlider->value() + 1); });
 
 
+        // Zoom
+        currentZoom = 1;
+        connect(ui->zoomIn, &QPushButton::clicked, [this](){
+          currentZoom ++;
+          zoom(currentZoom);
+        });
+        connect(ui->zoomOut, &QPushButton::clicked, [this](){
+          zoom(1./double(currentZoom));
+          currentZoom > 1 ? currentZoom -- : currentZoom = 1;
+        });
 
         isReplayable = false;
         framerate = new QTimer();
@@ -136,10 +146,24 @@ Replay::~Replay()
   * @brief Opens a dialogue to select a folder.
 */
 void Replay::openReplayFolder() {
+
+    // Delete existing data
+    replayFrames.clear();
+    occlusionEvents.clear();
+    ui->object1Replay->clear();
+    ui->object2Replay->clear();
+    ui->replayDisplay->clear();
+    ui->replayPath->clear();
+    framerate->stop();
+    object = true;
+    currentZoom = 1;
+    ui->replayDisplay->setFixedSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
+    memoryDir.clear();
+
     QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"), memoryDir, QFileDialog::ShowDirsOnly);
 
     if(dir.right(15) == "Tracking_Result") {
-      dir.truncate(dir.size() - 15);
+      dir.truncate(dir.size() - 16);
     }
 
     memoryDir = dir;
@@ -152,14 +176,7 @@ void Replay::openReplayFolder() {
   * @arg[in] dir Path to the folder where the image sequence is stored.
 */
 void Replay::loadReplayFolder(QString dir) {
-
-    // Delete existing data
-    replayFrames.clear();
-    occlusionEvents.clear();
-    ui->object1Replay->clear();
-    ui->object2Replay->clear();
-    framerate->stop();
-    object = true;
+    
     if (dir.length()) {
 
         // Finds image format
@@ -301,6 +318,17 @@ void Replay::loadFrame(int frameIndex) {
       resizedFrame.setWidth(resizedPix.width());
       resizedFrame.setHeight(resizedPix.height());
     }
+}
+
+
+/**
+  * @brief Zoom the display from a scale factor.
+  * @param[in] scale Scale factor.
+*/
+void Replay::zoom(double scale) {
+    QSize currentSize = ui->replayDisplay->size();
+    ui->replayDisplay->setFixedSize(currentSize*scale);
+    loadFrame(ui->replaySlider->value());
 }
 
 /**
@@ -497,7 +525,7 @@ void Replay::saveTrackedMovie() {
 
         if (ui->replayTrace->isChecked()) {
           vector<Point> memory;
-          for (int j = frameIndex - 50; j < frameIndex; j++) {
+          for (unsigned int j = frameIndex - 50; j < frameIndex; j++) {
             if (j > 0) {
                 QMap<QString, double> coordinate = trackingData->getData(j, a);
                 if (coordinate.contains("xBody")) {
