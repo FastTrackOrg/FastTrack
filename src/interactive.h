@@ -67,6 +67,8 @@ private slots:
     void display(int index);
     void display(UMat image);
 
+    void zoom(double scale);
+
     void getParameters();
 
     void previewTracking();
@@ -105,6 +107,7 @@ private:
     vector<Point3f> colorMap;
     QVector<int> benchmarkTime;
     int benchmarkCount;
+    int currentZoom;
 
 signals:
     void message(QString message);

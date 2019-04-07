@@ -14,21 +14,57 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QGridLayout" name="gridLayout_2">
+   <layout class="QGridLayout" name="gridLayout_15">
     <item row="0" column="0">
-     <widget class="QLabel" name="display">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
+     <widget class="QSplitter" name="splitter_2">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
       </property>
-      <property name="text">
-       <string/>
+      <widget class="QPushButton" name="zoomOut">
+       <property name="text">
+        <string>Zoom Out</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="zoomIn">
+       <property name="text">
+        <string>Zoom In</string>
+       </property>
+      </widget>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QScrollArea" name="scrollArea">
+      <property name="widgetResizable">
+       <bool>true</bool>
       </property>
-      <property name="alignment">
-       <set>Qt::AlignCenter</set>
-      </property>
+      <widget class="QWidget" name="scrollAreaWidgetContents">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>565</width>
+         <height>596</height>
+        </rect>
+       </property>
+       <layout class="QGridLayout" name="gridLayout_2">
+        <item row="1" column="0">
+         <widget class="QLabel" name="display">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
      </widget>
     </item>
    </layout>
@@ -63,7 +99,7 @@
           <x>0</x>
           <y>0</y>
           <width>261</width>
-          <height>551</height>
+          <height>546</height>
          </rect>
         </property>
         <attribute name="label">
@@ -255,7 +291,7 @@
           <x>0</x>
           <y>0</y>
           <width>261</width>
-          <height>551</height>
+          <height>546</height>
          </rect>
         </property>
         <attribute name="label">
@@ -378,7 +414,7 @@
           <x>0</x>
           <y>0</y>
           <width>190</width>
-          <height>455</height>
+          <height>450</height>
          </rect>
         </property>
         <attribute name="label">
@@ -485,7 +521,7 @@
           <x>0</x>
           <y>0</y>
           <width>190</width>
-          <height>455</height>
+          <height>450</height>
          </rect>
         </property>
         <attribute name="label">
@@ -582,7 +618,7 @@ corner</string>
           <x>0</x>
           <y>0</y>
           <width>211</width>
-          <height>455</height>
+          <height>450</height>
          </rect>
         </property>
         <attribute name="label">
@@ -672,7 +708,7 @@ corner</string>
           <x>0</x>
           <y>0</y>
           <width>190</width>
-          <height>455</height>
+          <height>450</height>
          </rect>
         </property>
         <attribute name="label">
@@ -728,7 +764,7 @@ corner</string>
           <x>0</x>
           <y>0</y>
           <width>195</width>
-          <height>455</height>
+          <height>450</height>
          </rect>
         </property>
         <attribute name="label">

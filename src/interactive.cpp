@@ -121,6 +121,17 @@ Interactive::Interactive(QWidget *parent) :
       ui->stopImage->setRange(0, framePath.size() - startImage); 
     });
 
+
+    // Zoom
+    currentZoom = 1;
+    connect(ui->zoomIn, &QPushButton::clicked, [this](){
+      currentZoom ++;
+      zoom(currentZoom);
+    });
+    connect(ui->zoomOut, &QPushButton::clicked, [this](){
+      zoom(1./double(currentZoom));
+      currentZoom > 1 ? currentZoom -- : currentZoom = 1;
+    });
     
     // Ui buttons connects
     connect(ui->backgroundSelectButton, &QPushButton::clicked, this, &Interactive::selectBackground);
@@ -165,6 +176,8 @@ void Interactive::openFolder() {
     memoryDir.clear();
     framePath.clear();
     ui->display->clear();
+    currentZoom = 1;
+    ui->display->setFixedSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
 
     // Reset the ui display
     ui->isNone->setChecked(true);
@@ -305,6 +318,17 @@ void Interactive::display(int index) {
     resizedFrame.setHeight(resizedPix.height());
   }
   
+}
+
+
+/**
+  * @brief Zoom the display from a scale factor.
+  * @param[in] scale Scale factor.
+*/
+void Interactive::zoom(double scale) {
+    QSize currentSize = ui->display->size();
+    ui->display->setFixedSize(currentSize*scale);
+    display(ui->slider->value());
 }
 
 
