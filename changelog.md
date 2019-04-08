@@ -4,6 +4,7 @@
 
 ### Added
 - Auto load background image and settings file in the Tracking Inspector.
+- Zoom in the Tracking Inspector and in the Interactive Tracking panels.
 - Delete object in the Tracking Inspector.
 - Added image counter in the Interactive Tracking.
 
