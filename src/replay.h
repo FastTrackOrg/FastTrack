@@ -5,6 +5,8 @@
 #include <QWidget>
 #include <QPushButton>
 #include <QLabel>
+#include <QScrollArea>
+#include <QScrollBar>
 #include <QLineEdit>
 #include <QProgressBar>
 #include <QImage>
@@ -80,16 +82,19 @@ private:
     bool object;   /*!< Alternatively true or false to associate either object A or object B at each click of the user in the ui->replayDisplay. */
     QSize resizedFrame;   /*!< Width and height of displayed QPixmap to accomodate window size changment. */
     QSize originalImageSize;   /*!< Width and height of the original image in the images sequence. */
-    int currentZoom;
+    double currentZoom;
+    QPointF panReferenceClick;
+    QPointF zoomReferencePosition;
 
 public slots:
 
     void openReplayFolder();
     void loadReplayFolder(QString dir);
     void loadFrame(int frameIndex);
-    void zoom(double scale);
+    void zoomIn();
+    void zoomOut();
     void toggleReplayPlay();
-    void mousePressEvent(QMouseEvent* event);
+    bool eventFilter(QObject* target, QEvent* event);
     void correctTracking();
     void nextOcclusionEvent();
     void previousOcclusionEvent();

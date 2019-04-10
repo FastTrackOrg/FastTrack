@@ -14,5 +14,6 @@
         <file>assets/buttons/refresh.png</file>
         <file>assets/buttons/openImage.png</file>
         <file>assets/buttons/openFile.png</file>
+        <file>assets/displayHelp.png</file>
     </qresource>
 </RCC>

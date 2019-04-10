@@ -68,6 +68,17 @@ Interactive::Interactive(QWidget *parent) :
       display(ui->slider->value());
     });
 
+    // Zoom
+    connect(ui->scrollArea->verticalScrollBar(), &QScrollBar::rangeChanged, [this]() {
+      QScrollBar* vertical = ui->scrollArea->verticalScrollBar();
+      vertical->setValue(int(zoomReferencePosition.y()*(currentZoom - 1) + currentZoom*vertical->value()));
+    });
+    connect(ui->scrollArea->horizontalScrollBar(), &QScrollBar::rangeChanged, [this]() {
+      QScrollBar* horizontal = ui->scrollArea->horizontalScrollBar();
+      horizontal->setValue(int(zoomReferencePosition.x()*(currentZoom - 1) + horizontal->value()*currentZoom));
+    });
+
+
     // Sets the roi limits
     connect(ui->x2, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [this](int value) {
       ui->x1->setMaximum(value - 1);
@@ -122,17 +133,10 @@ Interactive::Interactive(QWidget *parent) :
     });
 
 
-    // Zoom
-    currentZoom = 1;
-    connect(ui->zoomIn, &QPushButton::clicked, [this](){
-      currentZoom ++;
-      zoom(currentZoom);
-    });
-    connect(ui->zoomOut, &QPushButton::clicked, [this](){
-      zoom(1./double(currentZoom));
-      currentZoom > 1 ? currentZoom -- : currentZoom = 1;
-    });
-    
+    // Display event
+    ui->display->installEventFilter(this);
+    ui->scrollArea->viewport()->installEventFilter(this);
+
     // Ui buttons connects
     connect(ui->backgroundSelectButton, &QPushButton::clicked, this, &Interactive::selectBackground);
     connect(ui->backgroundComputeButton, &QPushButton::clicked, this, &Interactive::computeBackground);
@@ -152,6 +156,12 @@ Interactive::Interactive(QWidget *parent) :
     isBackground = false;
     tracking = new Tracking("", "");
 
+    // Qt need a delay to update widget geometry
+    QTimer::singleShot(500, [this]() {
+      display(QImage(":/assets/displayHelp.png"));
+      originalImageSize = QImage(":/assets/displayHelp.png").size();
+    });
+
     double a,b,c;
     srand (time(NULL));
     for (int j = 0; j < 90000 ; ++j)  {
@@ -168,6 +178,7 @@ Interactive::Interactive(QWidget *parent) :
 */
 void Interactive::openFolder() {
     
+    qInfo() << ui->display->size();
     // Reset the class members
     backgroundPath.clear();
     isBackground = false;
@@ -309,10 +320,8 @@ void Interactive::display(int index) {
     if(roi.width != 0 || roi.height != 0 ) {
       frame = frame(roi);
     }
-    double w = ui->display->width();
-    double h = ui->display->height();
     Mat image = frame.getMat(ACCESS_READ);
-    resizedPix = (QPixmap::fromImage(QImage(image.data, image.cols, image.rows, image.step, QImage::Format_RGB888)).scaled(w, h, Qt::KeepAspectRatio));
+    resizedPix = (QPixmap::fromImage(QImage(image.data, image.cols, image.rows, image.step, QImage::Format_RGB888)).scaled(ui->display->size(), Qt::KeepAspectRatio));
     ui->display->setPixmap(resizedPix);
     resizedFrame.setWidth(resizedPix.width());
     resizedFrame.setHeight(resizedPix.height());
@@ -323,14 +332,35 @@ void Interactive::display(int index) {
 
 /**
   * @brief Zoom the display from a scale factor.
-  * @param[in] scale Scale factor.
 */
-void Interactive::zoom(double scale) {
-    QSize currentSize = ui->display->size();
-    ui->display->setFixedSize(currentSize*scale);
+void Interactive::zoomIn() {
+    (currentZoom >= 3) ? (currentZoom = 3) : (currentZoom += 0.2); 
+    ui->display->setFixedSize(ui->display->size()*currentZoom);
     display(ui->slider->value());
 }
 
+
+/**
+  * @brief Zoom the display from a scale factor.
+*/
+void Interactive::zoomOut() {
+    ui->display->setFixedSize((ui->display->size())/(currentZoom));
+    display(ui->slider->value());
+    (currentZoom <= 1) ? (currentZoom = 1) : (currentZoom -= 0.2); 
+}
+
+
+/**
+  * @brief This is an overloaded function to display a QImage in the ui->display.
+*/
+void Interactive::display(QImage image) {
+
+    resizedPix = (QPixmap::fromImage(image).scaled(ui->display->size(), Qt::KeepAspectRatio));
+    ui->display->setPixmap(resizedPix);
+    resizedFrame.setWidth(resizedPix.width());
+    resizedFrame.setHeight(resizedPix.height());
+ 
+}
 
 /**
   * @brief This is an overloaded function to display an image UMat in the ui->display.
@@ -339,15 +369,12 @@ void Interactive::display(UMat image) {
 
     cvtColor(image, image, COLOR_GRAY2RGB);  
     Mat frame = image.getMat(ACCESS_READ);
-    double w = ui->display->width();
-    double h = ui->display->height();
-    resizedPix = (QPixmap::fromImage(QImage(frame.data, frame.cols, frame.rows, frame.step, QImage::Format_RGB888)).scaled(w, h, Qt::KeepAspectRatio));
+    resizedPix = (QPixmap::fromImage(QImage(frame.data, frame.cols, frame.rows, frame.step, QImage::Format_RGB888)).scaled(ui->display->size(), Qt::KeepAspectRatio));
     ui->display->setPixmap(resizedPix);
     resizedFrame.setWidth(resizedPix.width());
     resizedFrame.setHeight(resizedPix.height());
  
 }
-
 
 /**
   * @brief Computes and displays the background image in the ui->display. Triggered when ui->backgroundComputeButton is clicked.
@@ -525,48 +552,95 @@ void Interactive::track() {
 
 
 /**
-  * @brief Gets the mouse coordinate in the frame of reference of the widget where user have clicked.
+  * @brief Manages all the mouse input in the display.
+  * @param[in] target Target widget to apply the filter.
   * @param[in] event Describes the mouse event.
 */
-void Interactive::mousePressEvent(QMouseEvent* event) {
+bool Interactive::eventFilter(QObject *target, QEvent* event) {
 
-    if (event->buttons() == Qt::LeftButton) {
-      clicks.first = ui->display->mapFrom(this, event->pos()); 
+    // Mouse event for the display
+    if(target == ui->display) {
       
-      // The QPixmap is V/Hcentered in the Qlabel widget
-      // Gets the click coordinate in the frame of reference of the centered display
-      clicks.first.setX(clicks.first.x() -  0.5*(ui->display->width() - resizedFrame.width())); 
-      clicks.first.setY(clicks.first.y() - 0.5*(ui->display->height() - resizedFrame.height()));
+      // Set the first point for the ROI at user click
+      if (event->type() == QEvent::MouseButtonPress) {
+          QMouseEvent* mouseEvent = static_cast<QMouseEvent*> (event);
+          if(mouseEvent->buttons() == Qt::LeftButton) {
+            clicks.first = mouseEvent->pos(); 
+            // The QPixmap is V/Hcentered in the Qlabel widget
+            // Gets the click coordinate in the frame of reference of the centered display
+            clicks.first.setX(clicks.first.x() -  0.5*(ui->display->width() - resizedFrame.width())); 
+            clicks.first.setY(clicks.first.y() - 0.5*(ui->display->height() - resizedFrame.height()));
+          }
+      }
+
+      // Sets the second point and draw the roi
+      if(event->type() == QEvent::MouseMove){
+        QMouseEvent* moveEvent = static_cast<QMouseEvent*> (event);  
+        if(moveEvent->buttons() == Qt::LeftButton) {
+          clicks.second = moveEvent->pos(); 
+          // The QPixmap is V/Hcentered in the Qlabel widget
+          // Gets the click coordinate in the frame of reference of the centered display
+          clicks.second.setX(clicks.second.x() -  0.5*(ui->display->width() - resizedFrame.width())); 
+          clicks.second.setY(clicks.second.y() - 0.5*(ui->display->height() - resizedFrame.height()));
+         
+          // Draws the ROI with 
+          QPixmap tmpImage = resizedPix;
+          QPainter paint(&tmpImage);
+          paint.setPen(QColor(0, 230, 0, 255));
+          QRect roiRect = QRect(clicks.first.x(), clicks.first.y(), clicks.second.x() - clicks.first.x(), clicks.second.y() - clicks.first.y());
+          paint.drawRect(roiRect); 
+          ui->display->setPixmap(tmpImage);
+
+          // Updates ui value
+          ui->x1->setValue(clicks.first.x());
+          ui->y1->setValue(clicks.first.y()); 
+          ui->x2->setValue(clicks.second.x());
+          ui->y2->setValue(clicks.second.y()); 
+        }  
+      }
     }
+
+    // Scroll Area event filter
+    if (target == ui->scrollArea->viewport()) {
+      // Moves in the image by middle click
+      if(event->type() == QEvent::MouseMove) {
+        QMouseEvent* moveEvent = static_cast<QMouseEvent*> (event);  
+        if(moveEvent->buttons() == Qt::MiddleButton) {
+          ui->scrollArea->horizontalScrollBar()->setValue( ui->scrollArea->horizontalScrollBar()->value() + (panReferenceClick.x() - moveEvent->localPos().x()) );
+          ui->scrollArea->verticalScrollBar()->setValue( ui->scrollArea->verticalScrollBar()->value() + (panReferenceClick.y()  - moveEvent->localPos().y()) );
+          panReferenceClick = moveEvent->localPos();
+        }
+      }
+      if (event->type() == QEvent::Wheel) {
+        QWheelEvent* wheelEvent = static_cast<QWheelEvent*> (event);
+        zoomReferencePosition = wheelEvent->pos();
+      }
+
+      // Zoom/unzoom the display by wheel
+      if (event->type() == QEvent::Wheel) {
+        QWheelEvent* wheelEvent = static_cast<QWheelEvent*> (event);
+        if( wheelEvent->angleDelta().y() > 0 ) {
+          zoomIn();
+        }
+        else {
+          zoomOut();
+        }
+        return true;
+      }
+      if (event->type() == QEvent::MouseButtonPress) {
+          QMouseEvent* mouseEvent = static_cast<QMouseEvent*> (event);
+          if(mouseEvent->buttons() == Qt::MiddleButton) {
+            qApp->setOverrideCursor(Qt::ClosedHandCursor);
+            panReferenceClick = mouseEvent->localPos();
+          }
+      }
+      if (event->type() == QEvent::MouseButtonRelease) {
+          qApp->restoreOverrideCursor();
+      }
+    }
+    return false;
 }
 
-
-/**
-  * @brief Draws a rectangle when the mouse is pressed in a QPixmap. The top left corner is at the coordinate of the first click and the bottom right at the coordinate of the released.
-  * @param[in] event Describes the mouse event.
-*/
-void Interactive::mouseMoveEvent(QMouseEvent* event) {
-   
-      clicks.second = (ui->display->mapFrom(this, event->pos())); 
-      
-      // The QPixmap is V/Hcentered in the Qlabel widget
-      // Gets the click coordinate in the frame of reference of the centered display
-      clicks.second.setX(clicks.second.x() -  0.5*(ui->display->width() - resizedFrame.width())); 
-      clicks.second.setY(clicks.second.y() - 0.5*(ui->display->height() - resizedFrame.height()));
-      
-      QPixmap tmpImage = resizedPix;
-      QPainter paint(&tmpImage);
-      paint.setPen(QColor(0, 230, 0, 255));
-      QRect roiRect = QRect(clicks.first.x(), clicks.first.y(), clicks.second.x() - clicks.first.x(), clicks.second.y() - clicks.first.y());
-      paint.drawRect(roiRect); 
-      ui->display->setPixmap(tmpImage);
-
-      // Updates ui value
-      ui->x1->setValue(clicks.first.x());
-      ui->y1->setValue(clicks.first.y()); 
-      ui->x2->setValue(clicks.second.x());
-      ui->y2->setValue(clicks.second.y()); 
-}
 
  /**
    * @brief Crops the image from a rectangle drawed with the mouse on the ui->display. Triggered when the QPushButton ui->crop is clicked.

@@ -175,6 +175,7 @@ bool Tracking::objectDirection(const UMat &image, Point center, vector<double> &
     reduce(image, projection, 0, REDUCE_SUM);
 
     vector<double> distribution; //tmp
+    distribution.reserve(projection.size());
     double ccMax = *max_element(projection.begin(), projection.end()) / 100;
     for (size_t it = 0; it < projection.size(); ++it){
       int cc = projection[it];

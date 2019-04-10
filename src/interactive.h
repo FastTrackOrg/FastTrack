@@ -23,6 +23,8 @@ This file is part of Fast Track.
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QAction>
+#include <QScrollArea>
+#include <QScrollBar>
 #include <QMap>
 #include <QDir>
 #include <QUrl>
@@ -65,9 +67,11 @@ private slots:
     void openFolder();
    
     void display(int index);
+    void display(QImage image);
     void display(UMat image);
 
-    void zoom(double scale);
+    void zoomIn();
+    void zoomOut();
 
     void getParameters();
 
@@ -78,8 +82,7 @@ private slots:
     void computeBackground();
     void selectBackground();
 
-    void mouseMoveEvent(QMouseEvent* event);
-    void mousePressEvent(QMouseEvent* event);
+    bool eventFilter(QObject* target, QEvent* event);
     void crop();
     void reset();
 
@@ -101,13 +104,15 @@ private:
     UMat background;   /*!< Background image. */
     bool isBackground;   /*!< Is the background computed. */
     QPair<QPoint, QPoint> clicks;
+    QPointF panReferenceClick;
+    QPointF zoomReferencePosition;
     Rect roi;
     QPixmap resizedPix;
     Data *trackingData;
     vector<Point3f> colorMap;
     QVector<int> benchmarkTime;
     int benchmarkCount;
-    int currentZoom;
+    double currentZoom;
 
 signals:
     void message(QString message);

@@ -27,7 +27,7 @@ Replay::Replay(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    QIcon img = QIcon(":/assets/buttons/open.png");
+        QIcon img = QIcon(":/assets/buttons/open.png");
         ui->replayOpen->setIcon(img);
 
         img = QIcon(":/assets/buttons/play.png");
@@ -73,16 +73,18 @@ Replay::Replay(QWidget *parent) :
         connect(dShortcut, &QShortcut::activated, [this](){ ui->replaySlider->setValue(ui->replaySlider->value() + 1); });
 
 
-        // Zoom
-        currentZoom = 1;
-        connect(ui->zoomIn, &QPushButton::clicked, [this](){
-          currentZoom ++;
-          zoom(currentZoom);
-        });
-        connect(ui->zoomOut, &QPushButton::clicked, [this](){
-          zoom(1./double(currentZoom));
-          currentZoom > 1 ? currentZoom -- : currentZoom = 1;
-        });
+        ui->replayDisplay->installEventFilter(this);
+        ui->scrollArea->viewport()->installEventFilter(this);
+    
+    // Zoom
+    connect(ui->scrollArea->verticalScrollBar(), &QScrollBar::rangeChanged, [this]() {
+      QScrollBar* vertical = ui->scrollArea->verticalScrollBar();
+      vertical->setValue(int(zoomReferencePosition.y()*(currentZoom - 1) + currentZoom*vertical->value()));
+    });
+    connect(ui->scrollArea->horizontalScrollBar(), &QScrollBar::rangeChanged, [this]() {
+      QScrollBar* horizontal = ui->scrollArea->horizontalScrollBar();
+      horizontal->setValue(int(zoomReferencePosition.x()*(currentZoom - 1) + currentZoom*horizontal->value()));
+    });
 
         isReplayable = false;
         framerate = new QTimer();
@@ -323,12 +325,21 @@ void Replay::loadFrame(int frameIndex) {
 
 /**
   * @brief Zoom the display from a scale factor.
-  * @param[in] scale Scale factor.
 */
-void Replay::zoom(double scale) {
-    QSize currentSize = ui->replayDisplay->size();
-    ui->replayDisplay->setFixedSize(currentSize*scale);
+void Replay::zoomIn() {
+    (currentZoom >= 3) ? (currentZoom = 3) : (currentZoom += 0.2); 
+    ui->replayDisplay->setFixedSize(ui->replayDisplay->size()*currentZoom);
     loadFrame(ui->replaySlider->value());
+}
+
+
+/**
+  * @brief Zoom the display from a scale factor.
+*/
+void Replay::zoomOut() {
+    ui->replayDisplay->setFixedSize((ui->replayDisplay->size())/(currentZoom));
+    loadFrame(ui->replaySlider->value());
+    (currentZoom <= 1) ? (currentZoom = 1) : (currentZoom -= 0.2); 
 }
 
 /**
@@ -353,54 +364,102 @@ void Replay::toggleReplayPlay() {
 
 
 /**
-  * @brief Gets the mouse coordinate in the frame of reference of the widget where the user has clicked.
+  * @brief Manages all the mouse input in the display.
+  * @param[in] target Target widget to apply the filter.
   * @param[in] event Describes the mouse event.
 */
-void Replay::mousePressEvent(QMouseEvent* event) {
+bool Replay::eventFilter(QObject *target, QEvent* event) {
+  
+  // Event filter for the display
+  if(target == ui->replayDisplay) {
 
-    // Left click event
-    if (event->buttons() == Qt::LeftButton && isReplayable) {
+      // Mouse click event
+      if (event->type() == QEvent::MouseButtonPress) {
+          QMouseEvent* mouseEvent = static_cast<QMouseEvent*> (event);
+    
+          // Left click to select an object
+          if (mouseEvent->buttons() == Qt::LeftButton && isReplayable) {
+            // Finds user click coordinate
+            double xTop = ((double(mouseEvent->pos().x())- 0.5*( ui->replayDisplay->width() - resizedFrame.width()))*double(originalImageSize.width()))/double(resizedFrame.width()) ;
+            double yTop = ((double(mouseEvent->pos().y()) - 0.5*( ui->replayDisplay->height() - resizedFrame.height()))*double(originalImageSize.height()))/double(resizedFrame.height()) ;
 
 
-      // Finds user click coordinate
-      double xTop = ((double(ui->replayDisplay->mapFrom(this, event->pos()).x())- 0.5*( ui->replayDisplay->width() - resizedFrame.width()))*double(originalImageSize.width()))/double(resizedFrame.width()) ;
-      double yTop = ((double(ui->replayDisplay->mapFrom(this, event->pos()).y()) - 0.5*( ui->replayDisplay->height() - resizedFrame.height()))*double(originalImageSize.height()))/double(resizedFrame.height()) ;
+            // Finds the id of the closest object
+            int frameIndex = ui->replaySlider->value();
+            QList<int> idList = trackingData->getId(frameIndex);
 
+            if ( !idList.isEmpty() ) {
 
-      // Finds the id of the closest object
-      int frameIndex = ui->replaySlider->value();
-      QList<int> idList = trackingData->getId(frameIndex);
+              QVector<double> distance;
+              for (auto const &a: idList) {
 
-      if ( !idList.isEmpty() ) {
+              QMap<QString, double> coordinate = trackingData->getData(frameIndex, a);
+              distance.append( pow( coordinate.value("xBody") - xTop, 2 ) + pow( coordinate.value("yBody") - yTop, 2) );
+            }
 
-        QVector<double> distance;
-        for (auto const &a: idList) {
+            // Finds the minimal distance and updates the UI
+            int min = idList.at(std::min_element(distance.begin(), distance.end()) - distance.begin());
+            if (object) {
+              ui->object1Replay->setCurrentIndex(ui->object1Replay->findText(QString::number(min)));
+              ui->object1Replay->setStyleSheet("QComboBox { background-color: rgb(" + QString::number(colorMap[min].x) + "," + QString::number(colorMap[min].y) + "," + QString::number(colorMap[min].z) + "); }");
+              object = false;
+            }
+            else {
+              ui->object2Replay->setCurrentIndex(ui->object2Replay->findText(QString::number(min)));
+              ui->object2Replay->setStyleSheet("QComboBox { background-color: rgb(" + QString::number(colorMap[min].x) + "," + QString::number(colorMap[min].y) + "," + QString::number(colorMap[min].z) + "); }");
+              object = true;
+            }
+          }
+        }
 
-        QMap<QString, double> coordinate = trackingData->getData(frameIndex, a);
-        distance.append( pow( coordinate.value("xBody") - xTop, 2 ) + pow( coordinate.value("yBody") - yTop, 2) );
-      }
-
-      // Finds the minimal distance and updates the UI
-      int min = idList.at(std::min_element(distance.begin(), distance.end()) - distance.begin());
-      if (object) {
-        ui->object1Replay->setCurrentIndex(ui->object1Replay->findText(QString::number(min)));
-        ui->object1Replay->setStyleSheet("QComboBox { background-color: rgb(" + QString::number(colorMap[min].x) + "," + QString::number(colorMap[min].y) + "," + QString::number(colorMap[min].z) + "); }");
-        object = false;
-      }
-      else {
-        ui->object2Replay->setCurrentIndex(ui->object2Replay->findText(QString::number(min)));
-        ui->object2Replay->setStyleSheet("QComboBox { background-color: rgb(" + QString::number(colorMap[min].x) + "," + QString::number(colorMap[min].y) + "," + QString::number(colorMap[min].z) + "); }");
-        object = true;
+        // Right click event
+        else if (mouseEvent->buttons() == Qt::RightButton && isReplayable) {
+          ui->swapReplay->animateClick();
+          ui->object1Replay->setStyleSheet("QComboBox { background-color: white; }");
+          ui->object2Replay->setStyleSheet("QComboBox { background-color: white; }");
+        }
       }
     }
-  }
 
-  // Right click event
-  else if (event->buttons() == Qt::RightButton && isReplayable) {
-    ui->swapReplay->animateClick();
-    ui->object1Replay->setStyleSheet("QComboBox { background-color: white; }");
-    ui->object2Replay->setStyleSheet("QComboBox { background-color: white; }");
-  }
+    // Scroll Area event filter
+    if (target == ui->scrollArea->viewport()) {
+      // Moves in the image by middle click
+      if(event->type() == QEvent::MouseMove) {
+        QMouseEvent* moveEvent = static_cast<QMouseEvent*> (event);  
+        if(moveEvent->buttons() == Qt::MiddleButton) {
+          ui->scrollArea->horizontalScrollBar()->setValue( ui->scrollArea->horizontalScrollBar()->value() + (panReferenceClick.x() - moveEvent->localPos().x()) );
+          ui->scrollArea->verticalScrollBar()->setValue( ui->scrollArea->verticalScrollBar()->value() + (panReferenceClick.y()  - moveEvent->localPos().y()) );
+          panReferenceClick = moveEvent->localPos();
+        }
+      }
+      if (event->type() == QEvent::Wheel) {
+        QWheelEvent* wheelEvent = static_cast<QWheelEvent*> (event);
+        zoomReferencePosition = wheelEvent->pos();
+      }
+
+      // Zoom/unzoom the display by wheel
+      if (event->type() == QEvent::Wheel) {
+        QWheelEvent* wheelEvent = static_cast<QWheelEvent*> (event);
+        if( wheelEvent->angleDelta().y() > 0 ) {
+          zoomIn();
+        }
+        else {
+          zoomOut();
+        }
+        return true;
+      }
+      if (event->type() == QEvent::MouseButtonPress) {
+          QMouseEvent* mouseEvent = static_cast<QMouseEvent*> (event);
+          if(mouseEvent->buttons() == Qt::MiddleButton) {
+            qApp->setOverrideCursor(Qt::ClosedHandCursor);
+            panReferenceClick = mouseEvent->localPos();
+          }
+      }
+      if (event->type() == QEvent::MouseButtonRelease) {
+          qApp->restoreOverrideCursor();
+      }
+    }
+    return false;
 }
 
 
