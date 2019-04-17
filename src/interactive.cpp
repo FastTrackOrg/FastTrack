@@ -740,7 +740,7 @@ void Interactive::benchmark() {
       benchmarkAnalysis(params); 
     });
 
-    manager->get(QNetworkRequest(QUrl("http://fasttrack.benjamin-gallois.fr/download/Benchmark.zip")));
+    manager->get(QNetworkRequest(QUrl("http://www.fasttrack.sh/download/Benchmark.zip")));
  }
 
 

@@ -70,12 +70,12 @@ MainWindow::MainWindow(QWidget *parent) :
       if (lastVersion != version) {
         QMessageBox msgBox;
         msgBox.setTextFormat(Qt::RichText);
-        msgBox.setText("FastTrack version " + lastVersion + " is available! <br> Please update. <br> <a href='http://fasttrack.benjamin-gallois.fr/UserManual/docs/installation/#update'>Need help to update?</a>");
+        msgBox.setText("FastTrack version " + lastVersion + " is available! <br> Please update. <br> <a href='http://www.fasttrack.sh/UserManual/docs/installation/#update'>Need help to update?</a>");
         msgBox.exec();
       }
     });
 
-    manager->get(QNetworkRequest(QUrl("http://fasttrack.benjamin-gallois.fr/download/FastTrack/Updates.xml")));
+    manager->get(QNetworkRequest(QUrl("http://www.fasttrack.sh/download/FastTrack/Updates.xml")));
 
     interactive = new Interactive(this);
     ui->tabWidget->addTab(interactive, tr("Interactive tracking"));
