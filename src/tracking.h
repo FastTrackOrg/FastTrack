@@ -146,6 +146,13 @@ class Tracking : public QObject {
   
   
   /**
+  * @brief Emitted when an image to compute the background is processed.
+  * @param int The number of processed image.
+  */
+  void backgroundProgress(int);
+  
+  
+  /**
   * @brief Emitted when the first image has been processed to trigger the starting of the analysis.
   */
   void finishedProcessFrame();

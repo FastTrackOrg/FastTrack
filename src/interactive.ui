@@ -282,8 +282,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>261</width>
-          <height>551</height>
+          <width>208</width>
+          <height>122</height>
          </rect>
         </property>
         <attribute name="label">
@@ -464,28 +464,28 @@
            </item>
           </layout>
          </item>
-         <item row="4" column="0" colspan="2">
+         <item row="5" column="0" colspan="2">
           <widget class="Line" name="line">
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
            </property>
           </widget>
          </item>
-         <item row="5" column="0" colspan="2">
+         <item row="6" column="0" colspan="2">
           <widget class="QLabel" name="label_21">
            <property name="text">
             <string>Select a background image</string>
            </property>
           </widget>
          </item>
-         <item row="6" column="0" colspan="2">
+         <item row="7" column="0" colspan="2">
           <widget class="QPushButton" name="backgroundSelectButton">
            <property name="text">
             <string>Open image</string>
            </property>
           </widget>
          </item>
-         <item row="7" column="1">
+         <item row="8" column="1">
           <spacer name="verticalSpacer">
            <property name="orientation">
             <enum>Qt::Vertical</enum>
@@ -505,6 +505,13 @@
            </property>
           </widget>
          </item>
+         <item row="4" column="0" colspan="2">
+          <widget class="QProgressBar" name="backgroundProgressBar">
+           <property name="value">
+            <number>0</number>
+           </property>
+          </widget>
+         </item>
         </layout>
        </widget>
        <widget class="QWidget" name="roi">
@@ -512,8 +519,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>190</width>
-          <height>455</height>
+          <width>172</width>
+          <height>170</height>
          </rect>
         </property>
         <attribute name="label">
@@ -609,8 +616,8 @@ corner</string>
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>211</width>
-          <height>455</height>
+          <width>197</width>
+          <height>87</height>
          </rect>
         </property>
         <attribute name="label">
@@ -699,8 +706,8 @@ corner</string>
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>190</width>
-          <height>455</height>
+          <width>139</width>
+          <height>88</height>
          </rect>
         </property>
         <attribute name="label">
@@ -756,7 +763,7 @@ corner</string>
           <x>0</x>
           <y>0</y>
           <width>195</width>
-          <height>455</height>
+          <height>88</height>
          </rect>
         </property>
         <attribute name="label">

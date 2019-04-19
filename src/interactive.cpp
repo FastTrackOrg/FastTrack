@@ -155,6 +155,7 @@ Interactive::Interactive(QWidget *parent) :
     
     isBackground = false;
     tracking = new Tracking("", "");
+    connect(tracking, &Tracking::backgroundProgress, ui->backgroundProgressBar, &QProgressBar::setValue);
 
     // Qt need a delay to update widget geometry
     QTimer::singleShot(500, [this]() {
@@ -384,11 +385,14 @@ void Interactive::computeBackground() {
   if(!framePath.empty()) {
     double nBack = double(ui->nBack->value());
     int method = ui->back->currentIndex();
+
+    ui->backgroundProgressBar->setMaximum(int(nBack));
+
     // Computes the background without blocking the ui
     QFuture<void> future = QtConcurrent::run([=]() {
       background = tracking->backgroundExtraction(framePath, nBack, method);
-      isBackground = true;
       
+      isBackground = true;
       ui->isBin->setCheckable(true);
       ui->isSub->setCheckable(true);
       

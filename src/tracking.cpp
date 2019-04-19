@@ -254,6 +254,7 @@ UMat Tracking::backgroundExtraction(const vector<String> &files, double n, const
               cv::max(background, cameraFrameReg, background);  
         }
 
+        emit(backgroundProgress(count));
         count ++;
 	}
   if (method == 2) {
