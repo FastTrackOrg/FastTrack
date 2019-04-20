@@ -27,10 +27,10 @@ BraceWrapping:
   AfterFunction:   false
   AfterNamespace:  false
   AfterObjCDeclaration: false
-  AfterStruct:     false
+  AfterStruct:     true
   AfterUnion:      false
   AfterExternBlock: false
-  BeforeCatch:     false
+  BeforeCatch:     true
   BeforeElse:      true
   IndentBraces:    false
   SplitEmptyFunction: true

@@ -34,8 +34,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>575</width>
-         <height>633</height>
+         <width>542</width>
+         <height>635</height>
         </rect>
        </property>
        <layout class="QGridLayout" name="gridLayout_2">
@@ -91,7 +91,7 @@
           <x>0</x>
           <y>0</y>
           <width>261</width>
-          <height>551</height>
+          <height>556</height>
          </rect>
         </property>
         <attribute name="label">
@@ -282,8 +282,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>208</width>
-          <height>122</height>
+          <width>261</width>
+          <height>556</height>
          </rect>
         </property>
         <attribute name="label">
@@ -380,8 +380,8 @@
   <widget class="QDockWidget" name="trackingOptions">
    <property name="minimumSize">
     <size>
-     <width>208</width>
-     <height>266</height>
+     <width>241</width>
+     <height>260</height>
     </size>
    </property>
    <property name="features">
@@ -405,8 +405,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>190</width>
-          <height>455</height>
+          <width>223</width>
+          <height>463</height>
          </rect>
         </property>
         <attribute name="label">
@@ -519,8 +519,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>172</width>
-          <height>170</height>
+          <width>181</width>
+          <height>463</height>
          </rect>
         </property>
         <attribute name="label">
@@ -616,8 +616,8 @@ corner</string>
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>197</width>
-          <height>87</height>
+          <width>219</width>
+          <height>463</height>
          </rect>
         </property>
         <attribute name="label">
@@ -706,8 +706,8 @@ corner</string>
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>139</width>
-          <height>88</height>
+          <width>166</width>
+          <height>463</height>
          </rect>
         </property>
         <attribute name="label">
@@ -762,8 +762,8 @@ corner</string>
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>195</width>
-          <height>88</height>
+          <width>209</width>
+          <height>463</height>
          </rect>
         </property>
         <attribute name="label">
@@ -838,7 +838,7 @@ corner</string>
      <x>0</x>
      <y>0</y>
      <width>1084</width>
-     <height>23</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuOpen">

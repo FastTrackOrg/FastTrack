@@ -83,7 +83,7 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
     ui->y1->setMinimum(0);
   });
 
-  // Update after operations
+  // Updates the display after each operation
   connect(ui->erosion, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [this]() {
     ui->isBin->setChecked(true);
     display(ui->slider->value());
@@ -92,7 +92,6 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
     ui->isBin->setChecked(true);
     display(ui->slider->value());
   });
-
   connect(ui->minSize, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [this]() {
     ui->isBin->setChecked(true);
     display(ui->slider->value());
@@ -121,16 +120,16 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
     display(ui->slider->value());
   });
 
-  // Set image preview limits
+  // Set the image preview limits
   connect(ui->startImage, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [this](int startImage) {
     ui->stopImage->setRange(0, framePath.size() - startImage);
   });
 
-  // Display event
+  // Events filter to zoom in/out in the display
   ui->display->installEventFilter(this);
   ui->scrollArea->viewport()->installEventFilter(this);
 
-  // Ui buttons connects
+  // Buttons connects
   connect(ui->backgroundSelectButton, &QPushButton::clicked, this, &Interactive::selectBackground);
   connect(ui->backgroundComputeButton, &QPushButton::clicked, this, &Interactive::computeBackground);
   connect(ui->previewButton, &QPushButton::clicked, this, &Interactive::previewTracking);
@@ -144,8 +143,10 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   connect(ui->cropButton, &QPushButton::clicked, this, &Interactive::crop);
   connect(ui->resetButton, &QPushButton::clicked, this, &Interactive::reset);
 
+  // Sets information table
   ui->informationTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
+  // Instanciates a default tracking object that will be used to access its public functions in order to perform the interactive tracking
   isBackground = false;
   tracking = new Tracking("", "");
   connect(tracking, &Tracking::backgroundProgress, ui->backgroundProgressBar, &QProgressBar::setValue);
@@ -156,33 +157,38 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
     originalImageSize = QImage(":/assets/displayHelp.png").size();
   });
 
+  // Sets a color map
+  colorMap.reserve(1000000);
   double a, b, c;
   srand(time(NULL));
-  for (int j = 0; j < 90000; ++j) {
+  for (int j = 0; j < 1000000; ++j) {
     a = rand() % 255;
     b = rand() % 255;
     c = rand() % 255;
     colorMap.push_back(Point3f(a, b, c));
   }
+
+  // Sets the object counter on top of the display
+  counterLabel = new QLabel(ui->scrollArea->viewport());
+  counterLabel->move(20, 20);
 }
 
 /**
-  * @brief Gets the path to a folder where an image sequence is stored. Triggered when the open button from menu bar is clicked.
+  * @brief Asks the path to a folder where an image sequence is stored. Setups the ui and resets the class attributs for a new analysis. Triggered when the open button from the menu bar is clicked.
 */
 void Interactive::openFolder() {
-  qInfo() << ui->display->size();
-  // Reset the class members
-  backgroundPath.clear();
+  // Resets the class members
   isBackground = false;
   trackingData = new Data("");
-  background.release();
   memoryDir.clear();
   framePath.clear();
-  ui->display->clear();
+  backgroundPath.clear();
+  background.release();
   currentZoom = 1;
-  ui->display->setFixedSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
 
-  // Reset the ui display
+  // Resets the ui
+  ui->display->clear();
+  ui->display->setFixedSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
   ui->isNone->setChecked(true);
   ui->isBin->setCheckable(false);
   ui->isSub->setCheckable(false);
@@ -191,7 +197,7 @@ void Interactive::openFolder() {
 
   dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"), memoryDir, QFileDialog::ShowDirsOnly);
 
-  // If Tracking_Result folder selectionned, get the path to the top directory
+  // Ignores the folder Tracking_Result if selected
   if (dir.right(15) == "Tracking_Result") {
     dir.truncate(dir.size() - 15);
   }
@@ -233,7 +239,7 @@ void Interactive::openFolder() {
       isBackground = false;
       reset();
       display(0);
-      
+
       // Automatic background computation type selection based on the image mean
       int meanValue = int(mean(frame)[0]);
       if (meanValue > 128) {
@@ -255,7 +261,8 @@ void Interactive::openFolder() {
 }
 
 /**
-  * @brief Displays the image at index in the image sequence in the ui->display.
+  * @brief Displays the image at index in the image sequence in the ui.
+  * @param[in] index Index of the image to display in the image sequence.
 */
 void Interactive::display(int index) {
   if (!framePath.empty()) {
@@ -306,6 +313,8 @@ void Interactive::display(int index) {
           rejectedContours.push_back(a);
         }
       }
+      counterLabel->setText("Objects detected: " + QString::number(displayContours.size()));
+      counterLabel->adjustSize();
     }
 
     // Displays the image in the QLabel
@@ -316,7 +325,6 @@ void Interactive::display(int index) {
     }
     if (ui->isTracked->isChecked()) {
       QList<int> idList = trackingData->getId(index);
-
       double scale = 2;
 
       for (auto const &a : idList) {
@@ -337,7 +345,7 @@ void Interactive::display(int index) {
 }
 
 /**
-  * @brief Zoom the display from a scale factor.
+  * @brief Zooms in the display.
 */
 void Interactive::zoomIn() {
   (currentZoom >= 3) ? (currentZoom = 3) : (currentZoom += 0.2);
@@ -346,7 +354,7 @@ void Interactive::zoomIn() {
 }
 
 /**
-  * @brief Zoom the display from a scale factor.
+  * @brief Zooms out the display.
 */
 void Interactive::zoomOut() {
   ui->display->setFixedSize((ui->display->size()) / (currentZoom));
@@ -355,7 +363,7 @@ void Interactive::zoomOut() {
 }
 
 /**
-  * @brief This is an overloaded function to display a QImage in the ui->display.
+  * @brief This is an overloaded function to display a QImage in the display.
 */
 void Interactive::display(QImage image) {
   resizedPix = (QPixmap::fromImage(image).scaled(ui->display->size(), Qt::KeepAspectRatio));
@@ -365,7 +373,7 @@ void Interactive::display(QImage image) {
 }
 
 /**
-  * @brief This is an overloaded function to display an image UMat in the ui->display.
+  * @brief This is an overloaded function to display a UMat in the display.
 */
 void Interactive::display(UMat image) {
   cvtColor(image, image, COLOR_GRAY2RGB);
@@ -377,7 +385,7 @@ void Interactive::display(UMat image) {
 }
 
 /**
-  * @brief Computes and displays the background image in the ui->display. Triggered when ui->backgroundComputeButton is clicked.
+  * @brief Computes and displays the background image in the display. Triggered when the backgroundComputeButton is clicked.
 */
 void Interactive::computeBackground() {
   if (!framePath.empty()) {
@@ -394,7 +402,7 @@ void Interactive::computeBackground() {
       ui->isBin->setCheckable(true);
       ui->isSub->setCheckable(true);
 
-      // Automatic background type selection based on image mean
+      // Automatic background type selection based on the image mean
       int meanValue = int(mean(background)[0]);
       if (meanValue > 128) {
         ui->backColor->setCurrentIndex(0);
@@ -442,7 +450,7 @@ void Interactive::selectBackground() {
 }
 
 /**
-  * @brief Gets all the tracking parameters from the ui and updates the parameter map.
+  * @brief Gets all the tracking parameters from the ui and updates the parameter map that will be passed to the tracking object.
 */
 void Interactive::getParameters() {
   parameters.insert("Maximal size", QString::number(ui->maxSize->value()));
@@ -468,7 +476,7 @@ void Interactive::getParameters() {
 }
 
 /**
-  * @brief Does a preview of a tracking analysis. Triggered when previewButton is clicked.
+  * @brief Does a tracing analysis on a sub-part of the image sequence defined by the user. Triggered when previewButton is clicked.
 */
 void Interactive::previewTracking() {
   if (!framePath.empty()) {
@@ -499,6 +507,7 @@ void Interactive::previewTracking() {
     getParameters();
     tracking->updatingParameters(parameters);
     thread->start();
+
     ui->slider->setDisabled(true);
     ui->isTracked->setCheckable(true);
     ui->isTracked->setChecked(true);
@@ -537,6 +546,7 @@ void Interactive::track() {
     getParameters();
     tracking->updatingParameters(parameters);
     thread->start();
+
     ui->slider->setDisabled(true);
     ui->isTracked->setCheckable(true);
     ui->isTracked->setChecked(true);
@@ -544,8 +554,8 @@ void Interactive::track() {
 }
 
 /**
-  * @brief Manages all the mouse input in the display.
-  * @param[in] target Target widget to apply the filter.
+  * @brief Manages all the mouse inputs in the display.
+  * @param[in] target Widget to apply the filter.
   * @param[in] event Describes the mouse event.
 */
 bool Interactive::eventFilter(QObject *target, QEvent *event) {
@@ -632,7 +642,7 @@ bool Interactive::eventFilter(QObject *target, QEvent *event) {
 }
 
 /**
-   * @brief Crops the image from a rectangle drawed with the mouse on the ui->display. Triggered when the QPushButton ui->crop is clicked.
+   * @brief Crops the image from a rectangle drawed by the user with the mouse on the display. Triggered when the QPushButton ui->crop is clicked.
  */
 void Interactive::crop() {
   // Converts clicks from display widget frame of reference to original image frame of reference
@@ -668,7 +678,7 @@ void Interactive::crop() {
 }
 
 /**
-   * @brief Reset the region of interest. Triggered by the ui->reset
+   * @brief Resets the region of interest. Triggered by the reset button.
  */
 void Interactive::reset() {
   cropedImageSize.setWidth(originalImageSize.width());
@@ -684,9 +694,10 @@ void Interactive::reset() {
 }
 
 /**
-
+ * @brief This is a function for the developer. Triggered a benchmark (downloads a dataset and perform several tracking analysis) to check program performance.
  */
 void Interactive::benchmark() {
+  // Checks if the dataset exist and creates the destination folder if not
   QNetworkAccessManager *manager = new QNetworkAccessManager(this);
   connect(manager, &QNetworkAccessManager::finished, [this](QNetworkReply *reply) {
     if (QDir(QDir::homePath() + "/FastTrackBenchmarkTmp").exists()) {
@@ -724,6 +735,9 @@ void Interactive::benchmark() {
   manager->get(QNetworkRequest(QUrl("http://www.fasttrack.sh/download/Benchmark.zip")));
 }
 
+/**
+ * @brief This is a function for the developer. Triggered a benchmark (downloads a dataset and perform several tracking analysis) to check program performance.
+ */
 void Interactive::benchmarkAnalysis(QMap<QString, QString> params) {
   QThread *thread = new QThread;
   Tracking *tracking = new Tracking((QDir::homePath() + "/FastTrackBenchmarkTmp/Juvenil_Zebrafish_2/").toStdString(), "");
