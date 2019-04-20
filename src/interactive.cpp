@@ -29,7 +29,7 @@ This file is part of Fast Track.
  *
  * @author Benjamin Gallois
  *
- * @version $Revision: 421 $
+ * @version $Revision: 460 $
  *
  * Contact: gallois.benjamin08@gmail.com
  *
@@ -233,7 +233,18 @@ void Interactive::openFolder() {
       isBackground = false;
       reset();
       display(0);
-    } catch (...) {
+      
+      // Automatic background computation type selection based on the image mean
+      int meanValue = int(mean(frame)[0]);
+      if (meanValue > 128) {
+        ui->back->setCurrentIndex(0);
+      }
+      else {
+        ui->back->setCurrentIndex(1);
+      }
+    }
+    // If an error occurs during the opening, resets the information table and warns the user
+    catch (...) {
       ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Path", Qt::MatchExactly)[0]), 1)->setText("");
       ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Image number", Qt::MatchExactly)[0]), 1)->setText("0");
       ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Image width", Qt::MatchExactly)[0]), 1)->setText("0");
@@ -267,12 +278,24 @@ void Interactive::display(int index) {
       element = getStructuringElement(MORPH_ELLIPSE, Size(2 * ui->erosion->value() + 1, 2 * ui->erosion->value() + 1), Point(ui->erosion->value(), ui->erosion->value()));
       erode(frame, frame, element);
 
-      // Keeps only right sized object.
+      // Keeps only right sized objects
+      // To benchmark: pushBack contours vs loop over index and call drawContours multiple times
       vector<vector<Point>> contours;
       findContours(frame, contours, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
+      displayContours.reserve(contours.size());
+      rejectedContours.reserve(contours.size());
 
       double min = ui->minSize->value();
       double max = ui->maxSize->value();
+
+      // If too many contours detected to be displayed without slowdowns, ask the user what to do
+      if (contours.size() > 10000) {
+        QMessageBox::StandardButton reply;
+        reply = QMessageBox::question(this, "Confirmation", "Too many objects detected to be displayed. \n Do you want to display them anyway (the program can be slow)? ", QMessageBox::No | QMessageBox::Yes);
+        if (reply == QMessageBox::No) {
+          return;
+        }
+      }
 
       for (auto const &a : contours) {
         double size = contourArea(a);
