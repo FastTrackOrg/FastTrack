@@ -1,15 +1,12 @@
 #include "data.h"
 
-
 Data::Data(QString dataPath) {
-  
   QVector<QString> replayTracking;
   dir = dataPath;
 
-  if( QDir().exists(dir + QDir::separator() + "Tracking_Result") ) {
+  if (QDir().exists(dir + QDir::separator() + "Tracking_Result")) {
+    QFile trackingFile(dir + QDir::separator() + "Tracking_Result" + QDir::separator() + "tracking.txt");
 
-    QFile trackingFile( dir + QDir::separator() + "Tracking_Result" + QDir::separator() + "tracking.txt");
-    
     if (trackingFile.open(QIODevice::ReadOnly)) {
       QTextStream input(&trackingFile);
       QString line;
@@ -22,18 +19,17 @@ Data::Data(QString dataPath) {
     QStringList header = replayTracking[0].split('\t', QString::SkipEmptyParts);
     replayTracking.removeFirst();
 
-    for(auto &a: replayTracking) {
-      
+    for (auto &a : replayTracking) {
       QVector<object> tmpVector;
-      QMap<int, QMap<QString, double> > objectMap; // Map object id to data
-      QMap<QString, double> objectData; // Map data keys to data value
+      QMap<int, QMap<QString, double> > objectMap;  // Map object id to data
+      QMap<QString, double> objectData;             // Map data keys to data value
 
       QStringList dat = a.split('\t', QString::SkipEmptyParts);
       int frameIndex = dat[21].toInt();
       int id = dat[22].toInt();
       dat.removeAt(22);
 
-      for(int j = 0; j < dat.size(); j++) {
+      for (int j = 0; j < dat.size(); j++) {
         objectData.insert(header[j], dat[j].toDouble());
       }
 
@@ -51,10 +47,9 @@ QVector<object> Data::getData(int imageIndex) {
   return data.value(imageIndex);
 }
 
-
 QMap<QString, double> Data::getData(int imageIndex, int id) {
   QVector<object> objects = data.value(imageIndex);
-  for(auto &a: objects) {
+  for (auto &a : objects) {
     if (a.id == id) {
       return a.data;
       break;
@@ -65,13 +60,10 @@ QMap<QString, double> Data::getData(int imageIndex, int id) {
   return tmp;
 }
 
-
-
 QList<int> Data::getId(int imageIndex) {
-
   QVector<object> objects = data.value(imageIndex);
   QList<int> ids;
-  for(auto &a: objects) {
+  for (auto &a : objects) {
     ids.append(a.id);
   }
   return ids;
@@ -84,33 +76,30 @@ QList<int> Data::getId(int imageIndex) {
   * @arg[in] from Start index from which the data will be swapped.
 */
 void Data::swapData(int firstObject, int secondObject, int from) {
-    
-      QMapIterator<int, QVector<object> > i(data);
-      while (i.hasNext()) {
-        i.next();
-        if(i.key() >= from) { 
-          QVector<object> objects = i.value();
-           
-          for(int j = 0; j < objects.size(); j++) {
-        
-            int id = objects[j].id;
-            int changed = -1;
-        
-            if (id == firstObject && j != changed) {
-              objects[j].id = secondObject;
-              changed = j;
-            }
-            else if (id == secondObject && j != changed) {
-              objects[j].id = firstObject;
-              changed = j;
-            }
-          }
+  QMapIterator<int, QVector<object> > i(data);
+  while (i.hasNext()) {
+    i.next();
+    if (i.key() >= from) {
+      QVector<object> objects = i.value();
 
-          data.insert(i.key(), objects);
+      for (int j = 0; j < objects.size(); j++) {
+        int id = objects[j].id;
+        int changed = -1;
+
+        if (id == firstObject && j != changed) {
+          objects[j].id = secondObject;
+          changed = j;
+        }
+        else if (id == secondObject && j != changed) {
+          objects[j].id = firstObject;
+          changed = j;
         }
       }
-}
 
+      data.insert(i.key(), objects);
+    }
+  }
+}
 
 /**
   * @brief In the tracking data, one object from a selected index to the end.
@@ -118,38 +107,34 @@ void Data::swapData(int firstObject, int secondObject, int from) {
   * @arg[in] from Start index from which the data will be swapped.
 */
 void Data::deleteData(int objectId, int from) {
+  QMapIterator<int, QVector<object> > i(data);
+  while (i.hasNext()) {
+    i.next();
+    if (i.key() >= from) {
+      QVector<object> objects = i.value();
 
-      QMapIterator<int, QVector<object> > i(data);
-      while (i.hasNext()) {
-        i.next();
-        if(i.key() >= from) { 
-          QVector<object> objects = i.value();
-           
-          for(int j = 0; j < objects.size(); j++) {
-        
-            if( objects[j].id == objectId) {
-              objects.remove(j);              
-            }
-          }
-          data.insert(i.key(), objects);
+      for (int j = 0; j < objects.size(); j++) {
+        if (objects[j].id == objectId) {
+          objects.remove(j);
         }
       }
+      data.insert(i.key(), objects);
+    }
+  }
 }
 
-
 void Data::save() {
-
   QFile file(dir + QDir::separator() + "Tracking_Result" + QDir::separator() + "tracking.txt");
   if (file.open(QFile::WriteOnly | QFile::Text)) {
     QTextStream out(&file);
-    out << "xHead" << '\t' << "yHead" << '\t' << "tHead" << '\t'  << "xTail" << '\t' << "yTail" << '\t' << "tTail"   << '\t'  << "xBody" << '\t' << "yBody" << '\t' << "tBody"   << '\t'  << "curvature"  << '\t' << "areaBody" << '\t' << "perimeterBody" << '\t' << "headMajorAxisLength" << '\t' << "headMinorAxisLength" << '\t' << "headExcentricity" << '\t' << "tailMajorAxisLength" << '\t' << "tailMinorAxisLength" << '\t' << "tailExcentricity" << '\t'<< "bodyMajorAxisLength" << '\t' << "bodyMinorAxisLength" << '\t' << "bodyExcentricity" << '\t' << "imageNumber" << '\t' << "id" << endl;
+    out << "xHead" << '\t' << "yHead" << '\t' << "tHead" << '\t' << "xTail" << '\t' << "yTail" << '\t' << "tTail" << '\t' << "xBody" << '\t' << "yBody" << '\t' << "tBody" << '\t' << "curvature" << '\t' << "areaBody" << '\t' << "perimeterBody" << '\t' << "headMajorAxisLength" << '\t' << "headMinorAxisLength" << '\t' << "headExcentricity" << '\t' << "tailMajorAxisLength" << '\t' << "tailMinorAxisLength" << '\t' << "tailExcentricity" << '\t' << "bodyMajorAxisLength" << '\t' << "bodyMinorAxisLength" << '\t' << "bodyExcentricity" << '\t' << "imageNumber" << '\t' << "id" << endl;
     QMapIterator<int, QVector<object> > i(data);
     while (i.hasNext()) {
       i.next();
-      for(auto& a: i.value() ) {
-        out << a.data.value("xHead") << '\t' << a.data.value("yHead") << '\t' << a.data.value("tHead") << '\t'  << a.data.value("xTail") << '\t' << a.data.value("yTail") << '\t' << a.data.value("tTail")   << '\t'  << a.data.value("xBody") << '\t' << a.data.value("yBody") << '\t' << a.data.value("tBody")   << '\t'  << a.data.value("curvature")  << '\t' << a.data.value("areaBody") << '\t' << a.data.value("perimeterBody") << '\t' << a.data.value("headMajorAxisLength") << '\t' << a.data.value("headMinorAxisLength") << '\t' << a.data.value("headExcentricity") << '\t' << a.data.value("tailMajorAxisLength") << '\t' << a.data.value("tailMinorAxisLength") << '\t' << a.data.value("tailExcentricity") << '\t'<< a.data.value("bodyMajorAxisLength") << '\t' << a.data.value("bodyMinorAxisLength") << '\t' << a.data.value("bodyExcentricity") << '\t' << a.data.value("imageNumber") << '\t' << a.id << endl;
+      for (auto &a : i.value()) {
+        out << a.data.value("xHead") << '\t' << a.data.value("yHead") << '\t' << a.data.value("tHead") << '\t' << a.data.value("xTail") << '\t' << a.data.value("yTail") << '\t' << a.data.value("tTail") << '\t' << a.data.value("xBody") << '\t' << a.data.value("yBody") << '\t' << a.data.value("tBody") << '\t' << a.data.value("curvature") << '\t' << a.data.value("areaBody") << '\t' << a.data.value("perimeterBody") << '\t' << a.data.value("headMajorAxisLength") << '\t' << a.data.value("headMinorAxisLength") << '\t' << a.data.value("headExcentricity") << '\t' << a.data.value("tailMajorAxisLength") << '\t' << a.data.value("tailMinorAxisLength") << '\t' << a.data.value("tailExcentricity") << '\t' << a.data.value("bodyMajorAxisLength") << '\t' << a.data.value("bodyMinorAxisLength") << '\t' << a.data.value("bodyExcentricity") << '\t' << a.data.value("imageNumber") << '\t' << a.id << endl;
       }
     }
-  file.close();
+    file.close();
   }
 }

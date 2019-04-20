@@ -15,38 +15,36 @@ This file is part of Fast Track.
     along with FastTrack.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-
 #ifndef INTERACTIVE_H
 #define INTERACTIVE_H
 
-#include <QMainWindow>
-#include <QFileDialog>
-#include <QMessageBox>
+#include <quazip/JlCompress.h>
 #include <QAction>
-#include <QScrollArea>
-#include <QScrollBar>
-#include <QMap>
 #include <QDir>
-#include <QUrl>
-#include <QFuture>
-#include <QtConcurrent/QtConcurrentRun>
-#include <QNetworkRequest>
-#include <QNetworkReply>
-#include <QNetworkAccessManager>
-#include <QString>
 #include <QDirIterator>
-#include <QTableWidget>
-#include <QTableWidgetItem>
-#include <QPainter>
-#include <QFile>
 #include <QElapsedTimer>
 #include <QEventLoop>
-#include "opencv2/imgproc/imgproc.hpp"
-#include "opencv2/highgui/highgui.hpp"
-#include "tracking.h"
+#include <QFile>
+#include <QFileDialog>
+#include <QFuture>
+#include <QMainWindow>
+#include <QMap>
+#include <QMessageBox>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+#include <QNetworkRequest>
+#include <QPainter>
+#include <QScrollArea>
+#include <QScrollBar>
+#include <QString>
+#include <QTableWidget>
+#include <QTableWidgetItem>
+#include <QUrl>
+#include <QtConcurrent/QtConcurrentRun>
 #include "data.h"
-#include <quazip/JlCompress.h>
-
+#include "opencv2/highgui/highgui.hpp"
+#include "opencv2/imgproc/imgproc.hpp"
+#include "tracking.h"
 
 using namespace std;
 using namespace cv;
@@ -55,68 +53,65 @@ namespace Ui {
 class Interactive;
 }
 
-class Interactive : public QMainWindow
-{
-    Q_OBJECT
+class Interactive : public QMainWindow {
+  Q_OBJECT
 
-public:
-    explicit Interactive(QWidget *parent = nullptr);
-    ~Interactive();
+ public:
+  explicit Interactive(QWidget *parent = nullptr);
+  ~Interactive();
 
-private slots:
-    void openFolder();
-   
-    void display(int index);
-    void display(QImage image);
-    void display(UMat image);
+ private slots:
+  void openFolder();
 
-    void zoomIn();
-    void zoomOut();
+  void display(int index);
+  void display(QImage image);
+  void display(UMat image);
 
-    void getParameters();
+  void zoomIn();
+  void zoomOut();
 
-    void previewTracking();
-    void track();
+  void getParameters();
 
+  void previewTracking();
+  void track();
 
-    void computeBackground();
-    void selectBackground();
+  void computeBackground();
+  void selectBackground();
 
-    bool eventFilter(QObject* target, QEvent* event);
-    void crop();
-    void reset();
+  bool eventFilter(QObject *target, QEvent *event);
+  void crop();
+  void reset();
 
-    void benchmark();
-    void benchmarkAnalysis(QMap<QString, QString>);
+  void benchmark();
+  void benchmarkAnalysis(QMap<QString, QString>);
 
-private:
-    Ui::Interactive *ui;
-    QString memoryDir;   /*!< Saves the path to the last opened folder in dialog. */
-    vector<String> framePath;   /*!< Path to all the image of the image sequence to display. */
-    QSize resizedFrame;   /*!< Size of the resized image in the display QWidget. */
-    QSize originalImageSize;   /*!< Size of the original image. */
-    QSize cropedImageSize;   /*!< Size of the croped image. */
-    QMap<QString, QString> parameters;   /*!< Tracking parameters. */
-    QString path;   /*!< */
-    QString backgroundPath;   /*!< Path to the background image. */
-    QString dir;   /*!< Path to the folder where the image sequence to display is stored. */
-    Tracking *tracking;   /*!< Tracking object. */
-    UMat background;   /*!< Background image. */
-    bool isBackground;   /*!< Is the background computed. */
-    QPair<QPoint, QPoint> clicks;
-    QPointF panReferenceClick;
-    QPointF zoomReferencePosition;
-    Rect roi;
-    QPixmap resizedPix;
-    Data *trackingData;
-    vector<Point3f> colorMap;
-    QVector<int> benchmarkTime;
-    int benchmarkCount;
-    double currentZoom;
+ private:
+  Ui::Interactive *ui;
+  QString memoryDir;                 /*!< Saves the path to the last opened folder in dialog. */
+  vector<String> framePath;          /*!< Path to all the image of the image sequence to display. */
+  QSize resizedFrame;                /*!< Size of the resized image in the display QWidget. */
+  QSize originalImageSize;           /*!< Size of the original image. */
+  QSize cropedImageSize;             /*!< Size of the croped image. */
+  QMap<QString, QString> parameters; /*!< Tracking parameters. */
+  QString path;                      /*!< */
+  QString backgroundPath;            /*!< Path to the background image. */
+  QString dir;                       /*!< Path to the folder where the image sequence to display is stored. */
+  Tracking *tracking;                /*!< Tracking object. */
+  UMat background;                   /*!< Background image. */
+  bool isBackground;                 /*!< Is the background computed. */
+  QPair<QPoint, QPoint> clicks;
+  QPointF panReferenceClick;
+  QPointF zoomReferencePosition;
+  Rect roi;
+  QPixmap resizedPix;
+  Data *trackingData;
+  vector<Point3f> colorMap;
+  QVector<int> benchmarkTime;
+  int benchmarkCount;
+  double currentZoom;
 
-signals:
-    void message(QString message);
-
+ signals:
+  void message(QString message);
 };
 
-#endif // INTERACTIVE_H
+#endif  // INTERACTIVE_H

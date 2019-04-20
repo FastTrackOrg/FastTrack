@@ -1,14 +1,14 @@
 #ifndef DATA_H
 #define DATA_H
 
-#include <QWidget>
+#include <QDebug>
 #include <QDir>
 #include <QFile>
 #include <QMap>
 #include <QMapIterator>
-#include <QTextStream>
 #include <QString>
-#include <QDebug>
+#include <QTextStream>
+#include <QWidget>
 
 struct object {
   int id;
@@ -16,18 +16,14 @@ struct object {
 };
 
 class Data {
-
-private:
-  
+ private:
   QString dir;
   QMap<int, QVector<object>> data;
-  
-  
-public:
+
+ public:
   explicit Data(QString dataPath);
   ~Data();
 
-  
   QVector<object> getData(int imageIndex);
   QMap<QString, double> getData(int imageIndex, int id);
   QList<int> getId(int imageIndex);
@@ -35,6 +31,5 @@ public:
   void deleteData(int objectId, int from);
   void save();
 };
-
 
 #endif

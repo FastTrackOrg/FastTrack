@@ -15,13 +15,10 @@ This file is part of Fast Track.
     along with FastTrack.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-
-
-
 #include "mainwindow.h"
 
 #ifndef M_PI
-    #define M_PI 3.14159265358979323846
+#define M_PI 3.14159265358979323846
 #endif
 
 using namespace std;
@@ -39,64 +36,54 @@ using namespace std;
  *
 */
 
-
-
-
 /**
  * @brief Constructs the MainWindow QObject and initializes the UI. 
 */
-MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::MainWindow)
-{
-    QDir::setCurrent(QCoreApplication::applicationDirPath());
-    ui->setupUi(this);
-    setWindowState(Qt::WindowMaximized);
-    setWindowTitle("Fast Track");
-    
-    // Setup style
-    QFile stylesheet(":/theme.qss");
+MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
+                                          ui(new Ui::MainWindow) {
+  QDir::setCurrent(QCoreApplication::applicationDirPath());
+  ui->setupUi(this);
+  setWindowState(Qt::WindowMaximized);
+  setWindowTitle("Fast Track");
 
-    if(stylesheet.open(QIODevice::ReadOnly | QIODevice::Text)) { // Read the theme file
-        qApp->setStyleSheet(stylesheet.readAll());
-        stylesheet.close();
+  // Setup style
+  QFile stylesheet(":/theme.qss");
+
+  if (stylesheet.open(QIODevice::ReadOnly | QIODevice::Text)) {  // Read the theme file
+    qApp->setStyleSheet(stylesheet.readAll());
+    stylesheet.close();
+  }
+
+  QNetworkAccessManager *manager = new QNetworkAccessManager(this);
+  connect(manager, &QNetworkAccessManager::finished, [this](QNetworkReply *reply) {
+    QByteArray downloadedData = reply->readAll();
+    reply->deleteLater();
+    QByteArray lastVersion = downloadedData.mid(downloadedData.indexOf("</Version>") - 5, 5);
+    if (lastVersion != version) {
+      QMessageBox msgBox;
+      msgBox.setTextFormat(Qt::RichText);
+      msgBox.setText("FastTrack version " + lastVersion + " is available! <br> Please update. <br> <a href='http://www.fasttrack.sh/UserManual/docs/installation/#update'>Need help to update?</a>");
+      msgBox.exec();
     }
+  });
 
-    QNetworkAccessManager *manager = new QNetworkAccessManager(this);
-    connect(manager, &QNetworkAccessManager::finished, [this] (QNetworkReply *reply) {
-      QByteArray downloadedData = reply->readAll();
-      reply->deleteLater();
-      QByteArray lastVersion = downloadedData.mid(downloadedData.indexOf("</Version>") -5, 5);
-      if (lastVersion != version) {
-        QMessageBox msgBox;
-        msgBox.setTextFormat(Qt::RichText);
-        msgBox.setText("FastTrack version " + lastVersion + " is available! <br> Please update. <br> <a href='http://www.fasttrack.sh/UserManual/docs/installation/#update'>Need help to update?</a>");
-        msgBox.exec();
-      }
-    });
+  manager->get(QNetworkRequest(QUrl("http://www.fasttrack.sh/download/FastTrack/Updates.xml")));
 
-    manager->get(QNetworkRequest(QUrl("http://www.fasttrack.sh/download/FastTrack/Updates.xml")));
+  interactive = new Interactive(this);
+  ui->tabWidget->addTab(interactive, tr("Interactive tracking"));
 
-    interactive = new Interactive(this);
-    ui->tabWidget->addTab(interactive, tr("Interactive tracking"));
+  batch = new Batch(this);
+  ui->tabWidget->addTab(batch, tr("Batch tracking"));
 
-    batch = new Batch(this);
-    ui->tabWidget->addTab(batch, tr("Batch tracking"));
-    
-    replay = new Replay(this);
-    ui->tabWidget->addTab(replay, tr("Tracking inspector"));
-    
+  replay = new Replay(this);
+  ui->tabWidget->addTab(replay, tr("Tracking inspector"));
 
-} // Constructor
-
-
-
+}  // Constructor
 
 /**
   * @brief Destructs the MainWindow object and saves the previous set of parameters.  
 */
-MainWindow::~MainWindow()
-{
-    delete ui;
+MainWindow::~MainWindow() {
+  delete ui;
 }
 

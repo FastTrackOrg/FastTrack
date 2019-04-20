@@ -15,21 +15,19 @@ This file is part of Fast Track.
     along with FastTrack.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QMainWindow>
-#include <QUrl>
-#include <QNetworkRequest>
-#include <QNetworkReply>
 #include <QByteArray>
+#include <QMainWindow>
 #include <QNetworkAccessManager>
-#include "interactive.h"
+#include <QNetworkReply>
+#include <QNetworkRequest>
+#include <QUrl>
 #include "batch.h"
+#include "interactive.h"
 #include "replay.h"
 #include "ui_mainwindow.h"
-
 
 using namespace std;
 
@@ -37,21 +35,19 @@ namespace Ui {
 class MainWindow;
 }
 
-class MainWindow : public QMainWindow
-{
-    Q_OBJECT
+class MainWindow : public QMainWindow {
+  Q_OBJECT
 
-public:
-    explicit MainWindow(QWidget *parent = 0);
-    ~MainWindow();
-      QByteArray version = "4.5.0";
+ public:
+  explicit MainWindow(QWidget *parent = 0);
+  ~MainWindow();
+  QByteArray version = "4.5.0";
 
-private:
-    Ui::MainWindow *ui;    /*!< ui file from Qt designer. */
-    Interactive *interactive;
-    Batch *batch;
-    Replay *replay;
-
+ private:
+  Ui::MainWindow *ui; /*!< ui file from Qt designer. */
+  Interactive *interactive;
+  Batch *batch;
+  Replay *replay;
 };
 
-#endif // MAINWINDOW_H
+#endif  // MAINWINDOW_H

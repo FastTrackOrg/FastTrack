@@ -15,19 +15,16 @@ This file is part of Fast Track.
     along with FastTrack.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-
-#include "mainwindow.h"
 #include <QApplication>
+#include "mainwindow.h"
 
-int main(int argc, char *argv[])
-{
-
+int main(int argc, char *argv[]) {
   QApplication a(argc, argv);
   MainWindow w;
   a.setApplicationName("Fast Track");
   a.setOrganizationName("Benjamin Gallois");
   a.setOrganizationDomain("fasttrack.benjamin-gallois.fr");
-  w.setWindowIcon(QIcon(":/assets/icon.png")); 
+  w.setWindowIcon(QIcon(":/assets/icon.png"));
   w.show();
   a.exec();
 }
