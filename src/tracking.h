@@ -92,8 +92,9 @@ class Tracking : public QObject {
   int param_y1;                      /*!< Top y corner of the region of interest. */
   int param_x2;                      /*!< Bottom x corner of the region of interest. */
   int param_y2;                      /*!< Bottom y corner of the region of interest. */
-  int param_dilatation;              /*!< Dilatation coefficient to dilate binary image. */
-  int param_erosion;                 /*!< Erosion coefficient to dilate binary image. */
+  int param_kernelSize;              /*!< Size of the kernel of the morphological operation. */
+  int param_kernelType;              /*!< Type of the kernel of the morphological operation. */
+  int param_morphOperation;              /*!< Type of the morphological operation. */
   QMap<QString, QString> parameters; /*!< map of all the parameters for the tracking. */
 
  public:

@@ -603,14 +603,9 @@ void Tracking::imageProcessing() {
   (statusBinarisation) ? (subtract(m_background, m_visuFrame, m_binaryFrame)) : (subtract(m_visuFrame, m_background, m_binaryFrame));
   binarisation(m_binaryFrame, 'b', param_thresh);
 
-  if (param_dilatation != 0) {
-    Mat element = getStructuringElement(MORPH_ELLIPSE, Size(2 * param_dilatation + 1, 2 * param_dilatation + 1), Point(param_dilatation, param_dilatation));
-    dilate(m_binaryFrame, m_binaryFrame, element);
-  }
-
-  if (param_erosion != 0) {
-    Mat element = getStructuringElement(MORPH_ELLIPSE, Size(2 * param_erosion + 1, 2 * param_erosion + 1), Point(param_erosion, param_erosion));
-    erode(m_binaryFrame, m_binaryFrame, element);
+  if (param_kernelSize != 0) {
+    Mat element = getStructuringElement(param_kernelType, Size(2 * param_kernelSize + 1, 2 * param_kernelSize + 1), Point(param_kernelSize, param_kernelSize));
+    morphologyEx(m_binaryFrame, m_binaryFrame, param_morphOperation, element);
   }
 
   if (m_ROI.width != 0 || m_ROI.height != 0) {
@@ -751,14 +746,10 @@ void Tracking::startProcess() {
   (statusBinarisation) ? (subtract(m_background, m_visuFrame, m_binaryFrame)) : (subtract(m_visuFrame, m_background, m_binaryFrame));
 
   binarisation(m_binaryFrame, 'b', param_thresh);
-  if (param_dilatation != 0) {
-    Mat element = getStructuringElement(MORPH_ELLIPSE, Size(2 * param_dilatation + 1, 2 * param_dilatation + 1), Point(param_dilatation, param_dilatation));
-    dilate(m_binaryFrame, m_binaryFrame, element);
-  }
 
-  if (param_erosion != 0) {
-    Mat element = getStructuringElement(MORPH_ELLIPSE, Size(2 * param_erosion + 1, 2 * param_erosion + 1), Point(param_erosion, param_erosion));
-    erode(m_binaryFrame, m_binaryFrame, element);
+  if (param_kernelSize != 0) {
+    Mat element = getStructuringElement(param_kernelType, Size(2 * param_kernelSize + 1, 2 * param_kernelSize + 1), Point(param_kernelSize, param_kernelSize));
+    morphologyEx(m_binaryFrame, m_binaryFrame, param_morphOperation, element);
   }
 
   if (m_ROI.width != 0) {
@@ -856,8 +847,9 @@ void Tracking::updatingParameters(const QMap<QString, QString> &parameterList) {
   m_ROI = Rect(param_x1, param_y1, param_x2 - param_x1, param_y2 - param_y1);
   statusRegistration = (parameterList.value("Registration") == "yes") ? true : false;
   statusBinarisation = (parameterList.value("Light background") == "yes") ? true : false;
-  param_dilatation = parameterList.value("Dilatation").toInt();
-  param_erosion = parameterList.value("Erosion").toInt();
+  param_morphOperation = parameterList.value("Morphological operation").toInt();
+  param_kernelSize = parameterList.value("Kernel size").toInt();
+  param_kernelType = parameterList.value("Kernel type").toInt();
 }
 
 /**

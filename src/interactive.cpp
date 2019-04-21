@@ -84,11 +84,14 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   });
 
   // Updates the display after each operation
-  connect(ui->erosion, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [this]() {
+  connect(ui->morphOperation, static_cast<void (QComboBox::*)(int)>(&QComboBox::activated), [this]() {
+    display(ui->slider->value());
+  });
+  connect(ui->kernelSize, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [this]() {
     ui->isBin->setChecked(true);
     display(ui->slider->value());
   });
-  connect(ui->dilatation, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [this]() {
+  connect(ui->kernelType, static_cast<void (QComboBox::*)(int)>(&QComboBox::activated), [this]() {
     ui->isBin->setChecked(true);
     display(ui->slider->value());
   });
@@ -280,10 +283,8 @@ void Interactive::display(int index) {
     if (ui->isBin->isChecked() && isBackground) {
       (ui->backColor->currentText() == "Light background") ? (subtract(background, frame, frame)) : (subtract(frame, background, frame));
       tracking->binarisation(frame, 'b', ui->threshBox->value());
-      Mat element = getStructuringElement(MORPH_ELLIPSE, Size(2 * ui->dilatation->value() + 1, 2 * ui->dilatation->value() + 1), Point(ui->dilatation->value(), ui->dilatation->value()));
-      dilate(frame, frame, element);
-      element = getStructuringElement(MORPH_ELLIPSE, Size(2 * ui->erosion->value() + 1, 2 * ui->erosion->value() + 1), Point(ui->erosion->value(), ui->erosion->value()));
-      erode(frame, frame, element);
+      Mat element = getStructuringElement(ui->kernelType->currentIndex(), Size(2 * ui->kernelSize->value() + 1, 2 * ui->kernelSize->value() + 1), Point(ui->kernelSize->value(), ui->kernelSize->value()));
+      morphologyEx(frame, frame, ui->morphOperation->currentIndex(), element); // MorphTypes enum and QComboBox indexes have to match
 
       // Keeps only right sized objects
       // To benchmark: pushBack contours vs loop over index and call drawContours multiple times
@@ -470,9 +471,10 @@ void Interactive::getParameters() {
   parameters.insert("ROI bottom x", QString::number(roi.br().x));
   parameters.insert("ROI bottom y", QString::number(roi.br().y));
   parameters.insert("Registration", QString(ui->reg->currentText()));
+  parameters.insert("Morphological operation", QString::number(ui->morphOperation->currentIndex()));
+  parameters.insert("Kernel size", QString::number(ui->kernelSize->value()));
+  parameters.insert("Kernel type", QString::number(ui->kernelType->currentIndex()));
   (QString(ui->backColor->currentText()) == "Dark background") ? parameters.insert("Light background", "no") : parameters.insert("Light background", "yes");
-  parameters.insert("Dilatation", QString::number(ui->dilatation->value()));
-  parameters.insert("Erosion", QString::number(ui->erosion->value()));
 }
 
 /**

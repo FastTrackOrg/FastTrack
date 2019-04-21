@@ -431,6 +431,9 @@
            </item>
            <item>
             <widget class="QComboBox" name="back">
+             <property name="currentIndex">
+              <number>0</number>
+             </property>
              <item>
               <property name="text">
                <string>Min</string>
@@ -519,7 +522,7 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>181</width>
+          <width>223</width>
           <height>463</height>
          </rect>
         </property>
@@ -616,7 +619,7 @@ corner</string>
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>219</width>
+          <width>223</width>
           <height>463</height>
          </rect>
         </property>
@@ -706,7 +709,7 @@ corner</string>
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>166</width>
+          <width>223</width>
           <height>463</height>
          </rect>
         </property>
@@ -714,35 +717,69 @@ corner</string>
          <string>Morphological operation</string>
         </attribute>
         <layout class="QGridLayout" name="gridLayout_10">
+         <item row="1" column="0">
+          <layout class="QHBoxLayout" name="horizontalLayout_7">
+           <item>
+            <widget class="QComboBox" name="morphOperation">
+             <item>
+              <property name="text">
+               <string>Erosion</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Dilatation</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Opening</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Closing</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Gradient</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Top hat</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Black hat</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Hit miss</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+          </layout>
+         </item>
          <item row="0" column="0">
           <layout class="QHBoxLayout" name="horizontalLayout_8">
            <item>
             <widget class="QLabel" name="label_9">
              <property name="text">
-              <string>Dilatation: </string>
+              <string>Kernel size:</string>
              </property>
             </widget>
            </item>
            <item>
-            <widget class="QSpinBox" name="dilatation"/>
+            <widget class="QSpinBox" name="kernelSize"/>
            </item>
           </layout>
          </item>
-         <item row="1" column="0">
-          <layout class="QHBoxLayout" name="horizontalLayout_7">
-           <item>
-            <widget class="QLabel" name="label_10">
-             <property name="text">
-              <string>Erosion: </string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QSpinBox" name="erosion"/>
-           </item>
-          </layout>
-         </item>
-         <item row="2" column="0">
+         <item row="3" column="0">
           <spacer name="verticalSpacer_5">
            <property name="orientation">
             <enum>Qt::Vertical</enum>
@@ -755,6 +792,28 @@ corner</string>
            </property>
           </spacer>
          </item>
+         <item row="2" column="0">
+          <widget class="QComboBox" name="kernelType">
+           <property name="currentIndex">
+            <number>2</number>
+           </property>
+           <item>
+            <property name="text">
+             <string>Rectangle</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Cross</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Ellipse</string>
+            </property>
+           </item>
+          </widget>
+         </item>
         </layout>
        </widget>
        <widget class="QWidget" name="page_2">
@@ -762,7 +821,7 @@ corner</string>
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>209</width>
+          <width>223</width>
           <height>463</height>
          </rect>
         </property>
