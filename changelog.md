@@ -1,5 +1,22 @@
 # FastTrack changelog
 
+## 4.6.0
+
+### Added
+- Progress bar for the background computation in the Interactive panel.
+- Automatic background type in the Interactive panel.
+- New morphological operation and morphological elements.
+- Progress bar in the Batch panel.
+- Clang-format file.
+
+### Changed
+- Domaine name is now www.fasttrack.sh.
+- Parameter table in the Batch panel.
+
+### Fixed
+- Zoom and pan anchored on the mouse pointer.
+- Automatic parameter file in the Batch panel.
+
 ## 4.5.0
 
 ### Added
