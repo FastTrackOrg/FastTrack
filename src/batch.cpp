@@ -293,7 +293,8 @@ void Batch::addPath() {
   ui->tablePath->insertRow(row);
   ui->tablePath->setItem(row, 0, new QTableWidgetItem(path));
   ui->tablePath->setItem(row, 1, new QTableWidgetItem(background));
-
+  QProgressBar *progressBarPath = new QProgressBar(ui->tablePath);
+  ui->tablePath->setCellWidget(row, 2, progressBarPath);
   process tmpProcess = {
       .path = path,
       .backgroundPath = background,
@@ -329,15 +330,19 @@ void Batch::startTracking() {
     ui->startButton->setDisabled(true);
 
     if (QDir(processList[0].path).exists()) {
+      int count = QDir(processList[0].path).count(); 
       string path = (processList[0].path + QDir::separator()).toStdString();
       string backgroundPath = processList[0].backgroundPath.toStdString();
+      QProgressBar *progressBar = qobject_cast<QProgressBar *>(ui->tablePath->cellWidget(0, 2));
+      progressBar->setRange(0, count);
+      progressBar->setValue(0);
 
       thread = new QThread;
       tracking = new Tracking(path, backgroundPath);
       tracking->moveToThread(thread);
 
       connect(thread, &QThread::started, tracking, &Tracking::startProcess);
-      connect(this, &Batch::newParameterList, tracking, &Tracking::updatingParameters);
+      connect(tracking, &Tracking::progress, progressBar, &QProgressBar::setValue);
       // When the analysis is finished, clears the path in the ui and removes it from the pathList
       connect(tracking, &Tracking::finished, [this]() {
         processList.removeFirst();
