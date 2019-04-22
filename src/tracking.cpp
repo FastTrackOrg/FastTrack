@@ -845,8 +845,8 @@ void Tracking::updatingParameters(const QMap<QString, QString> &parameterList) {
   param_x2 = parameterList.value("ROI bottom x").toInt();
   param_y2 = parameterList.value("ROI bottom y").toInt();
   m_ROI = Rect(param_x1, param_y1, param_x2 - param_x1, param_y2 - param_y1);
-  statusRegistration = (parameterList.value("Registration") == "yes") ? true : false;
-  statusBinarisation = (parameterList.value("Light background") == "yes") ? true : false;
+  statusRegistration = (parameterList.value("Registration") == "1") ? true : false;
+  statusBinarisation = (parameterList.value("Light background") == "0") ? true : false;
   param_morphOperation = parameterList.value("Morphological operation").toInt();
   param_kernelSize = parameterList.value("Kernel size").toInt();
   param_kernelType = parameterList.value("Kernel type").toInt();

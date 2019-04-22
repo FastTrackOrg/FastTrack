@@ -470,11 +470,11 @@ void Interactive::getParameters() {
   parameters.insert("ROI top y", QString::number(roi.tl().y));
   parameters.insert("ROI bottom x", QString::number(roi.br().x));
   parameters.insert("ROI bottom y", QString::number(roi.br().y));
-  parameters.insert("Registration", QString(ui->reg->currentText()));
+  parameters.insert("Registration", QString::number(ui->reg->currentIndex()));
   parameters.insert("Morphological operation", QString::number(ui->morphOperation->currentIndex()));
   parameters.insert("Kernel size", QString::number(ui->kernelSize->value()));
   parameters.insert("Kernel type", QString::number(ui->kernelType->currentIndex()));
-  (QString(ui->backColor->currentText()) == "Dark background") ? parameters.insert("Light background", "no") : parameters.insert("Light background", "yes");
+  parameters.insert("Light background", QString::number(ui->backColor->currentIndex()));
 }
 
 /**

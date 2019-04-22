@@ -6,26 +6,46 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>613</width>
-    <height>626</height>
+    <width>952</width>
+    <height>677</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Batch</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0">
-    <widget class="QLineEdit" name="textPathAdd">
-     <property name="text">
-      <string>Select an image sequence</string>
+   <item row="4" column="2">
+    <widget class="QPushButton" name="addPath">
+     <property name="maximumSize">
+      <size>
+       <width>151</width>
+       <height>34</height>
+      </size>
      </property>
-     <property name="dragEnabled">
-      <bool>true</bool>
+     <property name="text">
+      <string>Add</string>
+     </property>
+     <property name="shortcut">
+      <string>I</string>
      </property>
     </widget>
    </item>
-   <item row="0" column="2">
-    <widget class="QPushButton" name="openPath">
+   <item row="1" column="0">
+    <widget class="QLineEdit" name="textBackgroundAdd">
+     <property name="text">
+      <string>Select a background image (optional)</string>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="0" colspan="3">
+    <widget class="Line" name="line_5">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="2">
+    <widget class="QPushButton" name="loadSettings">
      <property name="maximumSize">
       <size>
        <width>151</width>
@@ -35,15 +55,15 @@
      <property name="text">
       <string/>
      </property>
-     <property name="shortcut">
-      <string>O</string>
-     </property>
     </widget>
    </item>
-   <item row="1" column="0">
-    <widget class="QLineEdit" name="textBackgroundAdd">
+   <item row="3" column="2">
+    <widget class="QCheckBox" name="isAuto">
      <property name="text">
-      <string>Select a background image (optional)</string>
+      <string>Auto Load</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
      </property>
     </widget>
    </item>
@@ -63,23 +83,13 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="0">
-    <widget class="QLineEdit" name="textLoadSettings">
+   <item row="9" column="0" colspan="3">
+    <widget class="QPushButton" name="startButton">
      <property name="text">
-      <string>Select a settings files (optional)</string>
+      <string>Start tracking</string>
      </property>
-    </widget>
-   </item>
-   <item row="2" column="2">
-    <widget class="QPushButton" name="loadSettings">
-     <property name="maximumSize">
-      <size>
-       <width>151</width>
-       <height>34</height>
-      </size>
-     </property>
-     <property name="text">
-      <string/>
+     <property name="shortcut">
+      <string>Space</string>
      </property>
     </widget>
    </item>
@@ -99,19 +109,13 @@
      </property>
     </widget>
    </item>
-   <item row="4" column="2">
-    <widget class="QPushButton" name="addPath">
-     <property name="maximumSize">
-      <size>
-       <width>151</width>
-       <height>34</height>
-      </size>
-     </property>
+   <item row="0" column="0">
+    <widget class="QLineEdit" name="textPathAdd">
      <property name="text">
-      <string>Add</string>
+      <string>Select an image sequence</string>
      </property>
-     <property name="shortcut">
-      <string>I</string>
+     <property name="dragEnabled">
+      <bool>true</bool>
      </property>
     </widget>
    </item>
@@ -119,6 +123,29 @@
     <widget class="Line" name="line_6">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="2">
+    <widget class="QPushButton" name="openPath">
+     <property name="maximumSize">
+      <size>
+       <width>151</width>
+       <height>34</height>
+      </size>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="shortcut">
+      <string>O</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLineEdit" name="textLoadSettings">
+     <property name="text">
+      <string>Select a settings files (optional)</string>
      </property>
     </widget>
    </item>
@@ -143,6 +170,9 @@
       <property name="sortingEnabled">
        <bool>false</bool>
       </property>
+      <attribute name="verticalHeaderVisible">
+       <bool>false</bool>
+      </attribute>
       <column>
        <property name="text">
         <string>Parameter</string>
@@ -153,44 +183,7 @@
         <string>Value</string>
        </property>
       </column>
-      <column>
-       <property name="text">
-        <string>Description</string>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>11</pointsize>
-        </font>
-       </property>
-      </column>
      </widget>
-    </widget>
-   </item>
-   <item row="8" column="0" colspan="3">
-    <widget class="Line" name="line_5">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
-   </item>
-   <item row="9" column="0" colspan="3">
-    <widget class="QPushButton" name="startButton">
-     <property name="text">
-      <string>Start tracking</string>
-     </property>
-     <property name="shortcut">
-      <string>Space</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="2">
-    <widget class="QCheckBox" name="isAuto">
-     <property name="text">
-      <string>Auto Load</string>
-     </property>
-     <property name="checked">
-      <bool>true</bool>
-     </property>
     </widget>
    </item>
   </layout>

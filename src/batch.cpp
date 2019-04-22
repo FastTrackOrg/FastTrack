@@ -52,54 +52,176 @@ Batch::Batch(QWidget* parent) : QWidget(parent),
   qRegisterMetaType<QMap<QString, QString>>("QMap<QString, QString>");
   cv::ocl::setUseOpenCL(false);
 
-  ////////////////////////////Parameters panel/////////////////////////////////////////////
 
-  // Defines all the parameters to fill the parameter panel.
-  // For initialization the parameters are stored in a QMap with <QString>key: name of the parameter
-  // and <QString>value: value | description of the parameter for the initialization
-  // After initialization the QMap parameterList is {<QString> key, <QString> value}
   ui->tableParameters->horizontalHeader()->setStretchLastSection(true);
-  // Default Name, value|description
-  parameterList.insert("Dilatation", "0|Dilates the image. Sets to 0 for no dilatation.");
-  parameterList.insert("Maximal time", "50|.");
-  parameterList.insert("Registration", "no|Sets to yes to activate registration.");
-  parameterList.insert("Background method", "3|");
-  parameterList.insert("Light background", "yes|Sets to yes if objects are dark on light background. Sets to no if objects are light on dark background.");
-  parameterList.insert("ROI bottom y", "0|Bottom corner y coordinate of the region of interest. Sets to 0 for keeping the full image.");
-  parameterList.insert("ROI bottom x", "0|Bottom corner x coordinate of the region of interest. Sets to 0 for keeping the full image.");
-  parameterList.insert("ROI top y", "0|Top corner y coordinate of the region of interest. Sets to 0 for keeping the full image.");
-  parameterList.insert("ROI top x", "0|Top corner x coordinate of the region of interest. Sets to 0 for keeping the full image.");
-  parameterList.insert("Number of images background", "50|The number of images averaged to compute the background.");
-  parameterList.insert("Arrow size", "2|Size of the arrow in the tracking display.");
-  parameterList.insert("Maximal occlusion", "100|The maximum assignment distance in pixels. Only objects that have moved less than this value between two images are considered for the matching phase.");
-  parameterList.insert("Weight", "0.5|Closer to one the cost function used in the matching phase will be more sensitive to change in distance, closer to zero it will be more sensitive to change in direction.");
-  parameterList.insert("Maximal angle", "90|The maximal change in orientation in degrees of an object between two consecutive images.");
-  parameterList.insert("Maximal length", "100|The maximal displacement in pixels of an object between two consecutive images.");
-  parameterList.insert("Spot to track", "0|The part of the object used for the matching. 0: head, 1: tail, 2: full body.");
-  parameterList.insert("Binary threshold", "70|The threshold value (0 to 255) to separate objects from the background.");
-  parameterList.insert("Minimal size", "50|The minimal size of an object in pixels.");
-  parameterList.insert("Maximal size", "5000|The maximal size of an object to in pixels.");
+  
+  // Populates the parameter table
+  ui->tableParameters->insertRow(0);
+  ui->tableParameters->setItem(0, 0, new QTableWidgetItem("Background method"));
+  ui->tableParameters->item(0, 0)->setFlags(ui->tableParameters->item(0, 0)->flags() & ~Qt::ItemIsEditable);
+  QComboBox *backMethod = new QComboBox(ui->tableParameters);
+  backMethod->addItems({"Minimum", "Maximum", "Average"});
+  ui->tableParameters->setCellWidget(0, 1, backMethod);
+  connect(backMethod, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &Batch::updateParameters);
+  
+  ui->tableParameters->insertRow(1);
+  ui->tableParameters->setItem(1, 0, new QTableWidgetItem("Number of images background"));
+  ui->tableParameters->item(1, 0)->setFlags(ui->tableParameters->item(1, 0)->flags() & ~Qt::ItemIsEditable);
+  QSpinBox *backNumber = new QSpinBox(ui->tableParameters);
+  backNumber->setRange(0, 9999999);
+  ui->tableParameters->setCellWidget(1, 1, backNumber);
+  connect(backNumber, QOverload<int>::of(&QSpinBox::valueChanged), this, &Batch::updateParameters);
 
-  loadSettings();
+  ui->tableParameters->insertRow(2);
+  ui->tableParameters->setItem(2, 0, new QTableWidgetItem("Binary threshold"));
+  ui->tableParameters->item(2, 0)->setFlags(ui->tableParameters->item(2, 0)->flags() & ~Qt::ItemIsEditable);
+  QSpinBox *binThresh = new QSpinBox(ui->tableParameters);
+  binThresh->setRange(0, 255);
+  ui->tableParameters->setCellWidget(2, 1, binThresh);
+  connect(binThresh, QOverload<int>::of(&QSpinBox::valueChanged), this, &Batch::updateParameters);
 
-  // Fills the parameters table with the default names values and descriptions
-  // and deletes the descriptions that are not used anymore
-  for (int i = 0; i < parameterList.keys().length(); i++) {
-    ui->tableParameters->setSortingEnabled(false);
-    ui->tableParameters->insertRow(i);
-    QString parameterName = parameterList.keys()[i];
-    ui->tableParameters->setItem(i, 0, new QTableWidgetItem(parameterName));
-    ui->tableParameters->item(i, 0)->setFlags(ui->tableParameters->item(i, 0)->flags() & ~Qt::ItemIsEditable);
-    QStringList parameterAttributs = parameterList.value(parameterName).split('|');
-    ui->tableParameters->setItem(i, 1, new QTableWidgetItem(parameterAttributs[0]));
-    ui->tableParameters->setItem(i, 2, new QTableWidgetItem(parameterAttributs[1]));
-    ui->tableParameters->item(i, 2)->setFlags(ui->tableParameters->item(i, 2)->flags() & ~Qt::ItemIsEditable);
-    parameterList.insert(parameterName, parameterAttributs[0]);
-    ui->tableParameters->setRowHeight(i, 60);
-  }
+  ui->tableParameters->insertRow(3);
+  ui->tableParameters->setItem(3, 0, new QTableWidgetItem("Light background"));
+  ui->tableParameters->item(3, 0)->setFlags(ui->tableParameters->item(3, 0)->flags() & ~Qt::ItemIsEditable);
+  QComboBox *backType = new QComboBox(ui->tableParameters);
+  backType->addItems({"Yes", "No"});
+  ui->tableParameters->setCellWidget(3, 1, backType);
+  connect(backType, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &Batch::updateParameters);
 
-  connect(ui->tableParameters, SIGNAL(itemChanged(QTableWidgetItem*)), this, SLOT(updateParameterList(QTableWidgetItem*)));
+  ui->tableParameters->insertRow(4);
+  ui->tableParameters->setItem(4, 0, new QTableWidgetItem("RIO top x"));
+  ui->tableParameters->item(4, 0)->setFlags(ui->tableParameters->item(4, 0)->flags() & ~Qt::ItemIsEditable);
+  QSpinBox *xTop = new QSpinBox(ui->tableParameters);
+  xTop->setRange(0, 9999999);
+  ui->tableParameters->setCellWidget(4, 1, xTop);
+  connect(xTop, QOverload<int>::of(&QSpinBox::valueChanged), this, &Batch::updateParameters);
+
+  ui->tableParameters->insertRow(5);
+  ui->tableParameters->setItem(5, 0, new QTableWidgetItem("ROI top y"));
+  ui->tableParameters->item(5, 0)->setFlags(ui->tableParameters->item(5, 0)->flags() & ~Qt::ItemIsEditable);
+  QSpinBox *yTop = new QSpinBox(ui->tableParameters);
+  yTop->setRange(0, 9999999);
+  ui->tableParameters->setCellWidget(5, 1, yTop);
+  connect(yTop, QOverload<int>::of(&QSpinBox::valueChanged), this, &Batch::updateParameters);
+
+  ui->tableParameters->insertRow(6);
+  ui->tableParameters->setItem(6, 0, new QTableWidgetItem("ROI bottom x"));
+  ui->tableParameters->item(6, 0)->setFlags(ui->tableParameters->item(6, 0)->flags() & ~Qt::ItemIsEditable);
+  QSpinBox *xBottom = new QSpinBox(ui->tableParameters);
+  xBottom->setRange(0, 9999999);
+  ui->tableParameters->setCellWidget(6, 1, xBottom);
+  connect(xBottom, QOverload<int>::of(&QSpinBox::valueChanged), this, &Batch::updateParameters);
+
+  ui->tableParameters->insertRow(7);
+  ui->tableParameters->setItem(7, 0, new QTableWidgetItem("ROI bottom y"));
+  ui->tableParameters->item(7, 0)->setFlags(ui->tableParameters->item(6, 0)->flags() & ~Qt::ItemIsEditable);
+  QSpinBox *yBottom = new QSpinBox(ui->tableParameters);
+  yBottom->setRange(0, 9999999);
+  ui->tableParameters->setCellWidget(7, 1, yBottom);
+  connect(yBottom, QOverload<int>::of(&QSpinBox::valueChanged), this, &Batch::updateParameters);
+
+  ui->tableParameters->insertRow(8);
+  ui->tableParameters->setItem(8, 0, new QTableWidgetItem("Registration"));
+  ui->tableParameters->item(8, 0)->setFlags(ui->tableParameters->item(8, 0)->flags() & ~Qt::ItemIsEditable);
+  QComboBox *registration = new QComboBox(ui->tableParameters);
+  registration->addItems({"No", "Yes"});
+  ui->tableParameters->setCellWidget(8, 1, registration);
+  connect(registration, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &Batch::updateParameters);
+
+  ui->tableParameters->insertRow(9);
+  ui->tableParameters->setItem(9, 0, new QTableWidgetItem("Morphological operation"));
+  ui->tableParameters->item(9, 0)->setFlags(ui->tableParameters->item(9, 0)->flags() & ~Qt::ItemIsEditable);
+  QComboBox *morphType = new QComboBox(ui->tableParameters);
+  morphType->addItems({"Erosion", "Dilatation", "Opening", "Closing", "Gradient", "Top hat", "Black hat", "Hit miss"});
+  ui->tableParameters->setCellWidget(9, 1, morphType);
+  connect(morphType, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &Batch::updateParameters);
+
+  ui->tableParameters->insertRow(10);
+  ui->tableParameters->setItem(10, 0, new QTableWidgetItem("Kernel type"));
+  ui->tableParameters->item(10, 0)->setFlags(ui->tableParameters->item(10, 0)->flags() & ~Qt::ItemIsEditable);
+  QComboBox *kernelType = new QComboBox(ui->tableParameters);
+  kernelType->addItems({"Rectangle", "Cross", "Ellipse"});
+  ui->tableParameters->setCellWidget(10, 1, kernelType);
+  connect(kernelType, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &Batch::updateParameters);
+
+  ui->tableParameters->insertRow(11);
+  ui->tableParameters->setItem(11, 0, new QTableWidgetItem("Kernel size"));
+  ui->tableParameters->item(11, 0)->setFlags(ui->tableParameters->item(11, 0)->flags() & ~Qt::ItemIsEditable);
+  QSpinBox *kernelSize = new QSpinBox(ui->tableParameters);
+  kernelSize->setRange(0, 9999999);
+  ui->tableParameters->setCellWidget(11, 1, kernelSize);
+  connect(kernelSize, QOverload<int>::of(&QSpinBox::valueChanged), this, &Batch::updateParameters);
+
+  ui->tableParameters->insertRow(12);
+  ui->tableParameters->setItem(12, 0, new QTableWidgetItem("Minimal size"));
+  ui->tableParameters->item(12, 0)->setFlags(ui->tableParameters->item(12, 0)->flags() & ~Qt::ItemIsEditable);
+  QSpinBox *minSize = new QSpinBox(ui->tableParameters);
+  minSize->setRange(0, 9999999);
+  ui->tableParameters->setCellWidget(12, 1, minSize);
+  connect(minSize, QOverload<int>::of(&QSpinBox::valueChanged), this, &Batch::updateParameters);
+
+  ui->tableParameters->insertRow(13);
+  ui->tableParameters->setItem(13, 0, new QTableWidgetItem("Maximal size"));
+  ui->tableParameters->item(13, 0)->setFlags(ui->tableParameters->item(13, 0)->flags() & ~Qt::ItemIsEditable);
+  QSpinBox *maxSize = new QSpinBox(ui->tableParameters);
+  maxSize->setRange(0, 9999999);
+  ui->tableParameters->setCellWidget(13, 1, maxSize);
+  connect(maxSize, QOverload<int>::of(&QSpinBox::valueChanged), this, &Batch::updateParameters);
+
+  ui->tableParameters->insertRow(14);
+  ui->tableParameters->setItem(14, 0, new QTableWidgetItem("Maximal length"));
+  ui->tableParameters->item(14, 0)->setFlags(ui->tableParameters->item(14, 0)->flags() & ~Qt::ItemIsEditable);
+  QSpinBox *maxLength = new QSpinBox(ui->tableParameters);
+  maxLength->setRange(0, 9999999);
+  ui->tableParameters->setCellWidget(14, 1, maxLength);
+  connect(maxLength, QOverload<int>::of(&QSpinBox::valueChanged), this, &Batch::updateParameters);
+
+  ui->tableParameters->insertRow(15);
+  ui->tableParameters->setItem(15, 0, new QTableWidgetItem("Maximal angle"));
+  ui->tableParameters->item(15, 0)->setFlags(ui->tableParameters->item(15, 0)->flags() & ~Qt::ItemIsEditable);
+  QSpinBox *maxAngle = new QSpinBox(ui->tableParameters);
+  maxAngle->setRange(0, 360);
+  ui->tableParameters->setCellWidget(15, 1, maxAngle);
+  connect(maxAngle, QOverload<int>::of(&QSpinBox::valueChanged), this, &Batch::updateParameters);
+
+  ui->tableParameters->insertRow(16);
+  ui->tableParameters->setItem(16, 0, new QTableWidgetItem("Maximal time"));
+  ui->tableParameters->item(16, 0)->setFlags(ui->tableParameters->item(16, 0)->flags() & ~Qt::ItemIsEditable);
+  QSpinBox *maxTime = new QSpinBox(ui->tableParameters);
+  maxTime->setRange(0, 9999999);
+  ui->tableParameters->setCellWidget(16, 1, maxTime);
+  connect(maxTime, QOverload<int>::of(&QSpinBox::valueChanged), this, &Batch::updateParameters);
+
+  ui->tableParameters->insertRow(17);
+  ui->tableParameters->setItem(17, 0, new QTableWidgetItem("Maximal occlusion"));
+  ui->tableParameters->item(17, 0)->setFlags(ui->tableParameters->item(17, 0)->flags() & ~Qt::ItemIsEditable);
+  QSpinBox *maxOccl = new QSpinBox(ui->tableParameters);
+  maxOccl->setRange(0, 9999999);
+  ui->tableParameters->setCellWidget(17, 1, maxOccl);
+  connect(maxOccl, QOverload<int>::of(&QSpinBox::valueChanged), this, &Batch::updateParameters);
+
+  ui->tableParameters->insertRow(18);
+  ui->tableParameters->setItem(18, 0, new QTableWidgetItem("Spot to track"));
+  ui->tableParameters->item(18, 0)->setFlags(ui->tableParameters->item(18, 0)->flags() & ~Qt::ItemIsEditable);
+  QComboBox *spotType = new QComboBox(ui->tableParameters);
+  spotType->addItems({"Head", "Tail", "Body"});
+  spotType->setCurrentIndex(2);
+  ui->tableParameters->setCellWidget(18, 1, spotType);
+  connect(spotType, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &Batch::updateParameters);
+
+  ui->tableParameters->insertRow(19);
+  ui->tableParameters->setItem(19, 0, new QTableWidgetItem("Weight"));
+  ui->tableParameters->item(19, 0)->setFlags(ui->tableParameters->item(19, 0)->flags() & ~Qt::ItemIsEditable);
+  QDoubleSpinBox *weight = new QDoubleSpinBox(ui->tableParameters);
+  weight->setRange(0, 1);
+  weight->setValue(0.5);
+  weight->setSingleStep(0.1);
+  ui->tableParameters->setCellWidget(19, 1, weight);
+  connect(weight, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &Batch::updateParameters);
+
+
   connect(ui->loadSettings, &QPushButton::pressed, this, &Batch::openParameterFile);
+  loadSettings();
 
   ////////////////////////////Path panel/////////////////////////////////////////////
   ui->tablePath->horizontalHeader()->setStretchLastSection(true);
@@ -133,16 +255,18 @@ void Batch::openPathFolder() {
 
   // If Tracking_Result folder selectionned, get the path to the top directory
   if (dir.right(15) == "Tracking_Result") {
-    dir.truncate(dir.size() - 15);
+    dir.truncate(dir.size() - 16);
   }
 
   if (dir.length()) {
     ui->textPathAdd->setText(dir);
     // Autoloads  background and tracking if auto is checked
     if (ui->isAuto->isChecked()) {
-      ui->textBackgroundAdd->setText(dir + "Tracking_Result/background.pgm");
-      if (loadParameterFile(dir + "Tracking_Result/parameter.param")) {
-        ui->textLoadSettings->setText(dir + "Tracking_Result/parameter.param");
+      if (QFileInfo(dir + "/Tracking_Result/background.pgm").exists()) {
+        ui->textBackgroundAdd->setText(dir + "/Tracking_Result/background.pgm");
+      }
+      if (loadParameterFile(dir + "/Tracking_Result/parameter.param")) {
+        ui->textLoadSettings->setText(dir + "/Tracking_Result/parameter.param");
         updateParameterTable();
       }
     }
@@ -248,13 +372,26 @@ void Batch::startTracking() {
   * @brief Updates the parameterList vector with the new parameter when users changes a parameter in the QTableWidget of parameters. Triggered when ui->tableParameters is modified. Emits the updated parameters QMap.
   * @param[in] item QTableWidgetItem from a QTableWidget.
 */
-void Batch::updateParameterList(QTableWidgetItem* item) {
-  int row = item->row();
-  QString parameterName = ui->tableParameters->item(row, 0)->text();
-  QString parameterValue = ui->tableParameters->item(row, 1)->text();
-  parameterList.insert(parameterName, parameterValue);
-  saveSettings();
-  emit(newParameterList(parameterList));
+void Batch::updateParameters() {
+  if (isEditable) {
+    // Updates SpinBox parameters
+    QVector<int> spinBoxIndexes = {1, 2, 4, 5, 6, 7, 11, 12, 13, 14, 15, 16, 17};
+    QVector<int> doubleSpinBoxIndexes = {19};
+    QVector<int> comboBoxIndexes = {3, 8, 9, 10, 18};
+
+    for (auto &a : spinBoxIndexes) {
+      parameterList.insert(ui->tableParameters->item(a, 0)->text(), QString::number(qobject_cast<QSpinBox *>(ui->tableParameters->cellWidget(a, 1))->value()));
+    }
+    for (auto &a : doubleSpinBoxIndexes) {
+      parameterList.insert(ui->tableParameters->item(a, 0)->text(), QString::number(qobject_cast<QDoubleSpinBox *>(ui->tableParameters->cellWidget(a, 1))->value()));
+    }
+    for (auto &a : comboBoxIndexes) {
+      parameterList.insert(ui->tableParameters->item(a, 0)->text(), QString::number(qobject_cast<QComboBox *>(ui->tableParameters->cellWidget(a, 1))->currentIndex()));
+    }
+
+    saveSettings();
+    emit(newParameterList(parameterList));
+  }
 }
 
 /**
@@ -264,12 +401,10 @@ void Batch::loadSettings() {
   settingsFile = new QSettings("FastTrack", "Benjamin Gallois", this);
   settingsFile->setFallbacksEnabled(false);  // Shadows global variables added in MacOs system
   QStringList keyList = settingsFile->allKeys();
-
   for (auto a : keyList) {
-    QStringList parameterDescription = parameterList.value(a).split('|');
-    QString valueDescription = QString(settingsFile->value(a).toString() + "|" + parameterDescription[1]);
-    parameterList.insert(a, valueDescription);
+    parameterList.insert(a, settingsFile->value(a).toString());
   }
+  updateParameterTable();
 }
 
 /**
@@ -318,10 +453,20 @@ bool Batch::loadParameterFile(QString path) {
   * @brief Takes the QMap parameterList and updates the parameters panel table..
 */
 void Batch::updateParameterTable() {
+  isEditable = false;
   for (int i = 0; i < ui->tableParameters->rowCount(); i++) {
     QString label = ui->tableParameters->item(i, 0)->text();
-    ui->tableParameters->item(i, 1)->setText(parameterList.value(label));
+    if (qobject_cast<QSpinBox *>(ui->tableParameters->cellWidget(i, 1))) {
+      qobject_cast<QSpinBox *>(ui->tableParameters->cellWidget(i, 1))->setValue(parameterList.value(label).toInt());
+    }
+    else if (qobject_cast<QDoubleSpinBox *>(ui->tableParameters->cellWidget(i, 1))) {
+      qobject_cast<QDoubleSpinBox *>(ui->tableParameters->cellWidget(i, 1))->setValue(parameterList.value(label).toDouble());
+    }
+    else if (qobject_cast<QComboBox *>(ui->tableParameters->cellWidget(i, 1))) {
+      qobject_cast<QComboBox *>(ui->tableParameters->cellWidget(i, 1))->setCurrentIndex(parameterList.value(label).toInt());
+    }
   }
+  isEditable = true;
 }
 
 /**
