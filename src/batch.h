@@ -73,6 +73,7 @@ class Batch : public QWidget {
   QSettings *settingsFile; /*!< Saves parameters in a settings.ini file.*/
   QString memoryDir;       /*!< Saves the path of the last opened folder.*/
   bool isEditable;
+  int currentPathCount;
 
   //    Replay *replayPanel;
 

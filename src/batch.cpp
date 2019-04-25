@@ -25,15 +25,30 @@ This file is part of Fast Track.
 using namespace cv;
 using namespace std;
 
-Batch::Batch(QWidget* parent) : QWidget(parent),
+/**
+ * @class Batch
+ *
+ * @brief The Batch widget provides an convenient way to add multiple files to analyze.
+ *
+ * @author Benjamin Gallois
+ *
+ * @version $Revision: 460 $
+ *
+ * Contact: gallois.benjamin08@gmail.com
+ *
+ */
+
+/**
+  * @brief Constructs the Batch widget.
+*/
+Batch::Batch(QWidget *parent) : QWidget(parent),
                                 ui(new Ui::Batch) {
   ui->setupUi(this);
+
   // Setup the ui
   QDir::setCurrent(QCoreApplication::applicationDirPath());
   setWindowState(Qt::WindowMaximized);
   setWindowTitle("Fast Track");
-  ui->tableParameters->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-  ui->tablePath->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
   QIcon img = QIcon(":/assets/buttons/open.png");
   ui->openPath->setIcon(img);
@@ -50,10 +65,14 @@ Batch::Batch(QWidget* parent) : QWidget(parent),
   // Registers QMetaType
   qRegisterMetaType<UMat>("UMat&");
   qRegisterMetaType<QMap<QString, QString>>("QMap<QString, QString>");
+
+  // Unactivates OpenCl that can slow-down the program
   cv::ocl::setUseOpenCL(false);
 
-
   ui->tableParameters->horizontalHeader()->setStretchLastSection(true);
+  ui->tableParameters->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+  ui->tablePath->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+  currentPathCount = 0;
   
   // Populates the parameter table
   ui->tableParameters->insertRow(0);
@@ -223,7 +242,7 @@ Batch::Batch(QWidget* parent) : QWidget(parent),
   connect(ui->loadSettings, &QPushButton::pressed, this, &Batch::openParameterFile);
   loadSettings();
 
-  ////////////////////////////Path panel/////////////////////////////////////////////
+  // Setups the path panel
   ui->tablePath->horizontalHeader()->setStretchLastSection(true);
   ui->tablePath->setSortingEnabled(false);
   connect(ui->openPath, &QPushButton::clicked, this, &Batch::openPathFolder);
@@ -240,12 +259,8 @@ Batch::Batch(QWidget* parent) : QWidget(parent),
   connect(this, &Batch::next, this, &Batch::startTracking);
 }
 
-/*******************************************************************************************\
-                                    Path panel
-\*******************************************************************************************/
-
 /**
-  * @brief Opens a dialogue window to select a folder and updates ui->textPathAdd. Triggered when ui->openPath is clicked.
+  * @brief Opens a dialogue window to select a folder and updates the textPathAdd. Triggered when the openPath button is clicked.
 */
 void Batch::openPathFolder() {
   ui->textBackgroundAdd->clear();
@@ -314,6 +329,7 @@ void Batch::removePath() {
   if (row != -1) {
     processList.remove(row);
     ui->tablePath->removeRow(row);
+    currentPathCount --;
   }
 }
 
@@ -326,14 +342,15 @@ void Batch::startTracking() {
   // Creates a folder "Tracking_Result" inside the path and save the parameters file.
   // Start the tracking analysis in a new thread and manage creation and destruction
   // of the tracking object.
-  if (!processList.isEmpty()) {
+  if (currentPathCount < processList.size()) {
     ui->startButton->setDisabled(true);
+    ui->removePath->setDisabled(true);
 
-    if (QDir(processList[0].path).exists()) {
-      int count = QDir(processList[0].path).count(); 
-      string path = (processList[0].path + QDir::separator()).toStdString();
-      string backgroundPath = processList[0].backgroundPath.toStdString();
-      QProgressBar *progressBar = qobject_cast<QProgressBar *>(ui->tablePath->cellWidget(0, 2));
+    if (QDir(processList[currentPathCount].path).exists()) {
+      int count = QDir(processList[currentPathCount].path).count(); 
+      string path = (processList[currentPathCount].path + QDir::separator()).toStdString();
+      string backgroundPath = processList[currentPathCount].backgroundPath.toStdString();
+      QProgressBar *progressBar = qobject_cast<QProgressBar *>(ui->tablePath->cellWidget(currentPathCount, 2));
       progressBar->setRange(0, count);
       progressBar->setValue(0);
 
@@ -343,14 +360,12 @@ void Batch::startTracking() {
 
       connect(thread, &QThread::started, tracking, &Tracking::startProcess);
       connect(tracking, &Tracking::progress, progressBar, &QProgressBar::setValue);
-      // When the analysis is finished, clears the path in the ui and removes it from the pathList
-      connect(tracking, &Tracking::finished, [this]() {
-        processList.removeFirst();
-        ui->tablePath->removeRow(0);
+      connect(tracking, &Tracking::finished, progressBar, [this, progressBar, count]() {
+        ui->tablePath->setItem(currentPathCount, 3, new QTableWidgetItem("Done"));
+        progressBar->setValue(count);
+        currentPathCount ++;
+        emit(next());
       });
-
-      connect(tracking, &Tracking::finished, this, &Batch::next);
-      connect(tracking, &Tracking::error, this, &Batch::errors);
       connect(tracking, &Tracking::finished, thread, &QThread::quit);
       connect(tracking, &Tracking::finished, tracking, &Tracking::deleteLater);
       connect(thread, &QThread::finished, thread, &QThread::deleteLater);
@@ -360,12 +375,13 @@ void Batch::startTracking() {
     }
     else {
       processList.removeFirst();
-      ui->tablePath->removeRow(0);
       ui->startButton->setDisabled(false);
+      ui->removePath->setDisabled(false);
     }
   }
   else {
     ui->startButton->setDisabled(false);
+    ui->removePath->setDisabled(false);
   }
 }
 
