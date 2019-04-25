@@ -71,7 +71,7 @@ Batch::Batch(QWidget *parent) : QWidget(parent),
 
   ui->tableParameters->horizontalHeader()->setStretchLastSection(true);
   ui->tableParameters->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-  ui->tablePath->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+  ui->tablePath->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
   currentPathCount = 0;
   
   // Populates the parameter table
@@ -266,23 +266,64 @@ void Batch::openPathFolder() {
   ui->textBackgroundAdd->clear();
   ui->textPathAdd->clear();
   ui->textLoadSettings->clear();
-  QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"), memoryDir, QFileDialog::ShowDirsOnly);
 
-  // If Tracking_Result folder selectionned, get the path to the top directory
-  if (dir.right(15) == "Tracking_Result") {
-    dir.truncate(dir.size() - 16);
+  // Enable multiple selection
+  QFileDialog dialog;
+  dialog.setOption(QFileDialog::DontUseNativeDialog, true);
+  dialog.setFileMode(QFileDialog::DirectoryOnly);
+  QListView *listView = dialog.findChild<QListView *>("listView");
+  if (listView) {
+    listView->setSelectionMode(QAbstractItemView::MultiSelection);
+  }
+  QTreeView *treeView = dialog.findChild<QTreeView *>();
+  if (treeView) {
+    treeView->setSelectionMode(QAbstractItemView::MultiSelection);
+  }
+  QStringList dirList;
+  if (dialog.exec()) {
+    dirList = dialog.selectedFiles();
   }
 
-  if (dir.length()) {
-    ui->textPathAdd->setText(dir);
-    // Autoloads  background and tracking if auto is checked
-    if (ui->isAuto->isChecked()) {
-      if (QFileInfo(dir + "/Tracking_Result/background.pgm").exists()) {
-        ui->textBackgroundAdd->setText(dir + "/Tracking_Result/background.pgm");
+  if (dirList.size() > 1) {
+    for (auto dir : dirList) {
+      // If Tracking_Result folder selectionned, get the path to the top directory
+      if (dir.right(15) == "Tracking_Result") {
+        dir.truncate(dir.size() - 16);
       }
-      if (loadParameterFile(dir + "/Tracking_Result/parameter.param")) {
-        ui->textLoadSettings->setText(dir + "/Tracking_Result/parameter.param");
-        updateParameterTable();
+
+      if (dir.length()) {
+        ui->textPathAdd->setText(dir);
+        // Autoloads  background and tracking if auto is checked
+        if (ui->isAuto->isChecked()) {
+          if (QFileInfo(dir + "/Tracking_Result/background.pgm").exists()) {
+            ui->textBackgroundAdd->setText(dir + "/Tracking_Result/background.pgm");
+          }
+          if (loadParameterFile(dir + "/Tracking_Result/parameter.param")) {
+            ui->textLoadSettings->setText(dir + "/Tracking_Result/parameter.param");
+            updateParameterTable();
+          }
+        }
+      }
+      addPath();
+    }
+  }
+  else if (dirList.size() == 1) {
+    QString dir = dirList.at(0);
+    if (dir.right(15) == "Tracking_Result") {
+      dir.truncate(dir.size() - 16);
+    }
+
+    if (dir.length()) {
+      ui->textPathAdd->setText(dir);
+      // Autoloads  background and tracking if auto is checked
+      if (ui->isAuto->isChecked()) {
+        if (QFileInfo(dir + "/Tracking_Result/background.pgm").exists()) {
+          ui->textBackgroundAdd->setText(dir + "/Tracking_Result/background.pgm");
+        }
+        if (loadParameterFile(dir + "/Tracking_Result/parameter.param")) {
+          ui->textLoadSettings->setText(dir + "/Tracking_Result/parameter.param");
+          updateParameterTable();
+        }
       }
     }
   }
@@ -329,7 +370,7 @@ void Batch::removePath() {
   if (row != -1) {
     processList.remove(row);
     ui->tablePath->removeRow(row);
-    currentPathCount --;
+    if (currentPathCount > 0) currentPathCount --;
   }
 }
 

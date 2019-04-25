@@ -1,5 +1,13 @@
 # FastTrack changelog
 
+## 4.6.1
+
+### Fixed
+- Batch tracking crash on Windows.
+
+### Added
+- Multi-paths selection in the Batch panel.
+
 ## 4.6.0
 
 ### Added

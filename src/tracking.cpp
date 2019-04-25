@@ -718,17 +718,13 @@ void Tracking::startProcess() {
       if (extensions.contains(extension)) break;
     }
 
-    try {
-      if (m_files.empty()) {
-        m_path += +"*." + extension.toStdString();
-        glob(m_path, m_files, false);  // Get all path to frames
-      }
-      m_im = m_startImage;
-      (m_stopImage == -1) ? (m_stopImage = int(m_files.size())) : (m_stopImage = m_stopImage);
+    if (m_files.empty()) {
+      m_path += +"*." + extension.toStdString();
+      glob(m_path, m_files, false);  // Get all path to frames
     }
-    catch (...) {
-      emit(finished());
-    }
+    m_im = m_startImage;
+    (m_stopImage == -1) ? (m_stopImage = int(m_files.size())) : (m_stopImage = m_stopImage);
+
     sort(m_files.begin(), m_files.end());
 
     // Loads the background image is provided and check if the image has the correct size
@@ -831,8 +827,6 @@ void Tracking::startProcess() {
     emit(finishedProcessFrame());
   }
   catch (...) {
-    m_savefile.flush();
-    m_outputFile.close();
     emit(forceFinished());
   }
 }

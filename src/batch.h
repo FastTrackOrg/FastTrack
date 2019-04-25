@@ -16,6 +16,9 @@
 #include <QLayout>
 #include <QLineEdit>
 #include <QMainWindow>
+#include <QListView>
+#include <QTreeView>
+#include <QAbstractItemView>
 #include <QMap>
 #include <QMessageBox>
 #include <QProgressBar>
