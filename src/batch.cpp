@@ -368,9 +368,16 @@ void Batch::startTracking() {
       });
       connect(tracking, &Tracking::finished, thread, &QThread::quit);
       connect(tracking, &Tracking::finished, tracking, &Tracking::deleteLater);
+      connect(tracking, &Tracking::forceFinished, progressBar, [this, progressBar, count]() {
+        ui->tablePath->setItem(currentPathCount, 3, new QTableWidgetItem("Error"));
+        currentPathCount ++;
+        emit(next());
+      });
+      connect(tracking, &Tracking::forceFinished, thread, &QThread::quit);
+      connect(tracking, &Tracking::forceFinished, tracking, &Tracking::deleteLater);
       connect(thread, &QThread::finished, thread, &QThread::deleteLater);
 
-      tracking->updatingParameters(processList[0].trackingParameters);
+      tracking->updatingParameters(processList[currentPathCount].trackingParameters);
       thread->start();
     }
     else {

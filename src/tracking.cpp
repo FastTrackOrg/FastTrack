@@ -594,73 +594,80 @@ vector<Point3d> Tracking::color(int number) {
   * @brief Processes an image from an images sequence and tracks and matchs objects according to the previous image in the sequence. Takes a new image from the image sequence, substracts the background, binarises the image and crops according to the defined region of interest. Detects all the objects in the image and extracts the object features. Then matches detected objects with objects from the previous frame. This function emits a signal to display the images in the user interface.
 */
 void Tracking::imageProcessing() {
-  // Reads the next image in the image sequence and applies the image processing workflow
-  imread(m_files[m_im], IMREAD_GRAYSCALE).copyTo(m_visuFrame);
-  if (statusRegistration) {
-    registration(m_background, m_visuFrame);
-  }
+  try {
+    // Reads the next image in the image sequence and applies the image processing workflow
+    imread(m_files[m_im], IMREAD_GRAYSCALE).copyTo(m_visuFrame);
+    if (statusRegistration) {
+      registration(m_background, m_visuFrame);
+    }
 
-  (statusBinarisation) ? (subtract(m_background, m_visuFrame, m_binaryFrame)) : (subtract(m_visuFrame, m_background, m_binaryFrame));
-  binarisation(m_binaryFrame, 'b', param_thresh);
+    (statusBinarisation) ? (subtract(m_background, m_visuFrame, m_binaryFrame)) : (subtract(m_visuFrame, m_background, m_binaryFrame));
+    binarisation(m_binaryFrame, 'b', param_thresh);
 
-  if (param_kernelSize != 0) {
-    Mat element = getStructuringElement(param_kernelType, Size(2 * param_kernelSize + 1, 2 * param_kernelSize + 1), Point(param_kernelSize, param_kernelSize));
-    morphologyEx(m_binaryFrame, m_binaryFrame, param_morphOperation, element);
-  }
+    if (param_kernelSize != 0) {
+      Mat element = getStructuringElement(param_kernelType, Size(2 * param_kernelSize + 1, 2 * param_kernelSize + 1), Point(param_kernelSize, param_kernelSize));
+      morphologyEx(m_binaryFrame, m_binaryFrame, param_morphOperation, element);
+    }
 
-  if (m_ROI.width != 0 || m_ROI.height != 0) {
-    m_binaryFrame = m_binaryFrame(m_ROI);
-    m_visuFrame = m_visuFrame(m_ROI);
-  }
+    if (m_ROI.width != 0 || m_ROI.height != 0) {
+      m_binaryFrame = m_binaryFrame(m_ROI);
+      m_visuFrame = m_visuFrame(m_ROI);
+    }
 
-  // Detects the objects and extracts  parameters
-  m_out = objectPosition(m_binaryFrame, param_minArea, param_maxArea);
+    // Detects the objects and extracts  parameters
+    m_out = objectPosition(m_binaryFrame, param_minArea, param_maxArea);
 
-  // Associates the objets with the previous image
-  vector<int> identity = costFunc(m_outPrev[param_spot], m_out[param_spot], param_len, param_angle, param_weight, param_lo);
-  vector<int> occluded = findOcclusion(identity);
+    // Associates the objets with the previous image
+    vector<int> identity = costFunc(m_outPrev[param_spot], m_out[param_spot], param_len, param_angle, param_weight, param_lo);
+    vector<int> occluded = findOcclusion(identity);
 
-  // Reassignes the m_out vector regarding the identities of the objects
-  for (size_t i = 0; i < m_out.size(); i++) {
-    m_out[i] = reassignment(m_outPrev[i], m_out[i], identity);
-  }
+    // Reassignes the m_out vector regarding the identities of the objects
+    for (size_t i = 0; i < m_out.size(); i++) {
+      m_out[i] = reassignment(m_outPrev[i], m_out[i], identity);
+    }
 
-  // Updates id and lost counter
-  while (m_out[0].size() - m_id.size() != 0) {
-    m_idMax++;
-    m_id.push_back(m_idMax);
-    m_lost.push_back(0);
-  }
+    // Updates id and lost counter
+    while (m_out[0].size() - m_id.size() != 0) {
+      m_idMax++;
+      m_id.push_back(m_idMax);
+      m_lost.push_back(0);
+    }
 
-  // Draws lines and arrows on the image in the display panel
-  for (size_t l = 0; l < m_out[0].size(); l++) {
-    // Tracking data are available
-    if (find(occluded.begin(), occluded.end(), int(l)) == occluded.end()) {
-      for (auto const &a : m_out) {
-        m_savefile << a[l].x;
-        m_savefile << '\t';
-        m_savefile << a[l].y;
-        m_savefile << '\t';
-        m_savefile << a[l].z;
-        m_savefile << '\t';
+    // Draws lines and arrows on the image in the display panel
+    for (size_t l = 0; l < m_out[0].size(); l++) {
+      // Tracking data are available
+      if (find(occluded.begin(), occluded.end(), int(l)) == occluded.end()) {
+        for (auto const &a : m_out) {
+          m_savefile << a[l].x;
+          m_savefile << '\t';
+          m_savefile << a[l].y;
+          m_savefile << '\t';
+          m_savefile << a[l].z;
+          m_savefile << '\t';
+        }
+        m_savefile << m_im << '\t';
+        m_savefile << m_id[l] << '\n';
       }
-      m_savefile << m_im << '\t';
-      m_savefile << m_id[l] << '\n';
+    }
+
+    cleaning(occluded, m_lost, m_id, m_out, param_to);
+    m_outPrev = m_out;
+    m_im++;
+    if (m_im + 1 > m_stopImage) {
+      m_savefile.flush();
+      m_outputFile.close();
+      emit(finished());
+      emit(statistic(timer->elapsed()));
+    }
+    else {
+      emit(progress(m_im));
+      QTimer::singleShot(0, this, SLOT(imageProcessing()));
     }
   }
-
-  cleaning(occluded, m_lost, m_id, m_out, param_to);
-  m_outPrev = m_out;
-  m_im++;
-  if (m_im + 1 > m_stopImage) {
+  catch (...) {
     m_savefile.flush();
     m_outputFile.close();
-    emit(finished());
-    emit(statistic(timer->elapsed()));
-  }
-  else {
-    emit(progress(m_im));
-    QTimer::singleShot(0, this, SLOT(imageProcessing()));
+    emit(forceFinished());
   }
 }
 
@@ -699,126 +706,135 @@ Tracking::Tracking(vector<String> imagePath, UMat background, int startImage, in
   * @brief Initializes a tracking analysis and triggers its execution. Constructs from the path to a folder where the image sequence is stored, detects the image format and processes the first image to detect objects. First, it computes the background by averaging images from the sequence, then it subtracts  the background from the first image and then binarizes the resulting image. It detects the objects by contour analysis and extracts features by computing the object moments. It triggers the analysis of the second image of the sequence.
 */
 void Tracking::startProcess() {
-  timer = new QElapsedTimer();
-  timer->start();
-  // Finds image format
-  QList<QString> extensions = {"pgm", "png", "jpeg", "jpg", "tiff", "tif", "bmp", "dib", "jpe", "jp2", "webp", "pbm", "ppm", "sr", "ras", "tif"};
-  QDirIterator it(QString::fromStdString(m_path), QStringList(), QDir::NoFilter);
-  QString extension;
-  while (it.hasNext()) {
-    extension = it.next().section('.', -1);
-    if (extensions.contains(extension)) break;
-  }
-
   try {
-    if (m_files.empty()) {
-      m_path += +"*." + extension.toStdString();
-      glob(m_path, m_files, false);  // Get all path to frames
+    timer = new QElapsedTimer();
+    timer->start();
+    // Finds image format
+    QList<QString> extensions = {"pgm", "png", "jpeg", "jpg", "tiff", "tif", "bmp", "dib", "jpe", "jp2", "webp", "pbm", "ppm", "sr", "ras", "tif"};
+    QDirIterator it(QString::fromStdString(m_path), QStringList(), QDir::NoFilter);
+    QString extension;
+    while (it.hasNext()) {
+      extension = it.next().section('.', -1);
+      if (extensions.contains(extension)) break;
     }
-    m_im = m_startImage;
-    (m_stopImage == -1) ? (m_stopImage = int(m_files.size())) : (m_stopImage = m_stopImage);
-  } catch (...) {
-    emit(finished());
-  }
-  sort(m_files.begin(), m_files.end());
 
-  // Loads the background image is provided and check if the image has the correct size
-  if (m_background.empty() && m_backgroundPath.empty()) {
-    m_background = backgroundExtraction(m_files, param_nBackground, param_methodBackground);
-  }
-  else if (m_background.empty()) {
     try {
-      imread(m_backgroundPath, IMREAD_GRAYSCALE).copyTo(m_background);
-      UMat test;
-      imread(m_files[0], IMREAD_GRAYSCALE).copyTo(test);
-      subtract(test, m_background, test);
-    } catch (...) {
+      if (m_files.empty()) {
+        m_path += +"*." + extension.toStdString();
+        glob(m_path, m_files, false);  // Get all path to frames
+      }
+      m_im = m_startImage;
+      (m_stopImage == -1) ? (m_stopImage = int(m_files.size())) : (m_stopImage = m_stopImage);
+    }
+    catch (...) {
+      emit(finished());
+    }
+    sort(m_files.begin(), m_files.end());
+
+    // Loads the background image is provided and check if the image has the correct size
+    if (m_background.empty() && m_backgroundPath.empty()) {
       m_background = backgroundExtraction(m_files, param_nBackground, param_methodBackground);
-      emit(error(0));
     }
-  }
-
-  m_colorMap = color(9000);
-  m_memory = vector<vector<Point>>(9000, vector<Point>());
-  // First frame
-  imread(m_files[m_im], IMREAD_GRAYSCALE).copyTo(m_visuFrame);
-
-  (statusBinarisation) ? (subtract(m_background, m_visuFrame, m_binaryFrame)) : (subtract(m_visuFrame, m_background, m_binaryFrame));
-
-  binarisation(m_binaryFrame, 'b', param_thresh);
-
-  if (param_kernelSize != 0) {
-    Mat element = getStructuringElement(param_kernelType, Size(2 * param_kernelSize + 1, 2 * param_kernelSize + 1), Point(param_kernelSize, param_kernelSize));
-    morphologyEx(m_binaryFrame, m_binaryFrame, param_morphOperation, element);
-  }
-
-  if (m_ROI.width != 0) {
-    m_binaryFrame = m_binaryFrame(m_ROI);
-    m_visuFrame = m_visuFrame(m_ROI);
-  }
-
-  m_out = objectPosition(m_binaryFrame, param_minArea, param_maxArea);
-
-  for (size_t i = 0; i < m_out[0].size(); i++) {
-    m_id.push_back(i);
-    m_lost.push_back(0);
-  }
-
-  if (!m_id.empty()) m_idMax = int(*max_element(m_id.begin(), m_id.end()));
-
-  //  Creates the folder to save result, parameter and background image
-  QString savingPath = QString::fromStdString(m_path).section("*", 0, 0) + QDir::separator() + "Tracking_Result" + QDir::separator();
-  QDir().mkdir(savingPath);
-
-  QFile parameterFile(savingPath + "parameter.param");
-  if (!parameterFile.open(QFile::WriteOnly | QFile::Text)) {
-    QMessageBox errorBox;
-    errorBox.setText("You don't have the right to write in the selected folder!");
-    errorBox.exec();
-  }
-  else {
-    QTextStream out(&parameterFile);
-    QList<QString> keyList = parameters.keys();
-    for (auto a : keyList) {
-      out << a << " = " << parameters.value(a) << endl;
+    else if (m_background.empty()) {
+      try {
+        imread(m_backgroundPath, IMREAD_GRAYSCALE).copyTo(m_background);
+        UMat test;
+        imread(m_files[0], IMREAD_GRAYSCALE).copyTo(test);
+        subtract(test, m_background, test);
+      }
+      catch (...) {
+        m_background = backgroundExtraction(m_files, param_nBackground, param_methodBackground);
+        emit(error(0));
+      }
     }
-  }
 
-  imwrite(savingPath.toStdString() + "background.pgm", m_background);
+    m_colorMap = color(9000);
+    m_memory = vector<vector<Point>>(9000, vector<Point>());
+    // First frame
+    imread(m_files[m_im], IMREAD_GRAYSCALE).copyTo(m_visuFrame);
 
-  m_outputFile.setFileName(savingPath + "tracking.txt");
-  if (!m_outputFile.open(QFile::WriteOnly | QFile::Text)) {
-    QMessageBox msgBox;
-    msgBox.setText("Permission denied to write in the folder");
-    msgBox.exec();
-  }
+    (statusBinarisation) ? (subtract(m_background, m_visuFrame, m_binaryFrame)) : (subtract(m_visuFrame, m_background, m_binaryFrame));
 
-  m_savefile.setDevice(&m_outputFile);
+    binarisation(m_binaryFrame, 'b', param_thresh);
 
-  // Saving
+    if (param_kernelSize != 0) {
+      Mat element = getStructuringElement(param_kernelType, Size(2 * param_kernelSize + 1, 2 * param_kernelSize + 1), Point(param_kernelSize, param_kernelSize));
+      morphologyEx(m_binaryFrame, m_binaryFrame, param_morphOperation, element);
+    }
 
-  // File header
-  m_savefile << "xHead" << '\t' << "yHead" << '\t' << "tHead" << '\t' << "xTail" << '\t' << "yTail" << '\t' << "tTail" << '\t' << "xBody" << '\t' << "yBody" << '\t' << "tBody" << '\t' << "curvature" << '\t' << "areaBody" << '\t' << "perimeterBody" << '\t' << "headMajorAxisLength" << '\t' << "headMinorAxisLength" << '\t' << "headExcentricity" << '\t' << "tailMajorAxisLength" << '\t' << "tailMinorAxisLength" << '\t' << "tailExcentricity" << '\t' << "bodyMajorAxisLength" << '\t' << "bodyMinorAxisLength" << '\t' << "bodyExcentricity" << '\t' << "imageNumber" << '\t' << "id" << endl;
+    if (m_ROI.width != 0) {
+      m_binaryFrame = m_binaryFrame(m_ROI);
+      m_visuFrame = m_visuFrame(m_ROI);
+    }
 
-  // Draws lines and arrows on the image in the display panel
-  for (size_t l = 0; l < m_out[0].size(); l++) {
+    m_out = objectPosition(m_binaryFrame, param_minArea, param_maxArea);
+
+    for (size_t i = 0; i < m_out[0].size(); i++) {
+      m_id.push_back(i);
+      m_lost.push_back(0);
+    }
+
+    if (!m_id.empty()) m_idMax = int(*max_element(m_id.begin(), m_id.end()));
+
+    //  Creates the folder to save result, parameter and background image
+    QString savingPath = QString::fromStdString(m_path).section("*", 0, 0) + QDir::separator() + "Tracking_Result" + QDir::separator();
+    QDir().mkdir(savingPath);
+
+    QFile parameterFile(savingPath + "parameter.param");
+    if (!parameterFile.open(QFile::WriteOnly | QFile::Text)) {
+      QMessageBox errorBox;
+      errorBox.setText("You don't have the right to write in the selected folder!");
+      errorBox.exec();
+    }
+    else {
+      QTextStream out(&parameterFile);
+      QList<QString> keyList = parameters.keys();
+      for (auto a : keyList) {
+        out << a << " = " << parameters.value(a) << endl;
+      }
+    }
+
+    imwrite(savingPath.toStdString() + "background.pgm", m_background);
+
+    m_outputFile.setFileName(savingPath + "tracking.txt");
+    if (!m_outputFile.open(QFile::WriteOnly | QFile::Text)) {
+      QMessageBox msgBox;
+      msgBox.setText("Permission denied to write in the folder");
+      msgBox.exec();
+    }
+
+    m_savefile.setDevice(&m_outputFile);
+
+    // Saving
+
+    // File header
+    m_savefile << "xHead" << '\t' << "yHead" << '\t' << "tHead" << '\t' << "xTail" << '\t' << "yTail" << '\t' << "tTail" << '\t' << "xBody" << '\t' << "yBody" << '\t' << "tBody" << '\t' << "curvature" << '\t' << "areaBody" << '\t' << "perimeterBody" << '\t' << "headMajorAxisLength" << '\t' << "headMinorAxisLength" << '\t' << "headExcentricity" << '\t' << "tailMajorAxisLength" << '\t' << "tailMinorAxisLength" << '\t' << "tailExcentricity" << '\t' << "bodyMajorAxisLength" << '\t' << "bodyMinorAxisLength" << '\t' << "bodyExcentricity" << '\t' << "imageNumber" << '\t' << "id" << endl;
+
     // Draws lines and arrows on the image in the display panel
-    for (auto const &a : m_out) {
-      m_savefile << a[l].x;
-      m_savefile << '\t';
-      m_savefile << a[l].y;
-      m_savefile << '\t';
-      m_savefile << a[l].z;
-      m_savefile << '\t';
+    for (size_t l = 0; l < m_out[0].size(); l++) {
+      // Draws lines and arrows on the image in the display panel
+      for (auto const &a : m_out) {
+        m_savefile << a[l].x;
+        m_savefile << '\t';
+        m_savefile << a[l].y;
+        m_savefile << '\t';
+        m_savefile << a[l].z;
+        m_savefile << '\t';
+      }
+      m_savefile << m_im << '\t';
+      m_savefile << m_id[l] << '\n';
     }
-    m_savefile << m_im << '\t';
-    m_savefile << m_id[l] << '\n';
-  }
-  m_outPrev = m_out;
-  m_im++;
-  connect(this, SIGNAL(finishedProcessFrame()), this, SLOT(imageProcessing()));
+    m_outPrev = m_out;
+    m_im++;
+    connect(this, SIGNAL(finishedProcessFrame()), this, SLOT(imageProcessing()));
 
-  emit(finishedProcessFrame());
+    emit(finishedProcessFrame());
+  }
+  catch (...) {
+    m_savefile.flush();
+    m_outputFile.close();
+    emit(forceFinished());
+  }
 }
 
 /**

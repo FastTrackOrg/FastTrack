@@ -153,6 +153,11 @@ class Tracking : public QObject {
   void finished();
 
   /**
+  * @brief Emitted when a crash occurs during the analysis.
+  */
+  void forceFinished();
+
+  /**
   * @brief Emitted when an error occurs.
   */
   void error(int code);
