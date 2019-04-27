@@ -48,7 +48,9 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   connect(ui->slider, &QSlider::valueChanged, [this](const int &newValue) {
     ui->replayNumber->setText(QString::number(newValue));
   });
+#ifdef ENABLE_DEVTOOL
   connect(ui->actionbenchmark, &QAction::triggered, this, &Interactive::benchmark);
+#endif
   connect(this, &Interactive::message, this, [this](QString msg) {
     QMessageBox msgBox;
     msgBox.setText(msg);
@@ -695,6 +697,7 @@ void Interactive::reset() {
   display(ui->slider->value());
 }
 
+#ifdef ENABLE_DEVTOOL
 /**
  * @brief This is a function for the developer. Triggered a benchmark (downloads a dataset and perform several tracking analysis) to check program performance.
  */
@@ -769,6 +772,7 @@ void Interactive::benchmarkAnalysis(QMap<QString, QString> params) {
   tracking->updatingParameters(params);
   thread->start();
 }
+#endif
 
 /**
   * @brief Destructors.

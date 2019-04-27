@@ -54,14 +54,6 @@ Batch::Batch(QWidget *parent) : QWidget(parent),
   ui->openPath->setIcon(img);
   ui->openPath->setIconSize(QSize(ui->openPath->width(), ui->openPath->height()));
 
-  img = QIcon(":/assets/buttons/openImage.png");
-  ui->openBackground->setIcon(img);
-  ui->openBackground->setIconSize(QSize(ui->openBackground->width(), ui->openBackground->height()));
-
-  img = QIcon(":/assets/buttons/openFile.png");
-  ui->loadSettings->setIcon(img);
-  ui->loadSettings->setIconSize(QSize(ui->openBackground->width(), ui->openBackground->height()));
-
   // Registers QMetaType
   qRegisterMetaType<UMat>("UMat&");
   qRegisterMetaType<QMap<QString, QString>>("QMap<QString, QString>");
@@ -71,13 +63,10 @@ Batch::Batch(QWidget *parent) : QWidget(parent),
 
   ui->tableParameters->horizontalHeader()->setStretchLastSection(true);
   ui->tableParameters->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-  ui->tablePath->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
-  currentPathCount = 0;
-  
+
   // Populates the parameter table
   ui->tableParameters->insertRow(0);
   ui->tableParameters->setItem(0, 0, new QTableWidgetItem("Background method"));
-  ui->tableParameters->item(0, 0)->setFlags(ui->tableParameters->item(0, 0)->flags() & ~Qt::ItemIsEditable);
   QComboBox *backMethod = new QComboBox(ui->tableParameters);
   backMethod->addItems({"Minimum", "Maximum", "Average"});
   ui->tableParameters->setCellWidget(0, 1, backMethod);
@@ -85,7 +74,6 @@ Batch::Batch(QWidget *parent) : QWidget(parent),
   
   ui->tableParameters->insertRow(1);
   ui->tableParameters->setItem(1, 0, new QTableWidgetItem("Number of images background"));
-  ui->tableParameters->item(1, 0)->setFlags(ui->tableParameters->item(1, 0)->flags() & ~Qt::ItemIsEditable);
   QSpinBox *backNumber = new QSpinBox(ui->tableParameters);
   backNumber->setRange(0, 9999999);
   ui->tableParameters->setCellWidget(1, 1, backNumber);
@@ -93,7 +81,6 @@ Batch::Batch(QWidget *parent) : QWidget(parent),
 
   ui->tableParameters->insertRow(2);
   ui->tableParameters->setItem(2, 0, new QTableWidgetItem("Binary threshold"));
-  ui->tableParameters->item(2, 0)->setFlags(ui->tableParameters->item(2, 0)->flags() & ~Qt::ItemIsEditable);
   QSpinBox *binThresh = new QSpinBox(ui->tableParameters);
   binThresh->setRange(0, 255);
   ui->tableParameters->setCellWidget(2, 1, binThresh);
@@ -101,7 +88,6 @@ Batch::Batch(QWidget *parent) : QWidget(parent),
 
   ui->tableParameters->insertRow(3);
   ui->tableParameters->setItem(3, 0, new QTableWidgetItem("Light background"));
-  ui->tableParameters->item(3, 0)->setFlags(ui->tableParameters->item(3, 0)->flags() & ~Qt::ItemIsEditable);
   QComboBox *backType = new QComboBox(ui->tableParameters);
   backType->addItems({"Yes", "No"});
   ui->tableParameters->setCellWidget(3, 1, backType);
@@ -109,7 +95,6 @@ Batch::Batch(QWidget *parent) : QWidget(parent),
 
   ui->tableParameters->insertRow(4);
   ui->tableParameters->setItem(4, 0, new QTableWidgetItem("RIO top x"));
-  ui->tableParameters->item(4, 0)->setFlags(ui->tableParameters->item(4, 0)->flags() & ~Qt::ItemIsEditable);
   QSpinBox *xTop = new QSpinBox(ui->tableParameters);
   xTop->setRange(0, 9999999);
   ui->tableParameters->setCellWidget(4, 1, xTop);
@@ -117,7 +102,6 @@ Batch::Batch(QWidget *parent) : QWidget(parent),
 
   ui->tableParameters->insertRow(5);
   ui->tableParameters->setItem(5, 0, new QTableWidgetItem("ROI top y"));
-  ui->tableParameters->item(5, 0)->setFlags(ui->tableParameters->item(5, 0)->flags() & ~Qt::ItemIsEditable);
   QSpinBox *yTop = new QSpinBox(ui->tableParameters);
   yTop->setRange(0, 9999999);
   ui->tableParameters->setCellWidget(5, 1, yTop);
@@ -125,7 +109,6 @@ Batch::Batch(QWidget *parent) : QWidget(parent),
 
   ui->tableParameters->insertRow(6);
   ui->tableParameters->setItem(6, 0, new QTableWidgetItem("ROI bottom x"));
-  ui->tableParameters->item(6, 0)->setFlags(ui->tableParameters->item(6, 0)->flags() & ~Qt::ItemIsEditable);
   QSpinBox *xBottom = new QSpinBox(ui->tableParameters);
   xBottom->setRange(0, 9999999);
   ui->tableParameters->setCellWidget(6, 1, xBottom);
@@ -133,7 +116,6 @@ Batch::Batch(QWidget *parent) : QWidget(parent),
 
   ui->tableParameters->insertRow(7);
   ui->tableParameters->setItem(7, 0, new QTableWidgetItem("ROI bottom y"));
-  ui->tableParameters->item(7, 0)->setFlags(ui->tableParameters->item(6, 0)->flags() & ~Qt::ItemIsEditable);
   QSpinBox *yBottom = new QSpinBox(ui->tableParameters);
   yBottom->setRange(0, 9999999);
   ui->tableParameters->setCellWidget(7, 1, yBottom);
@@ -141,7 +123,6 @@ Batch::Batch(QWidget *parent) : QWidget(parent),
 
   ui->tableParameters->insertRow(8);
   ui->tableParameters->setItem(8, 0, new QTableWidgetItem("Registration"));
-  ui->tableParameters->item(8, 0)->setFlags(ui->tableParameters->item(8, 0)->flags() & ~Qt::ItemIsEditable);
   QComboBox *registration = new QComboBox(ui->tableParameters);
   registration->addItems({"No", "Yes"});
   ui->tableParameters->setCellWidget(8, 1, registration);
@@ -149,7 +130,6 @@ Batch::Batch(QWidget *parent) : QWidget(parent),
 
   ui->tableParameters->insertRow(9);
   ui->tableParameters->setItem(9, 0, new QTableWidgetItem("Morphological operation"));
-  ui->tableParameters->item(9, 0)->setFlags(ui->tableParameters->item(9, 0)->flags() & ~Qt::ItemIsEditable);
   QComboBox *morphType = new QComboBox(ui->tableParameters);
   morphType->addItems({"Erosion", "Dilatation", "Opening", "Closing", "Gradient", "Top hat", "Black hat", "Hit miss"});
   ui->tableParameters->setCellWidget(9, 1, morphType);
@@ -157,7 +137,6 @@ Batch::Batch(QWidget *parent) : QWidget(parent),
 
   ui->tableParameters->insertRow(10);
   ui->tableParameters->setItem(10, 0, new QTableWidgetItem("Kernel type"));
-  ui->tableParameters->item(10, 0)->setFlags(ui->tableParameters->item(10, 0)->flags() & ~Qt::ItemIsEditable);
   QComboBox *kernelType = new QComboBox(ui->tableParameters);
   kernelType->addItems({"Rectangle", "Cross", "Ellipse"});
   ui->tableParameters->setCellWidget(10, 1, kernelType);
@@ -165,7 +144,6 @@ Batch::Batch(QWidget *parent) : QWidget(parent),
 
   ui->tableParameters->insertRow(11);
   ui->tableParameters->setItem(11, 0, new QTableWidgetItem("Kernel size"));
-  ui->tableParameters->item(11, 0)->setFlags(ui->tableParameters->item(11, 0)->flags() & ~Qt::ItemIsEditable);
   QSpinBox *kernelSize = new QSpinBox(ui->tableParameters);
   kernelSize->setRange(0, 9999999);
   ui->tableParameters->setCellWidget(11, 1, kernelSize);
@@ -173,7 +151,6 @@ Batch::Batch(QWidget *parent) : QWidget(parent),
 
   ui->tableParameters->insertRow(12);
   ui->tableParameters->setItem(12, 0, new QTableWidgetItem("Minimal size"));
-  ui->tableParameters->item(12, 0)->setFlags(ui->tableParameters->item(12, 0)->flags() & ~Qt::ItemIsEditable);
   QSpinBox *minSize = new QSpinBox(ui->tableParameters);
   minSize->setRange(0, 9999999);
   ui->tableParameters->setCellWidget(12, 1, minSize);
@@ -181,7 +158,6 @@ Batch::Batch(QWidget *parent) : QWidget(parent),
 
   ui->tableParameters->insertRow(13);
   ui->tableParameters->setItem(13, 0, new QTableWidgetItem("Maximal size"));
-  ui->tableParameters->item(13, 0)->setFlags(ui->tableParameters->item(13, 0)->flags() & ~Qt::ItemIsEditable);
   QSpinBox *maxSize = new QSpinBox(ui->tableParameters);
   maxSize->setRange(0, 9999999);
   ui->tableParameters->setCellWidget(13, 1, maxSize);
@@ -189,7 +165,6 @@ Batch::Batch(QWidget *parent) : QWidget(parent),
 
   ui->tableParameters->insertRow(14);
   ui->tableParameters->setItem(14, 0, new QTableWidgetItem("Maximal length"));
-  ui->tableParameters->item(14, 0)->setFlags(ui->tableParameters->item(14, 0)->flags() & ~Qt::ItemIsEditable);
   QSpinBox *maxLength = new QSpinBox(ui->tableParameters);
   maxLength->setRange(0, 9999999);
   ui->tableParameters->setCellWidget(14, 1, maxLength);
@@ -197,7 +172,6 @@ Batch::Batch(QWidget *parent) : QWidget(parent),
 
   ui->tableParameters->insertRow(15);
   ui->tableParameters->setItem(15, 0, new QTableWidgetItem("Maximal angle"));
-  ui->tableParameters->item(15, 0)->setFlags(ui->tableParameters->item(15, 0)->flags() & ~Qt::ItemIsEditable);
   QSpinBox *maxAngle = new QSpinBox(ui->tableParameters);
   maxAngle->setRange(0, 360);
   ui->tableParameters->setCellWidget(15, 1, maxAngle);
@@ -205,7 +179,6 @@ Batch::Batch(QWidget *parent) : QWidget(parent),
 
   ui->tableParameters->insertRow(16);
   ui->tableParameters->setItem(16, 0, new QTableWidgetItem("Maximal time"));
-  ui->tableParameters->item(16, 0)->setFlags(ui->tableParameters->item(16, 0)->flags() & ~Qt::ItemIsEditable);
   QSpinBox *maxTime = new QSpinBox(ui->tableParameters);
   maxTime->setRange(0, 9999999);
   ui->tableParameters->setCellWidget(16, 1, maxTime);
@@ -213,7 +186,6 @@ Batch::Batch(QWidget *parent) : QWidget(parent),
 
   ui->tableParameters->insertRow(17);
   ui->tableParameters->setItem(17, 0, new QTableWidgetItem("Maximal occlusion"));
-  ui->tableParameters->item(17, 0)->setFlags(ui->tableParameters->item(17, 0)->flags() & ~Qt::ItemIsEditable);
   QSpinBox *maxOccl = new QSpinBox(ui->tableParameters);
   maxOccl->setRange(0, 9999999);
   ui->tableParameters->setCellWidget(17, 1, maxOccl);
@@ -221,7 +193,6 @@ Batch::Batch(QWidget *parent) : QWidget(parent),
 
   ui->tableParameters->insertRow(18);
   ui->tableParameters->setItem(18, 0, new QTableWidgetItem("Spot to track"));
-  ui->tableParameters->item(18, 0)->setFlags(ui->tableParameters->item(18, 0)->flags() & ~Qt::ItemIsEditable);
   QComboBox *spotType = new QComboBox(ui->tableParameters);
   spotType->addItems({"Head", "Tail", "Body"});
   spotType->setCurrentIndex(2);
@@ -230,7 +201,6 @@ Batch::Batch(QWidget *parent) : QWidget(parent),
 
   ui->tableParameters->insertRow(19);
   ui->tableParameters->setItem(19, 0, new QTableWidgetItem("Weight"));
-  ui->tableParameters->item(19, 0)->setFlags(ui->tableParameters->item(19, 0)->flags() & ~Qt::ItemIsEditable);
   QDoubleSpinBox *weight = new QDoubleSpinBox(ui->tableParameters);
   weight->setRange(0, 1);
   weight->setValue(0.5);
@@ -239,34 +209,44 @@ Batch::Batch(QWidget *parent) : QWidget(parent),
   connect(weight, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &Batch::updateParameters);
 
 
-  connect(ui->loadSettings, &QPushButton::pressed, this, &Batch::openParameterFile);
   loadSettings();
 
   // Setups the path panel
   ui->tablePath->horizontalHeader()->setStretchLastSection(true);
+  currentPathCount = 0;
   ui->tablePath->setSortingEnabled(false);
+  ui->tablePath->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
   connect(ui->openPath, &QPushButton::clicked, this, &Batch::openPathFolder);
-  connect(ui->openBackground, &QPushButton::clicked, this, &Batch::openPathBackground);
-  connect(ui->addPath, &QPushButton::clicked, this, &Batch::addPath);
-  connect(ui->removePath, &QPushButton::clicked, this, &Batch::removePath);
+  connect(ui->removePath, &QPushButton::clicked, this, QOverload<>::of(&Batch::removePath));
+  connect(ui->clearPath, &QPushButton::clicked, [this]() {
+    int rows = ui->tablePath->rowCount();
+    for (int row = rows - 1; row > -1; row--) {
+      removePath(row);
+    }
+  });
   connect(ui->startButton, &QPushButton::clicked, this, &Batch::startTracking);
-  connect(ui->textPathAdd, &QLineEdit::textEdited, [this]() {
-    ui->textBackgroundAdd->clear();
-  });
-  connect(ui->textLoadSettings, &QLineEdit::textEdited, [this]() {
-    ui->textLoadSettings->clear();
-  });
   connect(this, &Batch::next, this, &Batch::startTracking);
+  connect(ui->backgroundButton, &QPushButton::clicked, [this]() {
+    QString image = QFileDialog::getOpenFileName(this, tr("Open Image"), memoryDir);
+    if (image.length()) {
+      ui->lineBackground->setText(image);
+    }
+    int rows = ui->tablePath->rowCount();
+    for (int row = 0; row < rows; row++) {
+      ui->tablePath->removeCellWidget(row, 1);
+      ui->tablePath->setItem(row, 1, new QTableWidgetItem(image));
+      processList[row].backgroundPath = image;
+    }
+  });
+  connect(ui->backgroundClear, &QPushButton::clicked, [this]() {
+    ui->lineBackground->clear();
+  });
 }
 
 /**
-  * @brief Opens a dialogue window to select a folder and updates the textPathAdd. Triggered when the openPath button is clicked.
+  * @brief Opens a dialog window to select folders. Triggered when the openPath button is clicked. If auto-detection mode is enable, it will also selects a background image and/or a parameter file and update the list of file to process. It also possible to add a suffix to the selected path.
 */
 void Batch::openPathFolder() {
-  ui->textBackgroundAdd->clear();
-  ui->textPathAdd->clear();
-  ui->textLoadSettings->clear();
-
   // Enable multiple selection
   QFileDialog dialog;
   dialog.setOption(QFileDialog::DontUseNativeDialog, true);
@@ -284,82 +264,88 @@ void Batch::openPathFolder() {
     dirList = dialog.selectedFiles();
   }
 
-  if (dirList.size() > 1) {
+  if (!dirList.isEmpty()) {
     for (auto dir : dirList) {
+      dir += "/" + ui->suffix->text();
       // If Tracking_Result folder selectionned, get the path to the top directory
-      if (dir.right(15) == "Tracking_Result") {
-        dir.truncate(dir.size() - 16);
+      QString backgroundPath, paramPath;
+      if (dir.right(16) == "Tracking_Result/") {
+        dir.truncate(dir.size() - 17);
       }
 
       if (dir.length()) {
-        ui->textPathAdd->setText(dir);
         // Autoloads  background and tracking if auto is checked
         if (ui->isAuto->isChecked()) {
           if (QFileInfo(dir + "/Tracking_Result/background.pgm").exists()) {
-            ui->textBackgroundAdd->setText(dir + "/Tracking_Result/background.pgm");
+            backgroundPath = dir + "/Tracking_Result/background.pgm";
           }
           if (loadParameterFile(dir + "/Tracking_Result/parameter.param")) {
-            ui->textLoadSettings->setText(dir + "/Tracking_Result/parameter.param");
+            paramPath = dir + "/Tracking_Result/parameter.param";
             updateParameterTable();
           }
         }
       }
-      addPath();
-    }
-  }
-  else if (dirList.size() == 1) {
-    QString dir = dirList.at(0);
-    if (dir.right(15) == "Tracking_Result") {
-      dir.truncate(dir.size() - 16);
-    }
-
-    if (dir.length()) {
-      ui->textPathAdd->setText(dir);
-      // Autoloads  background and tracking if auto is checked
-      if (ui->isAuto->isChecked()) {
-        if (QFileInfo(dir + "/Tracking_Result/background.pgm").exists()) {
-          ui->textBackgroundAdd->setText(dir + "/Tracking_Result/background.pgm");
-        }
-        if (loadParameterFile(dir + "/Tracking_Result/parameter.param")) {
-          ui->textLoadSettings->setText(dir + "/Tracking_Result/parameter.param");
-          updateParameterTable();
-        }
+      if (!ui->lineBackground->text().isEmpty()){
+        backgroundPath = ui->lineBackground->text();
       }
+      addPath(dir, backgroundPath, paramPath);
     }
   }
 }
 
 /**
-  * @brief Opens a dialogue window to select a background image and updates ui->textBackgroundAdd. Triggered when ui->openBackground is clicked.
+  * @brief Opens a dialog window to select a background image. Triggered when an open background is clicked in the pathTable.
+  * @arg[in] row Index of the row containing the button in the pathPanel.
 */
-void Batch::openPathBackground() {
+void Batch::openPathBackground(int row) {
   QString image = QFileDialog::getOpenFileName(this, tr("Open Image"), memoryDir);
   if (image.length()) {
-    ui->textBackgroundAdd->setText(image);
+    ui->tablePath->removeCellWidget(row, 1);
+    ui->tablePath->setItem(row, 1, new QTableWidgetItem(image));
+    processList[row].backgroundPath = image;
   }
 }
 
 /**
-  * @brief Takes the value of ui->textPathAdd and add it in the ui->tablePath and in the pathList vector.
+  * @brief Adds movie to the list of movies to analyze.
+  * @arg[in] pathMovie Path to the image sequence to analyze.
+  * @arg[in] pathBackground Path to the background image.
+  * @arg[in] pathParameter Path to the parameter file.
 */
-void Batch::addPath() {
+void Batch::addPath(QString pathMovie, QString pathBackground, QString pathParameter) {
   int row = ui->tablePath->rowCount();
-  QString path = ui->textPathAdd->text();
-  QString background = ui->textBackgroundAdd->text();
   ui->tablePath->insertRow(row);
-  ui->tablePath->setItem(row, 0, new QTableWidgetItem(path));
-  ui->tablePath->setItem(row, 1, new QTableWidgetItem(background));
+  ui->tablePath->setItem(row, 0, new QTableWidgetItem(pathMovie));
+  if (pathBackground.isEmpty()) {
+    QPushButton *button = new QPushButton("Select a background");
+    ui->tablePath->setCellWidget(row, 1, button);
+    connect(button, &QPushButton::clicked, [this, row]() {
+      openPathBackground(row);
+    });
+  }
+  else {
+    ui->tablePath->setItem(row, 1, new QTableWidgetItem(pathBackground));
+  }
+  if (pathParameter.isEmpty()){
+    QPushButton *paramButton = new QPushButton("Select a parameter file");
+    ui->tablePath->setCellWidget(row, 2, paramButton);
+    connect(paramButton, &QPushButton::clicked, [this, row]() {
+    openParameterFile(row);
+    });
+  }
+  else {
+    ui->tablePath->setItem(row, 2, new QTableWidgetItem(pathParameter));
+  }
   QProgressBar *progressBarPath = new QProgressBar(ui->tablePath);
-  ui->tablePath->setCellWidget(row, 2, progressBarPath);
+  ui->tablePath->setCellWidget(row, 3, progressBarPath);
+  ui->tablePath->setItem(row, 4, new QTableWidgetItem("Waiting"));
+  ui->tablePath->item(row, 4)->setTextAlignment(Qt::AlignCenter);
+
   process tmpProcess = {
-      .path = path,
-      .backgroundPath = background,
+      .path = pathMovie,
+      .backgroundPath = pathBackground + ui->lineBackground->text(),
       .trackingParameters = parameterList};
   processList.append(tmpProcess);
-
-  ui->textPathAdd->clear();
-  ui->textBackgroundAdd->clear();
-  ui->textLoadSettings->clear();
 }
 
 /**
@@ -375,6 +361,16 @@ void Batch::removePath() {
 }
 
 /**
+  * @brief Deletes the row at index in the pathPanel.
+  * @arg[in] row Index of the row.
+*/
+void Batch::removePath(int row) {
+  processList.remove(row);
+  ui->tablePath->removeRow(row);
+  if (currentPathCount > 0) currentPathCount--;
+}
+
+/**
   * @brief Starts a new tracking analysis. First, it gets the path to the folder containing the image sequence. It creates a folder named Tracking_Result in this folder and a file parameters.txt containing the parameterList. It creates a new Tracking object that has to be run in a separate thread. When the analysis is finished, the Tracking object is destroyed and a new analysis is started. Triggerred when the start analysis button is clicked or when the signal finishedAnalysis() is emitted.
 */
 void Batch::startTracking() {
@@ -386,12 +382,13 @@ void Batch::startTracking() {
   if (currentPathCount < processList.size()) {
     ui->startButton->setDisabled(true);
     ui->removePath->setDisabled(true);
+    ui->clearPath->setDisabled(true);
 
     if (QDir(processList[currentPathCount].path).exists()) {
       int count = QDir(processList[currentPathCount].path).count(); 
       string path = (processList[currentPathCount].path + QDir::separator()).toStdString();
       string backgroundPath = processList[currentPathCount].backgroundPath.toStdString();
-      QProgressBar *progressBar = qobject_cast<QProgressBar *>(ui->tablePath->cellWidget(currentPathCount, 2));
+      QProgressBar *progressBar = qobject_cast<QProgressBar *>(ui->tablePath->cellWidget(currentPathCount, 3));
       progressBar->setRange(0, count);
       progressBar->setValue(0);
 
@@ -402,7 +399,7 @@ void Batch::startTracking() {
       connect(thread, &QThread::started, tracking, &Tracking::startProcess);
       connect(tracking, &Tracking::progress, progressBar, &QProgressBar::setValue);
       connect(tracking, &Tracking::finished, progressBar, [this, progressBar, count]() {
-        ui->tablePath->setItem(currentPathCount, 3, new QTableWidgetItem("Done"));
+        ui->tablePath->item(currentPathCount, 4)->setText("Done");;
         progressBar->setValue(count);
         currentPathCount ++;
         emit(next());
@@ -410,7 +407,7 @@ void Batch::startTracking() {
       connect(tracking, &Tracking::finished, thread, &QThread::quit);
       connect(tracking, &Tracking::finished, tracking, &Tracking::deleteLater);
       connect(tracking, &Tracking::forceFinished, progressBar, [this, progressBar, count]() {
-        ui->tablePath->setItem(currentPathCount, 3, new QTableWidgetItem("Error"));
+        ui->tablePath->item(currentPathCount, 4)->setText("Error");;
         currentPathCount ++;
         emit(next());
       });
@@ -425,11 +422,13 @@ void Batch::startTracking() {
       processList.removeFirst();
       ui->startButton->setDisabled(false);
       ui->removePath->setDisabled(false);
+      ui->clearPath->setDisabled(false);
     }
   }
   else {
     ui->startButton->setDisabled(false);
     ui->removePath->setDisabled(false);
+    ui->clearPath->setDisabled(false);
   }
 }
 
@@ -487,14 +486,16 @@ void Batch::saveSettings() {
 }
 
 /**
-  * @brief Opens a dialogue to select a parameter file.
+  * @brief Opens a dialog to select a parameter file.
+  * @arg[in] row Index of the row containing the button in the pathPanel.
 */
-void Batch::openParameterFile() {
+void Batch::openParameterFile(int row) {
   QString file = QFileDialog::getOpenFileName(this, tr("Open parameter file"), memoryDir, tr("Parameter file (*.param)"));
   if (!file.isEmpty()) {
+    ui->tablePath->removeCellWidget(row, 2);
+    ui->tablePath->setItem(row, 2, new QTableWidgetItem(file));
     loadParameterFile(file);
-    updateParameterTable();
-    ui->textLoadSettings->setText(file);
+    processList[row].trackingParameters = parameterList;
   }
 }
 

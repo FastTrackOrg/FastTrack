@@ -14,125 +14,13 @@
    <string>Batch</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="4" column="2">
-    <widget class="QPushButton" name="addPath">
-     <property name="maximumSize">
-      <size>
-       <width>151</width>
-       <height>34</height>
-      </size>
-     </property>
-     <property name="text">
-      <string>Add</string>
-     </property>
-     <property name="shortcut">
-      <string>I</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="0">
-    <widget class="QLineEdit" name="textBackgroundAdd">
-     <property name="text">
-      <string>Select a background image (optional)</string>
-     </property>
-    </widget>
-   </item>
-   <item row="8" column="0" colspan="3">
-    <widget class="Line" name="line_5">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="2">
-    <widget class="QPushButton" name="loadSettings">
-     <property name="maximumSize">
-      <size>
-       <width>151</width>
-       <height>34</height>
-      </size>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="2">
-    <widget class="QCheckBox" name="isAuto">
-     <property name="text">
-      <string>Auto Load</string>
-     </property>
-     <property name="checked">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="2">
-    <widget class="QPushButton" name="openBackground">
-     <property name="maximumSize">
-      <size>
-       <width>151</width>
-       <height>34</height>
-      </size>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-     <property name="shortcut">
-      <string>B</string>
-     </property>
-    </widget>
-   </item>
-   <item row="9" column="0" colspan="3">
-    <widget class="QPushButton" name="startButton">
-     <property name="text">
-      <string>Start tracking</string>
-     </property>
-     <property name="shortcut">
-      <string>Space</string>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="0">
-    <widget class="QPushButton" name="removePath">
-     <property name="maximumSize">
-      <size>
-       <width>151</width>
-       <height>34</height>
-      </size>
-     </property>
-     <property name="text">
-      <string>Remove</string>
-     </property>
-     <property name="shortcut">
-      <string>R</string>
-     </property>
-    </widget>
-   </item>
    <item row="0" column="0">
-    <widget class="QLineEdit" name="textPathAdd">
-     <property name="text">
-      <string>Select an image sequence</string>
-     </property>
-     <property name="dragEnabled">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="6" column="0" colspan="3">
-    <widget class="Line" name="line_6">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="2">
     <widget class="QPushButton" name="openPath">
-     <property name="maximumSize">
-      <size>
-       <width>151</width>
-       <height>34</height>
-      </size>
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
      </property>
      <property name="text">
       <string/>
@@ -142,19 +30,124 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="0">
-    <widget class="QLineEdit" name="textLoadSettings">
+   <item row="3" column="0" colspan="4">
+    <widget class="QSplitter" name="splitter_2">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <widget class="QPushButton" name="startButton">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>23</height>
+       </size>
+      </property>
+      <property name="text">
+       <string>Start tracking</string>
+      </property>
+      <property name="shortcut">
+       <string>Space</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="clearPath">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>23</height>
+       </size>
+      </property>
+      <property name="text">
+       <string>Clear</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="removePath">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>23</height>
+       </size>
+      </property>
+      <property name="text">
+       <string>Remove</string>
+      </property>
+      <property name="shortcut">
+       <string>R</string>
+      </property>
+     </widget>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>suffix (optional)</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="0" column="2">
+    <widget class="QLineEdit" name="suffix"/>
+   </item>
+   <item row="0" column="3">
+    <widget class="QCheckBox" name="isAuto">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="text">
-      <string>Select a settings files (optional)</string>
+      <string>Auto Load Background and Parameters</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
      </property>
     </widget>
    </item>
-   <item row="7" column="0" colspan="3">
+   <item row="2" column="0" colspan="4">
     <widget class="QSplitter" name="splitter">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
      <widget class="QTableWidget" name="tablePath">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="editTriggers">
+       <set>QAbstractItemView::NoEditTriggers</set>
+      </property>
+      <property name="showDropIndicator" stdset="0">
+       <bool>false</bool>
+      </property>
+      <property name="dragDropOverwriteMode">
+       <bool>false</bool>
+      </property>
+      <property name="selectionBehavior">
+       <enum>QAbstractItemView::SelectRows</enum>
+      </property>
       <column>
        <property name="text">
         <string>Movie to track</string>
@@ -167,6 +160,11 @@
       </column>
       <column>
        <property name="text">
+        <string>Parameter</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
         <string>Progress</string>
        </property>
       </column>
@@ -174,9 +172,21 @@
        <property name="text">
         <string>Status</string>
        </property>
+       <property name="textAlignment">
+        <set>AlignLeading|AlignVCenter</set>
+       </property>
       </column>
      </widget>
      <widget class="QTableWidget" name="tableParameters">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="editTriggers">
+       <set>QAbstractItemView::NoEditTriggers</set>
+      </property>
       <property name="sortingEnabled">
        <bool>false</bool>
       </property>
@@ -194,6 +204,23 @@
        </property>
       </column>
      </widget>
+    </widget>
+   </item>
+   <item row="1" column="2">
+    <widget class="QLineEdit" name="lineBackground"/>
+   </item>
+   <item row="1" column="3">
+    <widget class="QPushButton" name="backgroundClear">
+     <property name="text">
+      <string>Clear</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QPushButton" name="backgroundButton">
+     <property name="text">
+      <string>Unique background</string>
+     </property>
     </widget>
    </item>
   </layout>

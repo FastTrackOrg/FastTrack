@@ -84,12 +84,13 @@ class Batch : public QWidget {
   void updateParameters();
   void startTracking();
   void openPathFolder();
-  void openPathBackground();
-  void addPath();
+  void openPathBackground(int);
+  void addPath(QString, QString, QString);
   void removePath();
+  void removePath(int index);
   void updateParameterTable();
   bool loadParameterFile(QString path);
-  void openParameterFile();
+  void openParameterFile(int);
 
   void errors(int code);
  signals:

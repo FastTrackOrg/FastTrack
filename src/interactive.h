@@ -18,7 +18,9 @@ This file is part of Fast Track.
 #ifndef INTERACTIVE_H
 #define INTERACTIVE_H
 
+#ifdef ENABLE_DEVTOOL
 #include <quazip/JlCompress.h>
+#endif
 #include <QAction>
 #include <QDir>
 #include <QDirIterator>
@@ -82,8 +84,10 @@ class Interactive : public QMainWindow {
   void crop();
   void reset();
 
+#ifdef ENABLE_DEVTOOL
   void benchmark();
   void benchmarkAnalysis(QMap<QString, QString>);
+#endif
 
  private:
   Ui::Interactive *ui;
@@ -107,9 +111,12 @@ class Interactive : public QMainWindow {
   QPixmap resizedPix;
   Data *trackingData;
   vector<Point3f> colorMap;
+  double currentZoom;
+
+#ifdef ENABLE_DEVTOOL
   QVector<int> benchmarkTime;
   int benchmarkCount;
-  double currentZoom;
+#endif
 
  signals:
   void message(QString message);

@@ -2,7 +2,7 @@
 
 if [ "$1" = "full" ]; then
   set -e
-  qmake CONFIG+=released src/FastTrack.pro
+  qmake CONFIG+=released QMAKE_CXXFLAHE+=-DENABLE_DEVTOOL src/FastTrack.pro
   make clean
   make
   cd build
