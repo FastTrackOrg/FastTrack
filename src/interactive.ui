@@ -62,7 +62,7 @@
    </layout>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
-  <widget class="QDockWidget" name="imageOptions">
+  <widget class="QDockWidget" name="trackingOptions">
    <property name="minimumSize">
     <size>
      <width>279</width>
@@ -70,10 +70,13 @@
     </size>
    </property>
    <property name="features">
-    <set>QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable</set>
+    <set>QDockWidget::AllDockWidgetFeatures</set>
    </property>
    <property name="allowedAreas">
     <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
+   </property>
+   <property name="windowTitle">
+    <string>Tracking Options</string>
    </property>
    <attribute name="dockWidgetArea">
     <number>2</number>
@@ -91,7 +94,7 @@
           <x>0</x>
           <y>0</y>
           <width>261</width>
-          <height>556</height>
+          <height>560</height>
          </rect>
         </property>
         <attribute name="label">
@@ -283,7 +286,7 @@
           <x>0</x>
           <y>0</y>
           <width>261</width>
-          <height>556</height>
+          <height>560</height>
          </rect>
         </property>
         <attribute name="label">
@@ -377,7 +380,7 @@
     </layout>
    </widget>
   </widget>
-  <widget class="QDockWidget" name="trackingOptions">
+  <widget class="QDockWidget" name="imageOptions">
    <property name="minimumSize">
     <size>
      <width>241</width>
@@ -385,10 +388,13 @@
     </size>
    </property>
    <property name="features">
-    <set>QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable</set>
+    <set>QDockWidget::AllDockWidgetFeatures</set>
    </property>
    <property name="allowedAreas">
     <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
+   </property>
+   <property name="windowTitle">
+    <string>Image Options</string>
    </property>
    <attribute name="dockWidgetArea">
     <number>1</number>
@@ -406,7 +412,7 @@
           <x>0</x>
           <y>0</y>
           <width>223</width>
-          <height>463</height>
+          <height>473</height>
          </rect>
         </property>
         <attribute name="label">
@@ -523,7 +529,7 @@
           <x>0</x>
           <y>0</y>
           <width>223</width>
-          <height>463</height>
+          <height>473</height>
          </rect>
         </property>
         <attribute name="label">
@@ -620,7 +626,7 @@ corner</string>
           <x>0</x>
           <y>0</y>
           <width>223</width>
-          <height>463</height>
+          <height>473</height>
          </rect>
         </property>
         <attribute name="label">
@@ -710,7 +716,7 @@ corner</string>
           <x>0</x>
           <y>0</y>
           <width>223</width>
-          <height>463</height>
+          <height>473</height>
          </rect>
         </property>
         <attribute name="label">
@@ -822,7 +828,7 @@ corner</string>
           <x>0</x>
           <y>0</y>
           <width>223</width>
-          <height>463</height>
+          <height>473</height>
          </rect>
         </property>
         <attribute name="label">
@@ -911,22 +917,21 @@ corner</string>
      <string>Help</string>
     </property>
    </widget>
-   <widget class="QMenu" name="menuView">
-    <property name="title">
-     <string>View</string>
-    </property>
-    <addaction name="actionImageParam"/>
-   </widget>
    <widget class="QMenu" name="menuDevelopper">
     <property name="title">
      <string>Developper</string>
     </property>
     <addaction name="actionbenchmark"/>
    </widget>
+   <widget class="QMenu" name="menuView">
+    <property name="title">
+     <string>View</string>
+    </property>
+   </widget>
    <addaction name="menuOpen"/>
    <addaction name="menuHelp"/>
-   <addaction name="menuView"/>
    <addaction name="menuDevelopper"/>
+   <addaction name="menuView"/>
   </widget>
   <widget class="QDockWidget" name="controlOptions">
    <property name="minimumSize">
@@ -936,10 +941,13 @@ corner</string>
     </size>
    </property>
    <property name="features">
-    <set>QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable</set>
+    <set>QDockWidget::AllDockWidgetFeatures</set>
    </property>
    <property name="allowedAreas">
     <set>Qt::BottomDockWidgetArea|Qt::TopDockWidgetArea</set>
+   </property>
+   <property name="windowTitle">
+    <string>Video Controls</string>
    </property>
    <attribute name="dockWidgetArea">
     <number>8</number>
@@ -1385,14 +1393,31 @@ corner</string>
     <string>Image</string>
    </property>
   </action>
-  <action name="actionImageParam">
+  <action name="action">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
    <property name="text">
-    <string>&amp;Image parameters</string>
+    <string>&amp;Image Options</string>
    </property>
   </action>
   <action name="actionbenchmark">
    <property name="text">
     <string>Benchmark</string>
+   </property>
+  </action>
+  <action name="actionTrackingOpt">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>&amp;Tracking</string>
    </property>
   </action>
  </widget>

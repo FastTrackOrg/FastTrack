@@ -44,6 +44,10 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
 
   // Menu bar
   connect(ui->actionOpen, &QAction::triggered, this, &Interactive::openFolder);
+  ui->menuView->addAction(ui->imageOptions->toggleViewAction());
+  ui->menuView->addAction(ui->trackingOptions->toggleViewAction());
+  ui->menuView->addAction(ui->controlOptions->toggleViewAction());
+
   connect(ui->slider, &QSlider::valueChanged, this, static_cast<void (Interactive::*)(int)>(&Interactive::display));
   connect(ui->slider, &QSlider::valueChanged, [this](const int &newValue) {
     ui->replayNumber->setText(QString::number(newValue));
