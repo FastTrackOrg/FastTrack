@@ -52,6 +52,88 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   connect(ui->slider, &QSlider::valueChanged, [this](const int &newValue) {
     ui->replayNumber->setText(QString::number(newValue));
   });
+
+  // Default dock widgets layout
+  tabifyDockWidget(ui->imageOptions, ui->trackingOptions);
+  ui->imageOptions->raise();
+
+  // Layout options
+  connect(ui->actionLayout1, &QAction::triggered, [this]() {
+    ui->controlOptions->setVisible(true);
+    ui->imageOptions->setVisible(true);
+    ui->trackingOptions->setVisible(true);
+
+    ui->controlOptions->setFloating(false);
+    ui->imageOptions->setFloating(false);
+    ui->trackingOptions->setFloating(false);
+
+    addDockWidget(Qt::LeftDockWidgetArea, ui->imageOptions);
+    tabifyDockWidget(ui->imageOptions, ui->trackingOptions);
+    ui->imageOptions->raise();
+    addDockWidget(Qt::BottomDockWidgetArea, ui->controlOptions);
+
+    ui->actionLayout1->setChecked(true);
+    ui->actionLayout2->setChecked(false);
+    ui->actionLayout3->setChecked(false);
+    ui->actionLayout4->setChecked(false);
+  });
+  connect(ui->actionLayout2, &QAction::triggered, [this]() {
+    ui->controlOptions->setVisible(true);
+    ui->imageOptions->setVisible(true);
+    ui->trackingOptions->setVisible(true);
+
+    ui->controlOptions->setFloating(false);
+    ui->imageOptions->setFloating(false);
+    ui->trackingOptions->setFloating(false);
+
+    addDockWidget(Qt::RightDockWidgetArea, ui->imageOptions);
+    tabifyDockWidget(ui->imageOptions, ui->trackingOptions);
+    ui->imageOptions->raise();
+    addDockWidget(Qt::BottomDockWidgetArea, ui->controlOptions);
+
+    ui->actionLayout1->setChecked(false);
+    ui->actionLayout2->setChecked(true);
+    ui->actionLayout3->setChecked(false);
+    ui->actionLayout4->setChecked(false);
+  });
+  connect(ui->actionLayout3, &QAction::triggered, [this]() {
+    ui->controlOptions->setVisible(true);
+    ui->imageOptions->setVisible(true);
+    ui->trackingOptions->setVisible(true);
+
+    ui->controlOptions->setFloating(false);
+    ui->imageOptions->setFloating(false);
+    ui->trackingOptions->setFloating(false);
+
+    addDockWidget(Qt::LeftDockWidgetArea, ui->imageOptions);
+    addDockWidget(Qt::RightDockWidgetArea, ui->trackingOptions);
+    addDockWidget(Qt::BottomDockWidgetArea, ui->controlOptions);
+
+    ui->actionLayout1->setChecked(false);
+    ui->actionLayout2->setChecked(false);
+    ui->actionLayout3->setChecked(true);
+    ui->actionLayout4->setChecked(false);
+  });
+  connect(ui->actionLayout4, &QAction::triggered, [this]() {
+    ui->controlOptions->setVisible(true);
+    ui->imageOptions->setVisible(true);
+    ui->trackingOptions->setVisible(true);
+
+    ui->controlOptions->setFloating(false);
+    ui->imageOptions->setFloating(false);
+    ui->trackingOptions->setFloating(false);
+
+    addDockWidget(Qt::LeftDockWidgetArea, ui->imageOptions);
+    tabifyDockWidget(ui->imageOptions, ui->trackingOptions);
+    ui->imageOptions->raise();
+    addDockWidget(Qt::LeftDockWidgetArea, ui->controlOptions);
+
+    ui->actionLayout1->setChecked(false);
+    ui->actionLayout2->setChecked(false);
+    ui->actionLayout3->setChecked(false);
+    ui->actionLayout4->setChecked(true);
+  });
+
 #ifdef ENABLE_DEVTOOL
   connect(ui->actionbenchmark, &QAction::triggered, this, &Interactive::benchmark);
 #endif
