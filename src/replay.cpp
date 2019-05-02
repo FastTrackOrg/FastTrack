@@ -185,6 +185,9 @@ void Replay::loadReplayFolder(QString dir) {
       // Setups the ui by setting maximum and minimum of the slider bar.
       string path = (dir + QDir::separator() + "*." + extension).toStdString();
       glob(path, replayFrames, false);  // Gets all the paths to frames
+      if (replayFrames.empty()) {
+        return;
+      }
       ui->replaySlider->setMinimum(0);
       ui->replaySlider->setMaximum(replayFrames.size() - 1);
       Mat frame = imread(replayFrames[0], IMREAD_COLOR);

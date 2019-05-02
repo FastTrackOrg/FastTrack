@@ -337,6 +337,11 @@ void Interactive::openFolder() {
       memoryDir = dir;
       glob(path, framePath, false);
 
+      if (framePath.empty()) {
+        emit(message("No image found."));
+        return;
+      }
+
       ui->slider->setMinimum(0);
       ui->slider->setMaximum(framePath.size() - 1);
       ui->nBack->setMaximum(framePath.size() - 1);

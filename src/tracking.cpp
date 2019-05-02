@@ -722,6 +722,9 @@ void Tracking::startProcess() {
       m_path += +"*." + extension.toStdString();
       glob(m_path, m_files, false);  // Get all path to frames
     }
+    if (m_files.empty()) {
+      return;
+    }
     m_im = m_startImage;
     (m_stopImage == -1) ? (m_stopImage = int(m_files.size())) : (m_stopImage = m_stopImage);
 
