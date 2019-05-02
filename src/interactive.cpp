@@ -41,6 +41,10 @@ This file is part of Fast Track.
 Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
                                             ui(new Ui::Interactive) {
   ui->setupUi(this);
+  
+  // Loads settings
+  settingsFile = new QSettings("FastTrack", "Benjamin Gallois", this);
+  loadSettings();
 
   // Menu bar
   connect(ui->actionOpen, &QAction::triggered, this, &Interactive::openFolder);
@@ -52,10 +56,6 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   connect(ui->slider, &QSlider::valueChanged, [this](const int &newValue) {
     ui->replayNumber->setText(QString::number(newValue));
   });
-
-  // Default dock widgets layout
-  tabifyDockWidget(ui->imageOptions, ui->trackingOptions);
-  ui->imageOptions->raise();
 
   // Layout options
   connect(ui->actionLayout1, &QAction::triggered, [this]() {
@@ -76,6 +76,8 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
     ui->actionLayout2->setChecked(false);
     ui->actionLayout3->setChecked(false);
     ui->actionLayout4->setChecked(false);
+
+    settings.insert("layout", "1");
   });
   connect(ui->actionLayout2, &QAction::triggered, [this]() {
     ui->controlOptions->setVisible(true);
@@ -95,6 +97,8 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
     ui->actionLayout2->setChecked(true);
     ui->actionLayout3->setChecked(false);
     ui->actionLayout4->setChecked(false);
+
+    settings.insert("layout", "2");
   });
   connect(ui->actionLayout3, &QAction::triggered, [this]() {
     ui->controlOptions->setVisible(true);
@@ -113,6 +117,8 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
     ui->actionLayout2->setChecked(false);
     ui->actionLayout3->setChecked(true);
     ui->actionLayout4->setChecked(false);
+
+    settings.insert("layout", "3");
   });
   connect(ui->actionLayout4, &QAction::triggered, [this]() {
     ui->controlOptions->setVisible(true);
@@ -132,7 +138,29 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
     ui->actionLayout2->setChecked(false);
     ui->actionLayout3->setChecked(false);
     ui->actionLayout4->setChecked(true);
+
+    settings.insert("layout", "4");
   });
+
+  // Loads previous layout
+  int preferedLayout = settings.value("layout").toInt();
+
+  switch (preferedLayout) {
+    case 1:
+      ui->actionLayout1->activate(QAction::Trigger);
+      break;
+    case 2:
+      ui->actionLayout2->activate(QAction::Trigger);
+      break;
+    case 3:
+      ui->actionLayout3->activate(QAction::Trigger);
+      break;
+    case 4:
+      ui->actionLayout4->activate(QAction::Trigger);
+      break;
+    default:
+      ui->actionLayout1->activate(QAction::Trigger);
+  }
 
 #ifdef ENABLE_DEVTOOL
   connect(ui->actionbenchmark, &QAction::triggered, this, &Interactive::benchmark);
@@ -446,9 +474,10 @@ void Interactive::zoomIn() {
   * @brief Zooms out the display.
 */
 void Interactive::zoomOut() {
-  ui->display->setFixedSize((ui->display->size()) / (currentZoom));
+  if (currentZoom > 1) ui->display->setFixedSize((ui->display->size()) / (currentZoom));
+  if (currentZoom < 1) ui->display->setFixedSize((ui->display->size()) * (currentZoom));
   display(ui->slider->value());
-  (currentZoom <= 1) ? (currentZoom = 1) : (currentZoom -= 0.2);
+  (currentZoom <= 0.2) ? (currentZoom = 0.2) : (currentZoom -= 0.2);
 }
 
 /**
@@ -864,6 +893,26 @@ void Interactive::benchmarkAnalysis(QMap<QString, QString> params) {
   * @brief Destructors.
 */
 Interactive::~Interactive() {
+  saveSettings();
   delete tracking;
   delete ui;
+}
+
+/**
+  * @brief Loads the settings.
+*/
+void Interactive::loadSettings() {
+  QList<QString> keys = settingsFile->allKeys();
+  for(auto &a: keys){
+    settings.insert(a, settingsFile->value(a).toString());
+  }
+}
+/**
+  * @brief Saves the settings.
+*/
+void Interactive::saveSettings() {
+  QList<QString> keys = settings.keys();
+  for(auto &a: keys){
+    settingsFile->setValue(a, settings.value(a));
+  }
 }

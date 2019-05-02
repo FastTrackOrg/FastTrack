@@ -39,6 +39,7 @@ This file is part of Fast Track.
 #include <QScrollArea>
 #include <QScrollBar>
 #include <QString>
+#include <QSettings>
 #include <QTableWidget>
 #include <QTableWidgetItem>
 #include <QUrl>
@@ -84,6 +85,9 @@ class Interactive : public QMainWindow {
   void crop();
   void reset();
 
+  void loadSettings();
+  void saveSettings();
+
 #ifdef ENABLE_DEVTOOL
   void benchmark();
   void benchmarkAnalysis(QMap<QString, QString>);
@@ -91,6 +95,9 @@ class Interactive : public QMainWindow {
 
  private:
   Ui::Interactive *ui;
+  QSettings *settingsFile;
+  int currentLayout;
+  QMap<QString, QString> settings;
   QLabel *counterLabel;
   QString memoryDir;                 /*!< Saves the path to the last opened folder in dialog. */
   vector<String> framePath;          /*!< Path to all the image of the image sequence to display. */
@@ -120,6 +127,6 @@ class Interactive : public QMainWindow {
 
  signals:
   void message(QString message);
-};
+  };
 
 #endif  // INTERACTIVE_H
