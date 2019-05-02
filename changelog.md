@@ -1,12 +1,25 @@
 # FastTrack changelog
 
+## 4.7.0
+
+### Fixed
+- Batch tracking crash on Windows.
+- Minor file opening errors.
+
+### Added
+- Multi-paths selection in the Batch panel.
+- Added layout options in the Interactive panel.
+
+### Changed
+-  Batch panel ui.
+
 ## 4.6.1
 
 ### Fixed
 - Batch tracking crash on Windows.
 
 ### Added
-- Multi-paths selection in the Batch panel.
+- Multi-paths selection in the Batch panel (beta).
 
 ## 4.6.0
 
