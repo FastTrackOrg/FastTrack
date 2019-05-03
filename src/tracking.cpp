@@ -768,12 +768,14 @@ void Tracking::startProcess() {
 
     m_out = objectPosition(m_binaryFrame, param_minArea, param_maxArea);
 
+    // Assigns an id and a counter at each object detected
     for (size_t i = 0; i < m_out[0].size(); i++) {
       m_id.push_back(i);
       m_lost.push_back(0);
     }
 
     if (!m_id.empty()) m_idMax = int(*max_element(m_id.begin(), m_id.end()));
+    else m_idMax = 0;
 
     //  Creates the folder to save result, parameter and background image
     QString savingPath = QString::fromStdString(m_path).section("*", 0, 0) + QDir::separator() + "Tracking_Result" + QDir::separator();
