@@ -398,17 +398,27 @@ void Interactive::display(int index) {
     // Computes the image with the background subtracted
     if (ui->isSub->isChecked() && isBackground) {
       (ui->backColor->currentText() == "Light background") ? (subtract(background, frame, frame)) : (subtract(frame, background, frame));
+      // Crops the image
+      if (roi.width != 0 || roi.height != 0) {
+        frame = frame(roi);
+      }
     }
 
     // Computes the binary image an applies morphological operations
-    if (ui->isBin->isChecked() && isBackground) {
+    else if (ui->isBin->isChecked() && isBackground) {
       (ui->backColor->currentText() == "Light background") ? (subtract(background, frame, frame)) : (subtract(frame, background, frame));
       tracking->binarisation(frame, 'b', ui->threshBox->value());
       Mat element = getStructuringElement(ui->kernelType->currentIndex(), Size(2 * ui->kernelSize->value() + 1, 2 * ui->kernelSize->value() + 1), Point(ui->kernelSize->value(), ui->kernelSize->value()));
-      morphologyEx(frame, frame, ui->morphOperation->currentIndex(), element); // MorphTypes enum and QComboBox indexes have to match
+      morphologyEx(frame, frame, ui->morphOperation->currentIndex(), element);  // MorphTypes enum and QComboBox indexes have to match
 
       // Keeps only right sized objects
       // To benchmark: pushBack contours vs loop over index and call drawContours multiple times
+
+      // Crops the image
+      if (roi.width != 0 || roi.height != 0) {
+        frame = frame(roi);
+      }
+
       vector<vector<Point>> contours;
       findContours(frame, contours, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
       displayContours.reserve(contours.size());
@@ -439,6 +449,13 @@ void Interactive::display(int index) {
       counterLabel->adjustSize();
     }
 
+    else {
+      // Crops the image
+      if (roi.width != 0 || roi.height != 0) {
+        frame = frame(roi);
+      }
+    }
+
     // Displays the image in the QLabel
     cvtColor(frame, frame, COLOR_GRAY2RGB);
     if (ui->isBin->isChecked()) {
@@ -452,11 +469,8 @@ void Interactive::display(int index) {
       for (auto const &a : idList) {
         QMap<QString, double> coordinate = trackingData->getData(index, a);
         int id = a;
-        cv::ellipse(frame, Point(coordinate.value("xBody"), coordinate.value("yBody")), Size(coordinate.value("bodyMajorAxisLength"), coordinate.value("bodyMinorAxisLength")), 180 - (coordinate.value("tBody") * 180) / M_PI, 0, 360, Scalar(colorMap[id].x, colorMap[id].y, colorMap[id].z), scale, 8);
+        cv::ellipse(frame, Point(coordinate.value("xBody") - roi.tl().x, coordinate.value("yBody") - roi.tl().y), Size(coordinate.value("bodyMajorAxisLength"), coordinate.value("bodyMinorAxisLength")), 180 - (coordinate.value("tBody") * 180) / M_PI, 0, 360, Scalar(colorMap[id].x, colorMap[id].y, colorMap[id].z), scale, 8);
       }
-    }
-    if (roi.width != 0 || roi.height != 0) {
-      frame = frame(roi);
     }
     Mat image = frame.getMat(ACCESS_READ);
     resizedPix = (QPixmap::fromImage(QImage(image.data, image.cols, image.rows, image.step, QImage::Format_RGB888)).scaled(ui->display->size(), Qt::KeepAspectRatio));
