@@ -1,5 +1,40 @@
+/*
+This file is part of Fast Track.
+
+    FastTrack is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    FastTrack is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with FastTrack.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
 #include "data.h"
 
+
+/**
+ * @class Data
+ *
+ * @brief This class allows to load tracking data produced by the Tracking class.
+ *
+ * @author Benjamin Gallois
+ *
+ * @version $Revision: 4.0 $
+ *
+ * Contact: gallois.benjamin08@gmail.com
+ *
+ */
+
+/**
+  * @brief Constructs the data object from a tracking result file.
+  * @param[in] dataPath Path to the tracking data file.
+*/
 Data::Data(QString dataPath) {
   QVector<QString> replayTracking;
   dir = dataPath;
@@ -25,6 +60,7 @@ Data::Data(QString dataPath) {
       QMap<QString, double> objectData;             // Map data keys to data value
 
       QStringList dat = a.split('\t', QString::SkipEmptyParts);
+      if(dat.size() != 23) break; // Checks for corrupted data
       int frameIndex = dat[21].toInt();
       int id = dat[22].toInt();
       dat.removeAt(22);
@@ -43,10 +79,21 @@ Data::Data(QString dataPath) {
   }
 }
 
+/**
+  * @brief Gets the tracking data at the selected image number for all the objects.
+  * @param[in] imageIndex The index of the image where to extracts the data.
+  * @return The tracking data in a QVector that contains a structure with the Id of the object and data for this object. The data are stored in a QMap<dataName, value>. 
+*/
 QVector<object> Data::getData(int imageIndex) {
   return data.value(imageIndex);
 }
 
+/**
+  * @brief Gets the tracking data at the selected image number for one selected object.
+  * @param[in] imageIndex The index of the image where to extracts the data.
+  * @param[in] id The id of the object.
+  * @return The tracking data for for the selected object at the selected image. The data are stored in a QMap<dataName, value>. 
+*/
 QMap<QString, double> Data::getData(int imageIndex, int id) {
   QVector<object> objects = data.value(imageIndex);
   for (auto &a : objects) {
@@ -123,6 +170,9 @@ void Data::deleteData(int objectId, int from) {
   }
 }
 
+/**
+  * @brief Saves the data in the tracking result file.
+*/
 void Data::save() {
   QFile file(dir + QDir::separator() + "Tracking_Result" + QDir::separator() + "tracking.txt");
   if (file.open(QFile::WriteOnly | QFile::Text)) {
