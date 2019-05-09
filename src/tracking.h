@@ -41,6 +41,7 @@ This file is part of Fast Track.
 #include <numeric>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/video/tracking.hpp>
 #include <string>
 #include <tuple>
 #include <utility>
@@ -110,7 +111,7 @@ class Tracking : public QObject {
   vector<double> objectInformation(const UMat &image);
   vector<Point3d> reassignment(const vector<Point3d> &past, const vector<Point3d> &input, const vector<int> &assignment);
   UMat backgroundExtraction(const vector<String> &files, double n, const int method);
-  void registration(UMat imageReference, UMat &frame);
+  void registration(UMat imageReference, UMat &frame, int method = 0);
   void binarisation(UMat &frame, char backgroundColor, int value);
   vector<vector<Point3d>> objectPosition(const UMat &frame, int minSize, int maxSize);
   vector<int> costFunc(const vector<Point3d> &prevPos, const vector<Point3d> &pos, double LENGHT, double ANGLE, double WEIGHT, double LO);

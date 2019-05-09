@@ -205,11 +205,8 @@ UMat Tracking::backgroundExtraction(const vector<String> &files, double n, const
 
   for (size_t i = 0; i < files.size(); i += step) {
     imread(files[i], IMREAD_GRAYSCALE).copyTo(cameraFrameReg);
+    registration(img0, cameraFrameReg, 1);
     cameraFrameReg.convertTo(cameraFrameReg, CV_32FC1);
-    Point2d shift = phaseCorrelate(cameraFrameReg, img0);
-    H = (Mat_<float>(2, 3) << 1.0, 0.0, shift.x, 0.0, 1.0, shift.y);
-    warpAffine(cameraFrameReg, cameraFrameReg, H, cameraFrameReg.size());
-
     switch (method) {
       case 0:
         cv::min(background, cameraFrameReg, background);
@@ -243,13 +240,25 @@ UMat Tracking::backgroundExtraction(const vector<String> &files, double n, const
   * @param[in] imageReference The reference image for the registration.
   * @param[in, out] frame The image to register.
 */
-void Tracking::registration(UMat imageReference, UMat &frame) {
+void Tracking::registration(UMat imageReference, UMat &frame, int method) {
   frame.convertTo(frame, CV_32FC1);
   imageReference.convertTo(imageReference, CV_32FC1);
-  Point2d shift = phaseCorrelate(frame, imageReference);
-  Mat H = (Mat_<float>(2, 3) << 1.0, 0.0, shift.x, 0.0, 1.0, shift.y);
-  warpAffine(frame, frame, H, frame.size());
-  frame.convertTo(frame, CV_8U);
+  // Simple phase correlation registration
+  if (method == 0) {
+    Point2d shift = phaseCorrelate(frame, imageReference);
+    Mat H = (Mat_<float>(2, 3) << 1.0, 0.0, shift.x, 0.0, 1.0, shift.y);
+    warpAffine(frame, frame, H, frame.size());
+    frame.convertTo(frame, CV_8U);
+  }
+  // ECC images alignment
+  else if (method == 1) {
+    const int warpMode = MOTION_EUCLIDEAN;
+    Mat warpMat = Mat::eye(2, 3, CV_32F);
+    TermCriteria criteria(TermCriteria::COUNT + TermCriteria::EPS, 5000, 1e-5);
+    findTransformECC(imageReference, frame, warpMat, warpMode, criteria);
+    warpAffine(frame, frame, warpMat, frame.size(), INTER_LINEAR + WARP_INVERSE_MAP);
+    frame.convertTo(frame, CV_8U);
+  }
 }
 
 /**
