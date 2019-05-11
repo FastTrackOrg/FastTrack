@@ -236,29 +236,40 @@ UMat Tracking::backgroundExtraction(const vector<String> &files, double n, const
 }
 
 /**
-  * @brief Register two images by phase correlation.
+  * @brief Register two images. To speed-up, the registration is made in a pyramidal way: the images are downsampled then registered to have a an approximate transformation then upslampled to have the precise transformation.
   * @param[in] imageReference The reference image for the registration.
   * @param[in, out] frame The image to register.
+  * @param[in] method The method of registration: 0 = simple (phase correlation), 1 = ECC.
 */
 void Tracking::registration(UMat imageReference, UMat &frame, int method) {
   frame.convertTo(frame, CV_32FC1);
   imageReference.convertTo(imageReference, CV_32FC1);
-  // Simple phase correlation registration
-  if (method == 0) {
-    Point2d shift = phaseCorrelate(frame, imageReference);
-    Mat H = (Mat_<float>(2, 3) << 1.0, 0.0, shift.x, 0.0, 1.0, shift.y);
-    warpAffine(frame, frame, H, frame.size());
-    frame.convertTo(frame, CV_8U);
+
+  // Downsamples the image to accelerate the registration
+  vector<UMat> framesDownSampled;
+  vector<UMat> imagesReferenceDownSampled;
+  buildPyramid(frame, framesDownSampled, 4);
+  buildPyramid(imageReference, imagesReferenceDownSampled, 4);
+
+  for (size_t i = framesDownSampled.size(); i > 0; i--) {
+    // Simple phase correlation registration
+    if (method == 0) {
+      Point2d shift = phaseCorrelate(framesDownSampled[i - 1], imagesReferenceDownSampled[i - 1]);
+      Mat H = (Mat_<float>(2, 3) << 1.0, 0.0, shift.x, 0.0, 1.0, shift.y);
+      warpAffine(framesDownSampled[i - 1], framesDownSampled[i - 1], H, framesDownSampled[i - 1].size());
+    }
+    // ECC images alignment
+    // !!! This can throw an error if the algo do not converge
+    else if (method == 1) {
+      const int warpMode = MOTION_EUCLIDEAN;
+      Mat warpMat = Mat::eye(2, 3, CV_32F);
+      TermCriteria criteria(TermCriteria::COUNT + TermCriteria::EPS, 5000, 1e-5);
+      findTransformECC(imagesReferenceDownSampled[i - 1], framesDownSampled[i - 1], warpMat, warpMode, criteria);
+      // Gets the transformation from downsampled images
+      warpAffine(framesDownSampled[i - 1], framesDownSampled[i - 1], warpMat, framesDownSampled[i - 1].size(), INTER_LINEAR + WARP_INVERSE_MAP);
+    }
   }
-  // ECC images alignment
-  else if (method == 1) {
-    const int warpMode = MOTION_EUCLIDEAN;
-    Mat warpMat = Mat::eye(2, 3, CV_32F);
-    TermCriteria criteria(TermCriteria::COUNT + TermCriteria::EPS, 5000, 1e-5);
-    findTransformECC(imageReference, frame, warpMat, warpMode, criteria);
-    warpAffine(frame, frame, warpMat, frame.size(), INTER_LINEAR + WARP_INVERSE_MAP);
-    frame.convertTo(frame, CV_8U);
-  }
+  frame.convertTo(frame, CV_8U);
 }
 
 /**
