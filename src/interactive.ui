@@ -94,7 +94,7 @@
           <x>0</x>
           <y>0</y>
           <width>261</width>
-          <height>560</height>
+          <height>556</height>
          </rect>
         </property>
         <attribute name="label">
@@ -286,7 +286,7 @@
           <x>0</x>
           <y>0</y>
           <width>261</width>
-          <height>560</height>
+          <height>556</height>
          </rect>
         </property>
         <attribute name="label">
@@ -336,29 +336,7 @@
           </layout>
          </item>
          <item row="2" column="0">
-          <layout class="QHBoxLayout" name="horizontalLayout_16">
-           <item>
-            <widget class="QLabel" name="label_18">
-             <property name="text">
-              <string>Registration: </string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QComboBox" name="reg">
-             <item>
-              <property name="text">
-               <string>no</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>yes</string>
-              </property>
-             </item>
-            </widget>
-           </item>
-          </layout>
+          <layout class="QHBoxLayout" name="horizontalLayout_16"/>
          </item>
          <item row="3" column="0">
           <spacer name="verticalSpacer_4">
@@ -384,7 +362,7 @@
    <property name="minimumSize">
     <size>
      <width>241</width>
-     <height>260</height>
+     <height>291</height>
     </size>
    </property>
    <property name="features">
@@ -412,20 +390,13 @@
           <x>0</x>
           <y>0</y>
           <width>223</width>
-          <height>473</height>
+          <height>432</height>
          </rect>
         </property>
         <attribute name="label">
          <string>Background</string>
         </attribute>
         <layout class="QGridLayout" name="gridLayout_6">
-         <item row="3" column="0" colspan="2">
-          <widget class="QPushButton" name="backgroundComputeButton">
-           <property name="text">
-            <string>Compute</string>
-           </property>
-          </widget>
-         </item>
          <item row="1" column="0" colspan="2">
           <layout class="QHBoxLayout" name="horizontalLayout_19">
            <item>
@@ -459,6 +430,19 @@
            </item>
           </layout>
          </item>
+         <item row="9" column="1">
+          <spacer name="verticalSpacer">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>40</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
          <item row="2" column="0" colspan="2">
           <layout class="QHBoxLayout" name="horizontalLayout_18">
            <item>
@@ -473,30 +457,38 @@
            </item>
           </layout>
          </item>
-         <item row="6" column="0" colspan="2">
+         <item row="4" column="0" colspan="2">
+          <widget class="QPushButton" name="backgroundComputeButton">
+           <property name="text">
+            <string>Compute</string>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="0" colspan="2">
           <widget class="QLabel" name="label_21">
            <property name="text">
             <string>Select a background image</string>
            </property>
           </widget>
          </item>
-         <item row="8" column="1">
-          <spacer name="verticalSpacer">
-           <property name="orientation">
-            <enum>Qt::Vertical</enum>
+         <item row="8" column="0" colspan="2">
+          <widget class="QPushButton" name="backgroundSelectButton">
+           <property name="text">
+            <string>Open image</string>
            </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>20</width>
-             <height>40</height>
-            </size>
-           </property>
-          </spacer>
+          </widget>
          </item>
-         <item row="4" column="0" colspan="2">
+         <item row="5" column="0" colspan="2">
           <widget class="QProgressBar" name="backgroundProgressBar">
            <property name="value">
             <number>0</number>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="0" colspan="2">
+          <widget class="Line" name="line">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
            </property>
           </widget>
          </item>
@@ -507,18 +499,30 @@
            </property>
           </widget>
          </item>
-         <item row="7" column="0" colspan="2">
-          <widget class="QPushButton" name="backgroundSelectButton">
+         <item row="3" column="0">
+          <widget class="QLabel" name="label_10">
            <property name="text">
-            <string>Open image</string>
+            <string>Registration:</string>
            </property>
           </widget>
          </item>
-         <item row="5" column="0" colspan="2">
-          <widget class="Line" name="line">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
+         <item row="3" column="1">
+          <widget class="QComboBox" name="registrationBack">
+           <item>
+            <property name="text">
+             <string>None</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Simple</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>ECC</string>
+            </property>
+           </item>
           </widget>
          </item>
         </layout>
@@ -529,7 +533,7 @@
           <x>0</x>
           <y>0</y>
           <width>223</width>
-          <height>473</height>
+          <height>432</height>
          </rect>
         </property>
         <attribute name="label">
@@ -620,13 +624,67 @@ corner</string>
          </item>
         </layout>
        </widget>
+       <widget class="QWidget" name="registrationBox">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>223</width>
+          <height>432</height>
+         </rect>
+        </property>
+        <attribute name="label">
+         <string>Registration</string>
+        </attribute>
+        <layout class="QGridLayout" name="gridLayout_16">
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_18">
+           <property name="text">
+            <string>Registration: </string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QComboBox" name="reg">
+           <item>
+            <property name="text">
+             <string>None</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Simple</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>ECC</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item row="1" column="0" colspan="2">
+          <spacer name="verticalSpacer_8">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>380</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </widget>
        <widget class="QWidget" name="widget">
         <property name="geometry">
          <rect>
           <x>0</x>
           <y>0</y>
           <width>223</width>
-          <height>473</height>
+          <height>432</height>
          </rect>
         </property>
         <attribute name="label">
@@ -716,7 +774,7 @@ corner</string>
           <x>0</x>
           <y>0</y>
           <width>223</width>
-          <height>473</height>
+          <height>432</height>
          </rect>
         </property>
         <attribute name="label">
@@ -828,7 +886,7 @@ corner</string>
           <x>0</x>
           <y>0</y>
           <width>223</width>
-          <height>473</height>
+          <height>432</height>
          </rect>
         </property>
         <attribute name="label">

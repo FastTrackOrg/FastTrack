@@ -269,6 +269,9 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   isBackground = false;
   tracking = new Tracking("", "");
   connect(tracking, &Tracking::backgroundProgress, ui->backgroundProgressBar, &QProgressBar::setValue);
+  connect(tracking, &Tracking::forceFinished, [this]() {
+    message("An error occured.");
+  });
 
   // Qt need a delay to update widget geometry
   QTimer::singleShot(500, [this]() {
@@ -528,13 +531,18 @@ void Interactive::computeBackground() {
   if (!framePath.empty()) {
     double nBack = double(ui->nBack->value());
     int method = ui->back->currentIndex();
+    int registrationMethod = ui->registrationBack->currentIndex();
 
     ui->backgroundProgressBar->setMaximum(int(nBack));
 
     // Computes the background without blocking the ui
     QFuture<void> future = QtConcurrent::run([=]() {
-      background = tracking->backgroundExtraction(framePath, nBack, method);
-
+      try {
+        background = tracking->backgroundExtraction(framePath, nBack, method, registrationMethod);
+      }
+      catch (const std::exception &ex) {
+        message("An error occurs. Please change the registration method");
+      }
       isBackground = true;
       ui->isBin->setCheckable(true);
       ui->isSub->setCheckable(true);
@@ -602,6 +610,7 @@ void Interactive::getParameters() {
   parameters.insert("Binary threshold", QString::number(ui->threshBox->value()));
   parameters.insert("Number of images background", QString::number(ui->nBack->value()));
   parameters.insert("Background method", QString::number(ui->back->currentIndex()));
+  parameters.insert("Background registration method", QString::number(ui->back->currentIndex()));
   parameters.insert("ROI top x", QString::number(roi.tl().x));
   parameters.insert("ROI top y", QString::number(roi.tl().y));
   parameters.insert("ROI bottom x", QString::number(roi.br().x));
@@ -629,6 +638,13 @@ void Interactive::previewTracking() {
 
     connect(thread, &QThread::started, tracking, &Tracking::startProcess);
     connect(tracking, &Tracking::progress, ui->progressBar, &QProgressBar::setValue);
+    connect(tracking, &Tracking::forceFinished, [this]() {
+      ui->slider->setDisabled(false);
+      ui->previewButton->setDisabled(false);
+      ui->trackButton->setDisabled(false);
+      trackingData = new Data(dir);
+      message("An error occurs during the tracking.");
+    });
     connect(tracking, &Tracking::statistic, [this](int time) {
       ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Analysis rate", Qt::MatchExactly)[0]), 1)->setText(QString::number(double(ui->stopImage->value() * 1000) / double(time)));
     });
@@ -667,6 +683,13 @@ void Interactive::track() {
     tracking->moveToThread(thread);
 
     connect(thread, &QThread::started, tracking, &Tracking::startProcess);
+    connect(tracking, &Tracking::forceFinished, [this]() {
+      ui->slider->setDisabled(false);
+      ui->previewButton->setDisabled(false);
+      ui->trackButton->setDisabled(false);
+      trackingData = new Data(dir);
+      message("An error occurs during the tracking.");
+    });
     connect(tracking, &Tracking::progress, ui->progressBar, &QProgressBar::setValue);
     connect(tracking, &Tracking::statistic, [this](int time) {
       ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Analysis rate", Qt::MatchExactly)[0]), 1)->setText(QString::number(double(framePath.size() * 1000) / double(time)));

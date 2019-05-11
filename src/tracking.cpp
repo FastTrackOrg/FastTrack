@@ -187,7 +187,7 @@ bool Tracking::objectDirection(const UMat &image, Point center, vector<double> &
   * @param[in] Method 0: minimal projection, 1: maximal projection, 2: average projection.
   * @return The background image.
 */
-UMat Tracking::backgroundExtraction(const vector<String> &files, double n, const int method) {
+UMat Tracking::backgroundExtraction(const vector<String> &files, double n, const int method, const int registrationMethod) {
   if (static_cast<unsigned int>(n) > files.size()) {
     n = double(files.size());
   }
@@ -205,7 +205,7 @@ UMat Tracking::backgroundExtraction(const vector<String> &files, double n, const
 
   for (size_t i = 0; i < files.size(); i += step) {
     imread(files[i], IMREAD_GRAYSCALE).copyTo(cameraFrameReg);
-    registration(img0, cameraFrameReg, 1);
+    if (registrationMethod != 0) registration(img0, cameraFrameReg, registrationMethod - 1);
     cameraFrameReg.convertTo(cameraFrameReg, CV_32FC1);
     switch (method) {
       case 0:
@@ -241,7 +241,7 @@ UMat Tracking::backgroundExtraction(const vector<String> &files, double n, const
   * @param[in, out] frame The image to register.
   * @param[in] method The method of registration: 0 = simple (phase correlation), 1 = ECC.
 */
-void Tracking::registration(UMat imageReference, UMat &frame, int method) {
+void Tracking::registration(UMat imageReference, UMat &frame, const int method) {
   frame.convertTo(frame, CV_32FC1);
   imageReference.convertTo(imageReference, CV_32FC1);
 
@@ -617,8 +617,8 @@ void Tracking::imageProcessing() {
   try {
     // Reads the next image in the image sequence and applies the image processing workflow
     imread(m_files[m_im], IMREAD_GRAYSCALE).copyTo(m_visuFrame);
-    if (statusRegistration) {
-      registration(m_background, m_visuFrame);
+    if (param_registration != 0) {
+      registration(m_background, m_visuFrame, param_registration - 1);
     }
 
     (statusBinarisation) ? (subtract(m_background, m_visuFrame, m_binaryFrame)) : (subtract(m_visuFrame, m_background, m_binaryFrame));
@@ -752,7 +752,7 @@ void Tracking::startProcess() {
 
     // Loads the background image is provided and check if the image has the correct size
     if (m_background.empty() && m_backgroundPath.empty()) {
-      m_background = backgroundExtraction(m_files, param_nBackground, param_methodBackground);
+      m_background = backgroundExtraction(m_files, param_nBackground, param_methodBackground, param_methodRegistrationBackground);
     }
     else if (m_background.empty()) {
       try {
@@ -762,7 +762,7 @@ void Tracking::startProcess() {
         subtract(test, m_background, test);
       }
       catch (...) {
-        m_background = backgroundExtraction(m_files, param_nBackground, param_methodBackground);
+        m_background = backgroundExtraction(m_files, param_nBackground, param_methodBackground, param_methodRegistrationBackground);
         emit(error(0));
       }
     }
@@ -875,12 +875,13 @@ void Tracking::updatingParameters(const QMap<QString, QString> &parameterList) {
   param_thresh = parameterList.value("Binary threshold").toInt();
   param_nBackground = parameterList.value("Number of images background").toDouble();
   param_methodBackground = parameterList.value("Background method").toInt();
+  param_methodRegistrationBackground = parameterList.value("Background registration method").toInt();
   param_x1 = parameterList.value("ROI top x").toInt();
   param_y1 = parameterList.value("ROI top y").toInt();
   param_x2 = parameterList.value("ROI bottom x").toInt();
   param_y2 = parameterList.value("ROI bottom y").toInt();
   m_ROI = Rect(param_x1, param_y1, param_x2 - param_x1, param_y2 - param_y1);
-  statusRegistration = (parameterList.value("Registration") == "1") ? true : false;
+  param_registration = parameterList.value("Registration").toInt();
   statusBinarisation = (parameterList.value("Light background") == "0") ? true : false;
   param_morphOperation = parameterList.value("Morphological operation").toInt();
   param_kernelSize = parameterList.value("Kernel size").toInt();

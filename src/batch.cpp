@@ -124,7 +124,7 @@ Batch::Batch(QWidget *parent) : QWidget(parent),
   ui->tableParameters->insertRow(8);
   ui->tableParameters->setItem(8, 0, new QTableWidgetItem("Registration"));
   QComboBox *registration = new QComboBox(ui->tableParameters);
-  registration->addItems({"No", "Yes"});
+  registration->addItems({"None", "Simple", "ECC"});
   ui->tableParameters->setCellWidget(8, 1, registration);
   connect(registration, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &Batch::updateParameters);
 
@@ -207,6 +207,13 @@ Batch::Batch(QWidget *parent) : QWidget(parent),
   weight->setSingleStep(0.1);
   ui->tableParameters->setCellWidget(19, 1, weight);
   connect(weight, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &Batch::updateParameters);
+
+  ui->tableParameters->insertRow(20);
+  ui->tableParameters->setItem(20, 0, new QTableWidgetItem("Background registration method"));
+  QComboBox *backRegistrationMethod = new QComboBox(ui->tableParameters);
+  backRegistrationMethod->addItems({"None", "Simple", "ECC"});
+  ui->tableParameters->setCellWidget(20, 1, backRegistrationMethod);
+  connect(backRegistrationMethod, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &Batch::updateParameters);
 
 
   loadSettings();
@@ -445,7 +452,7 @@ void Batch::updateParameters() {
     // Updates SpinBox parameters
     QVector<int> spinBoxIndexes = {1, 2, 4, 5, 6, 7, 11, 12, 13, 14, 15, 16, 17};
     QVector<int> doubleSpinBoxIndexes = {19};
-    QVector<int> comboBoxIndexes = {3, 8, 9, 10, 18};
+    QVector<int> comboBoxIndexes = {3, 8, 9, 10, 18, 20};
 
     for (auto &a : spinBoxIndexes) {
       parameterList.insert(ui->tableParameters->item(a, 0)->text(), QString::number(qobject_cast<QSpinBox *>(ui->tableParameters->cellWidget(a, 1))->value()));
