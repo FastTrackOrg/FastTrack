@@ -26,6 +26,8 @@ class Data {
   explicit Data(QString dataPath);
   ~Data();
 
+  int maxId;
+
   QVector<object> getData(int imageIndex);
   QMap<QString, double> getData(int imageIndex, int id);
   QList<int> getId(int imageIndex);

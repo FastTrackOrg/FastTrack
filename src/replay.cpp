@@ -196,6 +196,10 @@ void Replay::loadReplayFolder(QString dir) {
       isReplayable = true;
 
       trackingData = new Data(dir);
+      qInfo() << trackingData->maxId;
+      for (int i = 0; i < trackingData->maxId + 1; i++) {
+      ui->object2Replay->addItem(QString::number(i));
+      }
 
       // Generates a color map.
       // TO REDO
@@ -220,7 +224,6 @@ void Replay::loadReplayFolder(QString dir) {
 void Replay::loadFrame(int frameIndex) {
   if (isReplayable) {
     ui->object1Replay->clear();
-    ui->object2Replay->clear();
 
     Mat frame = imread(replayFrames[frameIndex], IMREAD_COLOR);
     int scale = ui->replaySize->value();
@@ -232,7 +235,6 @@ void Replay::loadFrame(int frameIndex) {
       int id = a;
 
       ui->object1Replay->addItem(QString::number(id));
-      ui->object2Replay->addItem(QString::number(id));
 
       if (ui->replayEllipses->isChecked()) {
         switch (ui->ellipseBox->currentIndex()) {

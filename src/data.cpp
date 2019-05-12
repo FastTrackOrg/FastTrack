@@ -38,6 +38,7 @@ This file is part of Fast Track.
 Data::Data(QString dataPath) {
   QVector<QString> replayTracking;
   dir = dataPath;
+  maxId = 0;
 
   if (QDir().exists(dir + QDir::separator() + "Tracking_Result")) {
     QFile trackingFile(dir + QDir::separator() + "Tracking_Result" + QDir::separator() + "tracking.txt");
@@ -63,6 +64,7 @@ Data::Data(QString dataPath) {
       if(dat.size() != 23) break; // Checks for corrupted data
       int frameIndex = dat[21].toInt();
       int id = dat[22].toInt();
+      if (id > maxId) maxId = id;
       dat.removeAt(22);
 
       for (int j = 0; j < dat.size(); j++) {
@@ -107,6 +109,11 @@ QMap<QString, double> Data::getData(int imageIndex, int id) {
   return tmp;
 }
 
+/**
+  * @brief Gets the ids of all the objects in the frame.
+  * @arg[in] imageIndex Index of the frame.
+  * @return List of indexes.
+*/
 QList<int> Data::getId(int imageIndex) {
   QVector<object> objects = data.value(imageIndex);
   QList<int> ids;
