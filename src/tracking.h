@@ -27,6 +27,7 @@ This file is part of Fast Track.
 #include <QFile>
 #include <QFileInfo>
 #include <QList>
+#include <QDate>
 #include <QMap>
 #include <QMessageBox>
 #include <QObject>

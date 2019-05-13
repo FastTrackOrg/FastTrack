@@ -797,8 +797,11 @@ void Tracking::startProcess() {
     if (!m_id.empty()) m_idMax = int(*max_element(m_id.begin(), m_id.end()));
     else m_idMax = 0;
 
-    //  Creates the folder to save result, parameter and background image
+    //  Creates the folder to save result, parameter and background image 
+    //  If a folder already exist, renames it with the date and time.
     QString savingPath = QString::fromStdString(m_path).section("*", 0, 0) + QDir::separator() + "Tracking_Result" + QDir::separator();
+    QDir r;
+    r.rename(savingPath, QString::fromStdString(m_path).section("*", 0, 0) + QDir::separator() + "Tracking_Result_Archive-" + QDate::currentDate().toString("dd-MMM-yyyy-") + QTime::currentTime().toString("hh-mm-ss"));
     QDir().mkdir(savingPath);
 
     QFile parameterFile(savingPath + "parameter.param");
