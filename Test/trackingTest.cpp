@@ -37,19 +37,19 @@ TEST_F(TrackingTest, RegistrationMethod0Lena) {
 
   H = (Mat_<float>(2, 3) << 1.0, 0.0, -20, 0.0, 1.0, -20);
 	warpAffine(padded, registered, H, padded.size());
-  tracking.registration(padded, registered);
+  tracking.registration(padded, registered, 0);
   compare(registered, padded, diff, cv::CMP_NE);
   EXPECT_EQ(countNonZero(diff), 0);
   
   H = (Mat_<float>(2, 3) << 1.0, 0.0, 50, 0.0, 1.0, 10);
 	warpAffine(padded, registered, H, padded.size());
-  tracking.registration(padded, registered);
+  tracking.registration(padded, registered, 0);
   compare(registered, padded, diff, cv::CMP_NE);
   EXPECT_EQ(countNonZero(diff), 0);
 
   H = (Mat_<float>(2, 3) << 1.0, 0.0, 0, 0.0, 1.0, 0);
 	warpAffine(padded, registered, H, padded.size());
-  tracking.registration(padded, registered);
+  tracking.registration(padded, registered, 0);
   compare(registered, padded, diff, cv::CMP_NE);
   EXPECT_EQ(countNonZero(diff), 0);
 }
@@ -82,6 +82,39 @@ TEST_F(TrackingTest, RegistrationMethod1Lena) {
   EXPECT_EQ(countNonZero(diff), 0);
 }
 
+// Not working pixel resolution
+TEST_F(TrackingTest, RegistrationMethod2Lena) {
+  Tracking tracking("test", "");
+  
+  UMat imageReference, registered, diff;
+  Mat H;
+  imread("../dataSet/len_full.jpg", IMREAD_GRAYSCALE).copyTo(imageReference);
+  // Adds padding to avoid cropping
+  UMat padded(imageReference.rows + 100, imageReference.cols + 100, imageReference.depth());
+  copyMakeBorder(imageReference, padded, 50, 50, 50, 50, BORDER_CONSTANT);
+
+  /*H = (Mat_<float>(2, 3) << 1.0, 0.0, -2, 0.0, 1.0, -2);
+	warpAffine(padded, registered, H, padded.size());
+  tracking.registration(padded, registered, 2);
+  subtract(registered, padded, registered);
+  imwrite("/home/benjamin/reg.pgm", registered);
+  compare(registered, padded, diff, cv::CMP_NE);
+  EXPECT_EQ(countNonZero(diff), 0);
+  
+  H = (Mat_<float>(2, 3) << 1.0, 0.0, 50, 0.0, 1.0, 10);
+	warpAffine(padded, registered, H, padded.size());
+  tracking.registration(padded, registered, 2);
+  compare(registered, padded, diff, cv::CMP_NE);
+  EXPECT_EQ(countNonZero(diff), 0);
+
+  H = (Mat_<float>(2, 3) << 1.0, 0.0, 0, 0.0, 1.0, 0);
+	warpAffine(padded, registered, H, padded.size());
+  tracking.registration(padded, registered, 2);
+  compare(registered, padded, diff, cv::CMP_NE);
+  EXPECT_EQ(countNonZero(diff), 0);*/
+}
+
+
 // Method not working for this type of image
 TEST_F(TrackingTest, RegistrationMethod0Dual) {
   Tracking tracking("test", "");
@@ -95,19 +128,19 @@ TEST_F(TrackingTest, RegistrationMethod0Dual) {
 
   H = (Mat_<float>(2, 3) << 1.0, 0.0, -20, 0.0, 1.0, -20);
 	warpAffine(padded, registered, H, padded.size());
-  tracking.registration(padded, registered);
+  tracking.registration(padded, registered, 0);
   compare(registered, padded, diff, cv::CMP_NE);
   EXPECT_NE(countNonZero(diff), 0);
   
   H = (Mat_<float>(2, 3) << 1.0, 0.0, 50, 0.0, 1.0, 10);
 	warpAffine(padded, registered, H, padded.size());
-  tracking.registration(padded, registered);
+  tracking.registration(padded, registered, 0);
   compare(registered, padded, diff, cv::CMP_NE);
   EXPECT_NE(countNonZero(diff), 0);
 
   H = (Mat_<float>(2, 3) << 1.0, 0.0, 0, 0.0, 1.0, 0);
 	warpAffine(padded, registered, H, padded.size());
-  tracking.registration(padded, registered);
+  tracking.registration(padded, registered, 0);
   compare(registered, padded, diff, cv::CMP_NE);
   EXPECT_NE(countNonZero(diff), 0);
 }
@@ -139,6 +172,35 @@ TEST_F(TrackingTest, RegistrationMethod1Dual) {
   compare(registered, padded, diff, cv::CMP_NE);
   EXPECT_EQ(countNonZero(diff), 0);
 }
+
+TEST_F(TrackingTest, RegistrationMethod2Dual) {
+  Tracking tracking("test", "");
+  
+  /*UMat imageReference, registered, diff;
+  Mat H;
+  imread("../dataSet/dual.pgm", IMREAD_GRAYSCALE).copyTo(imageReference);
+  // Adds padding to avoid cropping
+  UMat padded(imageReference.rows + 100, imageReference.cols + 100, imageReference.depth());
+  copyMakeBorder(imageReference, padded, 50, 50, 50, 50, BORDER_CONSTANT);
+
+  H = (Mat_<float>(2, 3) << 1.0, 0.0, -20, 0.0, 1.0, -20);
+	warpAffine(padded, registered, H, padded.size());
+  tracking.registration(padded, registered, 2);
+  compare(registered, padded, diff, cv::CMP_NE);
+  EXPECT_EQ(countNonZero(diff), 0);
+  
+  H = (Mat_<float>(2, 3) << 1.0, 0.0, 50, 0.0, 1.0, 10);
+	warpAffine(padded, registered, H, padded.size());
+  tracking.registration(padded, registered, 2);
+  compare(registered, padded, diff, cv::CMP_NE);
+  EXPECT_EQ(countNonZero(diff), 0);
+
+  H = (Mat_<float>(2, 3) << 1.0, 0.0, 0, 0.0, 1.0, 0);
+  tracking.registration(padded, registered, 2);
+  compare(registered, padded, diff, cv::CMP_NE);
+  EXPECT_EQ(countNonZero(diff), 0);*/
+}
+
 
 TEST_F(TrackingTest, Module) {
   Tracking tracking("test", "");

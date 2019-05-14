@@ -124,7 +124,7 @@ Batch::Batch(QWidget *parent) : QWidget(parent),
   ui->tableParameters->insertRow(8);
   ui->tableParameters->setItem(8, 0, new QTableWidgetItem("Registration"));
   QComboBox *registration = new QComboBox(ui->tableParameters);
-  registration->addItems({"None", "Simple", "ECC"});
+  registration->addItems({"None", "Simple", "ECC", "Features"});
   ui->tableParameters->setCellWidget(8, 1, registration);
   connect(registration, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &Batch::updateParameters);
 
@@ -211,7 +211,7 @@ Batch::Batch(QWidget *parent) : QWidget(parent),
   ui->tableParameters->insertRow(20);
   ui->tableParameters->setItem(20, 0, new QTableWidgetItem("Background registration method"));
   QComboBox *backRegistrationMethod = new QComboBox(ui->tableParameters);
-  backRegistrationMethod->addItems({"None", "Simple", "ECC"});
+  backRegistrationMethod->addItems({"None", "Simple", "ECC", "Features"});
   ui->tableParameters->setCellWidget(20, 1, backRegistrationMethod);
   connect(backRegistrationMethod, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &Batch::updateParameters);
 

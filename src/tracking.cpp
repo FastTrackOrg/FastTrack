@@ -239,37 +239,87 @@ UMat Tracking::backgroundExtraction(const vector<String> &files, double n, const
   * @brief Register two images. To speed-up, the registration is made in a pyramidal way: the images are downsampled then registered to have a an approximate transformation then upslampled to have the precise transformation.
   * @param[in] imageReference The reference image for the registration.
   * @param[in, out] frame The image to register.
-  * @param[in] method The method of registration: 0 = simple (phase correlation), 1 = ECC.
+  * @param[in] method The method of registration: 0 = simple (phase correlation), 1 = ECC, 2 = Features based.
 */
 void Tracking::registration(UMat imageReference, UMat &frame, const int method) {
-  frame.convertTo(frame, CV_32FC1);
-  imageReference.convertTo(imageReference, CV_32FC1);
+  switch (method) {
+    // Simple registration by phase correlation
+    case 0: {
+      frame.convertTo(frame, CV_32FC1);
+      imageReference.convertTo(imageReference, CV_32FC1);
 
-  // Downsamples the image to accelerate the registration
-  vector<UMat> framesDownSampled;
-  vector<UMat> imagesReferenceDownSampled;
-  buildPyramid(frame, framesDownSampled, 4);
-  buildPyramid(imageReference, imagesReferenceDownSampled, 4);
+      // Downsamples the image to accelerate the registration
+      vector<UMat> framesDownSampled;
+      vector<UMat> imagesReferenceDownSampled;
+      buildPyramid(frame, framesDownSampled, 4);
+      buildPyramid(imageReference, imagesReferenceDownSampled, 4);
 
-  for (size_t i = framesDownSampled.size(); i > 0; i--) {
-    // Simple phase correlation registration
-    if (method == 0) {
-      Point2d shift = phaseCorrelate(framesDownSampled[i - 1], imagesReferenceDownSampled[i - 1]);
-      Mat H = (Mat_<float>(2, 3) << 1.0, 0.0, shift.x, 0.0, 1.0, shift.y);
-      warpAffine(framesDownSampled[i - 1], framesDownSampled[i - 1], H, framesDownSampled[i - 1].size());
+      for (size_t i = framesDownSampled.size(); i > 0; i--) {
+        // Simple phase correlation registration
+        Point2d shift = phaseCorrelate(framesDownSampled[i - 1], imagesReferenceDownSampled[i - 1]);
+        Mat H = (Mat_<float>(2, 3) << 1.0, 0.0, shift.x, 0.0, 1.0, shift.y);
+        warpAffine(framesDownSampled[i - 1], framesDownSampled[i - 1], H, framesDownSampled[i - 1].size());
+      }
+      frame.convertTo(frame, CV_8U);
+      break;
     }
-    // ECC images alignment
-    // !!! This can throw an error if the algo do not converge
-    else if (method == 1) {
-      const int warpMode = MOTION_EUCLIDEAN;
-      Mat warpMat = Mat::eye(2, 3, CV_32F);
-      TermCriteria criteria(TermCriteria::COUNT + TermCriteria::EPS, 5000, 1e-5);
-      findTransformECC(imagesReferenceDownSampled[i - 1], framesDownSampled[i - 1], warpMat, warpMode, criteria);
-      // Gets the transformation from downsampled images
-      warpAffine(framesDownSampled[i - 1], framesDownSampled[i - 1], warpMat, framesDownSampled[i - 1].size(), INTER_LINEAR + WARP_INVERSE_MAP);
+      // ECC images alignment
+      // !!! This can throw an error if the algo do not converge
+    case 1: {
+      frame.convertTo(frame, CV_32FC1);
+      imageReference.convertTo(imageReference, CV_32FC1);
+
+      // Downsamples the image to accelerate the registration
+      vector<UMat> framesDownSampled;
+      vector<UMat> imagesReferenceDownSampled;
+      buildPyramid(frame, framesDownSampled, 4);
+      buildPyramid(imageReference, imagesReferenceDownSampled, 4);
+
+      for (size_t i = framesDownSampled.size(); i > 0; i--) {
+        // Simple phase correlation registration
+        const int warpMode = MOTION_EUCLIDEAN;
+        Mat warpMat = Mat::eye(2, 3, CV_32F);
+        TermCriteria criteria(TermCriteria::COUNT + TermCriteria::EPS, 5000, 1e-5);
+        findTransformECC(imagesReferenceDownSampled[i - 1], framesDownSampled[i - 1], warpMat, warpMode, criteria);
+        // Gets the transformation from downsampled images
+        warpAffine(framesDownSampled[i - 1], framesDownSampled[i - 1], warpMat, framesDownSampled[i - 1].size(), INTER_LINEAR + WARP_INVERSE_MAP);
+      }
+      frame.convertTo(frame, CV_8U);
+      break;
+    }
+    // Features based registration
+    // To do: make an extra argument to the function to add directly a descriptor set avoiding to recalculate the same if the image of reference doesn't change
+    case 2: {
+      frame.convertTo(frame, CV_8U);
+      imageReference.convertTo(imageReference, CV_8U);
+
+      vector<KeyPoint> keypointsFrame, keypointsRef;
+      Mat descriptorsFrame, descriptorsRef;
+      vector<DMatch> matches;
+      const double featureNumber = 500;
+
+      Ptr<Feature2D> orb = ORB::create(featureNumber);
+      orb->detectAndCompute(frame, Mat(), keypointsFrame, descriptorsFrame);
+      orb->detectAndCompute(imageReference, Mat(), keypointsRef, descriptorsRef);
+
+      Ptr<DescriptorMatcher> matcher = DescriptorMatcher::create("BruteForce-Hamming");
+      matcher->match(descriptorsFrame, descriptorsRef, matches, Mat());
+
+      vector<Point2f> pointsFrame, pointsRef;
+      pointsFrame.reserve(featureNumber);
+      pointsRef.reserve(featureNumber);
+      for (size_t i = 0; i < matches.size(); i++) {
+        pointsFrame.push_back(keypointsFrame[matches[i].queryIdx].pt);
+        pointsRef.push_back(keypointsRef[matches[i].trainIdx].pt);
+      }
+
+      Mat h = findHomography(pointsFrame, pointsRef, RANSAC);
+      warpPerspective(frame, frame, h, frame.size());
+
+      frame.convertTo(frame, CV_8U);
+      break;
     }
   }
-  frame.convertTo(frame, CV_8U);
 }
 
 /**

@@ -46,6 +46,9 @@ This file is part of Fast Track.
 #include <string>
 #include <tuple>
 #include <utility>
+#include "opencv2/features2d/features2d.hpp"
+#include <opencv2/calib3d.hpp>
+#include <opencv2/core/types.hpp>
 
 using namespace cv;
 using namespace std;
