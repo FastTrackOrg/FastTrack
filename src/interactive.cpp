@@ -355,6 +355,8 @@ void Interactive::openFolder() {
       Mat frame = imread(framePath[0], IMREAD_COLOR);
       originalImageSize.setWidth(frame.cols);
       originalImageSize.setHeight(frame.rows);
+      cropedImageSize.setWidth(originalImageSize.width());
+      cropedImageSize.setHeight(originalImageSize.height());
       ui->x2->setMaximum(frame.cols);
       ui->y2->setMaximum(frame.rows);
 
