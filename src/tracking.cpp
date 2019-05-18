@@ -812,8 +812,8 @@ void Tracking::startProcess() {
         subtract(test, m_background, test);
       }
       catch (...) {
-        m_background = backgroundExtraction(m_files, param_nBackground, param_methodBackground, param_methodRegistrationBackground);
-        emit(error(0));
+        emit(forceFinished());
+        return;
       }
     }
 
