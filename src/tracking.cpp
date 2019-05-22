@@ -845,7 +845,7 @@ void Tracking::startProcess() {
     }
 
     if (!m_id.empty()) m_idMax = int(*max_element(m_id.begin(), m_id.end()));
-    else m_idMax = 0;
+    else m_idMax = -1;
 
     //  Creates the folder to save result, parameter and background image 
     //  If a folder already exist, renames it with the date and time.
