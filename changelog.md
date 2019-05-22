@@ -1,6 +1,6 @@
 # FastTrack changelog
 
-## 4.8.dev
+## 4.8.0
 
 ### Fixed
 - Id numbering issue.
