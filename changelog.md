@@ -1,5 +1,21 @@
 # FastTrack changelog
 
+## 4.8.dev
+
+### Fixed
+- Id numbering issue.
+- Crop not working properly if the rectangle get out of the image.
+- Fixed crash if tracking data are corrupted in the Replay panel.
+
+### Changed
+- Changed the id display in the Replay Panel, allowing the user to select any Id int the bottom combo box.
+- New tracking analysis not overwrite the previous but renames the previous one as Tracking_Result_DateOfTheNewAnalysis.
+- An error is triggered if the inputed image background is not openable.
+
+### Added
+- New registration method: ECC and feature based.
+- Undo/redo capabilities in the Replay panel.
+
 ## 4.7.0
 
 ### Fixed

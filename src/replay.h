@@ -3,6 +3,7 @@
 
 #include <stdlib.h>
 #include <QCheckBox>
+#include <QAction>
 #include <QComboBox>
 #include <QDebug>
 #include <QDir>
@@ -32,6 +33,7 @@
 #include <QThread>
 #include <QTimer>
 #include <QWidget>
+#include <QUndoStack>
 #include <ctime>
 #include <fstream>
 #include <opencv2/core/ocl.hpp>
@@ -60,6 +62,10 @@ class Replay : public QWidget {
   QShortcut *qShortcut; /*!< Keyboard shortcut to previous frame. */
   QShortcut *aShortcut; /*!< Keyboard shortcut to previous frame. */
   QShortcut *dShortcut; /*!< Keyboard shortcut to next frame. */
+
+  QUndoStack *commandStack;
+  QAction *undoAction;
+  QAction *redoAction;
 
   QString memoryDir; /*!< Saves the path of the last opened folder.*/
 

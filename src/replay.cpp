@@ -73,6 +73,21 @@ Replay::Replay(QWidget* parent) : QWidget(parent),
   ui->replayDisplay->installEventFilter(this);
   ui->scrollArea->viewport()->installEventFilter(this);
 
+  // Undo Redo
+  commandStack = new QUndoStack(this);
+  undoAction = commandStack->createUndoAction(this, tr("&Undo"));
+  undoAction->setShortcuts(QKeySequence::Undo);
+  connect(ui->undoButton, &QPushButton::clicked, undoAction, &QAction::trigger);
+  connect(undoAction, &QAction::triggered, [this]() {
+    loadFrame(ui->replaySlider->value());
+  });
+  redoAction = commandStack->createRedoAction(this, tr("&Undo"));
+  redoAction->setShortcuts(QKeySequence::Redo);
+  connect(ui->redoButton, &QPushButton::clicked, redoAction, &QAction::trigger);
+  connect(redoAction, &QAction::triggered, [this]() {
+    loadFrame(ui->replaySlider->value());
+  });
+
   // Zoom
   connect(ui->scrollArea->verticalScrollBar(), &QScrollBar::rangeChanged, [this]() {
     QScrollBar* vertical = ui->scrollArea->verticalScrollBar();
@@ -118,9 +133,8 @@ Replay::Replay(QWidget* parent) : QWidget(parent),
   connect(ui->replayPrevious, &QPushButton::clicked, this, &Replay::previousOcclusionEvent);
   connect(ui->deleteData, &QPushButton::clicked, [this]() {
     if (isReplayable) {
-      trackingData->deleteData(ui->object1Replay->currentText().toInt(), ui->replaySlider->value());
-      // Saves new tracking data
-      trackingData->save();
+      DeleteData* del = new DeleteData(ui->object1Replay->currentText().toInt(), ui->replaySlider->value(), trackingData);
+      commandStack->push(del);
       loadFrame(ui->replaySlider->value());
     }
   });
@@ -196,7 +210,6 @@ void Replay::loadReplayFolder(QString dir) {
       isReplayable = true;
 
       trackingData = new Data(dir);
-      qInfo() << trackingData->maxId;
       for (int i = 0; i < trackingData->maxId + 1; i++) {
       ui->object2Replay->addItem(QString::number(i));
       }
@@ -445,10 +458,8 @@ void Replay::correctTracking() {
     int firstObject = ui->object1Replay->currentText().toInt();
     int secondObject = ui->object2Replay->currentText().toInt();
     int start = ui->replaySlider->value();
-    trackingData->swapData(firstObject, secondObject, start);
-
-    // Saves new tracking data
-    trackingData->save();
+    SwapData *swap = new SwapData(firstObject, secondObject, start, trackingData);
+    commandStack->push(swap);
     loadFrame(ui->replaySlider->value());
   }
 }
