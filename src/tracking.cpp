@@ -674,7 +674,7 @@ void Tracking::imageProcessing() {
     (statusBinarisation) ? (subtract(m_background, m_visuFrame, m_binaryFrame)) : (subtract(m_visuFrame, m_background, m_binaryFrame));
     binarisation(m_binaryFrame, 'b', param_thresh);
 
-    if (param_kernelSize != 0) {
+    if (param_kernelSize != 0 && param_morphOperation != 8) {
       Mat element = getStructuringElement(param_kernelType, Size(2 * param_kernelSize + 1, 2 * param_kernelSize + 1), Point(param_kernelSize, param_kernelSize));
       morphologyEx(m_binaryFrame, m_binaryFrame, param_morphOperation, element);
     }
@@ -826,7 +826,7 @@ void Tracking::startProcess() {
 
     binarisation(m_binaryFrame, 'b', param_thresh);
 
-    if (param_kernelSize != 0) {
+    if (param_kernelSize != 0 && param_morphOperation != 8) {
       Mat element = getStructuringElement(param_kernelType, Size(2 * param_kernelSize + 1, 2 * param_kernelSize + 1), Point(param_kernelSize, param_kernelSize));
       morphologyEx(m_binaryFrame, m_binaryFrame, param_morphOperation, element);
     }

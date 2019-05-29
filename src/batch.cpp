@@ -131,7 +131,8 @@ Batch::Batch(QWidget *parent) : QWidget(parent),
   ui->tableParameters->insertRow(9);
   ui->tableParameters->setItem(9, 0, new QTableWidgetItem("Morphological operation"));
   QComboBox *morphType = new QComboBox(ui->tableParameters);
-  morphType->addItems({"Erosion", "Dilatation", "Opening", "Closing", "Gradient", "Top hat", "Black hat", "Hit miss"});
+  morphType->addItems({"Erosion", "Dilatation", "Opening", "Closing", "Gradient", "Top hat", "Black hat", "Hit miss", "None"});
+  morphType->setCurrentIndex(8);
   ui->tableParameters->setCellWidget(9, 1, morphType);
   connect(morphType, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &Batch::updateParameters);
 

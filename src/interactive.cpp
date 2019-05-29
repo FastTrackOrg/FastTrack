@@ -413,8 +413,10 @@ void Interactive::display(int index) {
     else if (ui->isBin->isChecked() && isBackground) {
       (ui->backColor->currentText() == "Light background") ? (subtract(background, frame, frame)) : (subtract(frame, background, frame));
       tracking->binarisation(frame, 'b', ui->threshBox->value());
-      Mat element = getStructuringElement(ui->kernelType->currentIndex(), Size(2 * ui->kernelSize->value() + 1, 2 * ui->kernelSize->value() + 1), Point(ui->kernelSize->value(), ui->kernelSize->value()));
-      morphologyEx(frame, frame, ui->morphOperation->currentIndex(), element);  // MorphTypes enum and QComboBox indexes have to match
+      if (ui->morphOperation->currentIndex() != 8) {
+        Mat element = getStructuringElement(ui->kernelType->currentIndex(), Size(2 * ui->kernelSize->value() + 1, 2 * ui->kernelSize->value() + 1), Point(ui->kernelSize->value(), ui->kernelSize->value()));
+        morphologyEx(frame, frame, ui->morphOperation->currentIndex(), element);  // MorphTypes enum and QComboBox indexes have to match
+      }
 
       // Keeps only right sized objects
       // To benchmark: pushBack contours vs loop over index and call drawContours multiple times

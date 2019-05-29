@@ -93,8 +93,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>261</width>
-          <height>556</height>
+          <width>283</width>
+          <height>542</height>
          </rect>
         </property>
         <attribute name="label">
@@ -106,7 +106,7 @@
            <item>
             <widget class="QLabel" name="label_13">
              <property name="text">
-              <string>Typical distance: </string>
+              <string>Normalization distance: </string>
              </property>
             </widget>
            </item>
@@ -127,7 +127,7 @@
            <item>
             <widget class="QLabel" name="label_14">
              <property name="text">
-              <string>Typical angle: </string>
+              <string>Normalization angle: </string>
              </property>
             </widget>
            </item>
@@ -448,7 +448,7 @@
            <item>
             <widget class="QLabel" name="label_2">
              <property name="text">
-              <string>Number of image: </string>
+              <string>Number of images: </string>
              </property>
             </widget>
            </item>
@@ -791,10 +791,34 @@ corner</string>
          <string>Morphological operation</string>
         </attribute>
         <layout class="QGridLayout" name="gridLayout_10">
+         <item row="0" column="0">
+          <layout class="QHBoxLayout" name="horizontalLayout_8">
+           <item>
+            <widget class="QLabel" name="label_9">
+             <property name="text">
+              <string>Kernel size:</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QSpinBox" name="kernelSize"/>
+           </item>
+          </layout>
+         </item>
          <item row="1" column="0">
           <layout class="QHBoxLayout" name="horizontalLayout_7">
            <item>
+            <widget class="QLabel" name="label_22">
+             <property name="text">
+              <string>Operation:</string>
+             </property>
+            </widget>
+           </item>
+           <item>
             <widget class="QComboBox" name="morphOperation">
+             <property name="currentIndex">
+              <number>8</number>
+             </property>
              <item>
               <property name="text">
                <string>Erosion</string>
@@ -835,21 +859,45 @@ corner</string>
                <string>Hit miss</string>
               </property>
              </item>
+             <item>
+              <property name="text">
+               <string>None</string>
+              </property>
+             </item>
             </widget>
            </item>
           </layout>
          </item>
-         <item row="0" column="0">
-          <layout class="QHBoxLayout" name="horizontalLayout_8">
+         <item row="2" column="0">
+          <layout class="QHBoxLayout" name="horizontalLayout_20">
            <item>
-            <widget class="QLabel" name="label_9">
+            <widget class="QLabel" name="label_23">
              <property name="text">
-              <string>Kernel size:</string>
+              <string>Kernel type:</string>
              </property>
             </widget>
            </item>
            <item>
-            <widget class="QSpinBox" name="kernelSize"/>
+            <widget class="QComboBox" name="kernelType">
+             <property name="currentIndex">
+              <number>2</number>
+             </property>
+             <item>
+              <property name="text">
+               <string>Rectangle</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Cross</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Ellipse</string>
+              </property>
+             </item>
+            </widget>
            </item>
           </layout>
          </item>
@@ -866,28 +914,6 @@ corner</string>
            </property>
           </spacer>
          </item>
-         <item row="2" column="0">
-          <widget class="QComboBox" name="kernelType">
-           <property name="currentIndex">
-            <number>2</number>
-           </property>
-           <item>
-            <property name="text">
-             <string>Rectangle</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Cross</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Ellipse</string>
-            </property>
-           </item>
-          </widget>
-         </item>
         </layout>
        </widget>
        <widget class="QWidget" name="page_2">
@@ -900,7 +926,7 @@ corner</string>
          </rect>
         </property>
         <attribute name="label">
-         <string>Detection parameters</string>
+         <string>Detection</string>
         </attribute>
         <layout class="QGridLayout" name="gridLayout">
          <item row="0" column="0">
