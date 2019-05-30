@@ -171,10 +171,6 @@ void Replay::openReplayFolder() {
 
   QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"), memoryDir, QFileDialog::ShowDirsOnly);
 
-  if (dir.right(15) == "Tracking_Result") {
-    dir.truncate(dir.size() - 16);
-  }
-
   memoryDir = dir;
   ui->replayPath->setText(dir + QDir::separator());
 }
@@ -184,50 +180,62 @@ void Replay::openReplayFolder() {
   * @arg[in] dir Path to the folder where the image sequence is stored.
 */
 void Replay::loadReplayFolder(QString dir) {
-  if (dir.length()) {
-    // Finds image format
-    QList<QString> extensions = {"pgm", "png", "jpeg", "jpg", "tiff", "tif", "bmp", "dib", "jpe", "jp2", "webp", "pbm", "ppm", "sr", "ras", "tif"};
-    QDirIterator it(dir, QStringList(), QDir::NoFilter);
-    QString extension;
-    while (it.hasNext()) {
-      extension = it.next().section('.', -1);
-      if (extensions.contains(extension)) break;
+  // This function will detect from an inputed path to a directory the image sequence and the tracking data.
+  // The last tracking data from the folder Tracking_Result is automatically loaded if found.
+  // If the user explicitly select another Tracking_Result folder, these data are loaded.
+  if (!dir.length()) return;
+
+  QString trackingDir = dir;
+  if (dir.contains("Tracking_Result")) {
+    dir.truncate(dir.lastIndexOf("/", -2));
+  }
+  else {
+    trackingDir.append("/Tracking_Result");
+  }
+
+  // Finds image format
+  QList<QString> extensions = {"pgm", "png", "jpeg", "jpg", "tiff", "tif", "bmp", "dib", "jpe", "jp2", "webp", "pbm", "ppm", "sr", "ras", "tif"};
+  QDirIterator it(dir, QStringList(), QDir::NoFilter);
+  QString extension;
+  while (it.hasNext()) {
+    extension = it.next().section('.', -1);
+    if (extensions.contains(extension)) break;
+  }
+
+  try {
+    // Gets the paths to all the frames in the folder and puts it in a vector.
+    // Setups the ui by setting maximum and minimum of the slider bar.
+    string path = (dir + QDir::separator() + "*." + extension).toStdString();
+    glob(path, replayFrames, false);  // Gets all the paths to frames
+    if (replayFrames.empty()) {
+      return;
     }
+    ui->replaySlider->setMinimum(0);
+    ui->replaySlider->setMaximum(replayFrames.size() - 1);
+    Mat frame = imread(replayFrames[0], IMREAD_COLOR);
+    originalImageSize.setWidth(frame.cols);
+    originalImageSize.setHeight(frame.rows);
+    isReplayable = true;
 
-    try {
-      // Gets the paths to all the frames in the folder and puts it in a vector.
-      // Setups the ui by setting maximum and minimum of the slider bar.
-      string path = (dir + QDir::separator() + "*." + extension).toStdString();
-      glob(path, replayFrames, false);  // Gets all the paths to frames
-      if (replayFrames.empty()) {
-        return;
-      }
-      ui->replaySlider->setMinimum(0);
-      ui->replaySlider->setMaximum(replayFrames.size() - 1);
-      Mat frame = imread(replayFrames[0], IMREAD_COLOR);
-      originalImageSize.setWidth(frame.cols);
-      originalImageSize.setHeight(frame.rows);
-      isReplayable = true;
-
-      trackingData = new Data(dir);
-      for (int i = 0; i < trackingData->maxId + 1; i++) {
+    trackingData = new Data(trackingDir);
+    for (int i = 0; i < trackingData->maxId + 1; i++) {
       ui->object2Replay->addItem(QString::number(i));
-      }
-
-      // Generates a color map.
-      // TO REDO
-      double a, b, c;
-      srand(time(NULL));
-      for (int j = 0; j < 9000; ++j) {
-        a = rand() % 255;
-        b = rand() % 255;
-        c = rand() % 255;
-        colorMap.push_back(Point3f(a, b, c));
-      }
-      loadFrame(0);
-    } catch (...) {
-      isReplayable = false;
     }
+
+    // Generates a color map.
+    // TO REDO
+    double a, b, c;
+    srand(time(NULL));
+    for (int j = 0; j < 9000; ++j) {
+      a = rand() % 255;
+      b = rand() % 255;
+      c = rand() % 255;
+      colorMap.push_back(Point3f(a, b, c));
+    }
+    loadFrame(0);
+  }
+  catch (...) {
+    isReplayable = false;
   }
 }
 

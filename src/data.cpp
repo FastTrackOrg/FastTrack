@@ -40,15 +40,12 @@ Data::Data(QString dataPath) {
   dir = dataPath;
   maxId = 0;
 
-  if (QDir().exists(dir + QDir::separator() + "Tracking_Result")) {
-    QFile trackingFile(dir + QDir::separator() + "Tracking_Result" + QDir::separator() + "tracking.txt");
-
-    if (trackingFile.open(QIODevice::ReadOnly)) {
-      QTextStream input(&trackingFile);
-      QString line;
-      while (input.readLineInto(&line)) {
-        replayTracking.append(line);
-      }
+  QFile trackingFile(dir + QDir::separator() + "tracking.txt");
+  if (trackingFile.exists() && trackingFile.open(QIODevice::ReadOnly)) {
+    QTextStream input(&trackingFile);
+    QString line;
+    while (input.readLineInto(&line)) {
+      replayTracking.append(line);
     }
 
     // Gets the header to construct the QMap data
