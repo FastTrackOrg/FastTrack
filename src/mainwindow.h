@@ -19,6 +19,8 @@ This file is part of Fast Track.
 #define MAINWINDOW_H
 
 #include <QByteArray>
+#include <QCloseEvent>
+#include <QMessageBox>
 #include <QMainWindow>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
@@ -45,6 +47,7 @@ class MainWindow : public QMainWindow {
 
  private:
   Ui::MainWindow *ui; /*!< ui file from Qt designer. */
+  void closeEvent(QCloseEvent *event);
   Interactive *interactive;
   Batch *batch;
   Replay *replay;

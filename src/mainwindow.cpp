@@ -81,6 +81,20 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 }  // Constructor
 
 /**
+  * @brief Close event reimplemented to ask confirmation before closing. 
+*/
+void MainWindow::closeEvent(QCloseEvent *event) {
+  QMessageBox::StandardButton reply;
+  reply = QMessageBox::question(this, "Quit?", "Are you sure you want to quit?", QMessageBox::Yes | QMessageBox::No);
+  if (reply == QMessageBox::Yes) {
+    event->accept();
+  }
+  else {
+    event->ignore();
+  }
+}
+
+/**
   * @brief Destructs the MainWindow object and saves the previous set of parameters.  
 */
 MainWindow::~MainWindow() {
