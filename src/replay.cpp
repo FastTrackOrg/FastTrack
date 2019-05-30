@@ -100,8 +100,8 @@ Replay::Replay(QWidget* parent) : QWidget(parent),
 
   isReplayable = false;
   framerate = new QTimer();
-  ui->ellipseBox->addItems({"Head + Tail", "Head", "Tail", "Body"});
-  ui->arrowBox->addItems({"Head + Tail", "Head", "Tail", "Body"});
+  ui->ellipseBox->addItems({"Head + Tail", "Head", "Tail", "Body", "None"});
+  ui->arrowBox->addItems({"Head + Tail", "Head", "Tail", "Body", "None"});
 
   connect(ui->replayOpen, &QPushButton::clicked, this, &Replay::openReplayFolder);
   connect(ui->replayPath, &QLineEdit::textChanged, this, &Replay::loadReplayFolder);
@@ -257,7 +257,7 @@ void Replay::loadFrame(int frameIndex) {
 
       ui->object1Replay->addItem(QString::number(id));
 
-      if (ui->replayEllipses->isChecked()) {
+      if (ui->ellipseBox->currentIndex() != 4) {
         switch (ui->ellipseBox->currentIndex()) {
           case 0:  // Head + Tail
             cv::ellipse(frame, Point(coordinate.value("xHead"), coordinate.value("yHead")), Size(coordinate.value("headMajorAxisLength"), coordinate.value("headMinorAxisLength")), 180 - (coordinate.value("tHead") * 180) / M_PI, 0, 360, Scalar(colorMap[id].x, colorMap[id].y, colorMap[id].z), scale, 8);
@@ -278,7 +278,7 @@ void Replay::loadFrame(int frameIndex) {
         }
       }
 
-      if (ui->replayArrows->isChecked()) {
+      if (ui->arrowBox->currentIndex() != 4) {
         switch (ui->arrowBox->currentIndex()) {
           case 0:
             cv::arrowedLine(frame, Point(coordinate.value("xHead"), coordinate.value("yHead")), Point(coordinate.value("xHead") + coordinate.value("headMajorAxisLength") * cos(coordinate.value("tHead")), coordinate.value("yHead") - coordinate.value("headMajorAxisLength") * sin(coordinate.value("tHead"))), Scalar(colorMap[id].x, colorMap[id].y, colorMap[id].z), scale, cv::LINE_AA, 0, double(scale) / 10);
@@ -305,7 +305,7 @@ void Replay::loadFrame(int frameIndex) {
 
       if (ui->replayTrace->isChecked()) {
         vector<Point> memory;
-        for (int j = frameIndex - 50; j < frameIndex; j++) {
+        for (int j = frameIndex - ui->replayTraceLength->value(); j < frameIndex; j++) {
           if (j > 0) {
             QMap<QString, double> coordinate = trackingData->getData(j, a);
             if (coordinate.contains("xBody")) {
@@ -518,7 +518,7 @@ void Replay::saveTrackedMovie() {
         ui->object1Replay->addItem(QString::number(id));
         ui->object2Replay->addItem(QString::number(id));
 
-        if (ui->replayEllipses->isChecked()) {
+        if (ui->ellipseBox->currentIndex() != 4) {
           switch (ui->ellipseBox->currentIndex()) {
             case 0:  // Head + Tail
               cv::ellipse(frame, Point(coordinate.value("xHead"), coordinate.value("yHead")), Size(coordinate.value("headMajorAxisLength"), coordinate.value("headMinorAxisLength")), 180 - (coordinate.value("tHead") * 180) / M_PI, 0, 360, Scalar(colorMap[id].x, colorMap[id].y, colorMap[id].z), scale, 8);
@@ -539,7 +539,7 @@ void Replay::saveTrackedMovie() {
           }
         }
 
-        if (ui->replayArrows->isChecked()) {
+        if (ui->arrowBox->currentIndex() != 4) {
           switch (ui->arrowBox->currentIndex()) {
             case 0:
               cv::arrowedLine(frame, Point(coordinate.value("xHead"), coordinate.value("yHead")), Point(coordinate.value("xHead") + coordinate.value("headMajorAxisLength") * cos(coordinate.value("tHead")), coordinate.value("yHead") - coordinate.value("headMajorAxisLength") * sin(coordinate.value("tHead"))), Scalar(colorMap[id].x, colorMap[id].y, colorMap[id].z), scale, cv::LINE_AA, 0, double(scale) / 10);
@@ -566,7 +566,7 @@ void Replay::saveTrackedMovie() {
 
         if (ui->replayTrace->isChecked()) {
           vector<Point> memory;
-          for (unsigned int j = frameIndex - 50; j < frameIndex; j++) {
+          for (int j = frameIndex - ui->replayTraceLength->value(); j < frameIndex; j++) {
             if (j > 0) {
               QMap<QString, double> coordinate = trackingData->getData(j, a);
               if (coordinate.contains("xBody")) {
