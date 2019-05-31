@@ -21,7 +21,7 @@ using namespace std;
  *
 */
 
-Replay::Replay(QWidget* parent) : QWidget(parent),
+Replay::Replay(QWidget* parent, bool standalone) : QWidget(parent),
                                   ui(new Ui::Replay) {
   ui->setupUi(this);
 
@@ -55,6 +55,11 @@ Replay::Replay(QWidget* parent) : QWidget(parent),
   img = QIcon(":/assets/buttons/refresh.png");
   ui->replayRefresh->setIcon(img);
   ui->replayRefresh->setIconSize(QSize(ui->replayRefresh->width(), ui->replayRefresh->height()));
+
+  if (!standalone) {
+    ui->replayPath->hide();
+    ui->replayOpen->hide();
+  }
 
   // Keyboard shorcut
   // AZERTY keyboard shorcuts are set in the ui

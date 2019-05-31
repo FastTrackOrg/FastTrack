@@ -40,7 +40,7 @@ This file is part of Fast Track.
 */
 ReplayWindow::ReplayWindow(QWidget *parent, Qt::WindowFlags f) : QWidget(parent, f) {
   QGridLayout *replayLayout = new QGridLayout(this);
-  replay = new Replay(this);
+  replay = new Replay(this, false);
   replayLayout->addWidget(replay);
   setLayout(replayLayout);
   hide();

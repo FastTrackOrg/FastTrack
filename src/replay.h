@@ -53,7 +53,7 @@ class Replay : public QWidget {
   Q_OBJECT
 
  public:
-  explicit Replay(QWidget *parent = nullptr);
+  explicit Replay(QWidget *parent = nullptr, bool standalone = true);
   ~Replay();
 
  private:

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1084</width>
-    <height>966</height>
+    <width>1211</width>
+    <height>898</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -34,8 +34,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>520</width>
-         <height>635</height>
+         <width>637</width>
+         <height>618</height>
         </rect>
        </property>
        <layout class="QGridLayout" name="gridLayout_2">
@@ -94,7 +94,7 @@
           <x>0</x>
           <y>0</y>
           <width>283</width>
-          <height>556</height>
+          <height>539</height>
          </rect>
         </property>
         <attribute name="label">
@@ -285,8 +285,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>261</width>
-          <height>556</height>
+          <width>283</width>
+          <height>539</height>
          </rect>
         </property>
         <attribute name="label">
@@ -390,7 +390,7 @@
           <x>0</x>
           <y>0</y>
           <width>223</width>
-          <height>432</height>
+          <height>415</height>
          </rect>
         </property>
         <attribute name="label">
@@ -538,7 +538,7 @@
           <x>0</x>
           <y>0</y>
           <width>223</width>
-          <height>432</height>
+          <height>415</height>
          </rect>
         </property>
         <attribute name="label">
@@ -635,7 +635,7 @@ corner</string>
           <x>0</x>
           <y>0</y>
           <width>223</width>
-          <height>432</height>
+          <height>415</height>
          </rect>
         </property>
         <attribute name="label">
@@ -694,7 +694,7 @@ corner</string>
           <x>0</x>
           <y>0</y>
           <width>223</width>
-          <height>432</height>
+          <height>415</height>
          </rect>
         </property>
         <attribute name="label">
@@ -784,7 +784,7 @@ corner</string>
           <x>0</x>
           <y>0</y>
           <width>223</width>
-          <height>432</height>
+          <height>415</height>
          </rect>
         </property>
         <attribute name="label">
@@ -922,7 +922,7 @@ corner</string>
           <x>0</x>
           <y>0</y>
           <width>223</width>
-          <height>432</height>
+          <height>415</height>
          </rect>
         </property>
         <attribute name="label">
@@ -996,7 +996,7 @@ corner</string>
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1084</width>
+     <width>1211</width>
      <height>22</height>
     </rect>
    </property>
@@ -1038,12 +1038,6 @@ corner</string>
    <addaction name="menuLayout"/>
   </widget>
   <widget class="QDockWidget" name="controlOptions">
-   <property name="minimumSize">
-    <size>
-     <width>814</width>
-     <height>266</height>
-    </size>
-   </property>
    <property name="features">
     <set>QDockWidget::AllDockWidgetFeatures</set>
    </property>
@@ -1057,163 +1051,172 @@ corner</string>
     <number>8</number>
    </attribute>
    <widget class="QWidget" name="dockWidgetContents_2">
-    <layout class="QGridLayout" name="gridLayout_14">
+    <layout class="QGridLayout" name="gridLayout_19">
      <item row="0" column="0">
-      <widget class="QSlider" name="slider">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
+      <widget class="QTabWidget" name="tabWidget">
+       <property name="tabPosition">
+        <enum>QTabWidget::West</enum>
        </property>
-      </widget>
-     </item>
-     <item row="0" column="1">
-      <widget class="QLabel" name="replayNumber">
-       <property name="text">
-        <string>000000</string>
+       <property name="tabShape">
+        <enum>QTabWidget::Rounded</enum>
        </property>
-       <property name="scaledContents">
-        <bool>false</bool>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="0" colspan="2">
-      <widget class="QProgressBar" name="progressBar">
-       <property name="value">
+       <property name="currentIndex">
         <number>0</number>
        </property>
-      </widget>
-     </item>
-     <item row="2" column="0" rowspan="3">
-      <widget class="QSplitter" name="splitter">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="midLineWidth">
-        <number>1</number>
-       </property>
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="opaqueResize">
-        <bool>true</bool>
-       </property>
-       <property name="handleWidth">
-        <number>10</number>
-       </property>
-       <widget class="QGroupBox" name="imageDisplayGroup">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-          <horstretch>1</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="title">
-         <string>Image Display</string>
-        </property>
-        <property name="checkable">
-         <bool>false</bool>
-        </property>
-        <layout class="QGridLayout" name="gridLayout_12">
+       <widget class="QWidget" name="tab">
+        <attribute name="title">
+         <string>Control</string>
+        </attribute>
+        <layout class="QGridLayout" name="gridLayout_18">
          <item row="0" column="0">
-          <layout class="QGridLayout" name="gridLayout_3">
-           <item row="2" column="0">
-            <widget class="QRadioButton" name="isBin">
-             <property name="text">
-              <string>Binar&amp;y</string>
-             </property>
-             <property name="checkable">
-              <bool>false</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="0">
-            <widget class="QRadioButton" name="isSub">
-             <property name="text">
-              <string>Backgro&amp;und Subtracted</string>
-             </property>
-             <property name="checkable">
-              <bool>false</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="0">
-            <widget class="QRadioButton" name="isOriginal">
-             <property name="text">
-              <string>Ori&amp;ginal</string>
-             </property>
-             <property name="checked">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-          </layout>
+          <widget class="QFrame" name="frame">
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>68</height>
+            </size>
+           </property>
+           <property name="frameShape">
+            <enum>QFrame::StyledPanel</enum>
+           </property>
+           <property name="frameShadow">
+            <enum>QFrame::Raised</enum>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_17">
+            <item row="0" column="0">
+             <widget class="QSlider" name="slider">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QLabel" name="replayNumber">
+              <property name="text">
+               <string>000000</string>
+              </property>
+              <property name="scaledContents">
+               <bool>false</bool>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0" colspan="2">
+             <widget class="QProgressBar" name="progressBar">
+              <property name="value">
+               <number>0</number>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QSplitter" name="splitter">
+           <property name="maximumSize">
+            <size>
+             <width>808</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <widget class="QGroupBox" name="imageDisplayGroup">
+            <property name="maximumSize">
+             <size>
+              <width>402</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="title">
+             <string>Image Display</string>
+            </property>
+            <property name="checkable">
+             <bool>false</bool>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_3">
+             <item row="0" column="0">
+              <widget class="QRadioButton" name="isOriginal">
+               <property name="text">
+                <string>Ori&amp;ginal</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QRadioButton" name="isSub">
+               <property name="text">
+                <string>Backgro&amp;und Subtracted</string>
+               </property>
+               <property name="checkable">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="2">
+              <widget class="QRadioButton" name="isBin">
+               <property name="text">
+                <string>Binar&amp;y</string>
+               </property>
+               <property name="checkable">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+           <widget class="QGroupBox" name="trackingOverlayGroup">
+            <property name="maximumSize">
+             <size>
+              <width>402</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="title">
+             <string>Tracking Overlay</string>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_12">
+             <item row="0" column="0">
+              <widget class="QRadioButton" name="isNone">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text">
+                <string>None</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QRadioButton" name="isTracked">
+               <property name="text">
+                <string>Tracking</string>
+               </property>
+               <property name="checkable">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </widget>
          </item>
         </layout>
        </widget>
-       <widget class="QGroupBox" name="trackingOverlayGroup">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-          <horstretch>1</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="title">
-         <string>Tracking Overlay</string>
-        </property>
-        <widget class="QRadioButton" name="isTracked">
-         <property name="geometry">
-          <rect>
-           <x>12</x>
-           <y>89</y>
-           <width>77</width>
-           <height>24</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>Tracking</string>
-         </property>
-         <property name="checkable">
-          <bool>false</bool>
-         </property>
-        </widget>
-        <widget class="QRadioButton" name="isNone">
-         <property name="geometry">
-          <rect>
-           <x>12</x>
-           <y>46</y>
-           <width>59</width>
-           <height>24</height>
-          </rect>
-         </property>
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="text">
-          <string>None</string>
-         </property>
-         <property name="checked">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </widget>
-       <widget class="QGroupBox" name="groupBox">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="title">
+       <widget class="QWidget" name="tab_2">
+        <attribute name="title">
          <string>Information</string>
-        </property>
+        </attribute>
         <layout class="QGridLayout" name="gridLayout_13">
          <item row="0" column="0">
           <widget class="QTableWidget" name="informationTable">
@@ -1455,29 +1458,51 @@ corner</string>
        </widget>
       </widget>
      </item>
-     <item row="2" column="1">
-      <widget class="QPushButton" name="previewButton">
-       <property name="text">
-        <string>Preview</string>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="1">
-      <widget class="QPushButton" name="trackButton">
-       <property name="text">
-        <string>Track</string>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="1">
-      <widget class="QPushButton" name="replayButton">
-       <property name="text">
-        <string>Replay</string>
-       </property>
-       <property name="checkable">
-        <bool>true</bool>
-       </property>
-      </widget>
+     <item row="0" column="1">
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <widget class="QPushButton" name="previewButton">
+         <property name="maximumSize">
+          <size>
+           <width>90</width>
+           <height>25</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Preview</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="trackButton">
+         <property name="maximumSize">
+          <size>
+           <width>90</width>
+           <height>25</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Track</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="replayButton">
+         <property name="maximumSize">
+          <size>
+           <width>90</width>
+           <height>25</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Replay</string>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </item>
     </layout>
    </widget>
