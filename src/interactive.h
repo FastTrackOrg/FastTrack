@@ -21,6 +21,7 @@ This file is part of Fast Track.
 #ifdef ENABLE_DEVTOOL
 #include <quazip/JlCompress.h>
 #endif
+#include <QWidget>
 #include <QAction>
 #include <QDir>
 #include <QDirIterator>
@@ -48,9 +49,24 @@ This file is part of Fast Track.
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
 #include "tracking.h"
+#include "replay.h"
 
 using namespace std;
 using namespace cv;
+
+class ReplayWindow : public QWidget {
+  Q_OBJECT
+
+ public:
+  explicit ReplayWindow(QWidget *parent, Qt::WindowFlags f);
+  Replay *replay;
+ 
+ private slots:
+  void closeEvent(QCloseEvent *event);
+
+ signals:
+  void closed(bool isClosed);
+};
 
 namespace Ui {
 class Interactive;
@@ -119,6 +135,7 @@ class Interactive : public QMainWindow {
   Data *trackingData;
   vector<Point3f> colorMap;
   double currentZoom;
+  ReplayWindow *replayWindow;
 
 #ifdef ENABLE_DEVTOOL
   QVector<int> benchmarkTime;
@@ -127,6 +144,5 @@ class Interactive : public QMainWindow {
 
  signals:
   void message(QString message);
-  };
-
+};
 #endif  // INTERACTIVE_H

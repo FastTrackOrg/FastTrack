@@ -23,15 +23,47 @@ This file is part of Fast Track.
 #endif
 
 /**
+ * @class ReplayWindow
+ *
+ * @brief The ReplayWindow widget provides a window with a Replay widget.
+ *
+ * @author Benjamin Gallois
+ *
+ * @version $Revision: 480 $
+ *
+ * Contact: benjamin.gallois@fasttrack.sh
+ *
+ */
+
+/**
+  * @brief Constructs the ReplayWindow object derived from a QWidget object.
+*/
+ReplayWindow::ReplayWindow(QWidget *parent, Qt::WindowFlags f) : QWidget(parent, f) {
+  QGridLayout *replayLayout = new QGridLayout(this);
+  replay = new Replay(this);
+  replayLayout->addWidget(replay);
+  setLayout(replayLayout);
+  hide();
+};
+
+/**
+  * @brief Reimplementes the closeEvent function to hide the window instead of closing it and signal the intent of closing.
+*/
+void ReplayWindow::closeEvent(QCloseEvent *event) {
+  event->ignore();
+  emit(closed(false));
+}
+
+/**
  * @class Interactive
  *
  * @brief The Interactive widget provides an environment to use the tracking widget in an interactive environment.
  *
  * @author Benjamin Gallois
  *
- * @version $Revision: 460 $
+ * @version $Revision: 480 $
  *
- * Contact: gallois.benjamin08@gmail.com
+ * Contact: benjamin.gallois@fasttrack.sh
  *
  */
 
@@ -198,6 +230,20 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
     ui->y1->setMaximum(value - 1);
     ui->y1->setMinimum(0);
   });
+
+  // Replay window
+  replayWindow = new ReplayWindow(this, Qt::Window);
+  replayWindow->setWindowState(Qt::WindowMaximized);
+  connect(ui->replayButton, &QPushButton::toggled, [this](bool isChecked) {
+    if (isChecked) {
+      replayWindow->replay->loadReplayFolder(dir);
+      replayWindow->show();
+    }
+    else {
+      replayWindow->hide();
+    }
+  });
+  connect(replayWindow, &ReplayWindow::closed, ui->replayButton, &QPushButton::setChecked);
 
   // Updates the display after each operation
   connect(ui->morphOperation, static_cast<void (QComboBox::*)(int)>(&QComboBox::activated), [this]() {
@@ -658,6 +704,7 @@ void Interactive::previewTracking() {
       ui->previewButton->setDisabled(false);
       ui->trackButton->setDisabled(false);
       trackingData = new Data(dir + "/Tracking_Result");
+      ui->replayButton->setChecked(true);
     });
     connect(tracking, &Tracking::finished, tracking, &Tracking::deleteLater);
     connect(thread, &QThread::finished, thread, &QThread::deleteLater);
@@ -704,6 +751,7 @@ void Interactive::track() {
       ui->previewButton->setDisabled(false);
       ui->trackButton->setDisabled(false);
       trackingData = new Data(dir + "/Tracking_Result");
+      ui->replayButton->setChecked(true);
     });
     connect(tracking, &Tracking::finished, tracking, &Tracking::deleteLater);
     connect(thread, &QThread::finished, thread, &QThread::deleteLater);
@@ -962,3 +1010,4 @@ void Interactive::saveSettings() {
     settingsFile->setValue(a, settings.value(a));
   }
 }
+
