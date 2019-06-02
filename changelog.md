@@ -2,6 +2,12 @@
 
 ## 4.8.0
 
+### Changed
+- Old tracking data can be opened in the Replay panel.
+- Changed ui design.
+
+## 4.8.0
+
 ### Fixed
 - Id numbering issue.
 - Crop not working properly if the rectangle get out of the image.
