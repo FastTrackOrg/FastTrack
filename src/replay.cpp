@@ -188,6 +188,20 @@ void Replay::loadReplayFolder(QString dir) {
   // This function will detect from an inputed path to a directory the image sequence and the tracking data.
   // The last tracking data from the folder Tracking_Result is automatically loaded if found.
   // If the user explicitly select another Tracking_Result folder, these data are loaded.
+
+  // Delete existing data
+  replayFrames.clear();
+  occlusionEvents.clear();
+  ui->object1Replay->clear();
+  ui->object2Replay->clear();
+  ui->replayDisplay->clear();
+  ui->replayPath->clear();
+  framerate->stop();
+  object = true;
+  currentZoom = 1;
+  ui->replayDisplay->setFixedSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
+  memoryDir.clear();
+
   if (!dir.length()) return;
 
   QString trackingDir = dir;

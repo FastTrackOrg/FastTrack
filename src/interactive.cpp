@@ -234,10 +234,12 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   // Replay window
   replayWindow = new ReplayWindow(this, Qt::Window);
   replayWindow->setWindowState(Qt::WindowMaximized);
+  replayWindow->show();
+  QTimer::singleShot(10, this, [this]() { replayWindow->hide(); });  //Force the window resize event
   connect(ui->replayButton, &QPushButton::toggled, [this](bool isChecked) {
     if (isChecked) {
-      replayWindow->replay->loadReplayFolder(dir);
       replayWindow->show();
+      replayWindow->replay->loadReplayFolder(dir);
     }
     else {
       replayWindow->hide();
