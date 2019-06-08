@@ -18,6 +18,5 @@
         <file>assets/buttons/undo.png</file>
         <file>assets/buttons/redo.png</file>
         <file>assets/buttons/delete.png</file>
-        <file>assets/displayHelp.png</file>
     </qresource>
 </RCC>

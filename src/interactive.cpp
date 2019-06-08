@@ -52,7 +52,6 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   ui->menuView->addAction(ui->imageOptions->toggleViewAction());
   ui->menuView->addAction(ui->trackingOptions->toggleViewAction());
   ui->menuView->addAction(ui->controlOptions->toggleViewAction());
-  ui->menuView->addAction(ui->replay->toggleViewAction());
 
   connect(ui->slider, &QSlider::valueChanged, this, static_cast<void (Interactive::*)(int)>(&Interactive::display));
   connect(ui->slider, &QSlider::valueChanged, [this](const int &newValue) {
@@ -201,7 +200,8 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
     ui->y1->setMinimum(0);
   });
 
-  replay = new Replay(ui->replay, false, ui->slider);
+  // Replay tab
+  replay = new Replay(this, false, ui->slider);
   connect(ui->interactiveTab, &QTabWidget::tabCloseRequested, [this](int index) {
     if (index != 0) {
       ui->interactiveTab->removeTab(index);
@@ -288,12 +288,6 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   connect(tracking, &Tracking::backgroundProgress, ui->backgroundProgressBar, &QProgressBar::setValue);
   connect(tracking, &Tracking::forceFinished, [this]() {
     message("An error occured.");
-  });
-
-  // Qt need a delay to update widget geometry
-  QTimer::singleShot(500, [this]() {
-    display(QImage(":/assets/displayHelp.png"));
-    originalImageSize = QImage(":/assets/displayHelp.png").size();
   });
 
   // Sets a color map
@@ -656,14 +650,14 @@ void Interactive::previewTracking() {
     connect(tracking, &Tracking::statistic, [this](int time) {
       ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Analysis rate", Qt::MatchExactly)[0]), 1)->setText(QString::number(double(ui->stopImage->value() * 1000) / double(time)));
     });
-    connect(tracking, &Tracking::finished, thread, &QThread::quit);
-    connect(tracking, &Tracking::finished, [this]() {
+    connect(tracking, &Tracking::finished, this, [this]() {
       ui->slider->setDisabled(false);
       ui->previewButton->setDisabled(false);
       ui->trackButton->setDisabled(false);
       trackingData = new Data(dir + "/Tracking_Result");
       ui->replayButton->setChecked(true);
     });
+    connect(tracking, &Tracking::finished, thread, &QThread::quit);
     connect(tracking, &Tracking::finished, tracking, &Tracking::deleteLater);
     connect(thread, &QThread::finished, thread, &QThread::deleteLater);
 
@@ -702,7 +696,7 @@ void Interactive::track() {
       ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Analysis rate", Qt::MatchExactly)[0]), 1)->setText(QString::number(double(framePath.size() * 1000) / double(time)));
     });
     connect(tracking, &Tracking::finished, thread, &QThread::quit);
-    connect(tracking, &Tracking::finished, [this]() {
+    connect(tracking, &Tracking::finished, this, [this]() {
       ui->slider->setDisabled(false);
       ui->previewButton->setDisabled(false);
       ui->trackButton->setDisabled(false);
