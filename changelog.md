@@ -1,6 +1,9 @@
 # FastTrack changelog
+## 4.8.2
+- Changed Replay panel ui design.
+- Changed Interactive panel ui design.
 
-## 4.8.0
+## 4.8.1
 
 ### Changed
 - Old tracking data can be opened in the Replay panel.
