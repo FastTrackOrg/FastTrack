@@ -66,7 +66,7 @@ Replay::Replay(QWidget* parent, bool standalone, QSlider* control) : QMainWindow
   redoAction->setIcon(img);
   redoAction->setShortcuts(QKeySequence::Redo);
   redoAction->setStatusTip(tr("Redo"));
-  connect(undoAction, &QAction::triggered, [this]() {
+  connect(redoAction, &QAction::triggered, [this]() {
     loadFrame(ui->replaySlider->value());
   });
   ui->toolBar->addAction(redoAction);
@@ -78,7 +78,7 @@ Replay::Replay(QWidget* parent, bool standalone, QSlider* control) : QMainWindow
   
   img = QIcon(":/assets/buttons/replace.png");
   QAction *swapAction = new QAction(img, tr("&Swap"), this);
-  refreshAction->setStatusTip(tr("Swap the two objects"));
+  swapAction->setStatusTip(tr("Swap the two objects"));
   connect(swapAction, &QAction::triggered, this, &Replay::correctTracking);
   ui->toolBar->addAction(swapAction);
 
@@ -124,7 +124,7 @@ Replay::Replay(QWidget* parent, bool standalone, QSlider* control) : QMainWindow
   }
 
   if (control) {
-    connect(control, &QSlider::valueChanged, this, &Replay::loadFrame);
+    connect(control, &QSlider::valueChanged, ui->replaySlider, &QSlider::setValue);
   }
 
   // Keyboard shorcut

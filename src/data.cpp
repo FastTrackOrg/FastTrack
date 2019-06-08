@@ -152,6 +152,7 @@ void Data::swapData(int firstObject, int secondObject, int from) {
     }
   }
   save();
+  dataCopy = data;
 }
 
 /**
