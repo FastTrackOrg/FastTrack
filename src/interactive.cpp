@@ -22,37 +22,6 @@ This file is part of Fast Track.
 #define M_PI 3.14159265358979323846
 #endif
 
-/**
- * @class ReplayWindow
- *
- * @brief The ReplayWindow widget provides a window with a Replay widget.
- *
- * @author Benjamin Gallois
- *
- * @version $Revision: 480 $
- *
- * Contact: benjamin.gallois@fasttrack.sh
- *
- */
-
-/**
-  * @brief Constructs the ReplayWindow object derived from a QWidget object.
-*/
-ReplayWindow::ReplayWindow(QWidget *parent, Qt::WindowFlags f) : QWidget(parent, f) {
-  QGridLayout *replayLayout = new QGridLayout(this);
-  replay = new Replay(this, false);
-  replayLayout->addWidget(replay);
-  setLayout(replayLayout);
-  hide();
-};
-
-/**
-  * @brief Reimplementes the closeEvent function to hide the window instead of closing it and signal the intent of closing.
-*/
-void ReplayWindow::closeEvent(QCloseEvent *event) {
-  event->ignore();
-  emit(closed(false));
-}
 
 /**
  * @class Interactive
@@ -83,6 +52,7 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   ui->menuView->addAction(ui->imageOptions->toggleViewAction());
   ui->menuView->addAction(ui->trackingOptions->toggleViewAction());
   ui->menuView->addAction(ui->controlOptions->toggleViewAction());
+  ui->menuView->addAction(ui->replay->toggleViewAction());
 
   connect(ui->slider, &QSlider::valueChanged, this, static_cast<void (Interactive::*)(int)>(&Interactive::display));
   connect(ui->slider, &QSlider::valueChanged, [this](const int &newValue) {
@@ -231,21 +201,26 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
     ui->y1->setMinimum(0);
   });
 
-  // Replay window
-  replayWindow = new ReplayWindow(this, Qt::Window);
-  replayWindow->setWindowState(Qt::WindowMaximized);
-  replayWindow->show();
-  QTimer::singleShot(10, this, [this]() { replayWindow->hide(); });  //Force the window resize event
-  connect(ui->replayButton, &QPushButton::toggled, [this](bool isChecked) {
-    if (isChecked) {
-      replayWindow->show();
-      replayWindow->replay->loadReplayFolder(dir);
-    }
-    else {
-      replayWindow->hide();
+  replay = new Replay(ui->replay, false, ui->slider);
+  connect(ui->interactiveTab, &QTabWidget::tabCloseRequested, [this](int index) {
+    if (index != 0) {
+      ui->interactiveTab->removeTab(index);
+      ui->replayButton->setChecked(false);
     }
   });
-  connect(replayWindow, &ReplayWindow::closed, ui->replayButton, &QPushButton::setChecked);
+  connect(ui->interactiveTab, &QTabWidget::currentChanged, [this](int index) {
+    if (index == 1) replay->loadReplayFolder(dir);
+  });
+  connect(ui->replayButton, &QPushButton::toggled, [this](bool isChecked) {
+    if (isChecked) {
+      ui->interactiveTab->addTab(replay, tr("Replay"));
+      replay->loadReplayFolder(dir);
+      ui->interactiveTab->setCurrentIndex(1);
+    }
+    else {
+      ui->interactiveTab->removeTab(1);
+    }
+  });
 
   // Updates the display after each operation
   connect(ui->morphOperation, static_cast<void (QComboBox::*)(int)>(&QComboBox::activated), [this]() {
@@ -278,12 +253,6 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
     display(ui->slider->value());
   });
   connect(ui->isSub, &QRadioButton::clicked, [this]() {
-    display(ui->slider->value());
-  });
-  connect(ui->isNone, &QRadioButton::clicked, [this]() {
-    display(ui->slider->value());
-  });
-  connect(ui->isTracked, &QRadioButton::clicked, [this]() {
     display(ui->slider->value());
   });
 
@@ -358,12 +327,9 @@ void Interactive::openFolder() {
 
   // Resets the ui
   ui->display->clear();
-  ui->display->setFixedSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
-  ui->isNone->setChecked(true);
   ui->isBin->setCheckable(false);
   ui->isSub->setCheckable(false);
   ui->isOriginal->setChecked(true);
-  ui->isTracked->setCheckable(false);
 
   dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"), memoryDir, QFileDialog::ShowDirsOnly);
 
@@ -516,16 +482,6 @@ void Interactive::display(int index) {
     if (ui->isBin->isChecked()) {
       drawContours(frame, displayContours, -1, Scalar(0, 255, 0), FILLED, 8);
       drawContours(frame, rejectedContours, -1, Scalar(255, 0, 0), FILLED, 8);
-    }
-    if (ui->isTracked->isChecked()) {
-      QList<int> idList = trackingData->getId(index);
-      double scale = 2;
-
-      for (auto const &a : idList) {
-        QMap<QString, double> coordinate = trackingData->getData(index, a);
-        int id = a;
-        cv::ellipse(frame, Point(coordinate.value("xBody") - roi.tl().x, coordinate.value("yBody") - roi.tl().y), Size(coordinate.value("bodyMajorAxisLength"), coordinate.value("bodyMinorAxisLength")), 180 - (coordinate.value("tBody") * 180) / M_PI, 0, 360, Scalar(colorMap[id].x, colorMap[id].y, colorMap[id].z), scale, 8);
-      }
     }
     Mat image = frame.getMat(ACCESS_READ);
     resizedPix = (QPixmap::fromImage(QImage(image.data, image.cols, image.rows, image.step, QImage::Format_RGB888)).scaled(ui->display->size(), Qt::KeepAspectRatio));
@@ -716,8 +672,6 @@ void Interactive::previewTracking() {
     thread->start();
 
     ui->slider->setDisabled(true);
-    ui->isTracked->setCheckable(true);
-    ui->isTracked->setChecked(true);
   }
 }
 
@@ -763,8 +717,6 @@ void Interactive::track() {
     thread->start();
 
     ui->slider->setDisabled(true);
-    ui->isTracked->setCheckable(true);
-    ui->isTracked->setChecked(true);
   }
 }
 
@@ -1013,3 +965,5 @@ void Interactive::saveSettings() {
   }
 }
 
+void Interactive::resizeEvent(QResizeEvent *event) {
+}

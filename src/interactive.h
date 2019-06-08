@@ -42,6 +42,8 @@ This file is part of Fast Track.
 #include <QString>
 #include <QSettings>
 #include <QTableWidget>
+#include <QResizeEvent>
+#include <QWidget>
 #include <QTableWidgetItem>
 #include <QUrl>
 #include <QtConcurrent/QtConcurrentRun>
@@ -53,20 +55,6 @@ This file is part of Fast Track.
 
 using namespace std;
 using namespace cv;
-
-class ReplayWindow : public QWidget {
-  Q_OBJECT
-
- public:
-  explicit ReplayWindow(QWidget *parent, Qt::WindowFlags f);
-  Replay *replay;
- 
- private slots:
-  void closeEvent(QCloseEvent *event);
-
- signals:
-  void closed(bool isClosed);
-};
 
 namespace Ui {
 class Interactive;
@@ -103,6 +91,8 @@ class Interactive : public QMainWindow {
 
   void loadSettings();
   void saveSettings();
+  
+  void resizeEvent(QResizeEvent *event);
 
 #ifdef ENABLE_DEVTOOL
   void benchmark();
@@ -135,7 +125,7 @@ class Interactive : public QMainWindow {
   Data *trackingData;
   vector<Point3f> colorMap;
   double currentZoom;
-  ReplayWindow *replayWindow;
+  Replay *replay;
 
 #ifdef ENABLE_DEVTOOL
   QVector<int> benchmarkTime;

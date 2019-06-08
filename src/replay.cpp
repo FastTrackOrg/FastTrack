@@ -21,50 +21,116 @@ using namespace std;
  *
 */
 
-Replay::Replay(QWidget* parent, bool standalone) : QWidget(parent),
+Replay::Replay(QWidget* parent, bool standalone, QSlider* control) : QMainWindow(parent),
                                   ui(new Ui::Replay) {
   ui->setupUi(this);
 
-  QIcon img = QIcon(":/assets/buttons/open.png");
-  ui->replayOpen->setIcon(img);
-
-  img = QIcon(":/assets/buttons/play.png");
+  QIcon img = QIcon(":/assets/buttons/play.png");
   ui->playReplay->setIcon(img);
   ui->playReplay->setIconSize(QSize(ui->playReplay->width(), ui->playReplay->height()));
 
   img = QIcon(":/assets/buttons/open.png");
-  ui->replayOpen->setIcon(img);
-  ui->replayOpen->setIconSize(QSize(ui->replayOpen->width(), ui->replayOpen->height()));
-
-  img = QIcon(":/assets/buttons/next.png");
-  ui->replayNext->setIcon(img);
-  ui->replayNext->setIconSize(QSize(ui->replayNext->width(), ui->replayNext->height()));
-
-  img = QIcon(":/assets/buttons/previous.png");
-  ui->replayPrevious->setIcon(img);
-  ui->replayPrevious->setIconSize(QSize(ui->replayPrevious->width(), ui->replayPrevious->height()));
-
-  img = QIcon(":/assets/buttons/help.png");
-  ui->replayHelp->setIcon(img);
-  ui->replayHelp->setIconSize(QSize(ui->replayHelp->width(), ui->replayHelp->height()));
-
-  img = QIcon(":/assets/buttons/save.png");
-  ui->replaySave->setIcon(img);
-  ui->replaySave->setIconSize(QSize(ui->replaySave->width(), ui->replaySave->height()));
+  QAction *openAction = new QAction(img, tr("&Open"), this);
+  openAction->setShortcuts(QKeySequence::Open);
+  openAction->setStatusTip(tr("Open a tracked movie"));
+  connect(openAction, &QAction::triggered, this, &Replay::openReplayFolder);
+  ui->toolBar->addAction(openAction);
 
   img = QIcon(":/assets/buttons/refresh.png");
-  ui->replayRefresh->setIcon(img);
-  ui->replayRefresh->setIconSize(QSize(ui->replayRefresh->width(), ui->replayRefresh->height()));
+  QAction *refreshAction = new QAction(img, tr("&Refresh"), this);
+  refreshAction->setStatusTip(tr("Refresh a tracked movie"));
+  connect(refreshAction, &QAction::triggered, [this]() {
+    loadReplayFolder(memoryDir);
+  });
+  ui->toolBar->addAction(refreshAction);
+
+  img = QIcon(":/assets/buttons/save.png");
+  QAction *exportAction = new QAction(img, tr("&Export"), this);
+  exportAction->setStatusTip(tr("Export the tracked movie"));
+  connect(exportAction, &QAction::triggered, this, &Replay::saveTrackedMovie);
+  ui->toolBar->addAction(exportAction);
+
+  commandStack = new QUndoStack(this);
+  img = QIcon(":/assets/buttons/undo.png");
+  QAction *undoAction = commandStack->createUndoAction(this, tr("&Undo"));
+  undoAction->setIcon(img);
+  undoAction->setShortcuts(QKeySequence::Undo);
+  undoAction->setStatusTip(tr("Undo"));
+  connect(undoAction, &QAction::triggered, [this]() {
+    loadFrame(ui->replaySlider->value());
+  });
+  ui->toolBar->addAction(undoAction);
+
+  img = QIcon(":/assets/buttons/redo.png");
+  QAction *redoAction = commandStack->createRedoAction(this, tr("&Redo"));
+  redoAction->setIcon(img);
+  redoAction->setShortcuts(QKeySequence::Redo);
+  redoAction->setStatusTip(tr("Redo"));
+  connect(undoAction, &QAction::triggered, [this]() {
+    loadFrame(ui->replaySlider->value());
+  });
+  ui->toolBar->addAction(redoAction);
+
+  ui->toolBar->addSeparator();
+
+  object1Replay = new QComboBox(this);
+  ui->toolBar->addWidget(object1Replay);
+  
+  img = QIcon(":/assets/buttons/replace.png");
+  QAction *swapAction = new QAction(img, tr("&Swap"), this);
+  refreshAction->setStatusTip(tr("Swap the two objects"));
+  connect(swapAction, &QAction::triggered, this, &Replay::correctTracking);
+  ui->toolBar->addAction(swapAction);
+
+  object2Replay = new QComboBox(this);
+  ui->toolBar->addWidget(object2Replay);
+
+  img = QIcon(":/assets/buttons/delete.png");
+  QAction* deleteAction = new QAction(img, tr("&Delete"), this);
+  deleteAction->setStatusTip(tr("Delete the object"));
+  connect(deleteAction, &QAction::triggered, [this]() {
+    if (isReplayable) {
+      DeleteData* del = new DeleteData(object2Replay->currentText().toInt(), ui->replaySlider->value(), trackingData);
+      commandStack->push(del);
+      loadFrame(ui->replaySlider->value());
+    }
+  });
+  ui->toolBar->addAction(deleteAction);
+
+  img = QIcon(":/assets/buttons/previous.png");
+  QAction *previousAction = new QAction(img, tr("&Previous"), this);
+  previousAction->setStatusTip(tr("Previous occlusion"));
+  connect(previousAction, &QAction::triggered, this, &Replay::previousOcclusionEvent);
+  ui->toolBar->addAction(previousAction);
+
+  img = QIcon(":/assets/buttons/next.png");
+  QAction *nextAction = new QAction(img, tr("&Next"), this);
+  nextAction->setStatusTip(tr("Next occlusion"));
+  connect(nextAction, &QAction::triggered, this, &Replay::nextOcclusionEvent);
+  ui->toolBar->addAction(nextAction);
+
+  img = QIcon(":/assets/buttons/help.png");
+  QAction *helpAction = new QAction(img, tr("&Help"), this);
+  helpAction->setStatusTip(tr("Help"));
+  connect(helpAction, &QAction::triggered, [this]() {
+    QMessageBox helpBox(this);
+    helpBox.setIconPixmap(QPixmap(":/assets/buttons/helpImg.png"));
+    helpBox.exec();
+  });
+  ui->toolBar->addAction(helpAction);
 
   if (!standalone) {
-    ui->replayPath->hide();
-    ui->replayOpen->hide();
+    ui->controls->hide();
+  }
+
+  if (control) {
+    connect(control, &QSlider::valueChanged, this, &Replay::loadFrame);
   }
 
   // Keyboard shorcut
   // AZERTY keyboard shorcuts are set in the ui
   wShortcut = new QShortcut(QKeySequence("w"), this);
-  connect(wShortcut, &QShortcut::activated, [this]() { ui->replayNext->animateClick(); });
+  //connect(wShortcut, &QShortcut::activated, [this](nextAction) { nextAction->triggered(); });
 
   qShortcut = new QShortcut(QKeySequence("q"), this);
   connect(qShortcut, &QShortcut::activated, [this]() { ui->replaySlider->setValue(ui->replaySlider->value() - 1); });
@@ -77,21 +143,6 @@ Replay::Replay(QWidget* parent, bool standalone) : QWidget(parent),
 
   ui->replayDisplay->installEventFilter(this);
   ui->scrollArea->viewport()->installEventFilter(this);
-
-  // Undo Redo
-  commandStack = new QUndoStack(this);
-  undoAction = commandStack->createUndoAction(this, tr("&Undo"));
-  undoAction->setShortcuts(QKeySequence::Undo);
-  connect(ui->undoButton, &QPushButton::clicked, undoAction, &QAction::trigger);
-  connect(undoAction, &QAction::triggered, [this]() {
-    loadFrame(ui->replaySlider->value());
-  });
-  redoAction = commandStack->createRedoAction(this, tr("&Undo"));
-  redoAction->setShortcuts(QKeySequence::Redo);
-  connect(ui->redoButton, &QPushButton::clicked, redoAction, &QAction::trigger);
-  connect(redoAction, &QAction::triggered, [this]() {
-    loadFrame(ui->replaySlider->value());
-  });
 
   // Zoom
   connect(ui->scrollArea->verticalScrollBar(), &QScrollBar::rangeChanged, [this]() {
@@ -108,16 +159,10 @@ Replay::Replay(QWidget* parent, bool standalone) : QWidget(parent),
   ui->ellipseBox->addItems({"Head + Tail", "Head", "Tail", "Body", "None"});
   ui->arrowBox->addItems({"Head + Tail", "Head", "Tail", "Body", "None"});
 
-  connect(ui->replayOpen, &QPushButton::clicked, this, &Replay::openReplayFolder);
-  connect(ui->replayPath, &QLineEdit::textChanged, this, &Replay::loadReplayFolder);
   connect(ui->replaySlider, &QSlider::valueChanged, this, &Replay::loadFrame);
   connect(ui->replaySlider, &QSlider::valueChanged, [this](const int& newValue) {
     ui->replayNumber->setText(QString::number(newValue));
   });
-  connect(ui->replayRefresh, &QPushButton::clicked, [this]() {
-    loadReplayFolder(ui->replayPath->text());
-  });
-  connect(ui->swapReplay, &QPushButton::clicked, this, &Replay::correctTracking);
 
   connect(framerate, &QTimer::timeout, [this]() {
     ui->replaySlider->setValue(autoPlayerIndex);
@@ -134,23 +179,8 @@ Replay::Replay(QWidget* parent, bool standalone) : QWidget(parent),
   });
   connect(ui->playReplay, &QPushButton::clicked, this, &Replay::toggleReplayPlay);
 
-  connect(ui->replayNext, &QPushButton::clicked, this, &Replay::nextOcclusionEvent);
-  connect(ui->replayPrevious, &QPushButton::clicked, this, &Replay::previousOcclusionEvent);
-  connect(ui->deleteData, &QPushButton::clicked, [this]() {
-    if (isReplayable) {
-      DeleteData* del = new DeleteData(ui->object1Replay->currentText().toInt(), ui->replaySlider->value(), trackingData);
-      commandStack->push(del);
-      loadFrame(ui->replaySlider->value());
-    }
-  });
 
-  connect(ui->replaySave, &QPushButton::clicked, this, &Replay::saveTrackedMovie);
 
-  connect(ui->replayHelp, &QPushButton::clicked, [this]() {
-    QMessageBox helpBox(this);
-    helpBox.setIconPixmap(QPixmap(":/assets/buttons/helpImg.png"));
-    helpBox.exec();
-  });
 }
 
 Replay::~Replay() {
@@ -164,10 +194,9 @@ void Replay::openReplayFolder() {
   // Delete existing data
   replayFrames.clear();
   occlusionEvents.clear();
-  ui->object1Replay->clear();
-  ui->object2Replay->clear();
+  object1Replay->clear();
+  object2Replay->clear();
   ui->replayDisplay->clear();
-  ui->replayPath->clear();
   framerate->stop();
   object = true;
   currentZoom = 1;
@@ -176,8 +205,7 @@ void Replay::openReplayFolder() {
 
   QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"), memoryDir, QFileDialog::ShowDirsOnly);
 
-  memoryDir = dir;
-  ui->replayPath->setText(dir + QDir::separator());
+  loadReplayFolder(dir);
 }
 
 /**
@@ -188,22 +216,9 @@ void Replay::loadReplayFolder(QString dir) {
   // This function will detect from an inputed path to a directory the image sequence and the tracking data.
   // The last tracking data from the folder Tracking_Result is automatically loaded if found.
   // If the user explicitly select another Tracking_Result folder, these data are loaded.
-
-  // Delete existing data
-  replayFrames.clear();
-  occlusionEvents.clear();
-  ui->object1Replay->clear();
-  ui->object2Replay->clear();
-  ui->replayDisplay->clear();
-  ui->replayPath->clear();
-  framerate->stop();
-  object = true;
-  currentZoom = 1;
-  ui->replayDisplay->setFixedSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
-  memoryDir.clear();
-
   if (!dir.length()) return;
 
+  memoryDir = dir;
   QString trackingDir = dir;
   if (dir.contains("Tracking_Result")) {
     dir.truncate(dir.lastIndexOf("/", -2));
@@ -238,7 +253,7 @@ void Replay::loadReplayFolder(QString dir) {
 
     trackingData = new Data(trackingDir);
     for (int i = 0; i < trackingData->maxId + 1; i++) {
-      ui->object2Replay->addItem(QString::number(i));
+      object2Replay->addItem(QString::number(i));
     }
 
     // Generates a color map.
@@ -263,7 +278,7 @@ void Replay::loadReplayFolder(QString dir) {
 */
 void Replay::loadFrame(int frameIndex) {
   if (isReplayable) {
-    ui->object1Replay->clear();
+    object1Replay->clear();
 
     Mat frame = imread(replayFrames[frameIndex], IMREAD_COLOR);
     int scale = ui->replaySize->value();
@@ -274,7 +289,7 @@ void Replay::loadFrame(int frameIndex) {
       QMap<QString, double> coordinate = trackingData->getData(frameIndex, a);
       int id = a;
 
-      ui->object1Replay->addItem(QString::number(id));
+      object1Replay->addItem(QString::number(id));
 
       if (ui->ellipseBox->currentIndex() != 4) {
         switch (ui->ellipseBox->currentIndex()) {
@@ -370,14 +385,12 @@ void Replay::toggleReplayPlay() {
   if (isReplayable && ui->playReplay->isChecked()) {
     QIcon img(":/assets/buttons/pause.png");
     ui->playReplay->setIcon(img);
-    ui->playReplay->setIconSize(QSize(ui->playReplay->width(), ui->playReplay->height()));
     framerate->start(1000 / ui->replayFps->value());
     autoPlayerIndex = ui->replaySlider->value();
   }
   else if (isReplayable && !ui->playReplay->isChecked()) {
     QIcon img(":/assets/buttons/resume.png");
     ui->playReplay->setIcon(img);
-    ui->playReplay->setIconSize(QSize(ui->playReplay->width(), ui->playReplay->height()));
     framerate->stop();
   }
 }
@@ -414,13 +427,13 @@ bool Replay::eventFilter(QObject* target, QEvent* event) {
           // Finds the minimal distance and updates the UI
           int min = idList.at(std::min_element(distance.begin(), distance.end()) - distance.begin());
           if (object) {
-            ui->object1Replay->setCurrentIndex(ui->object1Replay->findText(QString::number(min)));
-            ui->object1Replay->setStyleSheet("QComboBox { background-color: rgb(" + QString::number(colorMap[min].x) + "," + QString::number(colorMap[min].y) + "," + QString::number(colorMap[min].z) + "); }");
+            object1Replay->setCurrentIndex(object1Replay->findText(QString::number(min)));
+            object1Replay->setStyleSheet("QComboBox { background-color: rgb(" + QString::number(colorMap[min].x) + "," + QString::number(colorMap[min].y) + "," + QString::number(colorMap[min].z) + "); }");
             object = false;
           }
           else {
-            ui->object2Replay->setCurrentIndex(ui->object2Replay->findText(QString::number(min)));
-            ui->object2Replay->setStyleSheet("QComboBox { background-color: rgb(" + QString::number(colorMap[min].x) + "," + QString::number(colorMap[min].y) + "," + QString::number(colorMap[min].z) + "); }");
+            object2Replay->setCurrentIndex(object2Replay->findText(QString::number(min)));
+            object2Replay->setStyleSheet("QComboBox { background-color: rgb(" + QString::number(colorMap[min].x) + "," + QString::number(colorMap[min].y) + "," + QString::number(colorMap[min].z) + "); }");
             object = true;
           }
         }
@@ -428,9 +441,9 @@ bool Replay::eventFilter(QObject* target, QEvent* event) {
 
       // Right click event
       else if (mouseEvent->buttons() == Qt::RightButton && isReplayable) {
-        ui->swapReplay->animateClick();
-        ui->object1Replay->setStyleSheet("QComboBox { background-color: white; }");
-        ui->object2Replay->setStyleSheet("QComboBox { background-color: white; }");
+        correctTracking();
+        object1Replay->setStyleSheet("QComboBox { background-color: white; }");
+        object2Replay->setStyleSheet("QComboBox { background-color: white; }");
       }
     }
   }
@@ -482,8 +495,8 @@ bool Replay::eventFilter(QObject* target, QEvent* event) {
 void Replay::correctTracking() {
   if (isReplayable) {
     // Swaps the data
-    int firstObject = ui->object1Replay->currentText().toInt();
-    int secondObject = ui->object2Replay->currentText().toInt();
+    int firstObject = object1Replay->currentText().toInt();
+    int secondObject = object2Replay->currentText().toInt();
     int start = ui->replaySlider->value();
     SwapData *swap = new SwapData(firstObject, secondObject, start, trackingData);
     commandStack->push(swap);
@@ -534,8 +547,8 @@ void Replay::saveTrackedMovie() {
         QMap<QString, double> coordinate = trackingData->getData(frameIndex, a);
         int id = a;
 
-        ui->object1Replay->addItem(QString::number(id));
-        ui->object2Replay->addItem(QString::number(id));
+        object1Replay->addItem(QString::number(id));
+        object2Replay->addItem(QString::number(id));
 
         if (ui->ellipseBox->currentIndex() != 4) {
           switch (ui->ellipseBox->currentIndex()) {

@@ -3,6 +3,7 @@
 
 #include <stdlib.h>
 #include <QCheckBox>
+#include <QMainWindow>
 #include <QAction>
 #include <QComboBox>
 #include <QDebug>
@@ -49,11 +50,11 @@ namespace Ui {
 class Replay;
 }
 
-class Replay : public QWidget {
+class Replay : public QMainWindow {
   Q_OBJECT
 
  public:
-  explicit Replay(QWidget *parent = nullptr, bool standalone = true);
+  explicit Replay(QWidget *parent = nullptr, bool standalone = true, QSlider* control = nullptr);
   ~Replay();
 
  private:
@@ -66,6 +67,9 @@ class Replay : public QWidget {
   QUndoStack *commandStack;
   QAction *undoAction;
   QAction *redoAction;
+
+  QComboBox *object1Replay;
+  QComboBox *object2Replay;
 
   QString memoryDir; /*!< Saves the path of the last opened folder.*/
 
