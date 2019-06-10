@@ -33,8 +33,8 @@ class Data {
   QMap<QString, double> getData(int imageIndex, int id);
   QList<int> getId(int imageIndex);
   void swapData(int firstObject, int secondObject, int from);
-  void deleteData(int objectId, int from);
-  void insertData(int objectId, int from);
+  void deleteData(int objectId, int from, int to);
+  void insertData(int objectId, int from, int to);
   void save();
 
   QMap<int, QVector<object>> dataCopy;
@@ -55,7 +55,7 @@ class SwapData : public QUndoCommand {
 
 class DeleteData : public QUndoCommand {
  public:
-  DeleteData(int object, int from, Data *data);
+  DeleteData(int object, int from, int to, Data *data);
   void undo() override;
   void redo() override;
 
@@ -63,5 +63,6 @@ class DeleteData : public QUndoCommand {
   Data *m_data;
   int m_object;
   int m_from;
+  int m_to;
 };
 #endif

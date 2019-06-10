@@ -70,6 +70,7 @@ class Replay : public QMainWindow {
 
   QComboBox *object1Replay;
   QComboBox *object2Replay;
+  QSpinBox *deletedFrameNumber;
 
   QString memoryDir; /*!< Saves the path of the last opened folder.*/
 

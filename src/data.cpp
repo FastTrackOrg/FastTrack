@@ -159,12 +159,13 @@ void Data::swapData(int firstObject, int secondObject, int from) {
   * @brief Deletes the tracking data of one object from a selected index to the end.
   * @arg[in] objectId The object id.
   * @arg[in] from Start index from which the data will be swapped.
+  * @arg[in] to End index from which the data will be swapped.
 */
-void Data::deleteData(int objectId, int from) {
+void Data::deleteData(int objectId, int from, int to) {
   QMapIterator<int, QVector<object> > i(data);
   while (i.hasNext()) {
     i.next();
-    if (i.key() >= from) {
+    if (i.key() >= from && i.key() <= to) {
       QVector<object> objects = i.value();
 
       for (int j = 0; j < objects.size(); j++) {
@@ -182,12 +183,13 @@ void Data::deleteData(int objectId, int from) {
   * @brief Insert the tracking data for one object from a selected index to the end.
   * @arg[in] objectId The object id.
   * @arg[in] from Start index from which the data will be swapped.
+  * @arg[in] to End index from which the data will be swapped.
 */
-void Data::insertData(int objectId, int from) {
+void Data::insertData(int objectId, int from, int to) {
   QMapIterator<int, QVector<object> > i(dataCopy);
   while (i.hasNext()) {
     i.next();
-    if (i.key() >= from) {
+    if (i.key() >= from && i.key() <= to) {
       QVector<object> objects = i.value();
 
       for (int j = 0; j < objects.size(); j++) {
@@ -226,7 +228,7 @@ SwapData::SwapData(int firstObject, int secondObject, int from, Data *data)
 void SwapData::redo() { m_data->swapData(m_firstObject, m_secondObject, m_from); }
 void SwapData::undo() { m_data->swapData(m_secondObject, m_firstObject, m_from); }
 
-DeleteData::DeleteData(int object, int from, Data *data)
-    : m_object(object), m_from(from), m_data(data) { setText("delete data"); }
-void DeleteData::redo() { m_data->deleteData(m_object, m_from); }
-void DeleteData::undo() { m_data->insertData(m_object, m_from); }
+DeleteData::DeleteData(int object, int from, int to, Data *data)
+    : m_object(object), m_from(from), m_to(to), m_data(data) { setText("delete data"); }
+void DeleteData::redo() { m_data->deleteData(m_object, m_from, m_to); }
+void DeleteData::undo() { m_data->insertData(m_object, m_from, m_to); }

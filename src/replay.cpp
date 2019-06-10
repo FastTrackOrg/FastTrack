@@ -74,6 +74,7 @@ Replay::Replay(QWidget* parent, bool standalone, QSlider* control) : QMainWindow
   ui->toolBar->addSeparator();
 
   object1Replay = new QComboBox(this);
+  object1Replay->setStatusTip(tr("First selected object"));
   ui->toolBar->addWidget(object1Replay);
   
   img = QIcon(":/assets/buttons/replace.png");
@@ -83,19 +84,28 @@ Replay::Replay(QWidget* parent, bool standalone, QSlider* control) : QMainWindow
   ui->toolBar->addAction(swapAction);
 
   object2Replay = new QComboBox(this);
+  object2Replay->setStatusTip(tr("Second selected object"));
   ui->toolBar->addWidget(object2Replay);
 
   img = QIcon(":/assets/buttons/delete.png");
   QAction* deleteAction = new QAction(img, tr("&Delete"), this);
-  deleteAction->setStatusTip(tr("Delete the object"));
+  deleteAction->setStatusTip(tr("Delete the object from this frame on the selected number of frames"));
   connect(deleteAction, &QAction::triggered, [this]() {
     if (isReplayable) {
-      DeleteData* del = new DeleteData(object2Replay->currentText().toInt(), ui->replaySlider->value(), trackingData);
+      DeleteData* del = new DeleteData(object2Replay->currentText().toInt(), ui->replaySlider->value(), ui->replaySlider->value() + deletedFrameNumber->value() - 1, trackingData);
       commandStack->push(del);
       loadFrame(ui->replaySlider->value());
     }
   });
   ui->toolBar->addAction(deleteAction);
+
+  deletedFrameNumber = new QSpinBox(this);
+  deletedFrameNumber->setStatusTip(tr("Number of frames where to delete the selected object"));
+  connect(ui->replaySlider, &QSlider::valueChanged, [this]() {
+    deletedFrameNumber->setMaximum(replayFrames.size() - ui->replaySlider->value());
+    deletedFrameNumber->setValue(replayFrames.size() - ui->replaySlider->value());
+    }); 
+  ui->toolBar->addWidget(deletedFrameNumber);
 
   img = QIcon(":/assets/buttons/previous.png");
   QAction *previousAction = new QAction(img, tr("&Previous"), this);
@@ -178,9 +188,6 @@ Replay::Replay(QWidget* parent, bool standalone, QSlider* control) : QMainWindow
     }
   });
   connect(ui->playReplay, &QPushButton::clicked, this, &Replay::toggleReplayPlay);
-
-
-
 }
 
 Replay::~Replay() {
@@ -191,17 +198,6 @@ Replay::~Replay() {
   * @brief Opens a dialogue to select a folder.
 */
 void Replay::openReplayFolder() {
-  // Delete existing data
-  replayFrames.clear();
-  occlusionEvents.clear();
-  object1Replay->clear();
-  object2Replay->clear();
-  ui->replayDisplay->clear();
-  framerate->stop();
-  object = true;
-  currentZoom = 1;
-  ui->replayDisplay->setFixedSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
-  memoryDir.clear();
 
   QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"), memoryDir, QFileDialog::ShowDirsOnly);
 
@@ -216,6 +212,17 @@ void Replay::loadReplayFolder(QString dir) {
   // This function will detect from an inputed path to a directory the image sequence and the tracking data.
   // The last tracking data from the folder Tracking_Result is automatically loaded if found.
   // If the user explicitly select another Tracking_Result folder, these data are loaded.
+  // Delete existing data
+  replayFrames.clear();
+  occlusionEvents.clear();
+  object1Replay->clear();
+  object2Replay->clear();
+  ui->replayDisplay->clear();
+  framerate->stop();
+  object = true;
+  currentZoom = 1;
+  memoryDir.clear();
+
   if (!dir.length()) return;
 
   memoryDir = dir;
@@ -249,6 +256,8 @@ void Replay::loadReplayFolder(QString dir) {
     Mat frame = imread(replayFrames[0], IMREAD_COLOR);
     originalImageSize.setWidth(frame.cols);
     originalImageSize.setHeight(frame.rows);
+    deletedFrameNumber->setRange(1, replayFrames.size()); 
+    deletedFrameNumber->setValue(replayFrames.size()); 
     isReplayable = true;
 
     trackingData = new Data(trackingDir);
