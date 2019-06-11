@@ -53,8 +53,8 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   ui->menuView->addAction(ui->trackingOptions->toggleViewAction());
   ui->menuView->addAction(ui->controlOptions->toggleViewAction());
 
-  connect(ui->slider, &QSlider::valueChanged, this, static_cast<void (Interactive::*)(int)>(&Interactive::display));
   connect(ui->slider, &QSlider::valueChanged, [this](const int &newValue) {
+    display(newValue);
     ui->replayNumber->setText(QString::number(newValue));
   });
 
@@ -178,6 +178,14 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   connect(ui->threshBox, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [this]() {
     ui->isBin->setChecked(true);
     display(ui->slider->value());
+  });
+
+  // Draws scale
+  connect(ui->lo, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [this](int scale) {
+    display(ui->slider->value(), scale);
+  });
+  connect(ui->maxL, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [this](int scale) {
+    display(ui->slider->value(), scale);
   });
 
   // Zoom
@@ -400,8 +408,9 @@ void Interactive::openFolder() {
 /**
   * @brief Displays the image at index in the image sequence in the ui.
   * @param[in] index Index of the image to display in the image sequence.
+  * @param[in] scale Optional scale to display.
 */
-void Interactive::display(int index) {
+void Interactive::display(int index, int scale) {
   if (!framePath.empty()) {
     UMat frame;
     imread(framePath[index], IMREAD_GRAYSCALE).copyTo(frame);
@@ -442,7 +451,7 @@ void Interactive::display(int index) {
       double min = ui->minSize->value();
       double max = ui->maxSize->value();
 
-      // If too many contours detected to be displayed without slowdowns, ask the user what to do
+      // If too many contours are detected to be displayed without slowdowns, ask the user what to do
       if (contours.size() > 10000) {
         QMessageBox::StandardButton reply;
         reply = QMessageBox::question(this, "Confirmation", "Too many objects detected to be displayed. \n Do you want to display them anyway (the program can be slow)? ", QMessageBox::No | QMessageBox::Yes);
@@ -473,6 +482,12 @@ void Interactive::display(int index) {
 
     // Displays the image in the QLabel
     cvtColor(frame, frame, COLOR_GRAY2RGB);
+
+    // Draws the scale
+    if (scale != 0) {
+      line(frame, Point(20, 20), Point(20 + scale, 20), Scalar(255, 0, 0), 2);
+    }
+
     if (ui->isBin->isChecked()) {
       drawContours(frame, displayContours, -1, Scalar(0, 255, 0), FILLED, 8);
       drawContours(frame, rejectedContours, -1, Scalar(255, 0, 0), FILLED, 8);

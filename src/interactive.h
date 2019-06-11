@@ -70,7 +70,7 @@ class Interactive : public QMainWindow {
  private slots:
   void openFolder();
 
-  void display(int index);
+  void display(int index, int scale = 0);
   void display(QImage image);
   void display(UMat image);
 
