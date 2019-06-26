@@ -1,1 +1,1 @@
-doxygen Documentation/Doxyfile
+doxygen docs/dev/Doxyfile
