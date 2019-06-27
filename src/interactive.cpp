@@ -218,6 +218,7 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   });
   connect(ui->interactiveTab, &QTabWidget::currentChanged, [this](int index) {
     if (index == 1) replay->loadReplayFolder(dir);
+    replay->loadFrame(ui->slider->value());
   });
   connect(ui->replayButton, &QPushButton::toggled, [this](bool isChecked) {
     if (isChecked) {
