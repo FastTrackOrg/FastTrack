@@ -841,10 +841,10 @@ void Interactive::crop() {
   }
 
   //Checks for wrong values
-  if (xTop < 0) xTop = roi.tl().x;
-  if (yTop < 0) yTop = roi.tl().y;
-  if (width > cropedImageSize.width()) width = cropedImageSize.width();
-  if (height > cropedImageSize.height()) height = cropedImageSize.height();
+  if (xTop < roi.tl().x) xTop = roi.tl().x;
+  if (yTop < roi.tl().y) yTop = roi.tl().y;
+  if (width > cropedImageSize.width() - xTop + roi.tl().x) width = cropedImageSize.width() - xTop + roi.tl().x;
+  if (height > cropedImageSize.height() - yTop + roi.tl().y) height = cropedImageSize.height() - yTop + roi.tl().y;
 
   roi = Rect(xTop, yTop, width, height);
   cropedImageSize.setWidth(roi.width);
