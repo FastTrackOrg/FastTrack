@@ -351,7 +351,7 @@ void Batch::addPath(QString pathMovie, QString pathBackground, QString pathParam
 
   process tmpProcess = {
       .path = pathMovie,
-      .backgroundPath = pathBackground + ui->lineBackground->text(),
+      .backgroundPath = pathBackground,
       .trackingParameters = parameterList};
   processList.append(tmpProcess);
 }
