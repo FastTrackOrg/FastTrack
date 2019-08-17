@@ -59,10 +59,7 @@ class Replay : public QMainWindow {
 
  private:
   Ui::Replay *ui;
-  QShortcut *wShortcut; /*!< Keyboard shortcut to next occlusion. */
-  QShortcut *qShortcut; /*!< Keyboard shortcut to previous frame. */
-  QShortcut *aShortcut; /*!< Keyboard shortcut to previous frame. */
-  QShortcut *dShortcut; /*!< Keyboard shortcut to next frame. */
+  QShortcut *deletedFrameFocus; /*!< Keyboard shortcut to next frame. */
 
   QUndoStack *commandStack;
   QAction *undoAction;

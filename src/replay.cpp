@@ -86,9 +86,23 @@ Replay::Replay(QWidget* parent, bool standalone, QSlider* control) : QMainWindow
   object2Replay = new QComboBox(this);
   object2Replay->setStatusTip(tr("Second selected object"));
   ui->toolBar->addWidget(object2Replay);
+  
+  img = QIcon(":/assets/buttons/deleteOne.png");
+  QAction* deleteOneAction = new QAction(img, tr("&Delete"), this);
+  deleteOneAction->setShortcut(QKeySequence("f"));
+  deleteOneAction->setStatusTip(tr("Delete the object on this frame"));
+  connect(deleteOneAction, &QAction::triggered, [this]() {
+    if (isReplayable) {
+      DeleteData* del = new DeleteData(object2Replay->currentText().toInt(), ui->replaySlider->value(), ui->replaySlider->value(), trackingData);
+      commandStack->push(del);
+      loadFrame(ui->replaySlider->value());
+    }
+  });
+  ui->toolBar->addAction(deleteOneAction);
 
   img = QIcon(":/assets/buttons/delete.png");
   QAction* deleteAction = new QAction(img, tr("&Delete"), this);
+  deleteAction->setShortcut(QKeySequence(tr("G")));
   deleteAction->setStatusTip(tr("Delete the object from this frame on the selected number of frames"));
   connect(deleteAction, &QAction::triggered, [this]() {
     if (isReplayable) {
@@ -105,6 +119,10 @@ Replay::Replay(QWidget* parent, bool standalone, QSlider* control) : QMainWindow
     deletedFrameNumber->setMaximum(replayFrames.size() - ui->replaySlider->value());
     deletedFrameNumber->setValue(replayFrames.size() - ui->replaySlider->value());
     }); 
+  deletedFrameFocus = new QShortcut(QKeySequence("c"), this);
+  connect(deletedFrameFocus, &QShortcut::activated, deletedFrameNumber, static_cast<void (QSpinBox::*)(void)>(&QSpinBox::setFocus));
+  connect(deletedFrameFocus, &QShortcut::activated, deletedFrameNumber, &QSpinBox::selectAll);
+
   ui->toolBar->addWidget(deletedFrameNumber);
 
   img = QIcon(":/assets/buttons/previous.png");
@@ -139,18 +157,18 @@ Replay::Replay(QWidget* parent, bool standalone, QSlider* control) : QMainWindow
 
   // Keyboard shorcut
   // AZERTY keyboard shorcuts are set in the ui
-  wShortcut = new QShortcut(QKeySequence("w"), this);
+  QShortcut* wShortcut = new QShortcut(QKeySequence("w"), this);
   //connect(wShortcut, &QShortcut::activated, [this](nextAction) { nextAction->triggered(); });
 
-  qShortcut = new QShortcut(QKeySequence("q"), this);
+  QShortcut* qShortcut = new QShortcut(QKeySequence("q"), this);
   connect(qShortcut, &QShortcut::activated, [this]() { ui->replaySlider->setValue(ui->replaySlider->value() - 1); });
 
-  aShortcut = new QShortcut(QKeySequence("a"), this);
+  QShortcut* aShortcut = new QShortcut(QKeySequence("a"), this);
   connect(aShortcut, &QShortcut::activated, [this]() { ui->replaySlider->setValue(ui->replaySlider->value() - 1); });
 
-  dShortcut = new QShortcut(QKeySequence("d"), this);
+  QShortcut* dShortcut = new QShortcut(QKeySequence("d"), this);
   connect(dShortcut, &QShortcut::activated, [this]() { ui->replaySlider->setValue(ui->replaySlider->value() + 1); });
-
+  
   ui->replayDisplay->installEventFilter(this);
   ui->scrollArea->viewport()->installEventFilter(this);
 
