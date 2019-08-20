@@ -1,5 +1,21 @@
 # FastTrack changelog
+
+## 4.8.3
+
+### Fixed
+- Fixed saving error in the Replay panel.
+- Fixed global background not working in the Batch panel.
+- Minor ui fixes.
+
+### Added
+- Better keyboard shortcut in the Replay Panel.
+- Button to delete one object on one image in the Replay panel.
+- Scale to see the length parameter in the Interactive tracking.
+- Automatic refresh in the Replay panel when a parameter is changed.
+
 ## 4.8.2
+
+### Changed
 - Changed Replay panel ui design.
 - Changed Interactive panel ui design.
 
