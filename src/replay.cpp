@@ -185,7 +185,28 @@ Replay::Replay(QWidget* parent, bool standalone, QSlider* control) : QMainWindow
   isReplayable = false;
   framerate = new QTimer();
   ui->ellipseBox->addItems({"Head + Tail", "Head", "Tail", "Body", "None"});
+  connect(ui->ellipseBox, static_cast<void (QComboBox::*)(int)>(&QComboBox::activated), [this]() {
+    loadFrame(ui->replaySlider->value());
+  });
   ui->arrowBox->addItems({"Head + Tail", "Head", "Tail", "Body", "None"});
+  connect(ui->arrowBox, static_cast<void (QComboBox::*)(int)>(&QComboBox::activated), [this]() {
+    loadFrame(ui->replaySlider->value());
+  });
+  
+  connect(ui->replayTrace, &QCheckBox::stateChanged, [this]() {
+    loadFrame(ui->replaySlider->value());
+  });
+  connect(ui->replayTraceLength, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [this]() {
+    loadFrame(ui->replaySlider->value());
+  });
+  
+  connect(ui->replayNumbers, &QCheckBox::stateChanged, [this]() {
+    loadFrame(ui->replaySlider->value());
+  });
+  
+  connect(ui->replaySize, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [this]() {
+    loadFrame(ui->replaySlider->value());
+  });
 
   connect(ui->replaySlider, &QSlider::valueChanged, this, &Replay::loadFrame);
   connect(ui->replaySlider, &QSlider::valueChanged, [this](const int& newValue) {
