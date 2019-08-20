@@ -649,6 +649,7 @@ void Interactive::previewTracking() {
     ui->progressBar->setValue(0);
     ui->previewButton->setDisabled(true);
     ui->trackButton->setDisabled(true);
+    ui->replayButton->setChecked(false);
 
     QThread *thread = new QThread;
     Tracking *tracking = new Tracking(framePath, background, ui->startImage->value(), ui->startImage->value() + ui->stopImage->value());
@@ -694,6 +695,7 @@ void Interactive::track() {
     ui->progressBar->setValue(0);
     ui->previewButton->setDisabled(true);
     ui->trackButton->setDisabled(true);
+    ui->replayButton->setChecked(false);
 
     QThread *thread = new QThread;
     Tracking *tracking = new Tracking(framePath, background);
