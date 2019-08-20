@@ -208,7 +208,7 @@ void Data::insertData(int objectId, int from, int to) {
   * @brief Saves the data in the tracking result file.
 */
 void Data::save() {
-  QFile file(dir + QDir::separator() + "Tracking_Result" + QDir::separator() + "tracking.txt");
+  QFile file(dir + QDir::separator() + "tracking.txt");
   if (file.open(QFile::WriteOnly | QFile::Text)) {
     QTextStream out(&file);
     out << "xHead" << '\t' << "yHead" << '\t' << "tHead" << '\t' << "xTail" << '\t' << "yTail" << '\t' << "tTail" << '\t' << "xBody" << '\t' << "yBody" << '\t' << "tBody" << '\t' << "curvature" << '\t' << "areaBody" << '\t' << "perimeterBody" << '\t' << "headMajorAxisLength" << '\t' << "headMinorAxisLength" << '\t' << "headExcentricity" << '\t' << "tailMajorAxisLength" << '\t' << "tailMinorAxisLength" << '\t' << "tailExcentricity" << '\t' << "bodyMajorAxisLength" << '\t' << "bodyMinorAxisLength" << '\t' << "bodyExcentricity" << '\t' << "imageNumber" << '\t' << "id" << endl;
