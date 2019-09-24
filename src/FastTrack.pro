@@ -34,6 +34,7 @@ SOURCES += \
         batch.cpp \
         interactive.cpp \
         data.cpp \
+        annotation.cpp \
 
 QMAKE_CXXFLAGS += -std=c++11 -O3 -fopenmp -g
 
@@ -49,6 +50,7 @@ HEADERS += \
         batch.h \
         interactive.h \
         data.h \
+        annotation.h \
 
 
 FORMS += \ 

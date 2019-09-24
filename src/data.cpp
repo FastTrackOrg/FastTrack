@@ -246,6 +246,8 @@ void Data::save() {
   }
 }
 
+Data::~Data(){};
+
 SwapData::SwapData(int firstObject, int secondObject, int from, Data *data)
     : m_firstObject(firstObject), m_secondObject(secondObject), m_from(from), m_data(data) { setText("swap data"); }
 void SwapData::redo() { m_data->swapData(m_firstObject, m_secondObject, m_from); }

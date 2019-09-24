@@ -42,8 +42,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>604</width>
-           <height>450</height>
+           <width>286</width>
+           <height>436</height>
           </rect>
          </property>
          <layout class="QGridLayout" name="gridLayout">
@@ -77,7 +77,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>22</height>
+     <height>30</height>
     </rect>
    </property>
   </widget>
@@ -94,6 +94,9 @@
    </attribute>
   </widget>
   <widget class="QDockWidget" name="dockWidget">
+   <property name="features">
+    <set>QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable</set>
+   </property>
    <attribute name="dockWidgetArea">
     <number>2</number>
    </attribute>
@@ -310,6 +313,45 @@
        </property>
        <property name="value">
         <number>25</number>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QDockWidget" name="dockWidget_2">
+   <property name="features">
+    <set>QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable</set>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>1</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents_2">
+    <layout class="QGridLayout" name="gridLayout_5">
+     <item row="0" column="2">
+      <widget class="QPushButton" name="findNext">
+       <property name="text">
+        <string>&gt;&gt;</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0">
+      <widget class="QLineEdit" name="findLine"/>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="label_2">
+       <property name="text">
+        <string>Annotation</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0" colspan="3">
+      <widget class="QTextEdit" name="annotation"/>
+     </item>
+     <item row="0" column="1">
+      <widget class="QPushButton" name="findPrev">
+       <property name="text">
+        <string>&lt;&lt;</string>
        </property>
       </widget>
      </item>

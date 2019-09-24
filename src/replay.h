@@ -41,6 +41,7 @@
 #include <string>
 #include <vector>
 #include "data.h"
+#include "annotation.h"
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
 using namespace std;
@@ -72,6 +73,7 @@ class Replay : public QMainWindow {
   QString memoryDir; /*!< Saves the path of the last opened folder.*/
 
   Data *trackingData;
+  Annotation *annotation;
 
   vector<cv::String> replayFrames; /*!< Paths to each image of the images sequences to replay. */
   vector<Point3f> colorMap;        /*!< RGB color map to display each object in one color. */

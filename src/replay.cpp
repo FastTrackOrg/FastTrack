@@ -237,6 +237,9 @@ Replay::Replay(QWidget* parent, bool standalone, QSlider* control) : QMainWindow
     }
   });
   connect(ui->playReplay, &QPushButton::clicked, this, &Replay::toggleReplayPlay);
+
+  annotation = new Annotation("");
+  trackingData = new Data("");
 }
 
 Replay::~Replay() {
@@ -262,11 +265,14 @@ void Replay::loadReplayFolder(QString dir) {
   // The last tracking data from the folder Tracking_Result is automatically loaded if found.
   // If the user explicitly select another Tracking_Result folder, these data are loaded.
   // Delete existing data
+  delete annotation;
+  delete trackingData;
   replayFrames.clear();
   occlusionEvents.clear();
   object1Replay->clear();
   object2Replay->clear();
   ui->replayDisplay->clear();
+  ui->annotation->clear();
   framerate->stop();
   object = true;
   currentZoom = 1;
@@ -325,7 +331,28 @@ void Replay::loadReplayFolder(QString dir) {
       c = rand() % 255;
       colorMap.push_back(Point3f(a, b, c));
     }
-    loadFrame(0);
+
+    // Load annotation file
+    annotation = new Annotation(trackingDir);
+    connect(ui->replaySlider, &QSlider::valueChanged, annotation, &Annotation::read);
+    connect(annotation, &Annotation::annotationText, ui->annotation, &QTextEdit::setPlainText);
+    connect(ui->annotation, &QTextEdit::textChanged, annotation, [this]() {
+      int index = ui->replaySlider->value();
+      QString text = ui->annotation->toPlainText();
+      annotation->write(index, text);
+    });
+    connect(ui->findLine, &QLineEdit::textEdited, annotation, &Annotation::find);
+    connect(ui->findNext, &QPushButton::pressed, annotation, [this](){
+      int index = annotation->next();
+      ui->replaySlider->setValue(index);
+    });
+    connect(ui->findPrev, &QPushButton::pressed, annotation, [this](){
+      int index = annotation->prev();
+      ui->replaySlider->setValue(index);
+    });
+
+    ui->replaySlider->setValue(1); // To force the change
+    ui->replaySlider->setValue(0);
   }
   catch (...) {
     isReplayable = false;
