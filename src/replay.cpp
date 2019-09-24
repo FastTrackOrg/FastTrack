@@ -152,7 +152,7 @@ Replay::Replay(QWidget* parent, bool standalone, QSlider* control) : QMainWindow
   }
 
   if (control) {
-    connect(control, &QSlider::valueChanged, ui->replaySlider, &QSlider::setValue);
+    ui->replaySlider = control;
   }
 
   // Keyboard shorcut
