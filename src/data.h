@@ -10,6 +10,7 @@
 #include <QTextStream>
 #include <QWidget>
 #include <QUndoCommand>
+#include <QMessageBox>
 
 struct object
 {

@@ -221,6 +221,11 @@ void Data::save() {
     }
     file.close();
   }
+  else {
+    QMessageBox msgBox;
+    msgBox.setText("Error writting the tracking.txt file. Changes not saved.");
+    msgBox.exec();
+  }
 }
 
 SwapData::SwapData(int firstObject, int secondObject, int from, Data *data)
