@@ -629,7 +629,7 @@ void Interactive::getParameters() {
   parameters.insert("Binary threshold", QString::number(ui->threshBox->value()));
   parameters.insert("Number of images background", QString::number(ui->nBack->value()));
   parameters.insert("Background method", QString::number(ui->back->currentIndex()));
-  parameters.insert("Background registration method", QString::number(ui->back->currentIndex()));
+  parameters.insert("Background registration method", QString::number(ui->registrationBack->currentIndex()));
   parameters.insert("ROI top x", QString::number(roi.tl().x));
   parameters.insert("ROI top y", QString::number(roi.tl().y));
   parameters.insert("ROI bottom x", QString::number(roi.br().x));
