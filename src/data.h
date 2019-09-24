@@ -33,6 +33,7 @@ class Data {
   QVector<object> getData(int imageIndex);
   QMap<QString, double> getData(int imageIndex, int id);
   QList<int> getId(int imageIndex);
+  QList<int> getId(int imageIndexFirst, int imageIndexLast);
   void swapData(int firstObject, int secondObject, int from);
   void deleteData(int objectId, int from, int to);
   void insertData(int objectId, int from, int to);

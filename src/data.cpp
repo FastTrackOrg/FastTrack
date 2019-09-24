@@ -122,6 +122,24 @@ QList<int> Data::getId(int imageIndex) {
 }
 
 /**
+  * @brief Gets the ids of all the objects in the frame.
+  * @arg[in] imageIndex Index of the frame.
+  * @return List of indexes.
+*/
+QList<int> Data::getId(int imageIndexFirst, int imageIndexLast) {
+  QList<int> ids;
+  for (int i = imageIndexFirst; i < imageIndexLast; i++) {
+    QVector<object> objects = data.value(i);
+    for (auto &a : objects) {
+      ids.append(a.id);
+    }
+  }
+  std::sort(ids.begin(), ids.end());
+  ids.erase(std::unique(ids.begin(), ids.end()), ids.end());
+  return ids;
+}
+
+/**
   * @brief In the tracking data, swaps two objects from a selected index to the end.
   * @arg[in] firstObject The first object id.
   * @arg[in] secondObject The second object id.

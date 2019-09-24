@@ -95,6 +95,11 @@ Replay::Replay(QWidget* parent, bool standalone, QSlider* control) : QMainWindow
     if (isReplayable) {
       DeleteData* del = new DeleteData(object2Replay->currentText().toInt(), ui->replaySlider->value(), ui->replaySlider->value(), trackingData);
       commandStack->push(del);
+      ids = trackingData->getId(0, replayFrames.size());
+      object2Replay->clear();
+      for (auto const& a : ids) {
+        object2Replay->addItem(QString::number(a));
+      }
       loadFrame(ui->replaySlider->value());
     }
   });
@@ -108,6 +113,11 @@ Replay::Replay(QWidget* parent, bool standalone, QSlider* control) : QMainWindow
     if (isReplayable) {
       DeleteData* del = new DeleteData(object2Replay->currentText().toInt(), ui->replaySlider->value(), ui->replaySlider->value() + deletedFrameNumber->value() - 1, trackingData);
       commandStack->push(del);
+      ids = trackingData->getId(0, replayFrames.size());
+      object2Replay->clear();
+      for (auto const& a : ids) {
+        object2Replay->addItem(QString::number(a));
+      }
       loadFrame(ui->replaySlider->value());
     }
   });
@@ -300,8 +310,9 @@ void Replay::loadReplayFolder(QString dir) {
     isReplayable = true;
 
     trackingData = new Data(trackingDir);
-    for (int i = 0; i < trackingData->maxId + 1; i++) {
-      object2Replay->addItem(QString::number(i));
+    ids = trackingData->getId(0, replayFrames.size());
+    for (auto const& a : ids) {
+      object2Replay->addItem(QString::number(a));
     }
 
     // Generates a color map.

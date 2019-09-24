@@ -87,6 +87,7 @@ class Replay : public QMainWindow {
   double currentZoom;
   QPointF panReferenceClick;
   QPointF zoomReferencePosition;
+  QList<int> ids;
 
  public slots:
 
