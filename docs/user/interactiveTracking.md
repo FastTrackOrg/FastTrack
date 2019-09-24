@@ -66,3 +66,5 @@ Several display options are available and unlocked at each step of the analysis.
 
 ## Layout options
 Several layout options are available in the layout menu in the top bar. You can also build your layout by dragging the option docks in the window.
+
+[See a video demonstration](https://www.youtube.com/watch?v=grxAAX0J6CQ&feature=youtu.be)

@@ -39,9 +39,11 @@ developer guide for more information).
 
     -   Execute the installer and follow the provided instructions.
 
-2.  For Linux:
+2. For Linux (all distributions) as AppImage (no system integration):
 
-    Allow FastTrack.AppImage to be executed:
+    * Download the AppImage [file](/download/FastTrack.AppImage).
+
+    * Allow FastTrack.AppImage to be executed:
 
     -   Right click on the AppImage file.
 
@@ -50,8 +52,22 @@ developer guide for more information).
     -   Click on Permissions.
 
     -   Tick “Allow executing file as program”.
+    
+3. For Ubuntu 18.04 as deb with Fast Track PPA (automatic update and system integration):
+    ```
+    wget -O - https://www.fasttrack.sh/download/apt/conf/public.gpg.key | sudo apt-key add - 
+    echo "deb https://www.fasttrack.sh/download/apt/ sid main" | sudo tee -a /etc/apt/sources.list
+    sudo apt-get upgrade 
+    sudo apt-get install fasttrack
+    ```
+4. For Arch Linux (no automatic update):
+```
+wget http://www.fasttrack.sh/download/arch/fasttrack-any.pkg.tar.xz
+sudo pacman -U fasttrack-any.pkg.tar.xz
+rm fasttrack-any.pkg.tar.xz
+```
 
-3.  For Mac:
+5.  For Mac:
 
     -   Double click on the dmg file.
 

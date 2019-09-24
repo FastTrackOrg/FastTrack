@@ -28,10 +28,25 @@ To correct an occlusion by swapping two the data for two objects from the curren
 * Left click on the first object, the object ID and color is displayed on the first box at the top left of the display.
 * Right click on the first object, the object ID and color is displayed on the second box at the top left of the display.
 * Right-click or click on the Swap button to exchange the data for the two selected objects from the current image to the last image.
+
 ### Delete the data of an object
 To delete the data for one object from the current image to the end of the sequence:
 * Left click on the object, the object ID and color is displayed on the first box at the top left of the display.
 * Click on the delete button to delete the data from the current image to the last image.
 
+### Keyboard shortcuts
+A set of keyboard shortcuts are available to speed-up the tracking correction.
+- Q/A: go to the previous image.
+- D: go to the next image.
+- F: delete the selected object on the current image.
+- C: enter the number of images where an object has to be deleted.
+- G: delete an object from the current image to the current plus the selected number.
+
+## Saving
+All the changes made in the inspector are automatically saved in the original tracking.txt file.
+IMPORTANT: always check that the changes are saved by reloading the file in the inspector with the refresh button at the end of a review. 
+
 ## Export a movie
 To export a movie of a tracking analysis, select the desired display overlay and click on the save button. Select a folder and a name to save the file, only .avi format is supported.
+
+[See a video demonstration](https://youtu.be/AEuJ1USGNew)
