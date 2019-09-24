@@ -321,6 +321,7 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
 void Interactive::openFolder() {
   // Resets the class members
   isBackground = false;
+  ui->replayButton->setChecked(false);
   trackingData = new Data("");
   memoryDir.clear();
   framePath.clear();
