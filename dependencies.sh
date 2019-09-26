@@ -12,14 +12,3 @@ if [ "$1" = "opencv" ]; then
   cd ../..
   rm -rf opencv
 fi
-
-if [ "$1" = "zip" ]; then
-  set -e
-  git clone https://github.com/stachenov/quazip
-  cd quazip/quazip
-  qmake PREFIX=/usr/local
-  make
-  sudo make install
-  cd ../..
-  rm -rf quazip
-fi

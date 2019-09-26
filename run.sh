@@ -2,7 +2,7 @@
 
 if [ "$1" = "full" ]; then
   set -e
-  qmake CONFIG+=released QMAKE_CXXFLAHE+=-DENABLE_DEVTOOL src/FastTrack.pro
+  qmake CONFIG+=released src/FastTrack.pro
   make clean
   make
   cd build
@@ -38,15 +38,4 @@ if [ "$1" = "profile" ]; then
   ./FastTrack
   cd ..
   gprof build/FastTrack build/gmon.out > profiling.txt
-fi
-
-if [ "$1" = "intel" ]; then
-  set -e
-  qmake CONFIG+=released src/FastTrack.pro -spec linux-icc
-  make clean
-  make
-  cd build
-  ./FastTrack
-  cd ..
-  make clean
 fi

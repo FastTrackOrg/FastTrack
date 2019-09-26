@@ -38,10 +38,11 @@ SOURCES += \
 
 QMAKE_CXXFLAGS += -std=c++11 -O3 -fopenmp -g
 
-INCLUDEPATH += /usr/local/include/opencv4/ /usr/local/include/quazip/
-INCLUDEPATH += /usr/local/include/quazip/
-LIBS += -L/usr/local/lib64/ -lopencv_core -lopencv_imgproc -lopencv_highgui -lopencv_imgcodecs -lopencv_videoio -lopencv_video -lopencv_calib3d -lopencv_photo -lopencv_features2d -fopenmp
-LIBS += -L/usr/local/lib/ -lquazip
+INCLUDEPATH += /usr/include/opencv4/
+INCLUDEPATH += /usr/local/include/opencv4/
+LIBS += -L/usr/local/lib64/ -fopenmp
+LIBS += -L/usr/local/include/opencv4/ -L/usr/include/opencv4/ -lopencv_core -lopencv_imgproc -lopencv_highgui -lopencv_imgcodecs -lopencv_videoio -lopencv_video -lopencv_calib3d -lopencv_photo -lopencv_features2d
+
 HEADERS += \
         mainwindow.h\
         tracking.h \

@@ -18,9 +18,6 @@ This file is part of Fast Track.
 #ifndef INTERACTIVE_H
 #define INTERACTIVE_H
 
-#ifdef ENABLE_DEVTOOL
-#include <quazip/JlCompress.h>
-#endif
 #include <QWidget>
 #include <QAction>
 #include <QDir>
@@ -94,11 +91,6 @@ class Interactive : public QMainWindow {
   
   void resizeEvent(QResizeEvent *event);
 
-#ifdef ENABLE_DEVTOOL
-  void benchmark();
-  void benchmarkAnalysis(QMap<QString, QString>);
-#endif
-
  private:
   Ui::Interactive *ui;
   QSettings *settingsFile;
@@ -126,11 +118,6 @@ class Interactive : public QMainWindow {
   vector<Point3f> colorMap;
   double currentZoom;
   Replay *replay;
-
-#ifdef ENABLE_DEVTOOL
-  QVector<int> benchmarkTime;
-  int benchmarkCount;
-#endif
 
  signals:
   void message(QString message);

@@ -53,8 +53,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>491</width>
-             <height>593</height>
+             <width>638</width>
+             <height>580</height>
             </rect>
            </property>
            <layout class="QGridLayout" name="gridLayout_2">
@@ -116,8 +116,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>320</width>
-          <height>536</height>
+          <width>286</width>
+          <height>500</height>
          </rect>
         </property>
         <attribute name="label">
@@ -184,18 +184,18 @@
             <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Sans Serif'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;The program will compute a cost for each pair of objects in two successive images using the distance &lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;d&lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600; vertical-align:sub;&quot;&gt;ij&lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt; and the angular difference &lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;a&lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600; vertical-align:sub;&quot;&gt;ij&lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt; between two objects. These two parameters can be computed using the direction and barycenter of the head, tail or body by selecting the&lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt; Spot to track &lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;accordingly.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;The cost is computed as follow:&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;c&lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600; vertical-align:sub;&quot;&gt;ij&lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt; = w*(d&lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600; vertical-align:sub;&quot;&gt;ij&lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;/D) + (1-w)*(a&lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600; vertical-align:sub;&quot;&gt;ij&lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;/A)&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;if d&lt;/span&gt;&lt;span style=&quot; font-size:8pt; vertical-align:sub;&quot;&gt;ij &lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;&amp;gt; &lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;L&lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt; the object i can be assigned with the object j.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;if the object is lost more images than &lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;T&lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt; then a new object is assigned.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;The weight &lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;w &lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;can be adjusted to have the cost more sensitive to the distance (w close to 1) or to the direction (w close to 0).&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;The best assignment is found by using the Hungarian algorithm.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Noto Sans'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:8pt;&quot;&gt;The program will compute a cost for each pair of objects in two successive images using the distance &lt;/span&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:8pt; font-weight:600;&quot;&gt;d&lt;/span&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:8pt; font-weight:600; vertical-align:sub;&quot;&gt;ij&lt;/span&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:8pt;&quot;&gt; and the angular difference &lt;/span&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:8pt; font-weight:600;&quot;&gt;a&lt;/span&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:8pt; font-weight:600; vertical-align:sub;&quot;&gt;ij&lt;/span&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:8pt;&quot;&gt; between two objects. These two parameters can be computed using the direction and barycenter of the head, tail or body by selecting the&lt;/span&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:8pt; font-weight:600;&quot;&gt; Spot to track &lt;/span&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:8pt;&quot;&gt;accordingly.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Sans Serif'; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:8pt;&quot;&gt;The cost is computed as follow:&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:8pt; font-weight:600;&quot;&gt;c&lt;/span&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:8pt; font-weight:600; vertical-align:sub;&quot;&gt;ij&lt;/span&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:8pt; font-weight:600;&quot;&gt; = w*(d&lt;/span&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:8pt; font-weight:600; vertical-align:sub;&quot;&gt;ij&lt;/span&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:8pt; font-weight:600;&quot;&gt;/D) + (1-w)*(a&lt;/span&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:8pt; font-weight:600; vertical-align:sub;&quot;&gt;ij&lt;/span&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:8pt; font-weight:600;&quot;&gt;/A)&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:8pt;&quot;&gt;if d&lt;/span&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:8pt; vertical-align:sub;&quot;&gt;ij &lt;/span&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:8pt;&quot;&gt;&amp;gt; &lt;/span&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:8pt; font-weight:600;&quot;&gt;L&lt;/span&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:8pt;&quot;&gt; the object i can be assigned with the object j.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:8pt;&quot;&gt;if the object is lost more images than &lt;/span&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:8pt; font-weight:600;&quot;&gt;T&lt;/span&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:8pt;&quot;&gt; then a new object is assigned.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:8pt;&quot;&gt;The weight &lt;/span&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:8pt; font-weight:600;&quot;&gt;w &lt;/span&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:8pt;&quot;&gt;can be adjusted to have the cost more sensitive to the distance (w close to 1) or to the direction (w close to 0).&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Sans Serif'; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Sans Serif'; font-size:8pt;&quot;&gt;The best assignment is found by using the Hungarian algorithm.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Sans Serif'; font-size:11pt; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Sans Serif'; font-size:11pt; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
            </property>
           </widget>
          </item>
@@ -322,8 +322,8 @@ p, li { white-space: pre-wrap; }
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>320</width>
-          <height>536</height>
+          <width>208</width>
+          <height>100</height>
          </rect>
         </property>
         <attribute name="label">
@@ -399,7 +399,7 @@ p, li { white-space: pre-wrap; }
    <property name="minimumSize">
     <size>
      <width>241</width>
-     <height>291</height>
+     <height>318</height>
     </size>
    </property>
    <property name="features">
@@ -426,8 +426,8 @@ p, li { white-space: pre-wrap; }
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>310</width>
-          <height>412</height>
+          <width>225</width>
+          <height>372</height>
          </rect>
         </property>
         <attribute name="label">
@@ -574,8 +574,8 @@ p, li { white-space: pre-wrap; }
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>310</width>
-          <height>412</height>
+          <width>178</width>
+          <height>180</height>
          </rect>
         </property>
         <attribute name="label">
@@ -671,8 +671,8 @@ corner</string>
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>310</width>
-          <height>412</height>
+          <width>184</width>
+          <height>50</height>
          </rect>
         </property>
         <attribute name="label">
@@ -730,8 +730,8 @@ corner</string>
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>310</width>
-          <height>412</height>
+          <width>195</width>
+          <height>92</height>
          </rect>
         </property>
         <attribute name="label">
@@ -820,8 +820,8 @@ corner</string>
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>310</width>
-          <height>412</height>
+          <width>185</width>
+          <height>132</height>
          </rect>
         </property>
         <attribute name="label">
@@ -958,8 +958,8 @@ corner</string>
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>310</width>
-          <height>412</height>
+          <width>195</width>
+          <height>92</height>
          </rect>
         </property>
         <attribute name="label">
@@ -1034,7 +1034,7 @@ corner</string>
      <x>0</x>
      <y>0</y>
      <width>1211</width>
-     <height>22</height>
+     <height>30</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuOpen">
@@ -1047,12 +1047,6 @@ corner</string>
     <property name="title">
      <string>Help</string>
     </property>
-   </widget>
-   <widget class="QMenu" name="menuDevelopper">
-    <property name="title">
-     <string>Developper</string>
-    </property>
-    <addaction name="actionbenchmark"/>
    </widget>
    <widget class="QMenu" name="menuView">
     <property name="title">
@@ -1070,7 +1064,6 @@ corner</string>
    </widget>
    <addaction name="menuOpen"/>
    <addaction name="menuHelp"/>
-   <addaction name="menuDevelopper"/>
    <addaction name="menuView"/>
    <addaction name="menuLayout"/>
   </widget>

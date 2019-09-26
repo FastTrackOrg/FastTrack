@@ -163,9 +163,6 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
       ui->actionLayout1->activate(QAction::Trigger);
   }
 
-#ifdef ENABLE_DEVTOOL
-  connect(ui->actionbenchmark, &QAction::triggered, this, &Interactive::benchmark);
-#endif
   connect(this, &Interactive::message, this, [this](QString msg) {
     QMessageBox msgBox;
     msgBox.setText(msg);
@@ -872,83 +869,6 @@ void Interactive::reset() {
   roi = Rect(0, 0, 0, 0);
   display(ui->slider->value());
 }
-
-#ifdef ENABLE_DEVTOOL
-/**
- * @brief This is a function for the developer. Triggered a benchmark (downloads a dataset and perform several tracking analysis) to check program performance.
- */
-void Interactive::benchmark() {
-  // Checks if the dataset exist and creates the destination folder if not
-  QNetworkAccessManager *manager = new QNetworkAccessManager(this);
-  connect(manager, &QNetworkAccessManager::finished, [this](QNetworkReply *reply) {
-    if (QDir(QDir::homePath() + "/FastTrackBenchmarkTmp").exists()) {
-      return;
-    }
-
-    QDir().mkdir(QDir::homePath() + "/FastTrackBenchmarkTmp");
-    QFile file(QDir::homePath() + "/FastTrackBenchmarkTmp/benchmark.zip");
-    if (!file.open(QIODevice::WriteOnly)) {
-      qInfo() << "error";
-      return;
-    }
-
-    file.write(reply->readAll());
-    reply->deleteLater();
-    QStringList tmp = JlCompress::extractDir(QDir::homePath() + "/FastTrackBenchmarkTmp/benchmark.zip", QDir::homePath() + "/FastTrackBenchmarkTmp/");
-
-    //Loads parameters
-    QMap<QString, QString> params;
-    QFile parameterFile(QDir::homePath() + "/FastTrackBenchmarkTmp/Juvenil_Zebrafish_2/Tracking_Result/parameter.param");
-    if (parameterFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
-      QTextStream in(&parameterFile);
-      QString line;
-      QStringList parameters;
-      while (in.readLineInto(&line)) {
-        parameters = line.split(" = ", QString::SkipEmptyParts);
-        params.insert(parameters[0], parameters[1]);
-      }
-    }
-    parameterFile.close();
-    benchmarkCount = 0;
-    benchmarkAnalysis(params);
-  });
-
-  manager->get(QNetworkRequest(QUrl("http://www.fasttrack.sh/download/Benchmark.zip")));
-}
-
-/**
- * @brief This is a function for the developer. Triggered a benchmark (downloads a dataset and perform several tracking analysis) to check program performance.
- */
-void Interactive::benchmarkAnalysis(QMap<QString, QString> params) {
-  QThread *thread = new QThread;
-  Tracking *tracking = new Tracking((QDir::homePath() + "/FastTrackBenchmarkTmp/Juvenil_Zebrafish_2/").toStdString(), "");
-  tracking->moveToThread(thread);
-
-  connect(thread, &QThread::started, tracking, &Tracking::startProcess);
-  connect(tracking, &Tracking::finished, thread, &QThread::quit);
-  connect(tracking, &Tracking::finished, tracking, &Tracking::deleteLater);
-  connect(tracking, &Tracking::statistic, [this, params](int time) {
-    if (benchmarkCount < 20) {
-      benchmarkAnalysis(params);
-      benchmarkTime.append(time);
-      this->benchmarkCount += 1;
-    }
-    else {
-      int mean = 0;
-      for (auto &a : benchmarkTime) {
-        mean += a;
-      }
-      mean /= benchmarkTime.size();
-      qInfo() << benchmarkTime << benchmarkTime.size();
-      emit(message("Benchmark result: " + QString::number(mean)));
-      QDir(QDir::homePath() + "/FastTrackBenchmarkTmp").QDir::removeRecursively();
-    }
-  });
-  connect(thread, &QThread::finished, thread, &QThread::deleteLater);
-  tracking->updatingParameters(params);
-  thread->start();
-}
-#endif
 
 /**
   * @brief Destructors.
