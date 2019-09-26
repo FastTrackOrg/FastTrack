@@ -54,7 +54,7 @@
              <x>0</x>
              <y>0</y>
              <width>638</width>
-             <height>580</height>
+             <height>536</height>
             </rect>
            </property>
            <layout class="QGridLayout" name="gridLayout_2">
@@ -117,7 +117,7 @@
           <x>0</x>
           <y>0</y>
           <width>286</width>
-          <height>500</height>
+          <height>456</height>
          </rect>
         </property>
         <attribute name="label">
@@ -322,8 +322,8 @@ p, li { white-space: pre-wrap; }
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>208</width>
-          <height>100</height>
+          <width>263</width>
+          <height>456</height>
          </rect>
         </property>
         <attribute name="label">
@@ -427,7 +427,7 @@ p, li { white-space: pre-wrap; }
           <x>0</x>
           <y>0</y>
           <width>225</width>
-          <height>372</height>
+          <height>328</height>
          </rect>
         </property>
         <attribute name="label">
@@ -532,7 +532,7 @@ p, li { white-space: pre-wrap; }
          <item row="0" column="0" colspan="2">
           <widget class="QLabel" name="label_20">
            <property name="text">
-            <string>Compute</string>
+            <string>Compute a backgroud image</string>
            </property>
           </widget>
          </item>
@@ -574,8 +574,8 @@ p, li { white-space: pre-wrap; }
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>178</width>
-          <height>180</height>
+          <width>225</width>
+          <height>350</height>
          </rect>
         </property>
         <attribute name="label">
@@ -671,8 +671,8 @@ corner</string>
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>184</width>
-          <height>50</height>
+          <width>225</width>
+          <height>350</height>
          </rect>
         </property>
         <attribute name="label">
@@ -730,8 +730,8 @@ corner</string>
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>195</width>
-          <height>92</height>
+          <width>225</width>
+          <height>350</height>
          </rect>
         </property>
         <attribute name="label">
@@ -820,8 +820,8 @@ corner</string>
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>185</width>
-          <height>132</height>
+          <width>225</width>
+          <height>350</height>
          </rect>
         </property>
         <attribute name="label">
@@ -958,8 +958,8 @@ corner</string>
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>195</width>
-          <height>92</height>
+          <width>225</width>
+          <height>328</height>
          </rect>
         </property>
         <attribute name="label">
@@ -1043,11 +1043,6 @@ corner</string>
     </property>
     <addaction name="actionOpen"/>
    </widget>
-   <widget class="QMenu" name="menuHelp">
-    <property name="title">
-     <string>Help</string>
-    </property>
-   </widget>
    <widget class="QMenu" name="menuView">
     <property name="title">
      <string>View</string>
@@ -1063,7 +1058,6 @@ corner</string>
     <addaction name="actionLayout4"/>
    </widget>
    <addaction name="menuOpen"/>
-   <addaction name="menuHelp"/>
    <addaction name="menuView"/>
    <addaction name="menuLayout"/>
   </widget>
@@ -1505,7 +1499,7 @@ corner</string>
   </action>
   <action name="actionOpen">
    <property name="text">
-    <string>&amp;Open</string>
+    <string>&amp;Open image sequence</string>
    </property>
   </action>
   <action name="actionImage_parameters">
