@@ -308,7 +308,7 @@ void Replay::loadReplayFolder(QString dir) {
     }
     ui->replaySlider->setMinimum(0);
     ui->replaySlider->setMaximum(replayFrames.size() - 1);
-    Mat frame = imread(replayFrames[0], IMREAD_COLOR);
+    Mat frame = imread(replayFrames[0], IMREAD_COLOR|IMREAD_ANYDEPTH);
     originalImageSize.setWidth(frame.cols);
     originalImageSize.setHeight(frame.rows);
     deletedFrameNumber->setRange(1, replayFrames.size()); 
@@ -366,7 +366,7 @@ void Replay::loadFrame(int frameIndex) {
   if (isReplayable) {
     object1Replay->clear();
 
-    Mat frame = imread(replayFrames[frameIndex], IMREAD_COLOR);
+    Mat frame = imread(replayFrames[frameIndex], IMREAD_COLOR|IMREAD_ANYDEPTH);
     int scale = ui->replaySize->value();
 
     // Takes the tracking data corresponding to the replayed frame and parse data to display
@@ -624,7 +624,7 @@ void Replay::saveTrackedMovie() {
     int scale = ui->replaySize->value();
 
     for (size_t frameIndex = 0; frameIndex < replayFrames.size(); frameIndex++) {
-      Mat frame = imread(replayFrames[frameIndex], IMREAD_COLOR);
+      Mat frame = imread(replayFrames[frameIndex], IMREAD_COLOR|IMREAD_ANYDEPTH);
       // Takes the tracking data corresponding to the replayed frame and parse data to display
       // arrows on tracked objects.
       // Takes the tracking data corresponding to the replayed frame and parse data to display

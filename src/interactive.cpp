@@ -367,7 +367,7 @@ void Interactive::openFolder() {
       ui->startImage->setRange(0, framePath.size() - 1);
       ui->startImage->setValue(0);
 
-      Mat frame = imread(framePath[0], IMREAD_COLOR);
+      Mat frame = imread(framePath[0], IMREAD_COLOR|IMREAD_ANYDEPTH);
       originalImageSize.setWidth(frame.cols);
       originalImageSize.setHeight(frame.rows);
       cropedImageSize.setWidth(originalImageSize.width());
@@ -412,7 +412,7 @@ void Interactive::openFolder() {
 void Interactive::display(int index, int scale) {
   if (!framePath.empty()) {
     UMat frame;
-    imread(framePath[index], IMREAD_GRAYSCALE).copyTo(frame);
+    imread(framePath[index], IMREAD_GRAYSCALE|IMREAD_ANYDEPTH).copyTo(frame);
     vector<vector<Point>> displayContours;
     vector<vector<Point>> rejectedContours;
 
@@ -585,7 +585,7 @@ void Interactive::selectBackground() {
 
   if (dir.length()) {
     backgroundPath = dir;
-    imread(backgroundPath.toStdString(), IMREAD_GRAYSCALE).copyTo(background);
+    imread(backgroundPath.toStdString(), IMREAD_GRAYSCALE|IMREAD_ANYDEPTH).copyTo(background);
     if (background.cols == originalImageSize.width() && background.rows == originalImageSize.height()) {
       isBackground = true;
 
