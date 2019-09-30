@@ -8,9 +8,29 @@ Two main features are implemented in the software:
 
 ![alt text](docs/user/assets/interactive_detec.gif)
 
-## Installation
+## Installation stable version
 
 [Installation instructions](docs/user/installation.md)
+
+## Installation development version
+
+For Debian based distribution:
+```
+sudo apt-get install build-essential cmake mesa-common-dev
+sudo apt-get install qt5-default 
+cd fasttrack
+./dependencencies.sh opencv
+./run.sh full
+```
+
+For Arch based distribution:
+```
+sudo pacman -S cmake gcc
+sudo pacman -S qt5-base
+cd fasttrack
+./dependencencies.sh opencv
+./run.sh full
+```
 
 ## Contributing
 

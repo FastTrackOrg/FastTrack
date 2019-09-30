@@ -11,4 +11,5 @@ if [ "$1" = "opencv" ]; then
   sudo make install
   cd ../..
   rm -rf opencv
+  sudo ldconfig
 fi
