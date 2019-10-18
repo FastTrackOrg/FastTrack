@@ -9,7 +9,7 @@ Several steps have to be performed in the right order (some are mandatory, some 
 ![](assets/interactive_workflow.svg)
 
 ## Open an image sequence
-The first step of a tracking analysis is to open an image sequence. In the menu bar, click on File then Open and select the folder that contains the image sequence to analyze.
+The first step of a tracking analysis is to open an image sequence. In the menu bar, click on File then Open an image sequence and select the folder that contains the image sequence to analyze.
 ![](assets/interactive_open.gif)
 
 ## Compute the background

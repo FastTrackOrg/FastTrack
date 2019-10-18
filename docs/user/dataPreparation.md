@@ -4,9 +4,10 @@ title: Data Preparation
 sidebar_label: Data Preparation
 ---
 
-Fast Track can only analyze image sequences[^1]. The images must follow the
+FastTrack can only analyze image sequences[^1]. The images must follow the
 zeroes padding naming convention (name00000.extension,
-name00001.extension, name00002.extension …). “pgm”, “png”, “jpeg”,
+name00001.extension, name00002.extension …).
+“pgm”, “png”, “jpeg”,
 “jpg”, “tiff”, “tif”, “bmp”, “dib”, “jpe”, “jp2”, “webp”, “pbm”, “ppm”,
 “sr”, “ras”, “tif” image formats are supported.
 
@@ -23,4 +24,4 @@ an image sequence:
     -   Use [Handbrake](https://handbrake.fr/).
     -   Use [ImageJ](https://imagej.nih.gov/ij/download.html).
 
-[^1]: Movies (.avi, .mkv etc...) will be supported in the version 4.10.
+[^1]: Movies (.avi, .mkv etc...) will be supported in the version 5.0.0.

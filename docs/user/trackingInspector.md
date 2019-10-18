@@ -22,6 +22,9 @@ Several display options are available:
 ## Inspect the tracking
 The tracking can be inspected by moving the display cursor and the bottom of the panel. Automatically detected occlusions can be reviewed by clicking on the previous and next occlusion button at the top right of the display.
 
+## Annotate the tracking
+You can annotate any image of the tracking. Write your annotation in the annotate panel. You can search accross annotation with the find bar at the top of the annotate panel. All the annotation.
+
 ## Correct the tracking
 ### Swap the data of two objects
 To correct an occlusion by swapping two the data for two objects from the current image to the end of the sequence:
