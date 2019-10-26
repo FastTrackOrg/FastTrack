@@ -24,6 +24,7 @@ using namespace std;
 Replay::Replay(QWidget* parent, bool standalone, QSlider* control) : QMainWindow(parent),
                                   ui(new Ui::Replay) {
   ui->setupUi(this);
+  ui->replayDisplay->setAttribute(Qt::WA_Hover);
 
   QIcon img = QIcon(":/assets/buttons/play.png");
   ui->playReplay->setIcon(img);
@@ -530,6 +531,16 @@ bool Replay::eventFilter(QObject* target, QEvent* event) {
         correctTracking();
         object1Replay->setStyleSheet("QComboBox { background-color: white; }");
         object2Replay->setStyleSheet("QComboBox { background-color: white; }");
+      }
+    }
+
+    // Hover screen
+    if (event->type() == QEvent::HoverMove) {
+      QHoverEvent* hoverEvent = static_cast<QHoverEvent*>(event);
+      int xPix = ((double(hoverEvent->pos().x()) - 0.5 * (ui->replayDisplay->width() - resizedFrame.width())) * double(originalImageSize.width())) / double(resizedFrame.width());
+      int yPix = ((double(hoverEvent->pos().y()) - 0.5 * (ui->replayDisplay->height() - resizedFrame.height())) * double(originalImageSize.height())) / double(resizedFrame.height());
+      if (xPix > 0 && yPix > 0 && xPix < originalImageSize.width() && yPix < originalImageSize.height()) {
+        this->statusBar()->showMessage("x: " + QString::number(xPix) + "\ty: " + QString::number(yPix));
       }
     }
   }
