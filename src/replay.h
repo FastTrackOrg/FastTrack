@@ -100,6 +100,7 @@ class Replay : public QMainWindow {
   void zoomOut();
   void toggleReplayPlay();
   bool eventFilter(QObject *target, QEvent *event);
+  void updateInformation(int objectId, int imageIndex, QTableWidget *table);
   void correctTracking();
   void nextOcclusionEvent();
   void previousOcclusionEvent();

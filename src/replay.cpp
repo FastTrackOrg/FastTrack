@@ -158,6 +158,26 @@ Replay::Replay(QWidget* parent, bool standalone, QSlider* control) : QMainWindow
   });
   ui->toolBar->addAction(helpAction);
 
+  ui->toolBar->addSeparator();
+  
+  img = QIcon(":/assets/buttons/annotate.png");
+  QAction *annotAction = ui->annotationDock->toggleViewAction();
+  annotAction->setIcon(img);
+  annotAction->setStatusTip(tr("Annotation"));
+  ui->toolBar->addAction(annotAction);
+  
+  img = QIcon(":/assets/buttons/info.png");
+  QAction *optionAction = ui->optionDock->toggleViewAction();
+  optionAction->setIcon(img);
+  optionAction->setStatusTip(tr("Display Options"));
+  ui->toolBar->addAction(optionAction);
+
+  img = QIcon(":/assets/buttons/option.png");
+  QAction *infoAction = ui->infoDock->toggleViewAction();
+  infoAction->setIcon(img);
+  infoAction->setStatusTip(tr("Information"));
+  ui->toolBar->addAction(infoAction);
+
   if (!standalone) {
     ui->controls->hide();
   }
@@ -352,6 +372,12 @@ void Replay::loadReplayFolder(QString dir) {
       ui->replaySlider->setValue(index);
     });
 
+    // Information
+    connect(ui->replaySlider, &QSlider::valueChanged, [this](int index) {
+      updateInformation(ui->infoTableObject1->item(0, 0)->text().toInt(), index, ui->infoTableObject1);
+      updateInformation(ui->infoTableObject2->item(0, 0)->text().toInt(), index, ui->infoTableObject2);
+    });
+
     ui->replaySlider->setValue(1); // To force the change
     ui->replaySlider->setValue(0);
   }
@@ -517,11 +543,13 @@ bool Replay::eventFilter(QObject* target, QEvent* event) {
             object1Replay->setCurrentIndex(object1Replay->findText(QString::number(min)));
             object1Replay->setStyleSheet("QComboBox { background-color: rgb(" + QString::number(colorMap[min].x) + "," + QString::number(colorMap[min].y) + "," + QString::number(colorMap[min].z) + "); }");
             object = false;
+            updateInformation(min, ui->replaySlider->value(), ui->infoTableObject1);
           }
           else {
             object2Replay->setCurrentIndex(object2Replay->findText(QString::number(min)));
             object2Replay->setStyleSheet("QComboBox { background-color: rgb(" + QString::number(colorMap[min].x) + "," + QString::number(colorMap[min].y) + "," + QString::number(colorMap[min].z) + "); }");
             object = true;
+            updateInformation(min, ui->replaySlider->value(), ui->infoTableObject2);
           }
         }
       }
@@ -584,6 +612,21 @@ bool Replay::eventFilter(QObject* target, QEvent* event) {
     }
   }
   return false;
+}
+
+/**
+  * @brief Update the information of an object inside a table widget.
+  * @param[in] objectId The id of the object to display the data.
+  * @param[in] imageIndex The index of the image where to extracts the data.
+  * @param[in] table Pointer to a QTableWidget where to display the data.
+*/
+void Replay::updateInformation(int objectId, int imageIndex, QTableWidget* table) {
+  QMap<QString, double> infoData = trackingData->getData(imageIndex, objectId);
+  table->item(0, 0)->setText(QString::number(objectId));
+  table->item(1, 0)->setText(QString::number(trackingData->getObjectInformation(objectId)));
+  table->item(2, 0)->setText(QString::number(infoData.value("areaBody")));
+  table->item(3, 0)->setText(QString::number(infoData.value("perimeterBody")));
+  table->item(4, 0)->setText(QString::number(infoData.value("bodyExcentricity")));
 }
 
 /**

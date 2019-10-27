@@ -39,6 +39,7 @@ Data::Data(QString dataPath) {
   QVector<QString> replayTracking;
   dir = dataPath;
   maxId = 0;
+  maxFrameIndex = 0;
 
   QFile trackingFile(dir + QDir::separator() + "tracking.txt");
   if (trackingFile.exists() && trackingFile.open(QIODevice::ReadOnly)) {
@@ -60,6 +61,7 @@ Data::Data(QString dataPath) {
       QStringList dat = a.split('\t', QString::SkipEmptyParts);
       if(dat.size() != 23) break; // Checks for corrupted data
       int frameIndex = dat[21].toInt();
+      if (frameIndex > maxFrameIndex) maxFrameIndex = frameIndex;
       int id = dat[22].toInt();
       if (id > maxId) maxId = id;
       dat.removeAt(22);
@@ -122,8 +124,9 @@ QList<int> Data::getId(int imageIndex) {
 }
 
 /**
-  * @brief Gets the ids of all the objects in the frame.
-  * @arg[in] imageIndex Index of the frame.
+  * @brief Gets the ids of all the objects in several frames.
+  * @arg[in] imageIndexFirst Index of the first frame.
+  * @arg[in] imageIndexLast Index of the last frame.
   * @return List of indexes.
 */
 QList<int> Data::getId(int imageIndexFirst, int imageIndexLast) {
@@ -137,6 +140,26 @@ QList<int> Data::getId(int imageIndexFirst, int imageIndexLast) {
   std::sort(ids.begin(), ids.end());
   ids.erase(std::unique(ids.begin(), ids.end()), ids.end());
   return ids;
+}
+
+/**
+  * @brief Gets the object's information.
+  * @arg[in] objectId Id of the object.
+  * @return First appearance image index.
+*/
+int Data::getObjectInformation(int objectId) {
+  int firstAppearance;
+  for (int i = 0; i < maxFrameIndex; i++) {
+    QVector<object> objects = data.value(i);
+    for (auto &a : objects) {
+      if (a.id == objectId) {
+        firstAppearance = i;
+        goto stop;
+      }
+    }
+  }
+stop:
+  return firstAppearance;
 }
 
 /**
