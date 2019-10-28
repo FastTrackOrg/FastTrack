@@ -1042,6 +1042,7 @@ corner</string>
      <string>Fi&amp;le</string>
     </property>
     <addaction name="actionOpen"/>
+    <addaction name="actionVideo"/>
    </widget>
    <widget class="QMenu" name="menuView">
     <property name="title">
@@ -1499,7 +1500,7 @@ corner</string>
   </action>
   <action name="actionOpen">
    <property name="text">
-    <string>&amp;Open image sequence</string>
+    <string>&amp;Open an image sequence</string>
    </property>
   </action>
   <action name="actionImage_parameters">
@@ -1577,6 +1578,11 @@ corner</string>
    </property>
    <property name="text">
     <string>Layout4</string>
+   </property>
+  </action>
+  <action name="actionVideo">
+   <property name="text">
+    <string>Open a video</string>
    </property>
   </action>
  </widget>

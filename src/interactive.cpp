@@ -49,6 +49,10 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
 
   // Menu bar
   connect(ui->actionOpen, &QAction::triggered, this, &Interactive::openFolder);
+  connect(ui->actionVideo, &QAction::triggered, [this]() {
+    OpenVideo *openvideo = new OpenVideo(this);
+    openvideo->show();
+  });
   ui->menuView->addAction(ui->imageOptions->toggleViewAction());
   ui->menuView->addAction(ui->trackingOptions->toggleViewAction());
   ui->menuView->addAction(ui->controlOptions->toggleViewAction());

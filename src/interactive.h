@@ -45,6 +45,7 @@ This file is part of Fast Track.
 #include <QUrl>
 #include <QtConcurrent/QtConcurrentRun>
 #include "data.h"
+#include "openvideo.h"
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
 #include "tracking.h"
