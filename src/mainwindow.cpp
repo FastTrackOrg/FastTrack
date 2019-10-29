@@ -69,6 +69,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 
   manager->get(QNetworkRequest(QUrl("http://www.fasttrack.sh/download/FastTrack/Updates.xml")));
 
+  QWebEngineView *view = new QWebEngineView(this);
+  view->setUrl(QUrl("http://www.fasttrack.sh/soft.html"));
+  connect(view->page(), &QWebEnginePage::loadFinished, [this, view]() {
+    delete view;
+  });
+
   interactive = new Interactive(this);
   ui->tabWidget->addTab(interactive, tr("Interactive tracking"));
 

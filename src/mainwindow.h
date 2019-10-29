@@ -19,6 +19,8 @@ This file is part of Fast Track.
 #define MAINWINDOW_H
 
 #include <QByteArray>
+#include <QFile>
+#include <QWebEngineView>
 #include <QCloseEvent>
 #include <QMessageBox>
 #include <QMainWindow>
