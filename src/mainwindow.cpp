@@ -78,6 +78,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
   replay = new Replay(this);
   ui->tabWidget->addTab(replay, tr("Tracking inspector"));
 
+  trackingManager = new TrackingManager(this);
+  ui->tabWidget->addTab(trackingManager, tr("Tracking Manager"));
+  connect(interactive, &Interactive::log, trackingManager, &TrackingManager::addLogEntry);
+  connect(batch, &Batch::log, trackingManager, &TrackingManager::addLogEntry);
+
 }  // Constructor
 
 /**

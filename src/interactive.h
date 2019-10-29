@@ -20,6 +20,7 @@ This file is part of Fast Track.
 
 #include <QWidget>
 #include <QAction>
+#include <QDateTime>
 #include <QDir>
 #include <QDirIterator>
 #include <QElapsedTimer>
@@ -122,5 +123,6 @@ class Interactive : public QMainWindow {
 
  signals:
   void message(QString message);
+  void log(QMap<QString, QString> log);
 };
 #endif  // INTERACTIVE_H

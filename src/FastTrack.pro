@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui network
+QT       += core gui network webenginewidgets
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -36,6 +36,7 @@ SOURCES += \
         interactive.cpp \
         data.cpp \
         annotation.cpp \
+        trackingmanager.cpp \
 
 QMAKE_CXXFLAGS += -std=c++11 -O3 -fopenmp -g
 
@@ -54,12 +55,14 @@ HEADERS += \
         interactive.h \
         data.h \
         annotation.h \
+        trackingmanager.h
 
 
 FORMS += \
         openvideo.ui \
         mainwindow.ui \
-        replay.ui \ 
+        replay.ui \
+        trackingmanager.ui \
         batch.ui \ 
         interactive.ui \ 
 

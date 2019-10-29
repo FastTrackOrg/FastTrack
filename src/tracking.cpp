@@ -802,7 +802,13 @@ void Tracking::startProcess() {
 
     // Loads the background image is provided and check if the image has the correct size
     if (m_background.empty() && m_backgroundPath.empty()) {
-      m_background = backgroundExtraction(m_files, param_nBackground, param_methodBackground, param_methodRegistrationBackground);
+      try {
+        m_background = backgroundExtraction(m_files, param_nBackground, param_methodBackground, param_methodRegistrationBackground);
+      }
+      catch (...) {
+        emit(forceFinished());
+        return;
+      }
     }
     else if (m_background.empty()) {
       try {

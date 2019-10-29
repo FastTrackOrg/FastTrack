@@ -704,28 +704,38 @@ void Interactive::track() {
 
     QThread *thread = new QThread;
     Tracking *tracking = new Tracking(framePath, background);
+    QMap<QString, QString> *logMap = new QMap<QString, QString>;
+    logMap->insert("date", QDateTime::currentDateTime().toString());
+    logMap->insert("path", dir);
     tracking->moveToThread(thread);
 
     connect(thread, &QThread::started, tracking, &Tracking::startProcess);
-    connect(tracking, &Tracking::forceFinished, [this]() {
+    connect(tracking, &Tracking::forceFinished, [this, logMap]() {
       ui->slider->setDisabled(false);
       ui->previewButton->setDisabled(false);
       ui->trackButton->setDisabled(false);
       trackingData = new Data(dir + "/Tracking_Result");
+      logMap->insert("status", "Error");
+      emit(log(*logMap));
       message("An error occurs during the tracking.");
     });
     connect(tracking, &Tracking::progress, ui->progressBar, &QProgressBar::setValue);
-    connect(tracking, &Tracking::statistic, [this](int time) {
+    connect(tracking, &Tracking::statistic, [this, logMap](int time) {
       ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Analysis rate", Qt::MatchExactly)[0]), 1)->setText(QString::number(double(framePath.size() * 1000) / double(time)));
+      logMap->insert("time", QString::number(time));
     });
     connect(tracking, &Tracking::finished, thread, &QThread::quit);
-    connect(tracking, &Tracking::finished, this, [this]() {
+    connect(tracking, &Tracking::finished, this, [this, logMap]() {
       ui->slider->setDisabled(false);
       ui->previewButton->setDisabled(false);
       ui->trackButton->setDisabled(false);
       trackingData = new Data(dir + "/Tracking_Result");
       ui->replayButton->setChecked(true);
+      logMap->insert("status", "Done");
+      emit(log(*logMap));
     });
+      connect(tracking, &Tracking::forceFinished, thread, &QThread::quit);
+    connect(tracking, &Tracking::forceFinished, tracking, &Tracking::deleteLater);
     connect(tracking, &Tracking::finished, tracking, &Tracking::deleteLater);
     connect(thread, &QThread::finished, thread, &QThread::deleteLater);
 

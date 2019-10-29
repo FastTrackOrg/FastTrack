@@ -402,23 +402,36 @@ void Batch::startTracking() {
 
       thread = new QThread;
       tracking = new Tracking(path, backgroundPath);
+    QMap<QString, QString> *logMap = new QMap<QString, QString>;
+    logMap->insert("date", QDateTime::currentDateTime().toString());
+    logMap->insert("path", QString::fromStdString(path));
       tracking->moveToThread(thread);
 
       connect(thread, &QThread::started, tracking, &Tracking::startProcess);
       connect(tracking, &Tracking::progress, progressBar, &QProgressBar::setValue);
-      connect(tracking, &Tracking::finished, progressBar, [this, progressBar, count]() {
+    connect(tracking, &Tracking::statistic, [this, logMap](int time) {
+      logMap->insert("time", QString::number(time));
+    });
+      connect(tracking, &Tracking::finished, progressBar, [this, progressBar, count, logMap]() {
         ui->tablePath->item(currentPathCount, 4)->setText("Done");;
         progressBar->setValue(count);
         currentPathCount ++;
         emit(next());
+      logMap->insert("status", "Done");
+      emit(log(*logMap));
       });
       connect(tracking, &Tracking::finished, thread, &QThread::quit);
       connect(tracking, &Tracking::finished, tracking, &Tracking::deleteLater);
-      connect(tracking, &Tracking::forceFinished, progressBar, [this, progressBar, count]() {
+      connect(tracking, &Tracking::forceFinished, progressBar, [this, progressBar, count, logMap]() {
         ui->tablePath->item(currentPathCount, 4)->setText("Error");;
         currentPathCount ++;
         emit(next());
+      logMap->insert("status", "Error");
+      emit(log(*logMap));
       });
+    connect(tracking, &Tracking::statistic, [this, logMap](int time) {
+      logMap->insert("time", QString::number(time));
+    });
       connect(tracking, &Tracking::forceFinished, thread, &QThread::quit);
       connect(tracking, &Tracking::forceFinished, tracking, &Tracking::deleteLater);
       connect(thread, &QThread::finished, thread, &QThread::deleteLater);

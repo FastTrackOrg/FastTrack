@@ -29,6 +29,7 @@ This file is part of Fast Track.
 #include "batch.h"
 #include "interactive.h"
 #include "replay.h"
+#include "trackingmanager.h"
 #include "ui_mainwindow.h"
 
 using namespace std;
@@ -51,6 +52,7 @@ class MainWindow : public QMainWindow {
   Interactive *interactive;
   Batch *batch;
   Replay *replay;
+  TrackingManager *trackingManager;
 };
 
 #endif  // MAINWINDOW_H

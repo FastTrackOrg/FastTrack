@@ -25,6 +25,7 @@
 #include <QPushButton>
 #include <QSettings>
 #include <QShortcut>
+#include <QDateTime>
 #include <QSlider>
 #include <QSpinBox>
 #include <QString>
@@ -104,6 +105,8 @@ class Batch : public QWidget {
   * @brief Emitted when a tracking analysis is finished.
   */
   void next();
+
+  void log(QMap<QString, QString> log);
 };
 
 #endif  // BATCH_H
