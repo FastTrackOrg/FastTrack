@@ -1,5 +1,23 @@
 # FastTrack changelog
 
+## 4.9.0
+
+### Added
+- Several error message if input/output can be done.
+- Added tracking annotation, each image of a tracking analysis can be annoted.
+- Added object information in the Tracking Inspector.
+- Added the Tracking Manager to log each tracking analysis performed with FastTrack.
+- Added video compatibility.
+- Added 16 bits compatibility.
+
+### Fixed
+- Fixed some ui inconsistencies.
+- Fixed the list of object displayed in the Tracking Inspector.
+- Fixed registration method no changing in the batch tracking.
+
+### Removed
+- Removed deprecated benchmarking feature.
+
 ## 4.8.3
 
 ### Fixed
