@@ -650,7 +650,7 @@ void Interactive::getParameters() {
 */
 void Interactive::previewTracking() {
   if (!framePath.empty()) {
-    ui->progressBar->setRange(ui->startImage->value(), ui->stopImage->value() - ui->startImage->value() - 1);
+    ui->progressBar->setRange(ui->startImage->value(), ui->stopImage->value() + ui->startImage->value() - 1);
     ui->progressBar->setValue(0);
     ui->previewButton->setDisabled(true);
     ui->trackButton->setDisabled(true);
