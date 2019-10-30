@@ -44,7 +44,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
   QDir::setCurrent(QCoreApplication::applicationDirPath());
   ui->setupUi(this);
   setWindowState(Qt::WindowMaximized);
-  setWindowTitle("Fast Track");
+  setWindowTitle("FastTrack " + version );
 
   // Setup style
   QFile stylesheet(":/theme.qss");
