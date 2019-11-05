@@ -664,81 +664,79 @@ vector<Point3d> Tracking::color(int number) {
   * @brief Processes an image from an images sequence and tracks and matchs objects according to the previous image in the sequence. Takes a new image from the image sequence, substracts the background, binarises the image and crops according to the defined region of interest. Detects all the objects in the image and extracts the object features. Then matches detected objects with objects from the previous frame. This function emits a signal to display the images in the user interface.
 */
 void Tracking::imageProcessing() {
-  try {
-    // Reads the next image in the image sequence and applies the image processing workflow
-    imread(m_files[m_im], IMREAD_GRAYSCALE).copyTo(m_visuFrame);
-    if (param_registration != 0) {
-      registration(m_background, m_visuFrame, param_registration - 1);
-    }
-
-    (statusBinarisation) ? (subtract(m_background, m_visuFrame, m_binaryFrame)) : (subtract(m_visuFrame, m_background, m_binaryFrame));
-    binarisation(m_binaryFrame, 'b', param_thresh);
-
-    if (param_kernelSize != 0 && param_morphOperation != 8) {
-      Mat element = getStructuringElement(param_kernelType, Size(2 * param_kernelSize + 1, 2 * param_kernelSize + 1), Point(param_kernelSize, param_kernelSize));
-      morphologyEx(m_binaryFrame, m_binaryFrame, param_morphOperation, element);
-    }
-
-    if (m_ROI.width != 0 || m_ROI.height != 0) {
-      m_binaryFrame = m_binaryFrame(m_ROI);
-      m_visuFrame = m_visuFrame(m_ROI);
-    }
-
-    // Detects the objects and extracts  parameters
-    m_out = objectPosition(m_binaryFrame, param_minArea, param_maxArea);
-
-    // Associates the objets with the previous image
-    vector<int> identity = costFunc(m_outPrev[param_spot], m_out[param_spot], param_len, param_angle, param_weight, param_lo);
-    vector<int> occluded = findOcclusion(identity);
-
-    // Reassignes the m_out vector regarding the identities of the objects
-    for (size_t i = 0; i < m_out.size(); i++) {
-      m_out[i] = reassignment(m_outPrev[i], m_out[i], identity);
-    }
-
-    // Updates id and lost counter
-    while (m_out[0].size() - m_id.size() != 0) {
-      m_idMax++;
-      m_id.push_back(m_idMax);
-      m_lost.push_back(0);
-    }
-
-    // Draws lines and arrows on the image in the display panel
-    for (size_t l = 0; l < m_out[0].size(); l++) {
-      // Tracking data are available
-      if (find(occluded.begin(), occluded.end(), int(l)) == occluded.end()) {
-        for (auto const &a : m_out) {
-          m_savefile << a[l].x;
-          m_savefile << '\t';
-          m_savefile << a[l].y;
-          m_savefile << '\t';
-          m_savefile << a[l].z;
-          m_savefile << '\t';
-        }
-        m_savefile << m_im << '\t';
-        m_savefile << m_id[l] << '\n';
+  while (m_im < m_stopImage) {
+    try {
+      // Reads the next image in the image sequence and applies the image processing workflow
+      imread(m_files[m_im], IMREAD_GRAYSCALE).copyTo(m_visuFrame);
+      if (param_registration != 0) {
+        registration(m_background, m_visuFrame, param_registration - 1);
       }
-    }
 
-    cleaning(occluded, m_lost, m_id, m_out, param_to);
-    m_outPrev = m_out;
-    m_im++;
-    if (m_im + 1 > m_stopImage) {
+      (statusBinarisation) ? (subtract(m_background, m_visuFrame, m_binaryFrame)) : (subtract(m_visuFrame, m_background, m_binaryFrame));
+      binarisation(m_binaryFrame, 'b', param_thresh);
+
+      if (param_kernelSize != 0 && param_morphOperation != 8) {
+        Mat element = getStructuringElement(param_kernelType, Size(2 * param_kernelSize + 1, 2 * param_kernelSize + 1), Point(param_kernelSize, param_kernelSize));
+        morphologyEx(m_binaryFrame, m_binaryFrame, param_morphOperation, element);
+      }
+
+      if (m_ROI.width != 0 || m_ROI.height != 0) {
+        m_binaryFrame = m_binaryFrame(m_ROI);
+        m_visuFrame = m_visuFrame(m_ROI);
+      }
+
+      // Detects the objects and extracts  parameters
+      m_out = objectPosition(m_binaryFrame, param_minArea, param_maxArea);
+
+      // Associates the objets with the previous image
+      vector<int> identity = costFunc(m_outPrev[param_spot], m_out[param_spot], param_len, param_angle, param_weight, param_lo);
+      vector<int> occluded = findOcclusion(identity);
+
+      // Reassignes the m_out vector regarding the identities of the objects
+      for (size_t i = 0; i < m_out.size(); i++) {
+        m_out[i] = reassignment(m_outPrev[i], m_out[i], identity);
+      }
+
+      // Updates id and lost counter
+      while (m_out[0].size() - m_id.size() != 0) {
+        m_idMax++;
+        m_id.push_back(m_idMax);
+        m_lost.push_back(0);
+      }
+
+      // Draws lines and arrows on the image in the display panel
+      for (size_t l = 0; l < m_out[0].size(); l++) {
+        // Tracking data are available
+        if (find(occluded.begin(), occluded.end(), int(l)) == occluded.end()) {
+          for (auto const &a : m_out) {
+            m_savefile << a[l].x;
+            m_savefile << '\t';
+            m_savefile << a[l].y;
+            m_savefile << '\t';
+            m_savefile << a[l].z;
+            m_savefile << '\t';
+          }
+          m_savefile << m_im << '\t';
+          m_savefile << m_id[l] << '\n';
+        }
+      }
+
+      cleaning(occluded, m_lost, m_id, m_out, param_to);
+      m_outPrev = m_out;
+      m_im++;
+        emit(progress(m_im));
+    }
+    catch (...) {
       m_savefile.flush();
       m_outputFile.close();
-      emit(finished());
-      emit(statistic(timer->elapsed()));
-    }
-    else {
-      emit(progress(m_im));
-      QTimer::singleShot(0, this, SLOT(imageProcessing()));
+      emit(forceFinished());
+      break;
     }
   }
-  catch (...) {
-    m_savefile.flush();
-    m_outputFile.close();
-    emit(forceFinished());
-  }
+  m_savefile.flush();
+  m_outputFile.close();
+  emit(finished());
+  emit(statistic(timer->elapsed()));
 }
 
 /**
