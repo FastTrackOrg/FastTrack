@@ -26,6 +26,16 @@ Replay::Replay(QWidget* parent, bool standalone, QSlider* control) : QMainWindow
   ui->setupUi(this);
   ui->replayDisplay->setAttribute(Qt::WA_Hover);
 
+  // Generates a color map.
+  double a, b, c;
+  srand(time(NULL));
+  for (int j = 0; j < 5000; ++j) {
+    a = rand() % 255;
+    b = rand() % 255;
+    c = rand() % 255;
+    colorMap.push_back(Point3f(a, b, c));
+  }
+
   QIcon img = QIcon(":/assets/buttons/play.png");
   ui->playReplay->setIcon(img);
   ui->playReplay->setIconSize(QSize(ui->playReplay->width(), ui->playReplay->height()));
@@ -81,6 +91,7 @@ Replay::Replay(QWidget* parent, bool standalone, QSlider* control) : QMainWindow
     if (object1Replay->count() != 0) {
       double id = object1Replay->itemText(index).toDouble();
       updateInformation(id, ui->replaySlider->value(), ui->infoTableObject1);
+      object1Replay->setStyleSheet("QComboBox { background-color: rgb(" + QString::number(colorMap[id].x) + "," + QString::number(colorMap[id].y) + "," + QString::number(colorMap[id].z) + "); }");
     }
   });
   ui->toolBar->addWidget(object1Replay);
@@ -98,6 +109,7 @@ Replay::Replay(QWidget* parent, bool standalone, QSlider* control) : QMainWindow
     if (object2Replay->count() != 0) {
       double id = object2Replay->itemText(index).toDouble();
       updateInformation(id, ui->replaySlider->value(), ui->infoTableObject2);
+      object2Replay->setStyleSheet("QComboBox { background-color: rgb(" + QString::number(colorMap[id].x) + "," + QString::number(colorMap[id].y) + "," + QString::number(colorMap[id].z) + "); }");
     }
   });
   ui->toolBar->addWidget(object2Replay);
@@ -369,16 +381,6 @@ void Replay::loadReplayFolder(QString dir) {
       object2Replay->addItem(QString::number(a));
     }
 
-    // Generates a color map.
-    // TO REDO
-    double a, b, c;
-    srand(time(NULL));
-    for (int j = 0; j < 9000; ++j) {
-      a = rand() % 255;
-      b = rand() % 255;
-      c = rand() % 255;
-      colorMap.push_back(Point3f(a, b, c));
-    }
 
     // Load annotation file
     annotation = new Annotation(trackingDir);
@@ -568,12 +570,10 @@ bool Replay::eventFilter(QObject* target, QEvent* event) {
           int min = idList.at(std::min_element(distance.begin(), distance.end()) - distance.begin());
           if (object) {
             object1Replay->setCurrentIndex(object1Replay->findText(QString::number(min)));
-            object1Replay->setStyleSheet("QComboBox { background-color: rgb(" + QString::number(colorMap[min].x) + "," + QString::number(colorMap[min].y) + "," + QString::number(colorMap[min].z) + "); }");
             object = false;
           }
           else {
             object2Replay->setCurrentIndex(object2Replay->findText(QString::number(min)));
-            object2Replay->setStyleSheet("QComboBox { background-color: rgb(" + QString::number(colorMap[min].x) + "," + QString::number(colorMap[min].y) + "," + QString::number(colorMap[min].z) + "); }");
             object = true;
           }
         }
