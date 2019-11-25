@@ -76,8 +76,12 @@ Replay::Replay(QWidget* parent, bool standalone, QSlider* control) : QMainWindow
 
   object1Replay = new QComboBox(this);
   object1Replay->setStatusTip(tr("First selected object"));
+  connect(object1Replay, QOverload<int>::of(&QComboBox::currentIndexChanged), [this](int index) {
+    double id = object1Replay->itemText(index).toDouble();
+    updateInformation(id, ui->replaySlider->value(), ui->infoTableObject1);
+  });
   ui->toolBar->addWidget(object1Replay);
-  
+
   img = QIcon(":/assets/buttons/replace.png");
   QAction *swapAction = new QAction(img, tr("&Swap"), this);
   swapAction->setStatusTip(tr("Swap the two objects"));
@@ -86,6 +90,10 @@ Replay::Replay(QWidget* parent, bool standalone, QSlider* control) : QMainWindow
 
   object2Replay = new QComboBox(this);
   object2Replay->setStatusTip(tr("Second selected object"));
+  connect(object2Replay, QOverload<int>::of(&QComboBox::currentIndexChanged), [this](int index) {
+    double id = object2Replay->itemText(index).toDouble();
+    updateInformation(id, ui->replaySlider->value(), ui->infoTableObject2);
+  });
   ui->toolBar->addWidget(object2Replay);
   
   img = QIcon(":/assets/buttons/deleteOne.png");
@@ -544,13 +552,11 @@ bool Replay::eventFilter(QObject* target, QEvent* event) {
             object1Replay->setCurrentIndex(object1Replay->findText(QString::number(min)));
             object1Replay->setStyleSheet("QComboBox { background-color: rgb(" + QString::number(colorMap[min].x) + "," + QString::number(colorMap[min].y) + "," + QString::number(colorMap[min].z) + "); }");
             object = false;
-            updateInformation(min, ui->replaySlider->value(), ui->infoTableObject1);
           }
           else {
             object2Replay->setCurrentIndex(object2Replay->findText(QString::number(min)));
             object2Replay->setStyleSheet("QComboBox { background-color: rgb(" + QString::number(colorMap[min].x) + "," + QString::number(colorMap[min].y) + "," + QString::number(colorMap[min].z) + "); }");
             object = true;
-            updateInformation(min, ui->replaySlider->value(), ui->infoTableObject2);
           }
         }
       }
