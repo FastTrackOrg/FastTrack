@@ -167,13 +167,13 @@ Replay::Replay(QWidget* parent, bool standalone, QSlider* control) : QMainWindow
   ui->toolBar->addAction(annotAction);
   
   img = QIcon(":/assets/buttons/info.png");
-  QAction *optionAction = ui->optionDock->toggleViewAction();
+  QAction *optionAction = ui->infoDock->toggleViewAction();
   optionAction->setIcon(img);
   optionAction->setStatusTip(tr("Display Options"));
   ui->toolBar->addAction(optionAction);
 
   img = QIcon(":/assets/buttons/option.png");
-  QAction *infoAction = ui->infoDock->toggleViewAction();
+  QAction *infoAction = ui->optionDock->toggleViewAction();
   infoAction->setIcon(img);
   infoAction->setStatusTip(tr("Information"));
   ui->toolBar->addAction(infoAction);
@@ -188,7 +188,7 @@ Replay::Replay(QWidget* parent, bool standalone, QSlider* control) : QMainWindow
 
   // Keyboard shorcut
   // AZERTY keyboard shorcuts are set in the ui
-  QShortcut* wShortcut = new QShortcut(QKeySequence("w"), this);
+  //QShortcut* wShortcut = new QShortcut(QKeySequence("w"), this);
   //connect(wShortcut, &QShortcut::activated, [this](nextAction) { nextAction->triggered(); });
 
   QShortcut* qShortcut = new QShortcut(QKeySequence("q"), this);
@@ -286,6 +286,9 @@ void Replay::loadReplayFolder(QString dir) {
   // The last tracking data from the folder Tracking_Result is automatically loaded if found.
   // If the user explicitly select another Tracking_Result folder, these data are loaded.
   // Delete existing data
+
+  if (!dir.length()) return;
+
   delete annotation;
   delete trackingData;
   replayFrames.clear();
@@ -298,8 +301,6 @@ void Replay::loadReplayFolder(QString dir) {
   object = true;
   currentZoom = 1;
   memoryDir.clear();
-
-  if (!dir.length()) return;
 
   memoryDir = dir;
   QString trackingDir = dir;
@@ -738,7 +739,7 @@ void Replay::saveTrackedMovie() {
 
         if (ui->replayTrace->isChecked()) {
           vector<Point> memory;
-          for (int j = frameIndex - ui->replayTraceLength->value(); j < frameIndex; j++) {
+          for (unsigned int j = frameIndex - ui->replayTraceLength->value(); j < frameIndex; j++) {
             if (j > 0) {
               QMap<QString, double> coordinate = trackingData->getData(j, a);
               if (coordinate.contains("xBody")) {
