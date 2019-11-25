@@ -75,10 +75,13 @@ Replay::Replay(QWidget* parent, bool standalone, QSlider* control) : QMainWindow
   ui->toolBar->addSeparator();
 
   object1Replay = new QComboBox(this);
+  object1Replay->setEditable(true);
   object1Replay->setStatusTip(tr("First selected object"));
   connect(object1Replay, QOverload<int>::of(&QComboBox::currentIndexChanged), [this](int index) {
-    double id = object1Replay->itemText(index).toDouble();
-    updateInformation(id, ui->replaySlider->value(), ui->infoTableObject1);
+    if (object1Replay->count() != 0) {
+      double id = object1Replay->itemText(index).toDouble();
+      updateInformation(id, ui->replaySlider->value(), ui->infoTableObject1);
+    }
   });
   ui->toolBar->addWidget(object1Replay);
 
@@ -89,10 +92,13 @@ Replay::Replay(QWidget* parent, bool standalone, QSlider* control) : QMainWindow
   ui->toolBar->addAction(swapAction);
 
   object2Replay = new QComboBox(this);
+  object2Replay->setEditable(true);
   object2Replay->setStatusTip(tr("Second selected object"));
   connect(object2Replay, QOverload<int>::of(&QComboBox::currentIndexChanged), [this](int index) {
-    double id = object2Replay->itemText(index).toDouble();
-    updateInformation(id, ui->replaySlider->value(), ui->infoTableObject2);
+    if (object2Replay->count() != 0) {
+      double id = object2Replay->itemText(index).toDouble();
+      updateInformation(id, ui->replaySlider->value(), ui->infoTableObject2);
+    }
   });
   ui->toolBar->addWidget(object2Replay);
   
@@ -266,6 +272,18 @@ Replay::Replay(QWidget* parent, bool standalone, QSlider* control) : QMainWindow
     }
   });
   connect(ui->playReplay, &QPushButton::clicked, this, &Replay::toggleReplayPlay);
+
+  // Info tables
+  connect(ui->infoTableObject1, &QTableWidget::cellClicked, [this](int row, int col) {
+    if (row == 1 && col == 0) {
+      ui->replaySlider->setValue(ui->infoTableObject1->item(row, col)->text().toDouble());
+    }
+  });
+  connect(ui->infoTableObject2, &QTableWidget::cellClicked, [this](int row, int col) {
+    if (row == 1 && col == 0) {
+      ui->replaySlider->setValue(ui->infoTableObject2->item(row, col)->text().toDouble());
+    }
+  });
 
   annotation = new Annotation("");
   trackingData = new Data("");
