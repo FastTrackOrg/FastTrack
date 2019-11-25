@@ -1,3 +1,20 @@
+/*
+This file is part of Fast Track.
+
+    FastTrack is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    FastTrack is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with FastTrack.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <getopt.h>
@@ -10,7 +27,7 @@
 using namespace std;
 
 void help() {
-      printf (("Usage: %s [OPTION]... [FILE]...\n"));
+      printf (("Usage:  [OPTION]... [FILE]...\n"));
       fputs (("\
 Use FastTrack from the command line.\n\
 \n\
@@ -41,14 +58,14 @@ All argument are mandatory except --backPath.\n\
   --yTop                     roi y top corner\n\
   --xBottom                  roi x top bottom, set to 0 to have the full image\n\
   --yBottom                  roi y top bottom, set to 0 to have the full image\n\
-\n\ 
+\n\
   --morph                    morphological operation, 0: None, 1: Erode, 2: Dilate, 3: Open, 4: Close, 5: Gradient, 6: TopHat, 7: BlackHat, 8: HitMiss\n\
   --morphSize                size of the kernel used in the morphological operation, can be omited if no operation are performed\n\
   --morphType                type of the kernel used in the morphological operation, can be omited if no operation are performed, 0: Rect, 1: Cross, 2: Ellipse\n\
 \n\
   --path                     path to the folder where the images are stored\n\
   --backPath                 optional, path to a background image\n\
-      "), stdout);
+"), stdout);
 }
 
 int main (int argc, char **argv){
@@ -86,10 +103,9 @@ static struct option long_options[] =
   QMap<QString, QString> parameters;
   while (1) {
 
-    c = getopt_long (argc, argv, "a:b:c:d:e:f:g:h:i:j:k:l:m:n:o:p:q:r:s:t:u:v:wx", long_options, &option_index);
+    c = getopt_long (argc, argv, "a:b:c:d:e:f:g:h:i:j:k:l:m:n:o:p:q:r:s:t:u:v:w:x", long_options, &option_index);
 
     if (c == -1) {
-      help();
       break;
     }
 
