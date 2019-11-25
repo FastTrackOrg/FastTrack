@@ -29,7 +29,7 @@ Replay::Replay(QWidget* parent, bool standalone, QSlider* control) : QMainWindow
   // Generates a color map.
   double a, b, c;
   srand(time(NULL));
-  for (int j = 0; j < 5000; ++j) {
+  for (int j = 0; j < 90000; ++j) {
     a = rand() % 255;
     b = rand() % 255;
     c = rand() % 255;
@@ -327,6 +327,7 @@ void Replay::loadReplayFolder(QString dir) {
 
   if (!dir.length()) return;
 
+  ui->replaySlider->setValue(0);
   delete annotation;
   delete trackingData;
   replayFrames.clear();
