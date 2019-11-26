@@ -328,6 +328,7 @@ void Replay::loadReplayFolder(QString dir) {
   if (!dir.length()) return;
 
   ui->replaySlider->setValue(0);
+  commandStack->clear();
   delete annotation;
   delete trackingData;
   replayFrames.clear();
