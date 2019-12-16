@@ -99,6 +99,7 @@ class Interactive : public QMainWindow {
   int currentLayout;
   QMap<QString, QString> settings;
   QLabel *counterLabel;
+  QAction *replayAction;
   QString memoryDir;                 /*!< Saves the path to the last opened folder in dialog. */
   vector<String> framePath;          /*!< Path to all the image of the image sequence to display. */
   QSize resizedFrame;                /*!< Size of the resized image in the display QWidget. */

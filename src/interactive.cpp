@@ -47,6 +47,44 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   settingsFile = new QSettings("FastTrack", "Benjamin Gallois", this);
   loadSettings();
 
+  //DockWidget
+  connect(ui->imageOptions, &QDockWidget::dockLocationChanged, [this](Qt::DockWidgetArea area) {
+    switch (area) {
+      case Qt::LeftDockWidgetArea:
+        ui->optionsTab->setTabPosition(QTabWidget::West);
+        break;
+      case Qt::RightDockWidgetArea:
+        ui->optionsTab->setTabPosition(QTabWidget::East);
+        break;
+      case Qt::TopDockWidgetArea:
+        ui->optionsTab->setTabPosition(QTabWidget::South);
+        break;
+      case Qt::BottomDockWidgetArea:
+        ui->optionsTab->setTabPosition(QTabWidget::North);
+        break;
+      default:
+        ui->optionsTab->setTabPosition(QTabWidget::West);
+    }
+  });
+  connect(ui->trackingOptions, &QDockWidget::dockLocationChanged, [this](Qt::DockWidgetArea area) {
+    switch (area) {
+      case Qt::LeftDockWidgetArea:
+        ui->trackingTab->setTabPosition(QTabWidget::West);
+        break;
+      case Qt::RightDockWidgetArea:
+        ui->trackingTab->setTabPosition(QTabWidget::East);
+        break;
+      case Qt::TopDockWidgetArea:
+        ui->trackingTab->setTabPosition(QTabWidget::South);
+        break;
+      case Qt::BottomDockWidgetArea:
+        ui->trackingTab->setTabPosition(QTabWidget::North);
+        break;
+      default:
+        ui->optionsTab->setTabPosition(QTabWidget::West);
+    }
+  });
+
   // Menu bar
   connect(ui->actionOpen, &QAction::triggered, this, &Interactive::openFolder);
   connect(ui->actionVideo, &QAction::triggered, [this]() {
@@ -56,6 +94,20 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   ui->menuView->addAction(ui->imageOptions->toggleViewAction());
   ui->menuView->addAction(ui->trackingOptions->toggleViewAction());
   ui->menuView->addAction(ui->controlOptions->toggleViewAction());
+
+  replayAction = new QAction(tr("Tracking replay"), this);
+  replayAction->setCheckable(true);
+  connect(replayAction, &QAction::toggled, [this](bool isChecked) {
+    if (isChecked) {
+      ui->interactiveTab->addTab(replay, tr("Replay"));
+      replay->loadReplayFolder(dir);
+      ui->interactiveTab->setCurrentIndex(1);
+    }
+    else {
+      ui->interactiveTab->removeTab(1);
+    }
+  });
+  ui->menuView->addAction(replayAction);
 
   connect(ui->slider, &QSlider::valueChanged, [this](const int &newValue) {
     display(newValue);
@@ -214,7 +266,7 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   connect(ui->interactiveTab, &QTabWidget::tabCloseRequested, [this](int index) {
     if (index != 0) {
       ui->interactiveTab->removeTab(index);
-      ui->replayButton->setChecked(false);
+      replayAction->setChecked(false);
     }
   });
   connect(ui->interactiveTab, &QTabWidget::currentChanged, [this](int index) {
@@ -222,16 +274,6 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
       int frame = ui->slider->value();
       replay->loadReplayFolder(dir);
       ui->slider->setValue(frame);
-    }
-  });
-  connect(ui->replayButton, &QPushButton::toggled, [this](bool isChecked) {
-    if (isChecked) {
-      ui->interactiveTab->addTab(replay, tr("Replay"));
-      replay->loadReplayFolder(dir);
-      ui->interactiveTab->setCurrentIndex(1);
-    }
-    else {
-      ui->interactiveTab->removeTab(1);
     }
   });
 
@@ -324,8 +366,9 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
 */
 void Interactive::openFolder() {
   // Resets the class members
+  replayAction->setChecked(false);
   isBackground = false;
-  ui->replayButton->setChecked(false);
+  ui->interactiveTab->removeTab(1);
   trackingData = new Data("");
   memoryDir.clear();
   framePath.clear();
@@ -654,7 +697,7 @@ void Interactive::previewTracking() {
     ui->progressBar->setValue(0);
     ui->previewButton->setDisabled(true);
     ui->trackButton->setDisabled(true);
-    ui->replayButton->setChecked(false);
+    replayAction->setChecked(false);
 
     QThread *thread = new QThread;
     Tracking *tracking = new Tracking(framePath, background, ui->startImage->value(), ui->startImage->value() + ui->stopImage->value());
@@ -677,7 +720,12 @@ void Interactive::previewTracking() {
       ui->previewButton->setDisabled(false);
       ui->trackButton->setDisabled(false);
       trackingData = new Data(dir + "/Tracking_Result");
-      ui->replayButton->setChecked(true);
+      replayAction->setChecked(true);
+    });
+    connect(tracking, &Tracking::forceFinished, this, [this]() {
+      ui->slider->setDisabled(false);
+      ui->previewButton->setDisabled(false);
+      ui->trackButton->setDisabled(false);
     });
     connect(tracking, &Tracking::finished, thread, &QThread::quit);
     connect(tracking, &Tracking::finished, tracking, &Tracking::deleteLater);
@@ -700,7 +748,7 @@ void Interactive::track() {
     ui->progressBar->setValue(0);
     ui->previewButton->setDisabled(true);
     ui->trackButton->setDisabled(true);
-    ui->replayButton->setChecked(false);
+    replayAction->setChecked(false);
 
     QThread *thread = new QThread;
     Tracking *tracking = new Tracking(framePath, background);
@@ -730,11 +778,20 @@ void Interactive::track() {
       ui->previewButton->setDisabled(false);
       ui->trackButton->setDisabled(false);
       trackingData = new Data(dir + "/Tracking_Result");
-      ui->replayButton->setChecked(true);
+      replayAction->setChecked(true);
       logMap->insert("status", "Done");
       emit(log(*logMap));
     });
-      connect(tracking, &Tracking::forceFinished, thread, &QThread::quit);
+    connect(tracking, &Tracking::forceFinished, this, [this, logMap]() {
+      ui->slider->setDisabled(false);
+      ui->previewButton->setDisabled(false);
+      ui->trackButton->setDisabled(false);
+      trackingData = new Data(dir + "/Tracking_Result");
+      replayAction->setChecked(true);
+      logMap->insert("status", "Error");
+      emit(log(*logMap));
+    });
+    connect(tracking, &Tracking::forceFinished, thread, &QThread::quit);
     connect(tracking, &Tracking::forceFinished, tracking, &Tracking::deleteLater);
     connect(tracking, &Tracking::finished, tracking, &Tracking::deleteLater);
     connect(thread, &QThread::finished, thread, &QThread::deleteLater);
