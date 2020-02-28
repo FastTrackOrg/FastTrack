@@ -329,8 +329,6 @@ void Replay::loadReplayFolder(QString dir) {
 
   ui->replaySlider->setValue(0);
   commandStack->clear();
-  delete annotation;
-  delete trackingData;
   replayFrames.clear();
   occlusionEvents.clear();
   object1Replay->clear();
@@ -368,6 +366,8 @@ void Replay::loadReplayFolder(QString dir) {
     if (replayFrames.empty()) {
       return;
     }
+    delete annotation;
+    delete trackingData;
     ui->replaySlider->setMinimum(0);
     ui->replaySlider->setMaximum(replayFrames.size() - 1);
     Mat frame = imread(replayFrames[0], IMREAD_COLOR|IMREAD_ANYDEPTH);
