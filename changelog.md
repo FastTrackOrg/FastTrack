@@ -1,5 +1,18 @@
 # FastTrack changelog
 
+## 4.9.1
+
+### Changed
+- Changed ui design in the Interactive panel.
+- Performance optimization
+- Added fasttrack-cli (not included in fasttrack-gui release)
+
+### Added
+- Added online message display at start-up if necessary
+
+### Fixed
+- Ui error that crash the program when opening new tracking analysis in the Replay panel.
+
 ## 4.9.0
 
 ### Added
