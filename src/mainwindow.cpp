@@ -58,16 +58,34 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
   connect(manager, &QNetworkAccessManager::finished, [this](QNetworkReply *reply) {
     QByteArray downloadedData = reply->readAll();
     reply->deleteLater();
-    QByteArray lastVersion = downloadedData.mid(downloadedData.indexOf("</Version>") - 5, 5);
+
+#ifdef Q_OS_UNIX
+    QByteArray lastVersion = downloadedData.mid(downloadedData.indexOf("lin") + 4, 5);
+#elif defined(Q_OS_WIN32)
+    QByteArray lastVersion = downloadedData.mid(downloadedData.indexOf("win") + 4, 5);
+#elif defined(Q_OS_MAC)
+    QByteArray lastVersion = downloadedData.mid(downloadedData.indexOf("mac") + 4, 5);
+#else
+    QByteArray lastVersion = "unknown version";
+#endif
+
+    QByteArray message = downloadedData.mid(downloadedData.indexOf("message") + 7, downloadedData.indexOf("!message") - downloadedData.indexOf("message") - 7);
+    QByteArray warning = downloadedData.mid(downloadedData.indexOf("warning") + 7, downloadedData.indexOf("!warning") - downloadedData.indexOf("warning") - 7);
+
     if (lastVersion != version) {
       QMessageBox msgBox;
       msgBox.setTextFormat(Qt::RichText);
-      msgBox.setText("FastTrack version " + lastVersion + " is available! <br> Please update. <br> <a href='http://www.fasttrack.sh/UserManual/docs/installation/#update'>Need help to update?</a>");
+      msgBox.setText("FastTrack version " + lastVersion + " is available! <br> Please update. <br> <a href='http://www.fasttrack.sh/UserManual/docs/installation/#update'>Need help to update?</a> <br>" + message + "<br>" + warning);
+      msgBox.exec();
+    }
+    else if (!warning.isEmpty()) {
+      QMessageBox msgBox;
+      msgBox.setText(warning);
       msgBox.exec();
     }
   });
 
-  manager->get(QNetworkRequest(QUrl("http://www.fasttrack.sh/download/FastTrack/Updates.xml")));
+  manager->get(QNetworkRequest(QUrl("http://www.fasttrack.sh/download/FastTrack/platforms.txt")));
 
   QWebEngineView *view = new QWebEngineView(this);
   view->setUrl(QUrl("http://www.fasttrack.sh/soft.html"));

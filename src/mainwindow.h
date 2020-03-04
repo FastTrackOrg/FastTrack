@@ -27,6 +27,7 @@ This file is part of Fast Track.
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
+#include <QSysInfo>
 #include <QUrl>
 #include "batch.h"
 #include "interactive.h"
