@@ -34,7 +34,7 @@ unix:!macx {
 
 win32 {
   CONFIG += c++latest
-  LIBS += -LC:\opencv_build\install\x86\vc15\lib -lopencv_core410d -lopencv_imgproc410d -lopencv_highgui410d -lopencv_imgcodecs410d -lopencv_videoio410d -lopencv_video410d -lopencv_calib3      d410d -lopencv_photo410d -lopencv_features2d410d
+  LIBS += -LC:\opencv_build\install\x86\vc15\lib -lopencv_core410d -lopencv_imgproc410d -lopencv_highgui410d -lopencv_imgcodecs410d -lopencv_videoio410d -lopencv_video410d -lopencv_calib3d410d -lopencv_photo410d -lopencv_features2d410d
   INCLUDEPATH += C:\opencv\build\include
   DEPENDPATH += C:\opencv\build\include
 }
