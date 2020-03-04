@@ -37,10 +37,10 @@ All argument are mandatory except --backPath.\n\
 "), stdout);
       fputs (("\
   --maxArea                  maximal area of objects\n\
-  --minArea                  maximal area of objects\n\
+  --minArea                  minimal area of objects\n\
 \n\
   --lightBack                is the background light? 0: Yes, 1: No\n\
-  --thresh                   binary threshold\n\
+  --thresh                   binary threshold, if lightBack is set to 0 (resp. 1), pixels with values less (resp. more) than thresh are considered to belong to an object\n\
    --reg                     registration method, 0: None, 1: Simple, 2: ECC, 3: Features\n\
 \n\
   --spot                     part of the object that features is used for the matching, 0: head, 1: tail, 2: body\n\
@@ -54,10 +54,10 @@ All argument are mandatory except --backPath.\n\
   --methBack                 method to compute the background. 0: min, 1: max, 2: average\n\
   --regBack                  registration method to compute the background. 0: None, 1: Simple, 2: ECC, 3: Features\n\
 \n\
-  --xTop                     roi x top corner\n\
-  --yTop                     roi y top corner\n\
-  --xBottom                  roi x top bottom, set to 0 to have the full image\n\
-  --yBottom                  roi y top bottom, set to 0 to have the full image\n\
+  --xTop                     roi x top corner (0:width-1)\n\
+  --yTop                     roi y top corner (0:height-1)\n\
+  --xBottom                  roi x top corner (0:xTop-1), set to 0 to avoid cropping\n\
+  --yBottom                  roi y top corner (0:yTop-1), set to 0 to avoid cropping\n\
 \n\
   --morph                    morphological operation, 0: None, 1: Erode, 2: Dilate, 3: Open, 4: Close, 5: Gradient, 6: TopHat, 7: BlackHat, 8: HitMiss\n\
   --morphSize                size of the kernel used in the morphological operation, can be omited if no operation are performed\n\
