@@ -62,4 +62,4 @@ sudo apt-get dist-upgrade
 ```
 
 4. For Mac
-The FastTrack App currently not support the automatic update. Replace the current App with the latest AppImage released.
+The FastTrack App currently not support the automatic update. Replace the current App with the latest App released.

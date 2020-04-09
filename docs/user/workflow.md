@@ -1,20 +1,12 @@
 ---
 id: workflow
-title: Workflow
+title: Find the right workflow
 sidebar_label: Workflow
 ---
 
-## Find your workflow
-
-### I have very different movies to track  
-
-* Open an image sequence to track in the Interactive panel. It is easy to determining the right set of parameters with the interactive environment. Preview the tracking on a subset of the image sequence until the right set of parameters is found.You can use the Tracking Inspector panel to see the result of the preview for more details.
-* Each analysis can be reviewed afterward with the tracking inspector.
+### I have very different movies to track 
+In this case, the best way to use FastTrack is the **Interactive** panel. You can easily find the right set of parameters for each movie with the help of the interactive environment.
 
 
-## I have a large amount of similar movie
-
-* Open an image sequence to track in the Interactive panel. It is easy to determining the right set of parameters with the interactive environment. Preview the tracking on a subset of the image sequence until the right set of parameters is found.You can use the Tracking Inspector panel to see the result of the preview for more details.
-* In the Batch tracking panel, open the previously analyzed image sequence with the Auto Load Background and Parameters ticked. It will load the parameters set in the parameters table.
-* You can now open all the movie similar to the first one that you want to track and click Start tracking.
-* Each analysis can be reviewed afterward with the tracking inspector.
+### I have a large number of similar movies
+In this case, it is best to use the **Interactive** panel in conjunction with the **Batch** panel. First, find the right set of parameters for a typical movie with the interactive tool. Then you can track the rest of the movies using the batch tool with this set of parameters.

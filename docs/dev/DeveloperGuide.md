@@ -6,7 +6,8 @@
 
 ## Introduction
 
-Fast Track is developed to be embedded in existing C++/Qt projects. It can also be adapted to every project by re-implementing the existing software.
+FastTrack is developed to be embedded in existing C++/Qt projects. It can also be adapted to every project by re-implementing the existing software.
+**Note:** more recent information are available at [1](https://blog.gallois.cc/Qt/opencv-qt-mac/) and [2](https://blog.gallois.cc/Qt/opencv-qt-win/) for Windows systems.
 
 ## Installation of the development environment
 
@@ -169,9 +170,9 @@ RESOURCES += resources.qrc
 
 
 
-## Adapt Fast Track for our project
+## Adapt FastTrack for our project
 
-To adapt Fast Track for our project, you must re-implement the **startProcess()** and **imageAnalysis()** method from the Tracking class with our own image analysis workflow.
+To adapt FastTrack for our project, you must re-implement the **startProcess()** and **imageAnalysis()** method from the Tracking class with our own image analysis workflow.
 
 ### startProcess() method
 
@@ -232,11 +233,11 @@ thread->start(); // Starts the tracking analysis
 
 The tracking analysis will be running in the thread and destroy itself at the end.
 
-### Real-time tracking (not fully supported in 4.0.0 version)
+### Real-time tracking
 
-Fast Track supports live tracking analysis. Be sure to test the program on a video before to see if the analysis frame rate is lower or equal to the tracking analysis frame rate.
+FastTrack supports live tracking analysis. Be sure to test the program on a video before to see if the analysis frame rate is lower or equal to the tracking analysis frame rate.
 
-Creates an acquisition image thread with an object Camera that sends a signal newImage(UMat) when a new image is available. 
+Create an acquisition image thread with an object Camera that sends a signal newImage(UMat) when a new image is available. 
 
 ```c++
 thread = new QThread; // Creates a new QThread
@@ -255,7 +256,6 @@ connect(thread, &QThread::finished, thread, &QThread::deleteLater); // Thread wi
 thread->start(); // Starts the tracking analysis
 ```
 
-Note: real-time tracking is not fully supported and tested in version 4.0.0. It will be supported in the 4.1.0 version.
 
 ## Generate documentation
 
@@ -277,4 +277,4 @@ FastTrack have a test script that allows to test the code after changes. To use 
 
 
 
-Revised 2019/01/10
+Revised 2020/03/19
