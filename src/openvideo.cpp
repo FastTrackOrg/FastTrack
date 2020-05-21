@@ -108,4 +108,3 @@ void OpenVideo::createImageSequence(QString pathVid, QProgressBar *bar) {
   }
   bar->setValue(maxIndex);
 }
-

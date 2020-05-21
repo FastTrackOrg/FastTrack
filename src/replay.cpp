@@ -22,7 +22,7 @@ using namespace std;
 */
 
 Replay::Replay(QWidget* parent, bool standalone, QSlider* control) : QMainWindow(parent),
-                                  ui(new Ui::Replay) {
+                                                                     ui(new Ui::Replay) {
   ui->setupUi(this);
   ui->replayDisplay->setAttribute(Qt::WA_Hover);
 
@@ -41,14 +41,14 @@ Replay::Replay(QWidget* parent, bool standalone, QSlider* control) : QMainWindow
   ui->playReplay->setIconSize(QSize(ui->playReplay->width(), ui->playReplay->height()));
 
   img = QIcon(":/assets/buttons/open.png");
-  QAction *openAction = new QAction(img, tr("&Open"), this);
+  QAction* openAction = new QAction(img, tr("&Open"), this);
   openAction->setShortcuts(QKeySequence::Open);
   openAction->setStatusTip(tr("Open a tracked movie"));
   connect(openAction, &QAction::triggered, this, &Replay::openReplayFolder);
   ui->toolBar->addAction(openAction);
 
   img = QIcon(":/assets/buttons/refresh.png");
-  QAction *refreshAction = new QAction(img, tr("&Refresh"), this);
+  QAction* refreshAction = new QAction(img, tr("&Refresh"), this);
   refreshAction->setStatusTip(tr("Refresh a tracked movie"));
   connect(refreshAction, &QAction::triggered, [this]() {
     loadReplayFolder(memoryDir);
@@ -56,14 +56,14 @@ Replay::Replay(QWidget* parent, bool standalone, QSlider* control) : QMainWindow
   ui->toolBar->addAction(refreshAction);
 
   img = QIcon(":/assets/buttons/save.png");
-  QAction *exportAction = new QAction(img, tr("&Export"), this);
+  QAction* exportAction = new QAction(img, tr("&Export"), this);
   exportAction->setStatusTip(tr("Export the tracked movie"));
   connect(exportAction, &QAction::triggered, this, &Replay::saveTrackedMovie);
   ui->toolBar->addAction(exportAction);
 
   commandStack = new QUndoStack(this);
   img = QIcon(":/assets/buttons/undo.png");
-  QAction *undoAction = commandStack->createUndoAction(this, tr("&Undo"));
+  QAction* undoAction = commandStack->createUndoAction(this, tr("&Undo"));
   undoAction->setIcon(img);
   undoAction->setShortcuts(QKeySequence::Undo);
   undoAction->setStatusTip(tr("Undo"));
@@ -73,7 +73,7 @@ Replay::Replay(QWidget* parent, bool standalone, QSlider* control) : QMainWindow
   ui->toolBar->addAction(undoAction);
 
   img = QIcon(":/assets/buttons/redo.png");
-  QAction *redoAction = commandStack->createRedoAction(this, tr("&Redo"));
+  QAction* redoAction = commandStack->createRedoAction(this, tr("&Redo"));
   redoAction->setIcon(img);
   redoAction->setShortcuts(QKeySequence::Redo);
   redoAction->setStatusTip(tr("Redo"));
@@ -97,7 +97,7 @@ Replay::Replay(QWidget* parent, bool standalone, QSlider* control) : QMainWindow
   ui->toolBar->addWidget(object1Replay);
 
   img = QIcon(":/assets/buttons/replace.png");
-  QAction *swapAction = new QAction(img, tr("&Swap"), this);
+  QAction* swapAction = new QAction(img, tr("&Swap"), this);
   swapAction->setStatusTip(tr("Swap the two objects"));
   connect(swapAction, &QAction::triggered, this, &Replay::correctTracking);
   ui->toolBar->addAction(swapAction);
@@ -113,7 +113,7 @@ Replay::Replay(QWidget* parent, bool standalone, QSlider* control) : QMainWindow
     }
   });
   ui->toolBar->addWidget(object2Replay);
-  
+
   img = QIcon(":/assets/buttons/deleteOne.png");
   QAction* deleteOneAction = new QAction(img, tr("&Delete"), this);
   deleteOneAction->setShortcut(QKeySequence("f"));
@@ -155,7 +155,7 @@ Replay::Replay(QWidget* parent, bool standalone, QSlider* control) : QMainWindow
   connect(ui->replaySlider, &QSlider::valueChanged, [this]() {
     deletedFrameNumber->setMaximum(replayFrames.size() - ui->replaySlider->value());
     deletedFrameNumber->setValue(replayFrames.size() - ui->replaySlider->value());
-    }); 
+  });
   deletedFrameFocus = new QShortcut(QKeySequence("c"), this);
   connect(deletedFrameFocus, &QShortcut::activated, deletedFrameNumber, static_cast<void (QSpinBox::*)(void)>(&QSpinBox::setFocus));
   connect(deletedFrameFocus, &QShortcut::activated, deletedFrameNumber, &QSpinBox::selectAll);
@@ -163,19 +163,19 @@ Replay::Replay(QWidget* parent, bool standalone, QSlider* control) : QMainWindow
   ui->toolBar->addWidget(deletedFrameNumber);
 
   img = QIcon(":/assets/buttons/previous.png");
-  QAction *previousAction = new QAction(img, tr("&Previous"), this);
+  QAction* previousAction = new QAction(img, tr("&Previous"), this);
   previousAction->setStatusTip(tr("Previous occlusion"));
   connect(previousAction, &QAction::triggered, this, &Replay::previousOcclusionEvent);
   ui->toolBar->addAction(previousAction);
 
   img = QIcon(":/assets/buttons/next.png");
-  QAction *nextAction = new QAction(img, tr("&Next"), this);
+  QAction* nextAction = new QAction(img, tr("&Next"), this);
   nextAction->setStatusTip(tr("Next occlusion"));
   connect(nextAction, &QAction::triggered, this, &Replay::nextOcclusionEvent);
   ui->toolBar->addAction(nextAction);
 
   img = QIcon(":/assets/buttons/help.png");
-  QAction *helpAction = new QAction(img, tr("&Help"), this);
+  QAction* helpAction = new QAction(img, tr("&Help"), this);
   helpAction->setStatusTip(tr("Help"));
   connect(helpAction, &QAction::triggered, [this]() {
     QMessageBox helpBox(this);
@@ -185,21 +185,21 @@ Replay::Replay(QWidget* parent, bool standalone, QSlider* control) : QMainWindow
   ui->toolBar->addAction(helpAction);
 
   ui->toolBar->addSeparator();
-  
+
   img = QIcon(":/assets/buttons/annotate.png");
-  QAction *annotAction = ui->annotationDock->toggleViewAction();
+  QAction* annotAction = ui->annotationDock->toggleViewAction();
   annotAction->setIcon(img);
   annotAction->setStatusTip(tr("Annotation"));
   ui->toolBar->addAction(annotAction);
-  
+
   img = QIcon(":/assets/buttons/info.png");
-  QAction *optionAction = ui->infoDock->toggleViewAction();
+  QAction* optionAction = ui->infoDock->toggleViewAction();
   optionAction->setIcon(img);
   optionAction->setStatusTip(tr("Display Options"));
   ui->toolBar->addAction(optionAction);
 
   img = QIcon(":/assets/buttons/option.png");
-  QAction *infoAction = ui->optionDock->toggleViewAction();
+  QAction* infoAction = ui->optionDock->toggleViewAction();
   infoAction->setIcon(img);
   infoAction->setStatusTip(tr("Information"));
   ui->toolBar->addAction(infoAction);
@@ -225,7 +225,7 @@ Replay::Replay(QWidget* parent, bool standalone, QSlider* control) : QMainWindow
 
   QShortcut* dShortcut = new QShortcut(QKeySequence("d"), this);
   connect(dShortcut, &QShortcut::activated, [this]() { ui->replaySlider->setValue(ui->replaySlider->value() + 1); });
-  
+
   ui->replayDisplay->installEventFilter(this);
   ui->scrollArea->viewport()->installEventFilter(this);
 
@@ -249,18 +249,18 @@ Replay::Replay(QWidget* parent, bool standalone, QSlider* control) : QMainWindow
   connect(ui->arrowBox, static_cast<void (QComboBox::*)(int)>(&QComboBox::activated), [this]() {
     loadFrame(ui->replaySlider->value());
   });
-  
+
   connect(ui->replayTrace, &QCheckBox::stateChanged, [this]() {
     loadFrame(ui->replaySlider->value());
   });
   connect(ui->replayTraceLength, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [this]() {
     loadFrame(ui->replaySlider->value());
   });
-  
+
   connect(ui->replayNumbers, &QCheckBox::stateChanged, [this]() {
     loadFrame(ui->replaySlider->value());
   });
-  
+
   connect(ui->replaySize, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [this]() {
     loadFrame(ui->replaySlider->value());
   });
@@ -309,7 +309,6 @@ Replay::~Replay() {
   * @brief Opens a dialogue to select a folder.
 */
 void Replay::openReplayFolder() {
-
   QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"), memoryDir, QFileDialog::ShowDirsOnly);
 
   loadReplayFolder(dir);
@@ -370,11 +369,11 @@ void Replay::loadReplayFolder(QString dir) {
     delete trackingData;
     ui->replaySlider->setMinimum(0);
     ui->replaySlider->setMaximum(replayFrames.size() - 1);
-    Mat frame = imread(replayFrames[0], IMREAD_COLOR|IMREAD_ANYDEPTH);
+    Mat frame = imread(replayFrames[0], IMREAD_COLOR | IMREAD_ANYDEPTH);
     originalImageSize.setWidth(frame.cols);
     originalImageSize.setHeight(frame.rows);
-    deletedFrameNumber->setRange(1, replayFrames.size()); 
-    deletedFrameNumber->setValue(replayFrames.size()); 
+    deletedFrameNumber->setRange(1, replayFrames.size());
+    deletedFrameNumber->setValue(replayFrames.size());
     isReplayable = true;
 
     trackingData = new Data(trackingDir);
@@ -382,7 +381,6 @@ void Replay::loadReplayFolder(QString dir) {
     for (auto const& a : ids) {
       object2Replay->addItem(QString::number(a));
     }
-
 
     // Load annotation file
     annotation = new Annotation(trackingDir);
@@ -394,11 +392,11 @@ void Replay::loadReplayFolder(QString dir) {
       annotation->write(index, text);
     });
     connect(ui->findLine, &QLineEdit::textEdited, annotation, &Annotation::find);
-    connect(ui->findNext, &QPushButton::pressed, annotation, [this](){
+    connect(ui->findNext, &QPushButton::pressed, annotation, [this]() {
       int index = annotation->next();
       ui->replaySlider->setValue(index);
     });
-    connect(ui->findPrev, &QPushButton::pressed, annotation, [this](){
+    connect(ui->findPrev, &QPushButton::pressed, annotation, [this]() {
       int index = annotation->prev();
       ui->replaySlider->setValue(index);
     });
@@ -409,7 +407,7 @@ void Replay::loadReplayFolder(QString dir) {
       updateInformation(ui->infoTableObject2->item(0, 0)->text().toInt(), index, ui->infoTableObject2);
     });
 
-    ui->replaySlider->setValue(1); // To force the change
+    ui->replaySlider->setValue(1);  // To force the change
     ui->replaySlider->setValue(0);
   }
   catch (...) {
@@ -424,7 +422,7 @@ void Replay::loadFrame(int frameIndex) {
   if (isReplayable) {
     object1Replay->clear();
 
-    Mat frame = imread(replayFrames[frameIndex], IMREAD_COLOR|IMREAD_ANYDEPTH);
+    Mat frame = imread(replayFrames[frameIndex], IMREAD_COLOR | IMREAD_ANYDEPTH);
     int scale = ui->replaySize->value();
 
     // Takes the tracking data corresponding to the replayed frame and parse data to display
@@ -665,7 +663,7 @@ void Replay::correctTracking() {
     int firstObject = object1Replay->currentText().toInt();
     int secondObject = object2Replay->currentText().toInt();
     int start = ui->replaySlider->value();
-    SwapData *swap = new SwapData(firstObject, secondObject, start, trackingData);
+    SwapData* swap = new SwapData(firstObject, secondObject, start, trackingData);
     commandStack->push(swap);
     loadFrame(ui->replaySlider->value());
   }
@@ -705,7 +703,7 @@ void Replay::saveTrackedMovie() {
     int scale = ui->replaySize->value();
 
     for (size_t frameIndex = 0; frameIndex < replayFrames.size(); frameIndex++) {
-      Mat frame = imread(replayFrames[frameIndex], IMREAD_COLOR|IMREAD_ANYDEPTH);
+      Mat frame = imread(replayFrames[frameIndex], IMREAD_COLOR | IMREAD_ANYDEPTH);
       // Takes the tracking data corresponding to the replayed frame and parse data to display
       // arrows on tracked objects.
       // Takes the tracking data corresponding to the replayed frame and parse data to display

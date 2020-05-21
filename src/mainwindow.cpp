@@ -44,7 +44,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
   QDir::setCurrent(QCoreApplication::applicationDirPath());
   ui->setupUi(this);
   setWindowState(Qt::WindowMaximized);
-  setWindowTitle("FastTrack " + version );
+  setWindowTitle("FastTrack " + version);
 
   // Setup style
   QFile stylesheet(":/theme.qss");
@@ -129,4 +129,3 @@ void MainWindow::closeEvent(QCloseEvent *event) {
 MainWindow::~MainWindow() {
   delete ui;
 }
-

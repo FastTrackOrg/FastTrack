@@ -20,6 +20,7 @@ This file is part of Fast Track.
 #include <math.h>
 #include <stdlib.h>
 #include <time.h>
+#include <QDate>
 #include <QDebug>
 #include <QDir>
 #include <QDirIterator>
@@ -27,7 +28,6 @@ This file is part of Fast Track.
 #include <QFile>
 #include <QFileInfo>
 #include <QList>
-#include <QDate>
 #include <QMap>
 #include <QMessageBox>
 #include <QObject>
@@ -40,6 +40,8 @@ This file is part of Fast Track.
 #include <fstream>
 #include <iostream>
 #include <numeric>
+#include <opencv2/calib3d.hpp>
+#include <opencv2/core/types.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/video/tracking.hpp>
@@ -47,8 +49,6 @@ This file is part of Fast Track.
 #include <tuple>
 #include <utility>
 #include "opencv2/features2d/features2d.hpp"
-#include <opencv2/calib3d.hpp>
-#include <opencv2/core/types.hpp>
 
 using namespace cv;
 using namespace std;
@@ -79,29 +79,29 @@ class Tracking : public QObject {
   string m_backgroundPath; /*!< Path to an image background. */
   int m_displayTime;       /*!< Binary image CV_8U. */
 
-  int param_n;                       /*!< Number of objects. */
-  int param_maxArea;                 /*!< Maximal area of an object. */
-  int param_minArea;                 /*!< Minimal area of an object. */
-  int param_spot;                    /*!< Which spot parameters are used to computes the cost function. 0: head, 1: tail, 2: body. */
-  double param_len;                  /*!< Maximal length travelled by an object between two images. */
-  double param_angle;                /*!< Maximal change in direction of an object between two images. */
-  double param_weight;               /*!< Weight between distance and direction in the cost function.  */
-  double param_lo;                   /*!< Maximal distance allowed by an object to travel during an occlusion event. */
-  double param_to;                   /*!< Maximal time. */
-  int param_arrowSize;               /*!< Size of the arrow in the displayed image. */
-  int param_thresh;                  /*!< Value of the threshold to binarize the image. */
-  double param_nBackground;          /*!< Number of images to average to compute the background. */
-  int param_methodBackground;        /*!< The method used to compute the background. */
+  int param_n;                            /*!< Number of objects. */
+  int param_maxArea;                      /*!< Maximal area of an object. */
+  int param_minArea;                      /*!< Minimal area of an object. */
+  int param_spot;                         /*!< Which spot parameters are used to computes the cost function. 0: head, 1: tail, 2: body. */
+  double param_len;                       /*!< Maximal length travelled by an object between two images. */
+  double param_angle;                     /*!< Maximal change in direction of an object between two images. */
+  double param_weight;                    /*!< Weight between distance and direction in the cost function.  */
+  double param_lo;                        /*!< Maximal distance allowed by an object to travel during an occlusion event. */
+  double param_to;                        /*!< Maximal time. */
+  int param_arrowSize;                    /*!< Size of the arrow in the displayed image. */
+  int param_thresh;                       /*!< Value of the threshold to binarize the image. */
+  double param_nBackground;               /*!< Number of images to average to compute the background. */
+  int param_methodBackground;             /*!< The method used to compute the background. */
   int param_methodRegistrationBackground; /*!< The method used to register the images for the background. */
-  int param_registration; /*!< Method of registration. */
-  int param_x1;                      /*!< Top x corner of the region of interest. */
-  int param_y1;                      /*!< Top y corner of the region of interest. */
-  int param_x2;                      /*!< Bottom x corner of the region of interest. */
-  int param_y2;                      /*!< Bottom y corner of the region of interest. */
-  int param_kernelSize;              /*!< Size of the kernel of the morphological operation. */
-  int param_kernelType;              /*!< Type of the kernel of the morphological operation. */
-  int param_morphOperation;              /*!< Type of the morphological operation. */
-  QMap<QString, QString> parameters; /*!< map of all the parameters for the tracking. */
+  int param_registration;                 /*!< Method of registration. */
+  int param_x1;                           /*!< Top x corner of the region of interest. */
+  int param_y1;                           /*!< Top y corner of the region of interest. */
+  int param_x2;                           /*!< Bottom x corner of the region of interest. */
+  int param_y2;                           /*!< Bottom y corner of the region of interest. */
+  int param_kernelSize;                   /*!< Size of the kernel of the morphological operation. */
+  int param_kernelType;                   /*!< Type of the kernel of the morphological operation. */
+  int param_morphOperation;               /*!< Type of the morphological operation. */
+  QMap<QString, QString> parameters;      /*!< map of all the parameters for the tracking. */
 
  public:
   Tracking(string path, string background, int startImage = 0, int stopImage = -1);

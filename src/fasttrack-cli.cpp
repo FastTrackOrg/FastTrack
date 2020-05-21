@@ -15,27 +15,29 @@ This file is part of Fast Track.
     along with FastTrack.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+#include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <getopt.h>
 #include <tracking.h>
 #include <QMap>
 #include <QMapIterator>
-#include <QString>
 #include <QObject>
+#include <QString>
 
 using namespace std;
 
 void help() {
-      printf (("Usage:  [OPTION]... [FILE]...\n"));
-      fputs (("\
+  printf(("Usage:  [OPTION]... [FILE]...\n"));
+  fputs(("\
 Use FastTrack from the command line.\n\
 \n\
-"), stdout);
-      fputs (("\
+"),
+        stdout);
+  fputs(("\
 All argument are mandatory except --backPath.\n\
-"), stdout);
-      fputs (("\
+"),
+        stdout);
+  fputs(("\
   --maxArea                  maximal area of objects\n\
   --minArea                  minimal area of objects\n\
 \n\
@@ -65,45 +67,44 @@ All argument are mandatory except --backPath.\n\
 \n\
   --path                     path to the folder where the images are stored\n\
   --backPath                 optional, path to a background image\n\
-"), stdout);
+"),
+        stdout);
 }
 
-int main (int argc, char **argv){
-static struct option long_options[] =
-  {
-    {"maxArea",     required_argument,       0, 'a'},
-    {"minArea",  required_argument,       0, 'b'},
-    {"spot",  required_argument, 0, 'c'},
-    {"normDist",  required_argument, 0, 'd'},
-    {"normAngle",    required_argument, 0, 'e'},
-    {"weight",    required_argument, 0, 'f'},
-    {"maxDist",    required_argument, 0, 'g'},
-    {"maxTime",    required_argument, 0, 'h'},
-    {"thresh",    required_argument, 0, 'i'},
-    {"nBack",    required_argument, 0, 'j'},
-    {"methBack",    required_argument, 0, 'k'},
-    {"regBack",    required_argument, 0, 'l'},
-    {"xTop",    required_argument, 0, 'm'},
-    {"yTop",    required_argument, 0, 'n'},
-    {"xBottom",    required_argument, 0, 'o'},
-    {"yBottom",    required_argument, 0, 'p'},
-    {"reg",    required_argument, 0, 'q'},
-    {"lightBack",    required_argument, 0, 'r'},
-    {"morph",    required_argument, 0, 's'},
-    {"morphSize",    required_argument, 0, 't'},
-    {"morphType",    required_argument, 0, 'u'},
-    {"path",    required_argument, 0, 'v'},
-    {"backPath",    required_argument, 0, 'w'},
-    {"help",    no_argument, 0, 'x'},
-    {0, 0, 0, 0}
-  };
+int main(int argc, char **argv) {
+  static struct option long_options[] =
+      {
+          {"maxArea", required_argument, 0, 'a'},
+          {"minArea", required_argument, 0, 'b'},
+          {"spot", required_argument, 0, 'c'},
+          {"normDist", required_argument, 0, 'd'},
+          {"normAngle", required_argument, 0, 'e'},
+          {"weight", required_argument, 0, 'f'},
+          {"maxDist", required_argument, 0, 'g'},
+          {"maxTime", required_argument, 0, 'h'},
+          {"thresh", required_argument, 0, 'i'},
+          {"nBack", required_argument, 0, 'j'},
+          {"methBack", required_argument, 0, 'k'},
+          {"regBack", required_argument, 0, 'l'},
+          {"xTop", required_argument, 0, 'm'},
+          {"yTop", required_argument, 0, 'n'},
+          {"xBottom", required_argument, 0, 'o'},
+          {"yBottom", required_argument, 0, 'p'},
+          {"reg", required_argument, 0, 'q'},
+          {"lightBack", required_argument, 0, 'r'},
+          {"morph", required_argument, 0, 's'},
+          {"morphSize", required_argument, 0, 't'},
+          {"morphType", required_argument, 0, 'u'},
+          {"path", required_argument, 0, 'v'},
+          {"backPath", required_argument, 0, 'w'},
+          {"help", no_argument, 0, 'x'},
+          {0, 0, 0, 0}};
 
   int option_index = 0;
   int c;
   QMap<QString, QString> parameters;
   while (1) {
-
-    c = getopt_long (argc, argv, "a:b:c:d:e:f:g:h:i:j:k:l:m:n:o:p:q:r:s:t:u:v:w:x", long_options, &option_index);
+    c = getopt_long(argc, argv, "a:b:c:d:e:f:g:h:i:j:k:l:m:n:o:p:q:r:s:t:u:v:w:x", long_options, &option_index);
 
     if (c == -1) {
       break;
@@ -191,10 +192,10 @@ static struct option long_options[] =
     cout << i.key().toStdString() << " set to: " << i.value().toStdString() << endl;
   }
   Tracking *tracking;
-  if(parameters.contains("backPath")){
+  if (parameters.contains("backPath")) {
     tracking = new Tracking(parameters.value("path").toStdString(), parameters.value("backPath").toStdString());
   }
-  else{
+  else {
     tracking = new Tracking(parameters.value("path").toStdString(), "");
   }
   QObject::connect(tracking, &Tracking::finished, []() {

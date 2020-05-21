@@ -2,8 +2,10 @@
 #define BATCH_H
 
 #include <stdlib.h>
+#include <QAbstractItemView>
 #include <QCheckBox>
 #include <QComboBox>
+#include <QDateTime>
 #include <QDebug>
 #include <QDir>
 #include <QFile>
@@ -15,23 +17,21 @@
 #include <QLabel>
 #include <QLayout>
 #include <QLineEdit>
-#include <QMainWindow>
 #include <QListView>
-#include <QTreeView>
-#include <QAbstractItemView>
+#include <QMainWindow>
 #include <QMap>
 #include <QMessageBox>
 #include <QProgressBar>
 #include <QPushButton>
 #include <QSettings>
 #include <QShortcut>
-#include <QDateTime>
 #include <QSlider>
 #include <QSpinBox>
 #include <QString>
 #include <QTableWidgetItem>
 #include <QThread>
 #include <QTimer>
+#include <QTreeView>
 #include <QWidget>
 #include <ctime>
 #include <fstream>
@@ -65,7 +65,8 @@ class Batch : public QWidget {
   QShortcut *aShortcut; /*!< Keyboard shortcut to previous frame. */
   QShortcut *dShortcut; /*!< Keyboard shortcut to next frame. */
 
-  struct process {
+  struct process
+  {
     QString path;
     QString backgroundPath;
     QMap<QString, QString> trackingParameters;

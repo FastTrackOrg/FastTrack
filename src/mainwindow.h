@@ -19,16 +19,16 @@ This file is part of Fast Track.
 #define MAINWINDOW_H
 
 #include <QByteArray>
-#include <QFile>
-#include <QWebEngineView>
 #include <QCloseEvent>
-#include <QMessageBox>
+#include <QFile>
 #include <QMainWindow>
+#include <QMessageBox>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
 #include <QSysInfo>
 #include <QUrl>
+#include <QWebEngineView>
 #include "batch.h"
 #include "interactive.h"
 #include "replay.h"

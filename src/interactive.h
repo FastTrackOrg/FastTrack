@@ -18,7 +18,6 @@ This file is part of Fast Track.
 #ifndef INTERACTIVE_H
 #define INTERACTIVE_H
 
-#include <QWidget>
 #include <QAction>
 #include <QDateTime>
 #include <QDir>
@@ -35,22 +34,22 @@ This file is part of Fast Track.
 #include <QNetworkReply>
 #include <QNetworkRequest>
 #include <QPainter>
+#include <QResizeEvent>
 #include <QScrollArea>
 #include <QScrollBar>
-#include <QString>
 #include <QSettings>
+#include <QString>
 #include <QTableWidget>
-#include <QResizeEvent>
-#include <QWidget>
 #include <QTableWidgetItem>
 #include <QUrl>
+#include <QWidget>
 #include <QtConcurrent/QtConcurrentRun>
 #include "data.h"
-#include "openvideo.h"
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
-#include "tracking.h"
+#include "openvideo.h"
 #include "replay.h"
+#include "tracking.h"
 
 using namespace std;
 using namespace cv;
@@ -90,7 +89,7 @@ class Interactive : public QMainWindow {
 
   void loadSettings();
   void saveSettings();
-  
+
   void resizeEvent(QResizeEvent *event);
 
  private:

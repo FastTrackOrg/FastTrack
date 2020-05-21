@@ -724,7 +724,7 @@ void Tracking::imageProcessing() {
       cleaning(occluded, m_lost, m_id, m_out, param_to);
       m_outPrev = m_out;
       m_im++;
-        emit(progress(m_im));
+      emit(progress(m_im));
     }
     catch (...) {
       m_savefile.flush();
@@ -848,10 +848,12 @@ void Tracking::startProcess() {
       m_lost.push_back(0);
     }
 
-    if (!m_id.empty()) m_idMax = int(*max_element(m_id.begin(), m_id.end()));
-    else m_idMax = -1;
+    if (!m_id.empty())
+      m_idMax = int(*max_element(m_id.begin(), m_id.end()));
+    else
+      m_idMax = -1;
 
-    //  Creates the folder to save result, parameter and background image 
+    //  Creates the folder to save result, parameter and background image
     //  If a folder already exist, renames it with the date and time.
     QString savingPath = QString::fromStdString(m_path).section("*", 0, 0) + QDir::separator() + "Tracking_Result" + QDir::separator();
     QDir r;

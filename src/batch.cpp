@@ -71,7 +71,7 @@ Batch::Batch(QWidget *parent) : QWidget(parent),
   backMethod->addItems({"Minimum", "Maximum", "Average"});
   ui->tableParameters->setCellWidget(0, 1, backMethod);
   connect(backMethod, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &Batch::updateParameters);
-  
+
   ui->tableParameters->insertRow(1);
   ui->tableParameters->setItem(1, 0, new QTableWidgetItem("Number of images background"));
   QSpinBox *backNumber = new QSpinBox(ui->tableParameters);
@@ -216,7 +216,6 @@ Batch::Batch(QWidget *parent) : QWidget(parent),
   ui->tableParameters->setCellWidget(20, 1, backRegistrationMethod);
   connect(backRegistrationMethod, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &Batch::updateParameters);
 
-
   loadSettings();
 
   // Setups the path panel
@@ -293,7 +292,7 @@ void Batch::openPathFolder() {
           }
         }
       }
-      if (!ui->lineBackground->text().isEmpty()){
+      if (!ui->lineBackground->text().isEmpty()) {
         backgroundPath = ui->lineBackground->text();
       }
       addPath(dir, backgroundPath, paramPath);
@@ -334,11 +333,11 @@ void Batch::addPath(QString pathMovie, QString pathBackground, QString pathParam
   else {
     ui->tablePath->setItem(row, 1, new QTableWidgetItem(pathBackground));
   }
-  if (pathParameter.isEmpty()){
+  if (pathParameter.isEmpty()) {
     QPushButton *paramButton = new QPushButton("Select a parameter file");
     ui->tablePath->setCellWidget(row, 2, paramButton);
     connect(paramButton, &QPushButton::clicked, [this, row]() {
-    openParameterFile(row);
+      openParameterFile(row);
     });
   }
   else {
@@ -364,7 +363,7 @@ void Batch::removePath() {
   if (row != -1) {
     processList.remove(row);
     ui->tablePath->removeRow(row);
-    if (currentPathCount > 0) currentPathCount --;
+    if (currentPathCount > 0) currentPathCount--;
   }
 }
 
@@ -393,7 +392,7 @@ void Batch::startTracking() {
     ui->clearPath->setDisabled(true);
 
     if (QDir(processList[currentPathCount].path).exists()) {
-      int count = QDir(processList[currentPathCount].path).count(); 
+      int count = QDir(processList[currentPathCount].path).count();
       string path = (processList[currentPathCount].path + QDir::separator()).toStdString();
       string backgroundPath = processList[currentPathCount].backgroundPath.toStdString();
       QProgressBar *progressBar = qobject_cast<QProgressBar *>(ui->tablePath->cellWidget(currentPathCount, 3));
@@ -402,36 +401,38 @@ void Batch::startTracking() {
 
       thread = new QThread;
       tracking = new Tracking(path, backgroundPath);
-    QMap<QString, QString> *logMap = new QMap<QString, QString>;
-    logMap->insert("date", QDateTime::currentDateTime().toString());
-    logMap->insert("path", QString::fromStdString(path));
+      QMap<QString, QString> *logMap = new QMap<QString, QString>;
+      logMap->insert("date", QDateTime::currentDateTime().toString());
+      logMap->insert("path", QString::fromStdString(path));
       tracking->moveToThread(thread);
 
       connect(thread, &QThread::started, tracking, &Tracking::startProcess);
       connect(tracking, &Tracking::progress, progressBar, &QProgressBar::setValue);
-    connect(tracking, &Tracking::statistic, [this, logMap](int time) {
-      logMap->insert("time", QString::number(time));
-    });
+      connect(tracking, &Tracking::statistic, [this, logMap](int time) {
+        logMap->insert("time", QString::number(time));
+      });
       connect(tracking, &Tracking::finished, progressBar, [this, progressBar, count, logMap]() {
-        ui->tablePath->item(currentPathCount, 4)->setText("Done");;
+        ui->tablePath->item(currentPathCount, 4)->setText("Done");
+        ;
         progressBar->setValue(count);
-        currentPathCount ++;
+        currentPathCount++;
         emit(next());
-      logMap->insert("status", "Done");
-      emit(log(*logMap));
+        logMap->insert("status", "Done");
+        emit(log(*logMap));
       });
       connect(tracking, &Tracking::finished, thread, &QThread::quit);
       connect(tracking, &Tracking::finished, tracking, &Tracking::deleteLater);
       connect(tracking, &Tracking::forceFinished, progressBar, [this, progressBar, count, logMap]() {
-        ui->tablePath->item(currentPathCount, 4)->setText("Error");;
-        currentPathCount ++;
+        ui->tablePath->item(currentPathCount, 4)->setText("Error");
+        ;
+        currentPathCount++;
         emit(next());
-      logMap->insert("status", "Error");
-      emit(log(*logMap));
+        logMap->insert("status", "Error");
+        emit(log(*logMap));
       });
-    connect(tracking, &Tracking::statistic, [this, logMap](int time) {
-      logMap->insert("time", QString::number(time));
-    });
+      connect(tracking, &Tracking::statistic, [this, logMap](int time) {
+        logMap->insert("time", QString::number(time));
+      });
       connect(tracking, &Tracking::forceFinished, thread, &QThread::quit);
       connect(tracking, &Tracking::forceFinished, tracking, &Tracking::deleteLater);
       connect(thread, &QThread::finished, thread, &QThread::deleteLater);

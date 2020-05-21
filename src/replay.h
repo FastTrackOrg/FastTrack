@@ -2,9 +2,8 @@
 #define REPLAY_H
 
 #include <stdlib.h>
-#include <QCheckBox>
-#include <QMainWindow>
 #include <QAction>
+#include <QCheckBox>
 #include <QComboBox>
 #include <QDebug>
 #include <QDir>
@@ -18,6 +17,7 @@
 #include <QLabel>
 #include <QLayout>
 #include <QLineEdit>
+#include <QMainWindow>
 #include <QMap>
 #include <QMessageBox>
 #include <QMouseEvent>
@@ -33,15 +33,15 @@
 #include <QTableWidgetItem>
 #include <QThread>
 #include <QTimer>
-#include <QWidget>
 #include <QUndoStack>
+#include <QWidget>
 #include <ctime>
 #include <fstream>
 #include <opencv2/core/ocl.hpp>
 #include <string>
 #include <vector>
-#include "data.h"
 #include "annotation.h"
+#include "data.h"
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
 using namespace std;
@@ -55,7 +55,7 @@ class Replay : public QMainWindow {
   Q_OBJECT
 
  public:
-  explicit Replay(QWidget *parent = nullptr, bool standalone = true, QSlider* control = nullptr);
+  explicit Replay(QWidget *parent = nullptr, bool standalone = true, QSlider *control = nullptr);
   ~Replay();
 
  private:

@@ -6,11 +6,11 @@
 #include <QFile>
 #include <QMap>
 #include <QMapIterator>
+#include <QMessageBox>
 #include <QString>
 #include <QTextStream>
-#include <QWidget>
 #include <QUndoCommand>
-#include <QMessageBox>
+#include <QWidget>
 
 struct object
 {
@@ -21,7 +21,6 @@ struct object
 class Data {
  private:
   QString dir; /*!< Path to the tracking result file. */
-
 
  public:
   explicit Data(QString dataPath);
@@ -35,7 +34,7 @@ class Data {
   QMap<QString, double> getData(int imageIndex, int id);
   QList<int> getId(int imageIndex);
   QList<int> getId(int imageIndexFirst, int imageIndexLast);
-  int getObjectInformation(int objectId); 
+  int getObjectInformation(int objectId);
   void swapData(int firstObject, int secondObject, int from);
   void deleteData(int objectId, int from, int to);
   void insertData(int objectId, int from, int to);

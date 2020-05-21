@@ -22,7 +22,6 @@ This file is part of Fast Track.
 #define M_PI 3.14159265358979323846
 #endif
 
-
 /**
  * @class Interactive
  *
@@ -42,7 +41,7 @@ This file is part of Fast Track.
 Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
                                             ui(new Ui::Interactive) {
   ui->setupUi(this);
-  
+
   // Loads settings
   settingsFile = new QSettings("FastTrack", "Benjamin Gallois", this);
   loadSettings();
@@ -417,7 +416,7 @@ void Interactive::openFolder() {
       ui->startImage->setRange(0, framePath.size() - 1);
       ui->startImage->setValue(0);
 
-      Mat frame = imread(framePath[0], IMREAD_COLOR|IMREAD_ANYDEPTH);
+      Mat frame = imread(framePath[0], IMREAD_COLOR | IMREAD_ANYDEPTH);
       originalImageSize.setWidth(frame.cols);
       originalImageSize.setHeight(frame.rows);
       cropedImageSize.setWidth(originalImageSize.width());
@@ -462,7 +461,7 @@ void Interactive::openFolder() {
 void Interactive::display(int index, int scale) {
   if (!framePath.empty()) {
     UMat frame;
-    imread(framePath[index], IMREAD_GRAYSCALE|IMREAD_ANYDEPTH).copyTo(frame);
+    imread(framePath[index], IMREAD_GRAYSCALE | IMREAD_ANYDEPTH).copyTo(frame);
     vector<vector<Point>> displayContours;
     vector<vector<Point>> rejectedContours;
 
@@ -635,7 +634,7 @@ void Interactive::selectBackground() {
 
   if (dir.length()) {
     backgroundPath = dir;
-    imread(backgroundPath.toStdString(), IMREAD_GRAYSCALE|IMREAD_ANYDEPTH).copyTo(background);
+    imread(backgroundPath.toStdString(), IMREAD_GRAYSCALE | IMREAD_ANYDEPTH).copyTo(background);
     if (background.cols == originalImageSize.width() && background.rows == originalImageSize.height()) {
       isBackground = true;
 
@@ -958,7 +957,7 @@ Interactive::~Interactive() {
 */
 void Interactive::loadSettings() {
   QList<QString> keys = settingsFile->allKeys();
-  for(auto &a: keys){
+  for (auto &a : keys) {
     settings.insert(a, settingsFile->value(a).toString());
   }
 }
@@ -967,7 +966,7 @@ void Interactive::loadSettings() {
 */
 void Interactive::saveSettings() {
   QList<QString> keys = settings.keys();
-  for(auto &a: keys){
+  for (auto &a : keys) {
     settingsFile->setValue(a, settings.value(a));
   }
 }

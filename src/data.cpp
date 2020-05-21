@@ -17,7 +17,6 @@ This file is part of Fast Track.
 
 #include "data.h"
 
-
 /**
  * @class Data
  *
@@ -59,7 +58,7 @@ Data::Data(QString dataPath) {
       QMap<QString, double> objectData;             // Map data keys to data value
 
       QStringList dat = a.split('\t', QString::SkipEmptyParts);
-      if(dat.size() != 23) break; // Checks for corrupted data
+      if (dat.size() != 23) break;  // Checks for corrupted data
       int frameIndex = dat[21].toInt();
       if (frameIndex > maxFrameIndex) maxFrameIndex = frameIndex;
       int id = dat[22].toInt();
@@ -235,7 +234,7 @@ void Data::insertData(int objectId, int from, int to) {
 
       for (int j = 0; j < objects.size(); j++) {
         if (objects[j].id == objectId) {
-          object objectToInsert= dataCopy.value(i.key())[j];  
+          object objectToInsert = dataCopy.value(i.key())[j];
           QVector<object> objectsToReplace = data.value(i.key());
           objectsToReplace.append(objectToInsert);
           data.insert(i.key(), objectsToReplace);
