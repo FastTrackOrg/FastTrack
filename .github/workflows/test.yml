@@ -1,0 +1,30 @@
+name: Tests
+
+on:
+  push:
+    branches:
+    - master
+  pull_request:
+    branches:
+    - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: install qt5
+      run: |
+        sudo apt-get install qt5-default qt5-qmake qtwebengine5-dev libgtest-dev
+        cd /usr/src/googletest/googletest
+        sudo mkdir build
+        cd build
+        sudo cmake ..
+        sudo make install
+
+    - name: install opencv
+      run: sudo ./dependencies.sh opencv
+    - name: build
+      run: |
+        ./test.sh
