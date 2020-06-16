@@ -46,10 +46,10 @@ jobs:
         - uses: ilammy/msvc-dev-cmd@v1
         - uses: jurplel/install-qt-action@v2
           with:
-            version: '5.13.2'
+            version: '5.15.0'
             host: 'windows'
             target: 'desktop'
-            arch: 'win64_msvc2017_64'
+            arch: 'win64_msvc2019_64'
             dir: '${{ github.workspace }}/Qt/'
             install-deps: 'true'
             modules: 'qtwebengine'
