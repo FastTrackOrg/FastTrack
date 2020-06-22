@@ -4,48 +4,29 @@
 
 ## About
 
-Tracking objects in video recording can be tedious. Existing softwares are expensive, the learning curve are step, and the workflow can not be easily adapted when the project evolved.
+Tracking objects in video recording can be tedious. Existing software are expensive, the learning curve can be steep, and the workflow can not be easily adapted when the project evolved.
 
-**FastTrack** is a tracking desktop software, easy to install and easy to used. The software is open-source and can be downloaded and modified to adapt any needs.
+**FastTrack** is a desktop tracking software, easy to install, easy to use, and performant. The software can be downloaded and modified to adapt to any needs. The core of the software can also be embedded easily in any C++/Qt project.
+
 Two main features are implemented in the software:
-* An automatic tracking algorithm that can detect and track objects (conserving the objects identities across the video recording).
-* A manual review of the tracking where errors can be corrected rapidly and easily by hands to achieved 100% accuracy.
+* An automatic tracking algorithm that can detect and track objects (conserving the objects' identities across the video recording).
+* A manual review of the tracking where errors can be corrected rapidly and easily to achieve 100% accuracy.
 
-![alt text](docs/user/assets/interactive_detec.gif)
+![alt text](docs/user/assets/readme.png)
 
 ## Installation
 
-Stable builds of the software are available for Linux, Mac and Windows on the [download page](http://www.fasttrack.sh/UserManual/docs/installation/). Nightly builds are available on the [releases page](https://github.com/bgallois/FastTrack/releases).
+Stable builds of the software are available for Linux, Mac, and Windows on the [download page](http://www.fasttrack.sh/UserManual/docs/installation/). Nightly builds are available on the [releases page](https://github.com/bgallois/FastTrack/releases).
 
-## Development environment
+## Documentation
 
-For Debian based distribution:
-```
-sudo apt-get install build-essential cmake mesa-common-dev
-sudo apt-get install qt5-default 
-cd fasttrack
-./dependencencies.sh opencv
-./run.sh full
-```
-
-For Arch based distribution:
-```
-sudo pacman -S cmake gcc
-sudo pacman -S qt5-base
-cd fasttrack
-./dependencencies.sh opencv
-./run.sh full
-```
-
-For Windows and Mac see [the developer guide](http://www.fasttrack.sh/API/index.html)
+User documentation can be found [here](http://www.fasttrack.sh/UserManual/docs/intro.html) with video tutorials, examples, and an extended description of the software.
+Developer documentation can be found [here](http://www.fasttrack.sh/API/index.html), it contains information to set up a development environment and the API of FastTrack.
 
 ## Contributing
 
-[Development environment](docs/dev/DeveloperGuide.md)
+If you want to contribute to FastTrack, please follow the [guidelines](contributing.md), any contribution or idea is welcome.
 
-[Guidelines](contributing.md)
+## Get help
 
-- Website: http://www.fasttrack.sh/
-- User manual: http://www.fasttrack.sh/UserManual/docs/intro.html
-- Developer guide: http://www.fasttrack.sh/API/index.html
-
+If you need help, please contact benjamin.gallois@fasttrack.sh or [gitter](https://gitter.im/fasttracksh).
