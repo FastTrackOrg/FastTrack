@@ -20,6 +20,7 @@ This file is part of Fast Track.
 
 #include <QAction>
 #include <QDateTime>
+#include <QDesktopServices>
 #include <QDir>
 #include <QDirIterator>
 #include <QElapsedTimer>

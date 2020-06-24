@@ -218,6 +218,25 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
       ui->actionLayout1->activate(QAction::Trigger);
   }
 
+  // Help menu
+  connect(ui->actionDoc, &QAction::triggered, []() {
+    QDesktopServices::openUrl(QUrl("http://www.fasttrack.sh/UserManual/docs/intro.html", QUrl::TolerantMode));
+  });
+  connect(ui->actionTuto, &QAction::triggered, []() {
+    QDesktopServices::openUrl(QUrl("https://www.youtube.com/watch?v=RzzmcZs04E4&list=PLGjsUpRojSmO4RHrd-TbpbNpJrfjNYlIm", QUrl::TolerantMode));
+  });
+  connect(ui->actionIssue, &QAction::triggered, []() {
+    QDesktopServices::openUrl(QUrl("https://github.com/FastTrackOrg/FastTrack/issues", QUrl::TolerantMode));
+  });
+  connect(ui->actionContact, &QAction::triggered, []() {
+    QDesktopServices::openUrl(QUrl("mailto:benjamin.gallois@fasttrack.sh?subject=[fasttrack]", QUrl::TolerantMode));
+  });
+  connect(ui->actionAbout, &QAction::triggered, []() {
+    QMessageBox aboutBox;
+    aboutBox.setText("FastTrack is a desktop tracking software, easy to install, easy to use, and performant.<br>Created and maintained by Benjamin Gallois.<br>Distributed under the terms of the <a href='https://www.gnu.org/licenses/gpl-3.0'>GPL3.0 license</a>.<br>");
+    aboutBox.exec();
+  });
+
   connect(this, &Interactive::message, this, [this](QString msg) {
     QMessageBox msgBox;
     msgBox.setText(msg);
