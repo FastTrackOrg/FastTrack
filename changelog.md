@@ -1,5 +1,14 @@
 # FastTrack changelog
 
+## 4.9.2
+
+### Added
+- Added integrated help.
+- Added theme selector.
+
+### Fixed
+- Fixed list of objects update in the Replay panel.
+
 ## 4.9.1
 
 ### Changed
