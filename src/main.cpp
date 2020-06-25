@@ -21,9 +21,10 @@ This file is part of Fast Track.
 int main(int argc, char *argv[]) {
   QApplication a(argc, argv);
   MainWindow w;
-  a.setApplicationName("Fast Track");
-  a.setOrganizationName("Benjamin Gallois");
-  a.setOrganizationDomain("fasttrack.benjamin-gallois.fr");
+  a.setApplicationName("FastTrack");
+  a.setApplicationVersion(APP_VERSION);
+  a.setOrganizationName("FastTrackOrg");
+  a.setOrganizationDomain("www.fasttrack.sh");
   w.setWindowIcon(QIcon(":/assets/icon.png"));
   w.show();
   a.exec();

@@ -44,7 +44,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
   QDir::setCurrent(QCoreApplication::applicationDirPath());
   ui->setupUi(this);
   setWindowState(Qt::WindowMaximized);
-  setWindowTitle("FastTrack " + version);
+  setWindowTitle(qApp->applicationName() + " " + APP_VERSION);
 
   // Setup style
   QFile stylesheet(":/theme.qss");
@@ -72,7 +72,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
     QByteArray message = downloadedData.mid(downloadedData.indexOf("message") + 7, downloadedData.indexOf("!message") - downloadedData.indexOf("message") - 7);
     QByteArray warning = downloadedData.mid(downloadedData.indexOf("warning") + 7, downloadedData.indexOf("!warning") - downloadedData.indexOf("warning") - 7);
 
-    if (lastVersion != version) {
+    if (lastVersion != APP_VERSION) {
       QMessageBox msgBox;
       msgBox.setTextFormat(Qt::RichText);
       msgBox.setText("FastTrack version " + lastVersion + " is available! <br> Please update. <br> <a href='http://www.fasttrack.sh/UserManual/docs/installation/#update'>Need help to update?</a> <br>" + message + "<br>" + warning);
