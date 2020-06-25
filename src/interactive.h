@@ -40,6 +40,7 @@ This file is part of Fast Track.
 #include <QScrollBar>
 #include <QSettings>
 #include <QString>
+#include <QStyleFactory>
 #include <QTableWidget>
 #include <QTableWidgetItem>
 #include <QUrl>

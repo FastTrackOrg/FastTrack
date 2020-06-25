@@ -101,5 +101,6 @@ FORMS += \
         batch.ui \ 
         interactive.ui \ 
 
-RESOURCES += resources.qrc
+RESOURCES += resources.qrc \
+        assets/breeze.qrc
 

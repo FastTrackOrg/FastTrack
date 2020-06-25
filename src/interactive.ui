@@ -53,8 +53,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>576</width>
-             <height>604</height>
+             <width>566</width>
+             <height>599</height>
             </rect>
            </property>
            <layout class="QGridLayout" name="gridLayout_2">
@@ -413,7 +413,7 @@ p, li { white-space: pre-wrap; }
         <enum>QTabWidget::West</enum>
        </property>
        <property name="currentIndex">
-        <number>0</number>
+        <number>3</number>
        </property>
        <widget class="QWidget" name="widget">
         <attribute name="title">
@@ -1141,9 +1141,15 @@ corner: </string>
     <addaction name="separator"/>
     <addaction name="actionAbout"/>
    </widget>
+   <widget class="QMenu" name="menuSettings">
+    <property name="title">
+     <string>Settings</string>
+    </property>
+   </widget>
    <addaction name="menuOpen"/>
    <addaction name="menuView"/>
    <addaction name="menuLayout"/>
+   <addaction name="menuSettings"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QDockWidget" name="controlOptions">
@@ -1669,6 +1675,11 @@ corner: </string>
   <action name="actionContact">
    <property name="text">
     <string>Contact</string>
+   </property>
+  </action>
+  <action name="actionStyle">
+   <property name="text">
+    <string>Style</string>
    </property>
   </action>
  </widget>

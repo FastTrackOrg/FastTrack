@@ -113,7 +113,92 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
     ui->replayNumber->setText(QString::number(newValue));
   });
 
+  // Loads prefered style
+  QStringList styles = QStyleFactory::keys();
+  QString defaultStyle = settings.value("style");
+  QMenu *menuStyle = new QMenu(tr("Appearance"), this);
+  ui->menuSettings->addMenu(menuStyle);
+
+  for (auto const &a : styles) {
+    QAction *styleAction = new QAction(a, this);
+    styleAction->setCheckable(true);
+    connect(styleAction, &QAction::triggered, [this, styleAction, menuStyle]() {
+      qApp->setStyle(QStyleFactory::create(styleAction->text()));
+      settings.insert("style", styleAction->text());
+      foreach (QAction *action, menuStyle->actions()) {
+        action->setChecked(false);
+      }
+      styleAction->setChecked(true);
+    });
+    menuStyle->addAction(styleAction);
+  }
+
+  if (styles.contains(defaultStyle)) {
+    qApp->setStyle(QStyleFactory::create(defaultStyle));
+    foreach (QAction *action, menuStyle->actions()) {
+      if (action->text() == defaultStyle) {
+        action->setChecked(true);
+      }
+    }
+  }
+
+  // Palette
+  QMenu *menuPalette = new QMenu(tr("Theme"), this);
+  ui->menuSettings->addMenu(menuPalette);
+  QAction *defaultColor = new QAction(tr("Default"), this);
+  defaultColor->setCheckable(true);
+  menuPalette->addAction(defaultColor);
+  QAction *darkColor = new QAction(tr("Breeze Dark"), this);
+  darkColor->setCheckable(true);
+  menuPalette->addAction(darkColor);
+  QAction *lightColor = new QAction(tr("Breeze Light"), this);
+  lightColor->setCheckable(true);
+  menuPalette->addAction(lightColor);
+  connect(defaultColor, &QAction::triggered, [this, defaultColor, menuPalette]() {
+    foreach (QAction *action, menuPalette->actions()) {
+      action->setChecked(false);
+    }
+    defaultColor->setChecked(true);
+    qApp->setStyleSheet("");
+    settings.insert("color", "default");
+  });
+  connect(darkColor, &QAction::triggered, [this, darkColor, menuPalette]() {
+    foreach (QAction *action, menuPalette->actions()) {
+      action->setChecked(false);
+    }
+    darkColor->setChecked(true);
+    QFile file(":/dark.qss");
+    file.open(QFile::ReadOnly | QFile::Text);
+    QTextStream stream(&file);
+    qApp->setStyleSheet(stream.readAll());
+    settings.insert("color", "dark");
+  });
+  connect(lightColor, &QAction::triggered, [this, lightColor, menuPalette]() {
+    foreach (QAction *action, menuPalette->actions()) {
+      action->setChecked(false);
+    }
+    lightColor->setChecked(true);
+    QFile file(":/light.qss");
+    file.open(QFile::ReadOnly | QFile::Text);
+    QTextStream stream(&file);
+    qApp->setStyleSheet(stream.readAll());
+    settings.insert("color", "light");
+  });
+
+  QString defaultColorTheme = settings.value("color");
+  if (defaultColorTheme == "light") {
+    lightColor->trigger();
+  }
+  else if (defaultColorTheme == "dark") {
+    darkColor->trigger();
+  }
+  else {
+    defaultColor->trigger();
+  }
+
   // Layout options
+  ui->menuBar->removeAction(ui->menuLayout->menuAction());
+  ui->menuSettings->addMenu(ui->menuLayout);
   connect(ui->actionLayout1, &QAction::triggered, [this]() {
     ui->controlOptions->setVisible(true);
     ui->imageOptions->setVisible(true);
