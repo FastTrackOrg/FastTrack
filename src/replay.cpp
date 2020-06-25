@@ -68,6 +68,12 @@ Replay::Replay(QWidget* parent, bool standalone, QSlider* control) : QMainWindow
   undoAction->setShortcuts(QKeySequence::Undo);
   undoAction->setStatusTip(tr("Undo"));
   connect(undoAction, &QAction::triggered, [this]() {
+    object2Replay->clear();
+    ids = trackingData->getId(0, replayFrames.size());
+    std::sort(ids.begin(), ids.end());
+    for (auto const& a : ids) {
+      object2Replay->addItem(QString::number(a));
+    }
     loadFrame(ui->replaySlider->value());
   });
   ui->toolBar->addAction(undoAction);
@@ -78,6 +84,12 @@ Replay::Replay(QWidget* parent, bool standalone, QSlider* control) : QMainWindow
   redoAction->setShortcuts(QKeySequence::Redo);
   redoAction->setStatusTip(tr("Redo"));
   connect(redoAction, &QAction::triggered, [this]() {
+    object2Replay->clear();
+    ids = trackingData->getId(0, replayFrames.size());
+    std::sort(ids.begin(), ids.end());
+    for (auto const& a : ids) {
+      object2Replay->addItem(QString::number(a));
+    }
     loadFrame(ui->replaySlider->value());
   });
   ui->toolBar->addAction(redoAction);
@@ -427,6 +439,7 @@ void Replay::loadFrame(int frameIndex) {
 
     // Takes the tracking data corresponding to the replayed frame and parse data to display
     QList<int> idList = trackingData->getId(frameIndex);
+    std::sort(idList.begin(), idList.end());
     for (auto const& a : idList) {
       QMap<QString, double> coordinate = trackingData->getData(frameIndex, a);
       int id = a;
