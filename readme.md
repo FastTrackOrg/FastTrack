@@ -23,6 +23,9 @@ Stable builds of the software are available for Linux, Mac, and Windows on the [
 User documentation can be found [here](http://www.fasttrack.sh/UserManual/docs/intro.html) with video tutorials, examples, and an extended description of the software.
 Developer documentation can be found [here](http://www.fasttrack.sh/API/index.html), it contains information to set up a development environment and the API of FastTrack.
 
+## Examples
+![alt text](docs/user/assets/example.gif)
+
 ## Contributing
 
 If you want to contribute to FastTrack, please follow the [guidelines](contributing.md), any contribution or idea is welcome.
