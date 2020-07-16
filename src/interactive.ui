@@ -53,8 +53,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>566</width>
-             <height>599</height>
+             <width>576</width>
+             <height>604</height>
             </rect>
            </property>
            <layout class="QGridLayout" name="gridLayout_2">
@@ -128,7 +128,7 @@
            <item>
             <widget class="QSpinBox" name="maxL">
              <property name="minimum">
-              <number>1</number>
+              <number>0</number>
              </property>
              <property name="maximum">
               <number>99999999</number>
@@ -152,7 +152,7 @@
            <item>
             <widget class="QSpinBox" name="maxT">
              <property name="minimum">
-              <number>1</number>
+              <number>0</number>
              </property>
              <property name="maximum">
               <number>360</number>
@@ -266,25 +266,7 @@
           </layout>
          </item>
          <item row="7" column="0">
-          <layout class="QHBoxLayout" name="horizontalLayout_17">
-           <item>
-            <widget class="QLabel" name="label_19">
-             <property name="text">
-              <string>Weight (w):</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QDoubleSpinBox" name="weight">
-             <property name="maximum">
-              <double>1.000000000000000</double>
-             </property>
-             <property name="value">
-              <double>0.500000000000000</double>
-             </property>
-            </widget>
-           </item>
-          </layout>
+          <layout class="QHBoxLayout" name="horizontalLayout_17"/>
          </item>
          <item row="8" column="0">
           <widget class="QTextBrowser" name="textBrowser">
@@ -296,10 +278,16 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;The program will compute a cost for each pair of objects in two successive images using the distance &lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;d&lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600; vertical-align:sub;&quot;&gt;ij&lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt; and the angular difference &lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;a&lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600; vertical-align:sub;&quot;&gt;ij&lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt; between two objects. These two parameters can be computed using the direction and barycenter of the head, tail or body by selecting the&lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt; Spot to track &lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;accordingly.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;The cost is computed as follow:&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;c&lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600; vertical-align:sub;&quot;&gt;ij&lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt; = w*(d&lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600; vertical-align:sub;&quot;&gt;ij&lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;/D) + (1-w)*(a&lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600; vertical-align:sub;&quot;&gt;ij&lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;/A)&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;c&lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600; vertical-align:sub;&quot;&gt;ij&lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt; = d&lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600; vertical-align:sub;&quot;&gt;ij&lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;/D + a&lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600; vertical-align:sub;&quot;&gt;ij&lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;/A&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;if d&lt;/span&gt;&lt;span style=&quot; font-size:8pt; vertical-align:sub;&quot;&gt;ij &lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;&amp;gt; &lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;L&lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt; the object i can be assigned with the object j.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;if the object is lost more images than &lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;T&lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt; then a new object is assigned.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;The weight &lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;w &lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;can be adjusted to have the cost more sensitive to the distance (w close to 1) or to the direction (w close to 0).&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;Normalization parameters can be set to 0 to remove the associated contribution in the cost function.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;The normalization parameters &lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;D &lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;and&lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt; A &lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;have to be adjusted:&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;1. &lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Set&lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt; D &lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;as the typical distance traveled by an object.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;2. &lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Set&lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt; A&lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt; as the typical angular change performed by an object. &lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;3&lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;. Decrease &lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;D&lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt; or increase &lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;A&lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt; to be more sensitive to the traveled distance. Increase &lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;D&lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt; or decrease &lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;A&lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt; to be more sensitive to the angular change.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;The best assignment is found by using the Hungarian algorithm.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
@@ -413,7 +401,7 @@ p, li { white-space: pre-wrap; }
         <enum>QTabWidget::West</enum>
        </property>
        <property name="currentIndex">
-        <number>3</number>
+        <number>0</number>
        </property>
        <widget class="QWidget" name="widget">
         <attribute name="title">

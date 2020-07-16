@@ -85,7 +85,6 @@ class Tracking : public QObject {
   int param_spot;                         /*!< Which spot parameters are used to computes the cost function. 0: head, 1: tail, 2: body. */
   double param_len;                       /*!< Maximal length travelled by an object between two images. */
   double param_angle;                     /*!< Maximal change in direction of an object between two images. */
-  double param_weight;                    /*!< Weight between distance and direction in the cost function.  */
   double param_lo;                        /*!< Maximal distance allowed by an object to travel during an occlusion event. */
   double param_to;                        /*!< Maximal time. */
   int param_arrowSize;                    /*!< Size of the arrow in the displayed image. */
@@ -119,7 +118,7 @@ class Tracking : public QObject {
   void registration(UMat imageReference, UMat &frame, int method);
   void binarisation(UMat &frame, char backgroundColor, int value);
   vector<vector<Point3d>> objectPosition(const UMat &frame, int minSize, int maxSize);
-  vector<int> costFunc(const vector<Point3d> &prevPos, const vector<Point3d> &pos, double LENGHT, double ANGLE, double WEIGHT, double LO);
+  vector<int> costFunc(const vector<Point3d> &prevPos, const vector<Point3d> &pos, double LENGHT, double ANGLE, double LO);
   void cleaning(const vector<int> &occluded, vector<int> &lostCounter, vector<int> &id, vector<vector<Point3d>> &input, int param_maximalTime);
   vector<Point3d> prevision(vector<Point3d> past, vector<Point3d> present);
   vector<Point3d> color(int number);

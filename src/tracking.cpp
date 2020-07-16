@@ -482,12 +482,11 @@ vector<vector<Point3d>> Tracking::objectPosition(const UMat &frame, int minSize,
   * @param[in] prevPos The vector of objects parameters at the previous image.
   * @param[in] pos The vector of objects parameters at the current image that we want to sort in order to conserve objects identity.
   * @param[in] LENGTH The maximal displacement of an object between two images in pixels.
-  * @param[in] ANGLE The maximal change in direction of an object between two images in radians.
   * @param[in] WEIGHT The weight between distance and direction in the computation of the cost function. 0: change in distance, 1: change in orientation.
   * @param[in] LO The maximal assignment distance in pixels.
   * @return The assignment vector containing the new index position to sort the pos vector. 
 */
-vector<int> Tracking::costFunc(const vector<Point3d> &prevPos, const vector<Point3d> &pos, double LENGTH, double ANGLE, double WEIGHT, double LO) {
+vector<int> Tracking::costFunc(const vector<Point3d> &prevPos, const vector<Point3d> &pos, double LENGTH, double ANGLE, double LO) {
   int n = prevPos.size();
   int m = pos.size();
   vector<int> assignment;
@@ -500,13 +499,22 @@ vector<int> Tracking::costFunc(const vector<Point3d> &prevPos, const vector<Poin
     vector<vector<double>> costMatrix(n, vector<double>(m));
     vector<pair<int, int>> distances;
 
-    for (int i = 0; i < n; ++i) {
+    for (int i = 0; i < n; ++i) {  // Loop on previous objects
       Point3d prevCoord = prevPos[i];
-      for (int j = 0; j < m; ++j) {
+      for (int j = 0; j < m; ++j) {  // Loop on current objects
         Point3d coord = pos[j];
-        double d = pow(pow(prevCoord.x - coord.x, 2) + pow(prevCoord.y - coord.y, 2), 0.5);
-        if (d < LO) {
-          c = WEIGHT * (d / LENGTH) + (1 - WEIGHT) * abs(angleDifference(prevCoord.z, coord.z) / ANGLE);  //cost function
+        double distanceDiff = pow(pow(prevCoord.x - coord.x, 2) + pow(prevCoord.y - coord.y, 2), 0.5);
+        double angleDiff = abs(angleDifference(prevCoord.z, coord.z));
+        if (distanceDiff < LO) {
+          if (LENGTH != 0 && ANGLE != 0) {
+            c = (distanceDiff / LENGTH) + (angleDiff / ANGLE);
+          }
+          else if (LENGTH == 0) {
+            c = angleDiff / ANGLE;
+          }
+          else if (ANGLE == 0) {
+            c = distanceDiff / LENGTH;
+          }
           costMatrix[i][j] = c;
           distances.push_back({i, j});
         }
@@ -689,7 +697,7 @@ void Tracking::imageProcessing() {
       m_out = objectPosition(m_binaryFrame, param_minArea, param_maxArea);
 
       // Associates the objets with the previous image
-      vector<int> identity = costFunc(m_outPrev[param_spot], m_out[param_spot], param_len, param_angle, param_weight, param_lo);
+      vector<int> identity = costFunc(m_outPrev[param_spot], m_out[param_spot], param_len, param_angle, param_lo);
       vector<int> occluded = findOcclusion(identity);
 
       // Reassignes the m_out vector regarding the identities of the objects
@@ -926,7 +934,6 @@ void Tracking::updatingParameters(const QMap<QString, QString> &parameterList) {
   param_spot = parameterList.value("Spot to track").toInt();
   param_len = parameterList.value("Maximal length").toDouble();
   param_angle = (M_PI * parameterList.value("Maximal angle").toDouble() / 180);
-  param_weight = parameterList.value("Weight").toDouble();
   param_lo = parameterList.value("Maximal occlusion").toDouble();
   param_to = parameterList.value("Maximal time").toDouble();
   param_arrowSize = parameterList.value("Arrow size").toInt();

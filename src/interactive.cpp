@@ -344,6 +344,24 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
     display(ui->slider->value(), scale);
   });
 
+  // Forbid bad normalization parameters selection
+  connect(ui->maxL, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [this](int value) {
+    if (value == 0) {
+      ui->maxT->setMinimum(1);
+    }
+    else {
+      ui->maxT->setMinimum(0);
+    }
+  });
+  connect(ui->maxT, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [this](int value) {
+    if (value == 0) {
+      ui->maxL->setMinimum(1);
+    }
+    else {
+      ui->maxL->setMinimum(0);
+    }
+  });
+
   // Zoom
   connect(ui->scrollArea->verticalScrollBar(), &QScrollBar::rangeChanged, [this]() {
     QScrollBar *vertical = ui->scrollArea->verticalScrollBar();
@@ -772,7 +790,6 @@ void Interactive::getParameters() {
   parameters.insert("Spot to track", QString::number(ui->spot->currentIndex()));
   parameters.insert("Maximal length", QString::number(ui->maxL->value()));
   parameters.insert("Maximal angle", QString::number(ui->maxT->value()));
-  parameters.insert("Weight", QString::number(ui->weight->value()));
   parameters.insert("Maximal occlusion", QString::number(ui->lo->value()));
   parameters.insert("Maximal time", QString::number(ui->to->value()));
 
