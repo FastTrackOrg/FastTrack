@@ -925,7 +925,7 @@ void Tracking::updatingParameters(const QMap<QString, QString> &parameterList) {
   param_minArea = parameterList.value("Minimal size").toInt();
   param_spot = parameterList.value("Spot to track").toInt();
   param_len = parameterList.value("Maximal length").toDouble();
-  param_angle = parameterList.value("Maximal angle").toDouble();
+  param_angle = (M_PI * parameterList.value("Maximal angle").toDouble() / 180);
   param_weight = parameterList.value("Weight").toDouble();
   param_lo = parameterList.value("Maximal occlusion").toDouble();
   param_to = parameterList.value("Maximal time").toDouble();
