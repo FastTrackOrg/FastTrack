@@ -46,10 +46,9 @@ All argument are mandatory except --backPath.\n\
    --reg                     registration method, 0: None, 1: Simple, 2: ECC, 3: Features\n\
 \n\
   --spot                     part of the object that features is used for the matching, 0: head, 1: tail, 2: body\n\
-  --normDist                 normalization distance\n\
-  --normAngle                normalization angle\n\
-  --weight                   weight between distance and angle for computing the cost function\n\
-  --maxDist                  maximal distance of matching, if an object travels more than this distance, it is considered as a new object\n\
+  --normDist                 normalization distance pixels\n\
+  --normAngle                normalization angle degres\n\
+  --maxDist                  maximal distance of matching in pixels, if an object travels more than this distance, it is considered as a new object\n\
   --maxTime                  maximal time, if an object disappears more than this time, it is considered as a new object\n\
 \n\
   --nBack                    number of images to compute the background\n\
@@ -79,7 +78,6 @@ int main(int argc, char **argv) {
           {"spot", required_argument, 0, 'c'},
           {"normDist", required_argument, 0, 'd'},
           {"normAngle", required_argument, 0, 'e'},
-          {"weight", required_argument, 0, 'f'},
           {"maxDist", required_argument, 0, 'g'},
           {"maxTime", required_argument, 0, 'h'},
           {"thresh", required_argument, 0, 'i'},
@@ -125,9 +123,6 @@ int main(int argc, char **argv) {
         break;
       case 'e':
         parameters.insert("Maximal angle", QString::fromStdString(optarg));
-        break;
-      case 'f':
-        parameters.insert("Weight", QString::fromStdString(optarg));
         break;
       case 'g':
         parameters.insert("Maximal occlusion", QString::fromStdString(optarg));
@@ -190,6 +185,10 @@ int main(int argc, char **argv) {
   while (i.hasNext()) {
     i.next();
     cout << i.key().toStdString() << " set to: " << i.value().toStdString() << endl;
+  }
+  if (parameters.value("Maximal length") == "0" && parameters.value("Maximal angle") == "0") {
+    cout << "normDist and normAngle can't be both equal to 0!" << endl;
+    return 1;
   }
   Tracking *tracking;
   if (parameters.contains("backPath")) {
