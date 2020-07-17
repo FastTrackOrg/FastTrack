@@ -1,5 +1,13 @@
 # FastTrack changelog
 
+## 5.0.0
+
+### Fixed
+- Fixed error of conversion in the inputed angle normalization tracking parameter (breaking retrocompatibility).
+
+### Removed
+- Removed deprecated weight tracking parameter (breaking retro-compatibility).
+
 ## 4.9.2
 
 ### Added
