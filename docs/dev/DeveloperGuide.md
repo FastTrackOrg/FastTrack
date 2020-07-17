@@ -17,25 +17,25 @@ FastTrack is developed to be embedded in existing C++/Qt projects. It can also b
 
 1. Go to https://download/qt.io/archive/qt and choose the last version of Qt (this example is made with the 5.12 version). Download the Window installer.
 
-   ![Qt download page](ressources/Qt_Rep.png)
+   ![Qt download page](Qt_Rep.png)
 
 2. Follow the installation steps and select **C:\Qt\Qt5.12.0** for the installation folder. In the Select Components page, select MinGW 7.3.0 64 bit and Qt creator 4.8.
 
-   ![Qt installer dialogue](ressources/Qt_Dial.png)
+   ![Qt installer dialogue](Qt_Dial.png)
 
 3. Add MinGW to the path:
 
    - Open the **Settings** dialogue.
 
-     ![Windows settings dialogue](ressources/Setting_Dial.png)
+     ![Windows settings dialogue](Setting_Dial.png)
 
    - Open the **Edit the system environment variables** and click on the **Environment Variables** button.
 
-     ![Windows Environment Variables dialogue](ressources/Var_Dial.png)
+     ![Windows Environment Variables dialogue](Var_Dial.png)
 
    - Double click on **Path** and add the MinGW path: **C:\Qt\Qt5.12.0\Tools\mingw730_64\bin**.
 
-     ![Windows Edit environment variable dialogue](ressources/Path_Dial.png)
+     ![Windows Edit environment variable dialogue](Path_Dial.png)
 
 #### OpenCV installation
 
@@ -43,29 +43,29 @@ FastTrack is developed to be embedded in existing C++/Qt projects. It can also b
 
 - Extract OpenCV in the **C:\ ** folder.
 
-  ![OpenCV self-extracting archive dialogue](ressources/Opencv_Dial.png)
+  ![OpenCV self-extracting archive dialogue](Opencv_Dial.png)
 
 - Download and install CMake https://cmake.org/download/.
 
 - Open CMake an set **Where is the source code** to **C:/opencv/source ** and **Where to build the binaries** to **C:/opencv/source/build **.
 
-  ![CMake dialogue](ressources/1_Cmake.png)
+  ![CMake dialogue](1_Cmake.png)
 
 - Click on the Configure button and select **MinGW Makefiles** and tick **Specify native compiler**.
 
-  ![CMake dialogue](ressources/1.5_Cmake.png)
+  ![CMake dialogue](1.5_Cmake.png)
 
 - Set the C and C++ path compiler to **C:/Qt/Qt5.12.0/Tools/mingw730_64/bin/gcc.exe** and **C:/Qt/Qt5.12.0/Tools/mingw730_64/bin/g++.exe**.
 
-  ![CMake dialogue](ressources/3_Cmake.png)
+  ![CMake dialogue](3_Cmake.png)
 
 - Untick  **WITH_OPENCL** and tick **WITH_OPENMP** and click on the Configure button. Then click the Generate button.
 
-  ![CMake dialogue](ressources/4_Cmake.png)
+  ![CMake dialogue](4_Cmake.png)
 
 - Open the **Command Prompt** application.
 
-  ![Windows Command Prompt application](ressources/Command_Dial.png)
+  ![Windows Command Prompt application](Command_Dial.png)
 
 - Type (replace 8 by your the number of processors on your computer) the command
 
@@ -77,7 +77,7 @@ FastTrack is developed to be embedded in existing C++/Qt projects. It can also b
 
 - Add  **C:\opencv\sources\build\install\x64\mingw\bin** to the Path.
 
-  ![](ressources/Path2_Dial.png)
+  ![](Path2_Dial.png)
 
 
 #### Configure FastTrack

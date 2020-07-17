@@ -38,11 +38,10 @@ First, download the zip file and extract it. The image sequence is located insid
     
     ![alt text](assets/example_4.png)
  6. Click the **Tracking Options** tab and select:
-    * Normalization Distance: **100**
-    * Normalization Angle: **5**
+    * Normalization Distance: **50**
+    * Normalization Angle: **10**
     * Maximal Distance: **75**
     * Maximal Time: **25**
-    * Weight: **0.5**
     * Spot to track: **Head** (best for deformable asymetric objects)
     
     ![alt text](assets/example_5.png)

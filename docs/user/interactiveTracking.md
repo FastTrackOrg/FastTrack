@@ -39,11 +39,10 @@ Objects are detected by their size. Select the maximum and minimum size of the d
 ## Tune the tracking parameters
 Several parameters can be modified to ensure a good tracking analysis:
 * Normalization distance (legacy Maximal lenght/ Typical lenght): typical distance traveled between two consecutive images.
-* Normalization angle (legacy Maximal angle/Typical lenght): maximal reorientation possible between two consecutive images.
+* Normalization angle (legacy Maximal angle/Typical lenght): typical reorientation possible between two consecutive images.
 * Maximal distance: if an object traveled more than this distance between two consecutive images, it will be considered as a new object.
 * Maximal time: number of images an object is allowed to disappear. If an object reappears after this time, it will be considered as a new object.
 * Spot to track: part of the object features used to do the tracking. Select the part that reflects the better the direction of the object. Legacy parameter, head correspond to the smaller mid-part of the object, tail ellipse the wider mid-part og the object and body is the full object.
-* Weight: closer to one the tracking will be more sensitive to the change in position of the object. Closer to zero it will be more sensitive to the change in direction of the object.
 
 ## Registration
 The image registration is the process to correct small displacements and rotation of the camera that can occur during the movie. Fast Track provides several methods for registering the movie: 

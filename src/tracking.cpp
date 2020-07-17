@@ -481,8 +481,8 @@ vector<vector<Point3d>> Tracking::objectPosition(const UMat &frame, int minSize,
   * @brief Computes a cost function and use a global optimization association to associate targets between images. Method adapted from: "An effective and robust method for Tracking multiple fish in video image based on fish head detection" YQ Chen et al. Uses the Hungarian method implemented by Cong Ma, 2016 "https://github.com/mcximing/hungarian-algorithm-cpp" adapted from the Matlab implementation by Markus Buehren "https://fr.mathworks.com/matlabcentral/fileexchange/6543-functions-for-the-rectangular-assignment-problem".
   * @param[in] prevPos The vector of objects parameters at the previous image.
   * @param[in] pos The vector of objects parameters at the current image that we want to sort in order to conserve objects identity.
-  * @param[in] LENGTH The maximal displacement of an object between two images in pixels.
-  * @param[in] WEIGHT The weight between distance and direction in the computation of the cost function. 0: change in distance, 1: change in orientation.
+  * @param[in] LENGTH The typical displacement of an object in pixels.
+  * @param[in] ANGLE The typical reorientation angle in radians.
   * @param[in] LO The maximal assignment distance in pixels.
   * @return The assignment vector containing the new index position to sort the pos vector. 
 */

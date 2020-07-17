@@ -18,5 +18,3 @@ The detection parameters reject objects that are smaller or bigger than a certai
 Tracking parameters are mostly found by trials and errors. But some rules of thumbs can be applied. 
 
 **Spot to track** has to be set to **Body** for quasi-symmetric objects and low-resolution objects. For deformable objects with enough resolution, select **Head** or **Tail** according to the part that predicts best the traveling direction of the object.
-
-**Weight** has to be set to 1 for symmetric objects where the angular dependency is irrelevant.
