@@ -344,24 +344,6 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
     display(ui->slider->value(), scale);
   });
 
-  // Forbid bad normalization parameters selection
-  connect(ui->maxL, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [this](int value) {
-    if (value == 0) {
-      ui->maxT->setMinimum(1);
-    }
-    else {
-      ui->maxT->setMinimum(0);
-    }
-  });
-  connect(ui->maxT, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [this](int value) {
-    if (value == 0) {
-      ui->maxL->setMinimum(1);
-    }
-    else {
-      ui->maxL->setMinimum(0);
-    }
-  });
-
   // Zoom
   connect(ui->scrollArea->verticalScrollBar(), &QScrollBar::rangeChanged, [this]() {
     QScrollBar *vertical = ui->scrollArea->verticalScrollBar();
@@ -792,6 +774,8 @@ void Interactive::getParameters() {
   parameters.insert("Maximal angle", QString::number(ui->maxT->value()));
   parameters.insert("Maximal occlusion", QString::number(ui->lo->value()));
   parameters.insert("Maximal time", QString::number(ui->to->value()));
+  parameters.insert("Normalization area", QString::number(ui->normArea->value()));
+  parameters.insert("Normalization perimeter", QString::number(ui->normPerim->value()));
 
   parameters.insert("Binary threshold", QString::number(ui->threshBox->value()));
   parameters.insert("Number of images background", QString::number(ui->nBack->value()));
