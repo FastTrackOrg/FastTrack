@@ -48,6 +48,8 @@ All argument are mandatory except --backPath.\n\
   --spot                     part of the object that features is used for the matching, 0: head, 1: tail, 2: body\n\
   --normDist                 normalization distance pixels\n\
   --normAngle                normalization angle degres\n\
+  --normArea                 normalization area pixels\n\
+  --normPerim            normalization perimeter pixels\n\
   --maxDist                  maximal distance of matching in pixels, if an object travels more than this distance, it is considered as a new object\n\
   --maxTime                  maximal time, if an object disappears more than this time, it is considered as a new object\n\
 \n\
@@ -78,6 +80,8 @@ int main(int argc, char **argv) {
           {"spot", required_argument, 0, 'c'},
           {"normDist", required_argument, 0, 'd'},
           {"normAngle", required_argument, 0, 'e'},
+          {"normArea", required_argument, 0, 'y'},
+          {"normPerim", required_argument, 0, 'z'},
           {"maxDist", required_argument, 0, 'g'},
           {"maxTime", required_argument, 0, 'h'},
           {"thresh", required_argument, 0, 'i'},
@@ -175,6 +179,12 @@ int main(int argc, char **argv) {
       case 'w':
         parameters.insert("backPath", QString::fromStdString(optarg));
         break;
+      case 'y':
+        parameters.insert("Normalization area", QString::fromStdString(optarg));
+        break;
+      case 'z':
+        parameters.insert("Normalization perimeter", QString::fromStdString(optarg));
+        break;
       case 'x':
         help();
         break;
@@ -185,10 +195,6 @@ int main(int argc, char **argv) {
   while (i.hasNext()) {
     i.next();
     cout << i.key().toStdString() << " set to: " << i.value().toStdString() << endl;
-  }
-  if (parameters.value("Maximal length") == "0" && parameters.value("Maximal angle") == "0") {
-    cout << "normDist and normAngle can't be both equal to 0!" << endl;
-    return 1;
   }
   Tracking *tracking;
   if (parameters.contains("backPath")) {
