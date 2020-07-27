@@ -99,6 +99,21 @@ double Tracking::modul(double angle) {
 }
 
 /**
+  * @brief Computes the float division and handle the division by 0 by returning 0.
+  * @param[in] a Dividend.
+  * @param[in] a Divisor.
+  * @return Division result, 0 if b = 0.
+*/
+double Tracking::divide(double a, double b) {
+  if (b != 0) {
+    return a / b;
+  }
+  else {
+    return 0;
+  }
+}
+
+/**
   * @brief Computes the least difference between two angles, alpha - beta. The difference is oriented in the trigonometric convention.
   * @param[in] alpha Input angle.
   * @param[in] beta Input angle.
@@ -486,35 +501,31 @@ vector<vector<Point3d>> Tracking::objectPosition(const UMat &frame, int minSize,
   * @param[in] LO The maximal assignment distance in pixels.
   * @return The assignment vector containing the new index position to sort the pos vector. 
 */
-vector<int> Tracking::costFunc(const vector<Point3d> &prevPos, const vector<Point3d> &pos, double LENGTH, double ANGLE, double LO) {
-  int n = prevPos.size();
-  int m = pos.size();
+vector<int> Tracking::costFunc(const vector<vector<Point3d>> &prevPos, const vector<vector<Point3d>> &pos, double LENGTH, double ANGLE, double LO, double AREA, double PERIMETER) {
+  int n = prevPos[0].size();
+  int m = pos[0].size();
   vector<int> assignment;
 
   if (n == 0) {
     assignment = {};
   }
   else {
-    double c = -1;
     vector<vector<double>> costMatrix(n, vector<double>(m));
     vector<pair<int, int>> distances;
 
     for (int i = 0; i < n; ++i) {  // Loop on previous objects
-      Point3d prevCoord = prevPos[i];
+      Point3d prevCoord = prevPos[param_spot][i];
+      Point3d prevData = prevPos[3][i];
       for (int j = 0; j < m; ++j) {  // Loop on current objects
-        Point3d coord = pos[j];
+        Point3d coord = pos[param_spot][j];
+        Point3d data = pos[3][j];
         double distanceDiff = pow(pow(prevCoord.x - coord.x, 2) + pow(prevCoord.y - coord.y, 2), 0.5);
         double angleDiff = abs(angleDifference(prevCoord.z, coord.z));
+        double areaDiff = abs(prevData.y - data.y);
+        double perimeterDiff = abs(prevData.z - data.z);
+        double c = -1;
         if (distanceDiff < LO) {
-          if (LENGTH != 0 && ANGLE != 0) {
-            c = (distanceDiff / LENGTH) + (angleDiff / ANGLE);
-          }
-          else if (LENGTH == 0) {
-            c = angleDiff / ANGLE;
-          }
-          else if (ANGLE == 0) {
-            c = distanceDiff / LENGTH;
-          }
+          c = divide(distanceDiff, LENGTH) + divide(angleDiff, ANGLE) + divide(areaDiff, AREA) + divide(perimeterDiff, PERIMETER);
           costMatrix[i][j] = c;
           distances.push_back({i, j});
         }
@@ -697,7 +708,7 @@ void Tracking::imageProcessing() {
       m_out = objectPosition(m_binaryFrame, param_minArea, param_maxArea);
 
       // Associates the objets with the previous image
-      vector<int> identity = costFunc(m_outPrev[param_spot], m_out[param_spot], param_len, param_angle, param_lo);
+      vector<int> identity = costFunc(m_outPrev, m_out, param_len, param_angle, param_lo, param_area, param_perimeter);
       vector<int> occluded = findOcclusion(identity);
 
       // Reassignes the m_out vector regarding the identities of the objects
@@ -936,6 +947,8 @@ void Tracking::updatingParameters(const QMap<QString, QString> &parameterList) {
   param_angle = (M_PI * parameterList.value("Maximal angle").toDouble() / 180);
   param_lo = parameterList.value("Maximal occlusion").toDouble();
   param_to = parameterList.value("Maximal time").toDouble();
+  param_area = parameterList.value("Normalization area").toDouble();
+  param_perimeter = parameterList.value("Normalization perimeter").toDouble();
   param_arrowSize = parameterList.value("Arrow size").toInt();
 
   param_thresh = parameterList.value("Binary threshold").toInt();
