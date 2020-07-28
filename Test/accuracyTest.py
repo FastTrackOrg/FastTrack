@@ -135,7 +135,7 @@ def errorsCounter(reference, tracking):
     #print("--- %s seconds ---" % (time.time() - start_time))
     return (ps, errors, objects, anormalDetectionBehavior)
 
-def tracking(path, imagePath, normDist=None, normAngle=None, maxDist=None, maxTime=None):
+def tracking(path, imagePath, normDist=None, normAngle=None, maxDist=None, maxTime=None, normArea=None, normPerim=None):
 # Import truth parameters
   groundParameter = pandas.read_csv(path + "images/Groundtruth/Tracking_Result/parameter.param", header=None, engine="python", sep=" = ")
   groundParameter = groundParameter.set_index(0)
@@ -159,13 +159,13 @@ def tracking(path, imagePath, normDist=None, normAngle=None, maxDist=None, maxTi
   morphType = str(int(groundParameter.loc["Kernel type"][1]))
 
 
-  cmd = "../build_cli/fasttrack-cli --maxArea " + maxArea + " --minArea " + minArea + " --lightBack "+ lightBack + " --thresh "+ thresh + " --reg " + reg + " --spot "+ spot + " --nBack "+ nBack + " --regBack "+ regBack + " --methBack " + methBack+ " --xTop "+ xTop + " --yTop "+ yTop + " --xBottom " + xBottom + " --yBottom " + yBottom+ " --morph " + morph + " --morphSize " + morphSize+ " --morphType " + morphType+ " --normDist " + str(normDist) + " --normAngle " + str(normAngle) + " --maxDist " + str(maxDist) + " --maxTime " + str(maxTime) + " --path "+ path + imagePath + " --backPath dataSet/images/Groundtruth/Tracking_Result/background.pgm > /dev/null 2>&1" 
+  cmd = "../build_cli/fasttrack-cli --maxArea " + maxArea + " --minArea " + minArea + " --lightBack "+ lightBack + " --thresh "+ thresh + " --reg " + reg + " --spot "+ spot + " --nBack "+ nBack + " --regBack "+ regBack + " --methBack " + methBack+ " --xTop "+ xTop + " --yTop "+ yTop + " --xBottom " + xBottom + " --yBottom " + yBottom+ " --morph " + morph + " --morphSize " + morphSize+ " --morphType " + morphType +" --normaArea" +str(normArea) + " --normPerim"+ str(normPerim) + " --normDist " + str(normDist) + " --normAngle " + str(normAngle) + " --maxDist " + str(maxDist) + " --maxTime " + str(maxTime) + " --path "+ path + imagePath + " --backPath dataSet/images/Groundtruth/Tracking_Result/background.pgm > /dev/null 2>&1" 
   out = os.system(cmd)
 
 
 def test_accuracy():
   reference = pandas.read_csv("dataSet/images/Groundtruth/Tracking_Result/tracking.txt", engine="python", sep="\t", usecols=['xBody', 'yBody', 'imageNumber', 'id'])
-  tracking("dataSet/", "images/", normDist=20, normAngle=118, maxDist=195, maxTime=40)
+  tracking("dataSet/", "images/", normDist=20, normAngle=118, maxDist=195, maxTime=40, normArea=0, normPerim=0)
   trackingData = pandas.read_csv("dataSet/images/Tracking_Result/tracking.txt", engine="python", sep="\t", usecols=['xBody', 'yBody', 'imageNumber', 'id'])              
   res = errorsCounter(reference, trackingData)
   shutil.rmtree("dataSet/images/Tracking_Result/")
