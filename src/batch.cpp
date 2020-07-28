@@ -178,24 +178,6 @@ Batch::Batch(QWidget *parent) : QWidget(parent),
   ui->tableParameters->setCellWidget(15, 1, maxAngle);
   connect(maxAngle, QOverload<int>::of(&QSpinBox::valueChanged), this, &Batch::updateParameters);
 
-  // Set parameters exclusive values
-  connect(maxLength, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [maxAngle](int value) {
-    if (value == 0) {
-      maxAngle->setMinimum(1);
-    }
-    else {
-      maxAngle->setMinimum(0);
-    }
-  });
-  connect(maxAngle, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [maxLength](int value) {
-    if (value == 0) {
-      maxLength->setMinimum(1);
-    }
-    else {
-      maxLength->setMinimum(0);
-    }
-  });
-
   ui->tableParameters->insertRow(16);
   ui->tableParameters->setItem(16, 0, new QTableWidgetItem("Maximal time"));
   QSpinBox *maxTime = new QSpinBox(ui->tableParameters);
@@ -224,6 +206,24 @@ Batch::Batch(QWidget *parent) : QWidget(parent),
   backRegistrationMethod->addItems({"None", "Simple", "ECC", "Features"});
   ui->tableParameters->setCellWidget(19, 1, backRegistrationMethod);
   connect(backRegistrationMethod, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &Batch::updateParameters);
+
+  ui->tableParameters->insertRow(20);
+  ui->tableParameters->setItem(20, 0, new QTableWidgetItem("Normalization area"));
+  QDoubleSpinBox *area = new QDoubleSpinBox(ui->tableParameters);
+  area->setRange(0, 999);
+  area->setValue(0.0);
+  area->setSingleStep(0.1);
+  ui->tableParameters->setCellWidget(20, 1, area);
+  connect(area, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &Batch::updateParameters);
+
+  ui->tableParameters->insertRow(21);
+  ui->tableParameters->setItem(21, 0, new QTableWidgetItem("Normalization perimeter"));
+  QDoubleSpinBox *perim = new QDoubleSpinBox(ui->tableParameters);
+  perim->setRange(0, 999);
+  perim->setValue(0.0);
+  perim->setSingleStep(0.1);
+  ui->tableParameters->setCellWidget(21, 1, perim);
+  connect(perim, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &Batch::updateParameters);
 
   loadSettings();
 
@@ -475,10 +475,14 @@ void Batch::updateParameters() {
   if (isEditable) {
     // Updates SpinBox parameters
     QVector<int> spinBoxIndexes = {1, 2, 4, 5, 6, 7, 11, 12, 13, 14, 15, 16, 17};
+    QVector<int> doubleSpinBoxIndexes = {20, 21};
     QVector<int> comboBoxIndexes = {3, 8, 9, 10, 18, 19};
 
     for (auto &a : spinBoxIndexes) {
       parameterList.insert(ui->tableParameters->item(a, 0)->text(), QString::number(qobject_cast<QSpinBox *>(ui->tableParameters->cellWidget(a, 1))->value()));
+    }
+    for (auto &a : doubleSpinBoxIndexes) {
+      parameterList.insert(ui->tableParameters->item(a, 0)->text(), QString::number(qobject_cast<QDoubleSpinBox *>(ui->tableParameters->cellWidget(a, 1))->value()));
     }
     for (auto &a : comboBoxIndexes) {
       parameterList.insert(ui->tableParameters->item(a, 0)->text(), QString::number(qobject_cast<QComboBox *>(ui->tableParameters->cellWidget(a, 1))->currentIndex()));
