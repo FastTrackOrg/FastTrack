@@ -1,3 +1,20 @@
+/*
+This file is part of Fast Track.
+
+    FastTrack is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    FastTrack is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with FastTrack.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
 #ifndef REPLAY_H
 #define REPLAY_H
 
@@ -44,6 +61,7 @@
 #include "data.h"
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
+#include "videoreader.h"
 using namespace std;
 using namespace cv;
 
@@ -75,21 +93,21 @@ class Replay : public QMainWindow {
   Data *trackingData;
   Annotation *annotation;
 
-  vector<cv::String> replayFrames; /*!< Paths to each image of the images sequences to replay. */
-  vector<Point3f> colorMap;        /*!< RGB color map to display each object in one color. */
-  QVector<int> occlusionEvents;    /*!< Index of each occlusion event in the replayed images sequence. */
-  int replayNumberObject;          /*!< Number of objects tracked in the replayed images sequence. */
-  bool isReplayable;               /*!< True if user input is an images sequences that can be played. */
-  QTimer *framerate;               /*!< Sets the time at which a new image is displayed in autoplay mode in the replay. */
-  int replayFps;                   /*!< Frame rate value at which a new image is displayed in autoplay mode in the replay. */
-  int autoPlayerIndex;             /*!< Index of the image displayed in autoplay mode in the replay. */
-  bool object;                     /*!< Alternatively true or false to associate either object A or object B at each click of the user in the ui->replayDisplay. */
-  QSize resizedFrame;              /*!< Width and height of displayed QPixmap to accomodate window size changment. */
-  QSize originalImageSize;         /*!< Width and height of the original image in the images sequence. */
+  vector<Point3f> colorMap;     /*!< RGB color map to display each object in one color. */
+  QVector<int> occlusionEvents; /*!< Index of each occlusion event in the replayed images sequence. */
+  int replayNumberObject;       /*!< Number of objects tracked in the replayed images sequence. */
+  bool isReplayable;            /*!< True if user input is an images sequences that can be played. */
+  QTimer *framerate;            /*!< Sets the time at which a new image is displayed in autoplay mode in the replay. */
+  int replayFps;                /*!< Frame rate value at which a new image is displayed in autoplay mode in the replay. */
+  int autoPlayerIndex;          /*!< Index of the image displayed in autoplay mode in the replay. */
+  bool object;                  /*!< Alternatively true or false to associate either object A or object B at each click of the user in the ui->replayDisplay. */
+  QSize resizedFrame;           /*!< Width and height of displayed QPixmap to accomodate window size changment. */
+  QSize originalImageSize;      /*!< Width and height of the original image in the images sequence. */
   double currentZoom;
   QPointF panReferenceClick;
   QPointF zoomReferencePosition;
   QList<int> ids;
+  VideoReader *video;
 
  public slots:
 

@@ -45,6 +45,7 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   // Loads settings
   settingsFile = new QSettings("FastTrack", "Benjamin Gallois", this);
   loadSettings();
+  videoStatus = false;
 
   //DockWidget
   connect(ui->imageOptions, &QDockWidget::dockLocationChanged, [this](Qt::DockWidgetArea area) {
@@ -86,10 +87,6 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
 
   // Menu bar
   connect(ui->actionOpen, &QAction::triggered, this, &Interactive::openFolder);
-  connect(ui->actionVideo, &QAction::triggered, [this]() {
-    OpenVideo *openvideo = new OpenVideo(this);
-    openvideo->show();
-  });
   ui->menuView->addAction(ui->imageOptions->toggleViewAction());
   ui->menuView->addAction(ui->trackingOptions->toggleViewAction());
   ui->menuView->addAction(ui->controlOptions->toggleViewAction());
@@ -416,7 +413,7 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
 
   // Set the image preview limits
   connect(ui->startImage, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [this](int startImage) {
-    ui->stopImage->setRange(0, framePath.size() - startImage);
+    ui->stopImage->setRange(0, video->getImageCount() - startImage);
   });
 
   // Events filter to zoom in/out in the display
@@ -424,6 +421,8 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   ui->scrollArea->viewport()->installEventFilter(this);
 
   // Buttons connects
+  ui->previewButton->setDisabled(true);
+  ui->trackButton->setDisabled(true);
   connect(ui->backgroundSelectButton, &QPushButton::clicked, this, &Interactive::selectBackground);
   connect(ui->backgroundComputeButton, &QPushButton::clicked, this, &Interactive::computeBackground);
   connect(ui->previewButton, &QPushButton::clicked, this, &Interactive::previewTracking);
@@ -462,6 +461,8 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   // Sets the object counter on top of the display
   counterLabel = new QLabel(ui->scrollArea->viewport());
   counterLabel->move(20, 20);
+
+  video = new VideoReader("");
 }
 
 /**
@@ -472,9 +473,7 @@ void Interactive::openFolder() {
   replayAction->setChecked(false);
   isBackground = false;
   ui->interactiveTab->removeTab(1);
-  trackingData = new Data("");
   memoryDir.clear();
-  framePath.clear();
   backgroundPath.clear();
   background.release();
   currentZoom = 1;
@@ -485,42 +484,27 @@ void Interactive::openFolder() {
   ui->isSub->setCheckable(false);
   ui->isOriginal->setChecked(true);
 
-  dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"), memoryDir, QFileDialog::ShowDirsOnly);
-
-  // Ignores the folder Tracking_Result if selected
-  if (dir.right(15) == "Tracking_Result") {
-    dir.truncate(dir.size() - 15);
-  }
+  dir = QFileDialog::getOpenFileName(this, tr("Open File"), memoryDir);
 
   if (dir.length()) {
     // Finds the image format
-    QList<QString> extensions = {"pgm", "png", "jpeg", "jpg", "tiff", "tif", "bmp", "dib", "jpe", "jp2", "webp", "pbm", "ppm", "sr", "ras", "tif"};
-    QDirIterator it(dir, QStringList(), QDir::NoFilter);
-    QString extension;
-    while (it.hasNext()) {
-      extension = it.next().section('.', -1);
-      if (extensions.contains(extension)) break;
-    }
-
     // Setups the class member
     try {
-      string path = (dir + QDir::separator() + "*." + extension).toStdString();
       memoryDir = dir;
-      glob(path, framePath, false);
-
-      if (framePath.empty()) {
-        emit(message("No image found."));
-        return;
-      }
-
+      delete video;
+      video = new VideoReader(dir.toStdString());
       ui->slider->setMinimum(0);
-      ui->slider->setMaximum(framePath.size() - 1);
-      ui->nBack->setMaximum(framePath.size() - 1);
-      ui->nBack->setValue(framePath.size() - 1);
-      ui->startImage->setRange(0, framePath.size() - 1);
+      ui->slider->setMaximum(video->getImageCount() - 1);
+      ui->previewButton->setDisabled(true);
+      ui->trackButton->setDisabled(true);
+      ui->nBack->setMaximum(video->getImageCount() - 1);
+      ui->nBack->setValue(video->getImageCount() - 1);
+      ui->startImage->setRange(0, video->getImageCount() - 1);
       ui->startImage->setValue(0);
 
-      Mat frame = imread(framePath[0], IMREAD_COLOR | IMREAD_ANYDEPTH);
+      Mat frame;
+      video->getImage(0, frame);
+      cvtColor(frame, frame, COLOR_GRAY2RGB);
       originalImageSize.setWidth(frame.cols);
       originalImageSize.setHeight(frame.rows);
       cropedImageSize.setWidth(originalImageSize.width());
@@ -529,13 +513,12 @@ void Interactive::openFolder() {
       ui->y2->setMaximum(frame.rows);
 
       ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Path", Qt::MatchExactly)[0]), 1)->setText(dir);
-      ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Image number", Qt::MatchExactly)[0]), 1)->setText(QString::number(framePath.size()));
+      ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Image number", Qt::MatchExactly)[0]), 1)->setText(QString::number(video->getImageCount()));
       ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Image width", Qt::MatchExactly)[0]), 1)->setText(QString::number(frame.cols));
       ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Image height", Qt::MatchExactly)[0]), 1)->setText(QString::number(frame.rows));
 
       isBackground = false;
       reset();
-      display(0);
 
       // Automatic background computation type selection based on the image mean
       int meanValue = int(mean(frame)[0]);
@@ -545,6 +528,10 @@ void Interactive::openFolder() {
       else {
         ui->back->setCurrentIndex(1);
       }
+      if (video->isOpened()) {
+        videoStatus = true;
+      }
+      display(0);
     }
     // If an error occurs during the opening, resets the information table and warns the user
     catch (...) {
@@ -563,9 +550,9 @@ void Interactive::openFolder() {
   * @param[in] scale Optional scale to display.
 */
 void Interactive::display(int index, int scale) {
-  if (!framePath.empty()) {
+  if (videoStatus) {
     UMat frame;
-    imread(framePath[index], IMREAD_GRAYSCALE | IMREAD_ANYDEPTH).copyTo(frame);
+    video->getImage(index, frame);
     vector<vector<Point>> displayContours;
     vector<vector<Point>> rejectedContours;
 
@@ -697,7 +684,7 @@ void Interactive::display(UMat image) {
   * @brief Computes and displays the background image in the display. Triggered when the backgroundComputeButton is clicked.
 */
 void Interactive::computeBackground() {
-  if (!framePath.empty()) {
+  if (videoStatus) {
     double nBack = double(ui->nBack->value());
     int method = ui->back->currentIndex();
     int registrationMethod = ui->registrationBack->currentIndex();
@@ -707,7 +694,7 @@ void Interactive::computeBackground() {
     // Computes the background without blocking the ui
     QFuture<void> future = QtConcurrent::run([=]() {
       try {
-        background = tracking->backgroundExtraction(framePath, nBack, method, registrationMethod);
+        background = tracking->backgroundExtraction(*video, nBack, method, registrationMethod);
       }
       catch (const std::exception &ex) {
         message("An error occurs. Please change the registration method");
@@ -726,6 +713,8 @@ void Interactive::computeBackground() {
       }
 
       display(background);
+      ui->previewButton->setDisabled(false);
+      ui->trackButton->setDisabled(false);
     });
   }
 }
@@ -744,6 +733,8 @@ void Interactive::selectBackground() {
 
       ui->isBin->setCheckable(true);
       ui->isSub->setCheckable(true);
+      ui->previewButton->setDisabled(false);
+      ui->trackButton->setDisabled(false);
 
       // Automatic background type selection based on image mean
       int meanValue = int(mean(background)[0]);
@@ -796,7 +787,7 @@ void Interactive::getParameters() {
   * @brief Does a tracing analysis on a sub-part of the image sequence defined by the user. Triggered when previewButton is clicked.
 */
 void Interactive::previewTracking() {
-  if (!framePath.empty()) {
+  if (videoStatus) {
     ui->progressBar->setRange(ui->startImage->value(), ui->stopImage->value() + ui->startImage->value() - 1);
     ui->progressBar->setValue(0);
     ui->previewButton->setDisabled(true);
@@ -804,7 +795,7 @@ void Interactive::previewTracking() {
     replayAction->setChecked(false);
 
     QThread *thread = new QThread;
-    Tracking *tracking = new Tracking(framePath, background, ui->startImage->value(), ui->startImage->value() + ui->stopImage->value());
+    Tracking *tracking = new Tracking(memoryDir.toStdString(), background, ui->startImage->value(), ui->startImage->value() + ui->stopImage->value());
     tracking->moveToThread(thread);
 
     connect(thread, &QThread::started, tracking, &Tracking::startProcess);
@@ -813,7 +804,6 @@ void Interactive::previewTracking() {
       ui->slider->setDisabled(false);
       ui->previewButton->setDisabled(false);
       ui->trackButton->setDisabled(false);
-      trackingData = new Data(dir + "/Tracking_Result");
       message("An error occurs during the tracking.");
     });
     connect(tracking, &Tracking::statistic, [this](int time) {
@@ -823,7 +813,6 @@ void Interactive::previewTracking() {
       ui->slider->setDisabled(false);
       ui->previewButton->setDisabled(false);
       ui->trackButton->setDisabled(false);
-      trackingData = new Data(dir + "/Tracking_Result");
       replayAction->setChecked(true);
     });
     connect(tracking, &Tracking::forceFinished, this, [this]() {
@@ -847,15 +836,15 @@ void Interactive::previewTracking() {
   * @brief Does a tracking analysis. Triggered when the trackButton is clicked.
 */
 void Interactive::track() {
-  if (!framePath.empty()) {
-    ui->progressBar->setRange(0, framePath.size() - 1);
+  if (videoStatus) {
+    ui->progressBar->setRange(0, video->getImageCount() - 1);
     ui->progressBar->setValue(0);
     ui->previewButton->setDisabled(true);
     ui->trackButton->setDisabled(true);
     replayAction->setChecked(false);
 
     QThread *thread = new QThread;
-    Tracking *tracking = new Tracking(framePath, background);
+    Tracking *tracking = new Tracking(memoryDir.toStdString(), background);
     QMap<QString, QString> *logMap = new QMap<QString, QString>;
     logMap->insert("date", QDateTime::currentDateTime().toString());
     logMap->insert("path", dir);
@@ -866,14 +855,13 @@ void Interactive::track() {
       ui->slider->setDisabled(false);
       ui->previewButton->setDisabled(false);
       ui->trackButton->setDisabled(false);
-      trackingData = new Data(dir + "/Tracking_Result");
       logMap->insert("status", "Error");
       emit(log(*logMap));
       message("An error occurs during the tracking.");
     });
     connect(tracking, &Tracking::progress, ui->progressBar, &QProgressBar::setValue);
     connect(tracking, &Tracking::statistic, [this, logMap](int time) {
-      ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Analysis rate", Qt::MatchExactly)[0]), 1)->setText(QString::number(double(framePath.size() * 1000) / double(time)));
+      ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Analysis rate", Qt::MatchExactly)[0]), 1)->setText(QString::number(double(video->getImageCount() * 1000) / double(time)));
       logMap->insert("time", QString::number(time));
     });
     connect(tracking, &Tracking::finished, thread, &QThread::quit);
@@ -881,7 +869,6 @@ void Interactive::track() {
       ui->slider->setDisabled(false);
       ui->previewButton->setDisabled(false);
       ui->trackButton->setDisabled(false);
-      trackingData = new Data(dir + "/Tracking_Result");
       replayAction->setChecked(true);
       logMap->insert("status", "Done");
       emit(log(*logMap));
@@ -890,7 +877,6 @@ void Interactive::track() {
       ui->slider->setDisabled(false);
       ui->previewButton->setDisabled(false);
       ui->trackButton->setDisabled(false);
-      trackingData = new Data(dir + "/Tracking_Result");
       replayAction->setChecked(true);
       logMap->insert("status", "Error");
       emit(log(*logMap));
@@ -1054,6 +1040,7 @@ void Interactive::reset() {
 Interactive::~Interactive() {
   saveSettings();
   delete tracking;
+  delete video;
   delete ui;
 }
 
