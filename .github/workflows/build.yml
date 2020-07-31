@@ -15,6 +15,10 @@ jobs:
              sudo add-apt-repository ppa:beineri/opt-qt-5.14.2-xenial
              sudo apt-get update
              sudo apt-get install libgl1-mesa-dev qt514base qt514webengine
+             sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+             sudo apt-get update
+             sudo apt-get install gcc-9 g++-9
+             sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 90 --slave /usr/bin/g++ g++ /usr/bin/g++-9 --slave /usr/bin/gcov gcov /usr/bin/gcov-9
         - name: install opencv
           run: sudo ./dependencies.sh opencv
         - name: build

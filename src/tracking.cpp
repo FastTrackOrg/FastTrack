@@ -202,25 +202,32 @@ bool Tracking::objectDirection(const UMat &image, Point center, vector<double> &
   * @param[in] Method 0: minimal projection, 1: maximal projection, 2: average projection.
   * @return The background image.
 */
-UMat Tracking::backgroundExtraction(const vector<String> &files, double n, const int method, const int registrationMethod) {
-  if (static_cast<unsigned int>(n) > files.size()) {
-    n = double(files.size());
+UMat Tracking::backgroundExtraction(VideoReader &video, double n, const int method, const int registrationMethod) {
+  if (n > video.getImageCount()) {
+    n = double(video.getImageCount());
   }
 
   UMat background;
   UMat img0;
-  imread(files[0], IMREAD_GRAYSCALE).copyTo(background);
-  imread(files[0], IMREAD_GRAYSCALE).copyTo(img0);
+  video.getImage(0, background);
+  video.getImage(0, img0);
+  if (background.channels() >= 3) {
+    cvtColor(background, background, COLOR_BGR2GRAY);
+    cvtColor(img0, img0, COLOR_BGR2GRAY);
+  }
   background.convertTo(background, CV_32FC1);
   img0.convertTo(img0, CV_32FC1);
-  int step = files.size() / (n - 1);
+  int step = video.getImageCount() / (n - 1);
   UMat cameraFrameReg;
   Mat H;
   int count = 1;
 
-  for (size_t i = 0; i < files.size(); i += step) {
-    imread(files[i], IMREAD_GRAYSCALE).copyTo(cameraFrameReg);
+  for (size_t i = 0; i < video.getImageCount(); i += step) {
     if (registrationMethod != 0) registration(img0, cameraFrameReg, registrationMethod - 1);
+    video.getImage(i, cameraFrameReg);
+    if (cameraFrameReg.channels() >= 3) {
+      cvtColor(cameraFrameReg, cameraFrameReg, COLOR_BGR2GRAY);
+    }
     cameraFrameReg.convertTo(cameraFrameReg, CV_32FC1);
     switch (method) {
       case 0:
@@ -686,7 +693,7 @@ void Tracking::imageProcessing() {
   while (m_im < m_stopImage) {
     try {
       // Reads the next image in the image sequence and applies the image processing workflow
-      imread(m_files[m_im], IMREAD_GRAYSCALE).copyTo(m_visuFrame);
+      video->getImage(m_im, m_visuFrame);
       if (param_registration != 0) {
         registration(m_background, m_visuFrame, param_registration - 1);
       }
@@ -767,6 +774,7 @@ void Tracking::imageProcessing() {
 */
 Tracking::Tracking(string path, string backgroundPath, int startImage, int stopImage) {
   m_path = path;
+  video = new VideoReader(m_path);
   m_backgroundPath = backgroundPath;
   m_startImage = startImage;
   m_stopImage = stopImage;
@@ -779,14 +787,12 @@ Tracking::Tracking(string path, string backgroundPath, int startImage, int stopI
   * @param[in] startImage Index of the beginning image.
   * @param[in] stopImage Index of the ending image.
 */
-Tracking::Tracking(vector<String> imagePath, UMat background, int startImage, int stopImage) {
-  m_files = imagePath;
+Tracking::Tracking(string path, UMat background, int startImage, int stopImage) {
+  m_path = path;
+  video = new VideoReader(m_path);
   m_background = background;
   m_startImage = startImage;
   m_stopImage = stopImage;
-
-  size_t separator = m_files[0].find_last_of("/\\");
-  m_path = m_files[0].substr(0, separator + 1);
 }
 
 /**
@@ -794,33 +800,19 @@ Tracking::Tracking(vector<String> imagePath, UMat background, int startImage, in
 */
 void Tracking::startProcess() {
   try {
-    timer = new QElapsedTimer();
-    timer->start();
-    // Finds image format
-    QList<QString> extensions = {"pgm", "png", "jpeg", "jpg", "tiff", "tif", "bmp", "dib", "jpe", "jp2", "webp", "pbm", "ppm", "sr", "ras", "tif"};
-    QDirIterator it(QString::fromStdString(m_path), QStringList(), QDir::NoFilter);
-    QString extension;
-    while (it.hasNext()) {
-      extension = it.next().section('.', -1);
-      if (extensions.contains(extension)) break;
-    }
-
-    if (m_files.empty()) {
-      m_path += +"*." + extension.toStdString();
-      glob(m_path, m_files, false);  // Get all path to frames
-    }
-    if (m_files.empty()) {
+    if (!video->isOpened()) {
+      emit(forceFinished());
       return;
     }
+    timer = new QElapsedTimer();
+    timer->start();
     m_im = m_startImage;
-    (m_stopImage == -1) ? (m_stopImage = int(m_files.size())) : (m_stopImage = m_stopImage);
-
-    sort(m_files.begin(), m_files.end());
+    (m_stopImage == -1) ? (m_stopImage = int(video->getImageCount())) : (m_stopImage = m_stopImage);
 
     // Loads the background image is provided and check if the image has the correct size
     if (m_background.empty() && m_backgroundPath.empty()) {
       try {
-        m_background = backgroundExtraction(m_files, param_nBackground, param_methodBackground, param_methodRegistrationBackground);
+        m_background = backgroundExtraction(*video, param_nBackground, param_methodBackground, param_methodRegistrationBackground);
       }
       catch (...) {
         emit(forceFinished());
@@ -831,7 +823,7 @@ void Tracking::startProcess() {
       try {
         imread(m_backgroundPath, IMREAD_GRAYSCALE).copyTo(m_background);
         UMat test;
-        imread(m_files[0], IMREAD_GRAYSCALE).copyTo(test);
+        video->getImage(0, test);
         subtract(test, m_background, test);
       }
       catch (...) {
@@ -843,7 +835,7 @@ void Tracking::startProcess() {
     m_colorMap = color(9000);
     m_memory = vector<vector<Point>>(9000, vector<Point>());
     // First frame
-    imread(m_files[m_im], IMREAD_GRAYSCALE).copyTo(m_visuFrame);
+    video->getImage(m_im, m_visuFrame);
 
     (statusBinarisation) ? (subtract(m_background, m_visuFrame, m_binaryFrame)) : (subtract(m_visuFrame, m_background, m_binaryFrame));
 
@@ -874,10 +866,19 @@ void Tracking::startProcess() {
 
     //  Creates the folder to save result, parameter and background image
     //  If a folder already exist, renames it with the date and time.
-    QString savingPath = QString::fromStdString(m_path).section("*", 0, 0) + QDir::separator() + "Tracking_Result" + QDir::separator();
+    QFileInfo savingInfo(QString::fromStdString(m_path));
+    QString savingFilename = savingInfo.baseName();
+    QString savingPath = savingInfo.absolutePath();
+    if (video->isSequence()) {
+      savingPath.append(QString("/Tracking_Result"));
+    }
+    else {
+      savingPath.append(QString("/Tracking_Result_") + savingFilename);
+    }
     QDir r;
-    r.rename(savingPath, QString::fromStdString(m_path).section("*", 0, 0) + QDir::separator() + "Tracking_Result_Archive-" + QDate::currentDate().toString("dd-MMM-yyyy-") + QTime::currentTime().toString("hh-mm-ss"));
+    r.rename(savingPath, savingPath + "_Archive-" + QDate::currentDate().toString("dd-MMM-yyyy-") + QTime::currentTime().toString("hh-mm-ss"));
     QDir().mkdir(savingPath);
+    savingPath.append(QDir::separator());
 
     QFile parameterFile(savingPath + "parameter.param");
     if (!parameterFile.open(QFile::WriteOnly | QFile::Text)) {
@@ -971,4 +972,5 @@ void Tracking::updatingParameters(const QMap<QString, QString> &parameterList) {
   * @brief Destructs the tracking object.
 */
 Tracking::~Tracking() {
+  delete video;
 }

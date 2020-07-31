@@ -15,5 +15,5 @@ def f(x, reference):
 
 bounds = [(0, 400), (0, 180), (5, 400), (5, 200), (0, 100), (0, 100)]
 reference = pandas.read_csv("dataSet/images/Groundtruth/Tracking_Result/tracking.txt", engine="python", sep="\t", usecols=['xBody', 'yBody', 'imageNumber', 'id'])
-res = differential_evolution(f, bounds, args=[reference])
+res = differential_evolution(f, bounds, args=[reference], maxiter=4000)
 print(res)

@@ -266,7 +266,7 @@ void Batch::openPathFolder() {
   // Enable multiple selection
   QFileDialog dialog;
   dialog.setOption(QFileDialog::DontUseNativeDialog, true);
-  dialog.setFileMode(QFileDialog::DirectoryOnly);
+  dialog.setFileMode(QFileDialog::AnyFile);
   QListView *listView = dialog.findChild<QListView *>("listView");
   if (listView) {
     listView->setSelectionMode(QAbstractItemView::MultiSelection);
@@ -282,21 +282,29 @@ void Batch::openPathFolder() {
 
   if (!dirList.isEmpty()) {
     for (auto dir : dirList) {
-      dir += "/" + ui->suffix->text();
+      dir += ui->suffix->text();
       // If Tracking_Result folder selectionned, get the path to the top directory
       QString backgroundPath, paramPath;
-      if (dir.right(16) == "Tracking_Result/") {
-        dir.truncate(dir.size() - 17);
-      }
 
       if (dir.length()) {
         // Autoloads  background and tracking if auto is checked
         if (ui->isAuto->isChecked()) {
-          if (QFileInfo(dir + "/Tracking_Result/background.pgm").exists()) {
-            backgroundPath = dir + "/Tracking_Result/background.pgm";
+          QFileInfo savingInfo(dir);
+          QString savingFilename = savingInfo.baseName();
+          QString savingPath = savingInfo.absolutePath();
+          QString trackingDir = savingPath;
+          QString resDir;
+          if (QDir(savingPath + QString("/Tracking_Result")).exists()) {
+            resDir = savingPath + QString("/Tracking_Result");
           }
-          if (loadParameterFile(dir + "/Tracking_Result/parameter.param")) {
-            paramPath = dir + "/Tracking_Result/parameter.param";
+          else if (QDir(savingPath + QString("/Tracking_Result_") + savingFilename).exists()) {
+            resDir = savingPath + QString("/Tracking_Result_") + savingFilename;
+          }
+          if (QFileInfo(resDir + "/background.pgm").exists()) {
+            backgroundPath = resDir + "/background.pgm";
+          }
+          if (loadParameterFile(resDir + "/parameter.param")) {
+            paramPath = resDir + "/parameter.param";
             updateParameterTable();
           }
         }
@@ -400,12 +408,13 @@ void Batch::startTracking() {
     ui->removePath->setDisabled(true);
     ui->clearPath->setDisabled(true);
 
-    if (QDir(processList[currentPathCount].path).exists()) {
-      int count = QDir(processList[currentPathCount].path).count();
-      string path = (processList[currentPathCount].path + QDir::separator()).toStdString();
+    if (QFileInfo(processList[currentPathCount].path).exists()) {
+      int count = 100;  //QDir(processList[currentPathCount].path).count();
+      string path = (processList[currentPathCount].path).toStdString();
       string backgroundPath = processList[currentPathCount].backgroundPath.toStdString();
+      cout << backgroundPath << endl;
       QProgressBar *progressBar = qobject_cast<QProgressBar *>(ui->tablePath->cellWidget(currentPathCount, 3));
-      progressBar->setRange(0, count);
+      progressBar->setRange(0, 100);
       progressBar->setValue(0);
 
       thread = new QThread;
@@ -416,14 +425,14 @@ void Batch::startTracking() {
       tracking->moveToThread(thread);
 
       connect(thread, &QThread::started, tracking, &Tracking::startProcess);
-      connect(tracking, &Tracking::progress, progressBar, &QProgressBar::setValue);
+      //connect(tracking, &Tracking::progress, progressBar, &QProgressBar::setValue);
       connect(tracking, &Tracking::statistic, [this, logMap](int time) {
         logMap->insert("time", QString::number(time));
       });
       connect(tracking, &Tracking::finished, progressBar, [this, progressBar, count, logMap]() {
         ui->tablePath->item(currentPathCount, 4)->setText("Done");
         ;
-        progressBar->setValue(count);
+        //progressBar->setValue(count);
         currentPathCount++;
         emit(next());
         logMap->insert("status", "Done");

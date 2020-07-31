@@ -15,42 +15,30 @@ This file is part of Fast Track.
     along with FastTrack.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#ifndef OPENVIDEO_H
-#define OPENVIDEO_H
+#ifndef VIDEOREADER_H
+#define VIDEOREADER_H
 
-#include <stdio.h>
-#include <QAbstractItemView>
-#include <QDebug>
-#include <QDialog>
-#include <QFileDialog>
-#include <QFuture>
-#include <QMessageBox>
-#include <QProgressBar>
-#include <QtConcurrent/QtConcurrentRun>
+#include <filesystem>
 #include <iostream>
-#include <opencv2/core.hpp>
-#include <ostream>
+#include <opencv2/imgproc.hpp>
+#include <opencv2/videoio.hpp>
+#include <regex>
+#include <set>
 #include <string>
-#include "opencv2/opencv.hpp"
 
-namespace Ui {
-class OpenVideo;
-}
+using namespace cv;
+using namespace std;
+namespace fs = std::filesystem;
 
-class OpenVideo : public QDialog {
-  Q_OBJECT
+class VideoReader : public VideoCapture {
+  bool m_isSequence;
 
  public:
-  explicit OpenVideo(QWidget *parent = nullptr);
-  ~OpenVideo();
-
- private slots:
-
-  void selectVideo();
-  void createImageSequence(QString path, QProgressBar *bar);
-
- private:
-  Ui::OpenVideo *ui;
+  VideoReader(const string &path);
+  void getImage(int index, UMat &destination);
+  void getImage(int index, Mat &destination);
+  unsigned int getImageCount();
+  bool isSequence();
 };
 
-#endif  // OPENVIDEO_H
+#endif

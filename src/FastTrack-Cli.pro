@@ -17,7 +17,7 @@ unix:!macx {
   MOC_DIR=build_cli
   UI_DIR=build_cli
 
-  QMAKE_CXXFLAGS += -std=c++11 -O3 -fopenmp -g
+  QMAKE_CXXFLAGS += -std=c++17 -O3 -fopenmp -g
   QMAKE_CXXFLAGS_RELEASE -= -O1
   QMAKE_CXXFLAGS_RELEASE -= -O2
   QMAKE_CXXFLAGS_RELEASE += -O3
@@ -40,7 +40,7 @@ win32 {
 }
 
 unix:macx {
-  QMAKE_CXXFLAGS += -std=c++11 -O3 -g
+  QMAKE_CXXFLAGS += -std=c++17 -O3 -g
   QMAKE_CXXFLAGS_RELEASE -= -O1
   QMAKE_CXXFLAGS_RELEASE -= -O2
   QMAKE_CXXFLAGS_RELEASE += -O3
@@ -60,10 +60,12 @@ unix:macx {
 SOURCES += \
         fasttrack-cli.cpp \
         tracking.cpp \
+        videoreader.cpp \
         Hungarian.cpp \
 
 
 HEADERS += \
         tracking.h \
+        videoreader.h \
         Hungarian.h \
 

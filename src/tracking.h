@@ -49,6 +49,7 @@ This file is part of Fast Track.
 #include <tuple>
 #include <utility>
 #include "opencv2/features2d/features2d.hpp"
+#include "videoreader.h"
 
 using namespace cv;
 using namespace std;
@@ -62,6 +63,7 @@ class Tracking : public QObject {
 
   bool statusBinarisation; /*!< True if wite objects on dark background, flase otherwise. */
 
+  VideoReader *video;
   int m_im;                       /*!< Index of the next image to process in the m_files list. */
   int m_startImage;               /*!< Index of the next image to process in the m_files list. */
   int m_stopImage;                /*!< Index of the next image to process in the m_files list. */
@@ -106,7 +108,7 @@ class Tracking : public QObject {
 
  public:
   Tracking(string path, string background, int startImage = 0, int stopImage = -1);
-  Tracking(vector<String> imagePath, UMat background, int startImage = 0, int stopImage = -1);
+  Tracking(string path, UMat background, int startImage = 0, int stopImage = -1);
   ~Tracking();
 
   Point2d curvatureCenter(const Point3d &tail, const Point3d &head);
@@ -117,7 +119,7 @@ class Tracking : public QObject {
   bool objectDirection(const UMat &image, Point center, vector<double> &information);
   vector<double> objectInformation(const UMat &image);
   vector<Point3d> reassignment(const vector<Point3d> &past, const vector<Point3d> &input, const vector<int> &assignment);
-  UMat backgroundExtraction(const vector<String> &files, double n, const int method, const int registrationMethod);
+  UMat backgroundExtraction(VideoReader &video, double n, const int method, const int registrationMethod);
   void registration(UMat imageReference, UMat &frame, int method);
   void binarisation(UMat &frame, char backgroundColor, int value);
   vector<vector<Point3d>> objectPosition(const UMat &frame, int minSize, int maxSize);
