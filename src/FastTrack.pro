@@ -21,7 +21,7 @@ unix:!macx {
   UI_DIR=build
   RCC_DIR=build
 
-  QMAKE_CXXFLAGS += -std=c++11 -O3 -fopenmp -g
+  QMAKE_CXXFLAGS += -std=c++17 -O3 -fopenmp -g
   QMAKE_CXXFLAGS_RELEASE -= -O1
   QMAKE_CXXFLAGS_RELEASE -= -O2
   QMAKE_CXXFLAGS_RELEASE += -O3
@@ -36,17 +36,20 @@ unix:!macx {
 }
 
 win32 {
-  CONFIG += c++latest
+  QMAKE_CXXFLAGS += /std:c++latest
   LIBS += -LC:\opencv\build\x64\vc15\lib -lopencv_world430
   INCLUDEPATH += C:\opencv\build\include
   DEPENDPATH += C:\opencv\build\include
 }
 
 unix:macx {
-  QMAKE_CXXFLAGS += -std=c++11 -O3 -g
+  CONFIG += c++17
+  QMAKE_CXXFLAGS += -std=c++1z -stdlib=libc++ -mmacosx-version-min=10.15  -O3 -g
   QMAKE_CXXFLAGS_RELEASE -= -O1
   QMAKE_CXXFLAGS_RELEASE -= -O2
   QMAKE_CXXFLAGS_RELEASE += -O3
+
+  QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.15
 
   QMAKE_LFLAGS_RELEASE -= -O1
   QMAKE_LFLAGS_RELEASE -= -O2
@@ -69,7 +72,6 @@ unix:macx {
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
-        openvideo.cpp \
         tracking.cpp \
         Hungarian.cpp \
         replay.cpp \
@@ -78,11 +80,11 @@ SOURCES += \
         data.cpp \
         annotation.cpp \
         trackingmanager.cpp \
+        videoreader.cpp \
 
 
 HEADERS += \
         mainwindow.h\
-        openvideo.h \
         tracking.h \
         Hungarian.h \
         replay.h \
@@ -90,11 +92,11 @@ HEADERS += \
         interactive.h \
         data.h \
         annotation.h \
-        trackingmanager.h
+        trackingmanager.h\
+        videoreader.h \
 
 
 FORMS += \
-        openvideo.ui \
         mainwindow.ui \
         replay.ui \
         trackingmanager.ui \

@@ -53,8 +53,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>576</width>
-             <height>604</height>
+             <width>566</width>
+             <height>599</height>
             </rect>
            </property>
            <layout class="QGridLayout" name="gridLayout_2">
@@ -1130,7 +1130,6 @@ corner: </string>
      <string>Fi&amp;le</string>
     </property>
     <addaction name="actionOpen"/>
-    <addaction name="actionVideo"/>
    </widget>
    <widget class="QMenu" name="menuView">
     <property name="title">

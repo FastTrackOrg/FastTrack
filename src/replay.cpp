@@ -1,3 +1,20 @@
+/*
+This file is part of Fast Track.
+
+    FastTrack is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    FastTrack is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with FastTrack.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
 #include "replay.h"
 #include "ui_replay.h"
 
@@ -69,7 +86,7 @@ Replay::Replay(QWidget* parent, bool standalone, QSlider* control) : QMainWindow
   undoAction->setStatusTip(tr("Undo"));
   connect(undoAction, &QAction::triggered, [this]() {
     object2Replay->clear();
-    ids = trackingData->getId(0, replayFrames.size());
+    ids = trackingData->getId(0, video->getImageCount());
     std::sort(ids.begin(), ids.end());
     for (auto const& a : ids) {
       object2Replay->addItem(QString::number(a));
@@ -85,7 +102,7 @@ Replay::Replay(QWidget* parent, bool standalone, QSlider* control) : QMainWindow
   redoAction->setStatusTip(tr("Redo"));
   connect(redoAction, &QAction::triggered, [this]() {
     object2Replay->clear();
-    ids = trackingData->getId(0, replayFrames.size());
+    ids = trackingData->getId(0, video->getImageCount());
     std::sort(ids.begin(), ids.end());
     for (auto const& a : ids) {
       object2Replay->addItem(QString::number(a));
@@ -134,7 +151,7 @@ Replay::Replay(QWidget* parent, bool standalone, QSlider* control) : QMainWindow
     if (isReplayable) {
       DeleteData* del = new DeleteData(object2Replay->currentText().toInt(), ui->replaySlider->value(), ui->replaySlider->value(), trackingData);
       commandStack->push(del);
-      ids = trackingData->getId(0, replayFrames.size());
+      ids = trackingData->getId(0, video->getImageCount());
       object2Replay->clear();
       for (auto const& a : ids) {
         object2Replay->addItem(QString::number(a));
@@ -152,7 +169,7 @@ Replay::Replay(QWidget* parent, bool standalone, QSlider* control) : QMainWindow
     if (isReplayable) {
       DeleteData* del = new DeleteData(object2Replay->currentText().toInt(), ui->replaySlider->value(), ui->replaySlider->value() + deletedFrameNumber->value() - 1, trackingData);
       commandStack->push(del);
-      ids = trackingData->getId(0, replayFrames.size());
+      ids = trackingData->getId(0, video->getImageCount());
       object2Replay->clear();
       for (auto const& a : ids) {
         object2Replay->addItem(QString::number(a));
@@ -165,8 +182,8 @@ Replay::Replay(QWidget* parent, bool standalone, QSlider* control) : QMainWindow
   deletedFrameNumber = new QSpinBox(this);
   deletedFrameNumber->setStatusTip(tr("Number of frames where to delete the selected object"));
   connect(ui->replaySlider, &QSlider::valueChanged, [this]() {
-    deletedFrameNumber->setMaximum(replayFrames.size() - ui->replaySlider->value());
-    deletedFrameNumber->setValue(replayFrames.size() - ui->replaySlider->value());
+    deletedFrameNumber->setMaximum(video->getImageCount() - ui->replaySlider->value());
+    deletedFrameNumber->setValue(video->getImageCount() - ui->replaySlider->value());
   });
   deletedFrameFocus = new QShortcut(QKeySequence("c"), this);
   connect(deletedFrameFocus, &QShortcut::activated, deletedFrameNumber, static_cast<void (QSpinBox::*)(void)>(&QSpinBox::setFocus));
@@ -285,7 +302,7 @@ Replay::Replay(QWidget* parent, bool standalone, QSlider* control) : QMainWindow
   connect(framerate, &QTimer::timeout, [this]() {
     ui->replaySlider->setValue(autoPlayerIndex);
     autoPlayerIndex++;
-    if (autoPlayerIndex % int(replayFrames.size()) != autoPlayerIndex) {
+    if (autoPlayerIndex % int(video->getImageCount()) != autoPlayerIndex) {
       autoPlayerIndex = 0;
     }
   });
@@ -311,6 +328,7 @@ Replay::Replay(QWidget* parent, bool standalone, QSlider* control) : QMainWindow
 
   annotation = new Annotation("");
   trackingData = new Data("");
+  video = new VideoReader("");
 }
 
 Replay::~Replay() {
@@ -321,8 +339,7 @@ Replay::~Replay() {
   * @brief Opens a dialogue to select a folder.
 */
 void Replay::openReplayFolder() {
-  QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"), memoryDir, QFileDialog::ShowDirsOnly);
-
+  QString dir = QFileDialog::getOpenFileName(this, tr("Open Directory"), memoryDir);
   loadReplayFolder(dir);
 }
 
@@ -340,7 +357,6 @@ void Replay::loadReplayFolder(QString dir) {
 
   ui->replaySlider->setValue(0);
   commandStack->clear();
-  replayFrames.clear();
   occlusionEvents.clear();
   object1Replay->clear();
   object2Replay->clear();
@@ -352,44 +368,40 @@ void Replay::loadReplayFolder(QString dir) {
   memoryDir.clear();
 
   memoryDir = dir;
-  QString trackingDir = dir;
-  if (dir.contains("Tracking_Result")) {
-    dir.truncate(dir.lastIndexOf("/", -2));
-  }
-  else {
-    trackingDir.append("/Tracking_Result");
-  }
-
-  // Finds image format
-  QList<QString> extensions = {"pgm", "png", "jpeg", "jpg", "tiff", "tif", "bmp", "dib", "jpe", "jp2", "webp", "pbm", "ppm", "sr", "ras", "tif"};
-  QDirIterator it(dir, QStringList(), QDir::NoFilter);
-  QString extension;
-  while (it.hasNext()) {
-    extension = it.next().section('.', -1);
-    if (extensions.contains(extension)) break;
-  }
 
   try {
     // Gets the paths to all the frames in the folder and puts it in a vector.
     // Setups the ui by setting maximum and minimum of the slider bar.
-    string path = (dir + QDir::separator() + "*." + extension).toStdString();
-    glob(path, replayFrames, false);  // Gets all the paths to frames
-    if (replayFrames.empty()) {
-      return;
-    }
     delete annotation;
     delete trackingData;
+    delete video;
+    video = new VideoReader(dir.toStdString());
     ui->replaySlider->setMinimum(0);
-    ui->replaySlider->setMaximum(replayFrames.size() - 1);
-    Mat frame = imread(replayFrames[0], IMREAD_COLOR | IMREAD_ANYDEPTH);
+    ui->replaySlider->setMaximum(video->getImageCount() - 1);
+    //Mat frame = imread(replayFrames[0], IMREAD_COLOR | IMREAD_ANYDEPTH);
+    Mat frame;
+    video->getImage(0, frame);
+    cvtColor(frame, frame, COLOR_GRAY2RGB);
     originalImageSize.setWidth(frame.cols);
     originalImageSize.setHeight(frame.rows);
-    deletedFrameNumber->setRange(1, replayFrames.size());
-    deletedFrameNumber->setValue(replayFrames.size());
-    isReplayable = true;
+    deletedFrameNumber->setRange(1, video->getImageCount());
+    deletedFrameNumber->setValue(video->getImageCount());
+    if (video->isOpened()) {
+      isReplayable = true;
+    }
 
+    QFileInfo savingInfo(dir);
+    QString savingFilename = savingInfo.baseName();
+    QString savingPath = savingInfo.absolutePath();
+    QString trackingDir = savingPath;
+    if (video->isSequence()) {
+      trackingDir.append(QString("/Tracking_Result") + QDir::separator());
+    }
+    else {
+      trackingDir.append(QString("/Tracking_Result_") + savingFilename + QDir::separator());
+    }
     trackingData = new Data(trackingDir);
-    ids = trackingData->getId(0, replayFrames.size());
+    ids = trackingData->getId(0, video->getImageCount());
     for (auto const& a : ids) {
       object2Replay->addItem(QString::number(a));
     }
@@ -434,7 +446,10 @@ void Replay::loadFrame(int frameIndex) {
   if (isReplayable) {
     object1Replay->clear();
 
-    Mat frame = imread(replayFrames[frameIndex], IMREAD_COLOR | IMREAD_ANYDEPTH);
+    //Mat frame = imread(replayFrames[frameIndex], IMREAD_COLOR | IMREAD_ANYDEPTH);
+    Mat frame;
+    video->getImage(frameIndex, frame);
+    cvtColor(frame, frame, COLOR_GRAY2BGR);
     int scale = ui->replaySize->value();
 
     // Takes the tracking data corresponding to the replayed frame and parse data to display
@@ -715,8 +730,10 @@ void Replay::saveTrackedMovie() {
     cv::VideoWriter outputVideo(savePath.toStdString(), cv::VideoWriter::fourcc('M', 'J', 'P', 'G'), ui->replayFps->value(), Size(originalImageSize.width(), originalImageSize.height()));
     int scale = ui->replaySize->value();
 
-    for (size_t frameIndex = 0; frameIndex < replayFrames.size(); frameIndex++) {
-      Mat frame = imread(replayFrames[frameIndex], IMREAD_COLOR | IMREAD_ANYDEPTH);
+    for (size_t frameIndex = 0; frameIndex < video->getImageCount(); frameIndex++) {
+      Mat frame;
+      video->getImage(frameIndex, frame);
+      cvtColor(frame, frame, COLOR_GRAY2BGR);
       // Takes the tracking data corresponding to the replayed frame and parse data to display
       // arrows on tracked objects.
       // Takes the tracking data corresponding to the replayed frame and parse data to display

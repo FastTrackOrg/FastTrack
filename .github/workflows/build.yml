@@ -15,6 +15,10 @@ jobs:
              sudo add-apt-repository ppa:beineri/opt-qt-5.14.2-xenial
              sudo apt-get update
              sudo apt-get install libgl1-mesa-dev qt514base qt514webengine
+             sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+             sudo apt-get update
+             sudo apt-get install gcc-9 g++-9
+             sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 90 --slave /usr/bin/g++ g++ /usr/bin/g++-9 --slave /usr/bin/gcov gcov /usr/bin/gcov-9
         - name: install opencv
           run: sudo ./dependencies.sh opencv
         - name: build
@@ -53,11 +57,7 @@ jobs:
             dir: '${{ github.workspace }}/Qt/'
             install-deps: 'true'
             modules: 'qtwebengine'
-            mirror: 'http://mirrors.ocf.berkeley.edu/qt/'
             cached: 'false'
-            aqtversion: '==0.8'
-            py7zrversion: '==0.6'
-            extra: '--external 7z'
         - name: install opencv
           shell: cmd
           run: |
@@ -83,16 +83,13 @@ jobs:
         - uses: actions/checkout@v2
         - uses: jurplel/install-qt-action@v2
           with:
-            version: '5.13.2'
+            version: '5.15.0'
             host: 'mac'
             target: 'desktop'
             dir: '${{ github.workspace }}/Qt/'
             install-deps: 'true'
             modules: 'qtwebengine'
-            mirror: 'http://mirrors.ocf.berkeley.edu/qt/'
             cached: 'false'
-            aqtversion: '==0.8'
-            py7zrversion: '==0.6'
             extra: '--external 7z'
         - name: install opencv
           run: |
@@ -105,7 +102,6 @@ jobs:
               qmake src/FastTrack.pro
               make
               cd build/
-              #cd ..
               macdeployqt FastTrack.app -always-overwrite
               wget https://raw.githubusercontent.com/arl/macdeployqtfix/master/macdeployqtfix.py
               python macdeployqtfix.py FastTrack.app/Contents/MacOS/FastTrack ../../Qt/5.13.2/

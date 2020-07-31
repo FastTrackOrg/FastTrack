@@ -49,9 +49,9 @@ This file is part of Fast Track.
 #include "data.h"
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
-#include "openvideo.h"
 #include "replay.h"
 #include "tracking.h"
+#include "videoreader.h"
 
 using namespace std;
 using namespace cv;
@@ -102,7 +102,6 @@ class Interactive : public QMainWindow {
   QLabel *counterLabel;
   QAction *replayAction;
   QString memoryDir;                 /*!< Saves the path to the last opened folder in dialog. */
-  vector<String> framePath;          /*!< Path to all the image of the image sequence to display. */
   QSize resizedFrame;                /*!< Size of the resized image in the display QWidget. */
   QSize originalImageSize;           /*!< Size of the original image. */
   QSize cropedImageSize;             /*!< Size of the croped image. */
@@ -118,10 +117,11 @@ class Interactive : public QMainWindow {
   QPointF zoomReferencePosition;
   Rect roi;
   QPixmap resizedPix;
-  Data *trackingData;
   vector<Point3f> colorMap;
   double currentZoom;
   Replay *replay;
+  VideoReader *video;
+  bool videoStatus;
 
  signals:
   void message(QString message);

@@ -66,7 +66,7 @@ All argument are mandatory except --backPath.\n\
   --morphSize                size of the kernel used in the morphological operation, can be omited if no operation are performed\n\
   --morphType                type of the kernel used in the morphological operation, can be omited if no operation are performed, 0: Rect, 1: Cross, 2: Ellipse\n\
 \n\
-  --path                     path to the folder where the images are stored\n\
+  --path                     path to the movie or one image of a sequence\n\
   --backPath                 optional, path to a background image\n\
 "),
         stdout);
@@ -174,7 +174,7 @@ int main(int argc, char **argv) {
         parameters.insert("Kernel type", QString::fromStdString(optarg));
         break;
       case 'v':
-        parameters.insert("path", QString::fromStdString(optarg) + "/");
+        parameters.insert("path", QString::fromStdString(optarg));
         break;
       case 'w':
         parameters.insert("backPath", QString::fromStdString(optarg));
