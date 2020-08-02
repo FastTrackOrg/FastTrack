@@ -49,8 +49,8 @@ Point2d Tracking::curvatureCenter(const Point3d &tail, const Point3d &head) {
 
   // Computes the equation of the slope of the two minors axis of each ellipse
   // from the coordinates and direction of each ellipse.
-  Point2d p1 = Point2d(tail.x + 10 * cos(tail.z + 0.5 * M_PI), tail.y + 10 * sin(tail.z + 0.5 * M_PI));
-  Point2d p2 = Point2d(head.x + 10 * cos(head.z + 0.5 * M_PI), head.y + 10 * sin(head.z + 0.5 * M_PI));
+  Point2d p1 = Point2d(tail.x + 1 * cos(tail.z + 0.5 * M_PI), tail.y + 1 * -sin(tail.z + 0.5 * M_PI));
+  Point2d p2 = Point2d(head.x + 1 * cos(head.z + 0.5 * M_PI), head.y + 1 * -sin(head.z + 0.5 * M_PI));
 
   double a = (tail.y - p1.y) / (tail.x - p1.x);
   double c = (head.y - p2.y) / (head.x - p2.x);
@@ -59,11 +59,11 @@ Point2d Tracking::curvatureCenter(const Point3d &tail, const Point3d &head) {
 
   // Solves the equation system by computing the determinant. If the determinant
   // is different of zeros, the two slopes intersect.
-  if (a * b == 0) {  // Determinant == 0, no unique solution, no intersection
+  if (abs(a - c) < 10E-10) {  // Determinant == 0, no unique solution, no intersection
     center = Point2d(0, 0);
   }
   else {  // Unique solution
-    center = Point2d((b + d) / (c - a), a * ((b + d) / (c - a)) + b);
+    center = Point2d((d - b) / (a - c), a * ((d + b) / (a - c)) + b);
   }
 
   return center;

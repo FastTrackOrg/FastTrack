@@ -19,9 +19,15 @@ class TrackingTest : public ::testing::Test {
 //Curvature method test
 TEST_F(TrackingTest, CurvatureCenter) {
   Tracking tracking("test", "");
-  EXPECT_EQ(tracking.curvatureCenter(Point3d(1, 1, 0.25 * M_PI + 0.5 * M_PI), Point3d(2, 2, 0.5 * M_PI + 0.5 * M_PI)), Point2d(0, 0));
-  EXPECT_EQ(tracking.curvatureCenter(Point3d(1, 1, 0.25 * 5 * M_PI + 0.5 * M_PI), Point3d(2, 2, 0.5 * M_PI + 0.5 * M_PI)), Point2d(0, 0));
-  EXPECT_EQ(tracking.curvatureCenter(Point3d(1, 1, -3 * 0.25 * M_PI + 0.5 * M_PI), Point3d(2, 2, 0.5 * M_PI + 0.5 * M_PI)), Point2d(0, 0));
+  Point2i test = tracking.curvatureCenter(Point3d(1, 1, 0.25 * M_PI + 0.5 * M_PI), Point3d(2, 2, 0.5 * M_PI + 0.5 * M_PI));
+  EXPECT_DOUBLE_EQ(test.x, 2);
+  EXPECT_DOUBLE_EQ(test.y, 0);
+  test = tracking.curvatureCenter(Point3d(1, 1, 0.5 * M_PI), Point3d(2, 2, 0.5 * M_PI + 0.5 * M_PI));
+  EXPECT_DOUBLE_EQ(test.x, 2);
+  EXPECT_DOUBLE_EQ(test.y, 1);
+  EXPECT_EQ(tracking.curvatureCenter(Point3d(1, 1, M_PI), Point3d(1, 1, M_PI)), Point2d(0, 0));
+  EXPECT_EQ(tracking.curvatureCenter(Point3d(1, 1, M_PI), Point3d(1, 20, M_PI)), Point2d(0, 0));
+  EXPECT_EQ(tracking.curvatureCenter(Point3d(1, 1, M_PI), Point3d(2, 2, M_PI)), Point2d(0, 0));
 }
 
 //Registration test
