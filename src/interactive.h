@@ -18,6 +18,9 @@ This file is part of Fast Track.
 #ifndef INTERACTIVE_H
 #define INTERACTIVE_H
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 #include <QAction>
 #include <QDateTime>
 #include <QDesktopServices>
@@ -92,8 +95,6 @@ class Interactive : public QMainWindow {
   void loadSettings();
   void saveSettings();
 
-  void resizeEvent(QResizeEvent *event);
-
  private:
   Ui::Interactive *ui;
   QSettings *settingsFile;
@@ -117,7 +118,7 @@ class Interactive : public QMainWindow {
   QPointF zoomReferencePosition;
   Rect roi;
   QPixmap resizedPix;
-  vector<Point3f> colorMap;
+  vector<Point3i> colorMap;
   double currentZoom;
   Replay *replay;
   VideoReader *video;

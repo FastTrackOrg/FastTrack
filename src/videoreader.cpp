@@ -86,7 +86,7 @@ void VideoReader::getImage(int index, Mat &destination) {
   * @return total number of images.
 */
 unsigned int VideoReader::getImageCount() {
-  return get(CAP_PROP_FRAME_COUNT);
+  return static_cast<unsigned int>(get(CAP_PROP_FRAME_COUNT));
 }
 
 /**

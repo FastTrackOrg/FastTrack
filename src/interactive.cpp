@@ -449,13 +449,13 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
 
   // Sets a color map
   colorMap.reserve(1000000);
-  double a, b, c;
-  srand(time(NULL));
+  int a, b, c;
+  srand((unsigned int)time(NULL));
   for (int j = 0; j < 1000000; ++j) {
     a = rand() % 255;
     b = rand() % 255;
     c = rand() % 255;
-    colorMap.push_back(Point3f(a, b, c));
+    colorMap.push_back(Point3i(a, b, c));
   }
 
   // Sets the object counter on top of the display
@@ -632,7 +632,7 @@ void Interactive::display(int index, int scale) {
       drawContours(frame, rejectedContours, -1, Scalar(255, 0, 0), FILLED, 8);
     }
     Mat image = frame.getMat(ACCESS_READ);
-    resizedPix = (QPixmap::fromImage(QImage(image.data, image.cols, image.rows, image.step, QImage::Format_RGB888)).scaled(ui->display->size(), Qt::KeepAspectRatio));
+    resizedPix = (QPixmap::fromImage(QImage(image.data, image.cols, image.rows, static_cast<int>(image.step), QImage::Format_RGB888)).scaled(ui->display->size(), Qt::KeepAspectRatio));
     ui->display->setPixmap(resizedPix);
     resizedFrame.setWidth(resizedPix.width());
     resizedFrame.setHeight(resizedPix.height());
@@ -674,7 +674,7 @@ void Interactive::display(QImage image) {
 void Interactive::display(UMat image) {
   cvtColor(image, image, COLOR_GRAY2RGB);
   Mat frame = image.getMat(ACCESS_READ);
-  resizedPix = (QPixmap::fromImage(QImage(frame.data, frame.cols, frame.rows, frame.step, QImage::Format_RGB888)).scaled(ui->display->size(), Qt::KeepAspectRatio));
+  resizedPix = (QPixmap::fromImage(QImage(frame.data, frame.cols, frame.rows, static_cast<int>(frame.step), QImage::Format_RGB888)).scaled(ui->display->size(), Qt::KeepAspectRatio));
   ui->display->setPixmap(resizedPix);
   resizedFrame.setWidth(resizedPix.width());
   resizedFrame.setHeight(resizedPix.height());
@@ -694,7 +694,7 @@ void Interactive::computeBackground() {
     // Computes the background without blocking the ui
     QFuture<void> future = QtConcurrent::run([=]() {
       try {
-        background = tracking->backgroundExtraction(*video, nBack, method, registrationMethod);
+        background = tracking->backgroundExtraction(*video, static_cast<int>(nBack), method, registrationMethod);
       }
       catch (const std::exception &ex) {
         message("An error occurs. Please change the registration method");
@@ -909,8 +909,8 @@ bool Interactive::eventFilter(QObject *target, QEvent *event) {
         clicks.first = mouseEvent->pos();
         // The QPixmap is V/Hcentered in the Qlabel widget
         // Gets the click coordinate in the frame of reference of the centered display
-        clicks.first.setX(clicks.first.x() - 0.5 * (ui->display->width() - resizedFrame.width()));
-        clicks.first.setY(clicks.first.y() - 0.5 * (ui->display->height() - resizedFrame.height()));
+        clicks.first.setX(static_cast<unsigned int>(clicks.first.x() - 0.5 * (ui->display->width() - resizedFrame.width())));
+        clicks.first.setY(static_cast<unsigned int>(clicks.first.y() - 0.5 * (ui->display->height() - resizedFrame.height())));
       }
     }
 
@@ -921,8 +921,8 @@ bool Interactive::eventFilter(QObject *target, QEvent *event) {
         clicks.second = moveEvent->pos();
         // The QPixmap is V/Hcentered in the Qlabel widget
         // Gets the click coordinate in the frame of reference of the centered display
-        clicks.second.setX(clicks.second.x() - 0.5 * (ui->display->width() - resizedFrame.width()));
-        clicks.second.setY(clicks.second.y() - 0.5 * (ui->display->height() - resizedFrame.height()));
+        clicks.second.setX(static_cast<unsigned int>(clicks.second.x() - 0.5 * (ui->display->width() - resizedFrame.width())));
+        clicks.second.setY(static_cast<unsigned int>(clicks.second.y() - 0.5 * (ui->display->height() - resizedFrame.height())));
 
         // Draws the ROI with
         QPixmap tmpImage = resizedPix;
@@ -947,8 +947,8 @@ bool Interactive::eventFilter(QObject *target, QEvent *event) {
     if (event->type() == QEvent::MouseMove) {
       QMouseEvent *moveEvent = static_cast<QMouseEvent *>(event);
       if (moveEvent->buttons() == Qt::MiddleButton) {
-        ui->scrollArea->horizontalScrollBar()->setValue(ui->scrollArea->horizontalScrollBar()->value() + (panReferenceClick.x() - moveEvent->localPos().x()));
-        ui->scrollArea->verticalScrollBar()->setValue(ui->scrollArea->verticalScrollBar()->value() + (panReferenceClick.y() - moveEvent->localPos().y()));
+        ui->scrollArea->horizontalScrollBar()->setValue(static_cast<unsigned int>(ui->scrollArea->horizontalScrollBar()->value() + (panReferenceClick.x() - moveEvent->localPos().x())));
+        ui->scrollArea->verticalScrollBar()->setValue(static_cast<unsigned int>(ui->scrollArea->verticalScrollBar()->value() + (panReferenceClick.y() - moveEvent->localPos().y())));
         panReferenceClick = moveEvent->localPos();
       }
     }
@@ -1061,7 +1061,4 @@ void Interactive::saveSettings() {
   for (auto &a : keys) {
     settingsFile->setValue(a, settings.value(a));
   }
-}
-
-void Interactive::resizeEvent(QResizeEvent *event) {
 }

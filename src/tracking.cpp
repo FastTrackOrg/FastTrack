@@ -49,8 +49,8 @@ Point2d Tracking::curvatureCenter(const Point3d &tail, const Point3d &head) {
 
   // Computes the equation of the slope of the two minors axis of each ellipse
   // from the coordinates and direction of each ellipse.
-  Point p1 = Point(tail.x + 10 * cos(tail.z + 0.5 * M_PI), tail.y + 10 * sin(tail.z + 0.5 * M_PI));
-  Point p2 = Point(head.x + 10 * cos(head.z + 0.5 * M_PI), head.y + 10 * sin(head.z + 0.5 * M_PI));
+  Point2d p1 = Point2d(tail.x + 10 * cos(tail.z + 0.5 * M_PI), tail.y + 10 * sin(tail.z + 0.5 * M_PI));
+  Point2d p2 = Point2d(head.x + 10 * cos(head.z + 0.5 * M_PI), head.y + 10 * sin(head.z + 0.5 * M_PI));
 
   double a = (tail.y - p1.y) / (tail.x - p1.x);
   double c = (head.y - p2.y) / (head.x - p2.x);
@@ -60,10 +60,10 @@ Point2d Tracking::curvatureCenter(const Point3d &tail, const Point3d &head) {
   // Solves the equation system by computing the determinant. If the determinant
   // is different of zeros, the two slopes intersect.
   if (a * b == 0) {  // Determinant == 0, no unique solution, no intersection
-    center = Point(0, 0);
+    center = Point2d(0, 0);
   }
   else {  // Unique solution
-    center = Point((b + d) / (c - a), a * ((b + d) / (c - a)) + b);
+    center = Point2d((b + d) / (c - a), a * ((b + d) / (c - a)) + b);
   }
 
   return center;
@@ -156,11 +156,10 @@ vector<double> Tracking::objectInformation(const UMat &image) {
 /**
   * @brief Computes the direction of the object from the object parameter (coordinate of the center of mass and orientation). To use this function, the object major axis has to be the horizontal axis of the image. Therefore, it is necessary to rotate the image before calling objectDirection.
   * @param[in] image Binary image CV_8U.
-  * @param[in] center The center of mass of the object.
   * @param[in, out] information The parameters of the object (x coordinate, y coordinate, orientation).
   * @return True if the direction angle is the orientation angle. False if the direction angle is the orientation angle plus pi.
 */
-bool Tracking::objectDirection(const UMat &image, Point center, vector<double> &information) {
+bool Tracking::objectDirection(const UMat &image, vector<double> &information) {
   // Computes the distribution of the image on the horizontal axis.
 
   vector<double> projection;
@@ -170,7 +169,7 @@ bool Tracking::objectDirection(const UMat &image, Point center, vector<double> &
   distribution.reserve(projection.size());
   double ccMax = *max_element(projection.begin(), projection.end()) / 100;
   for (size_t it = 0; it < projection.size(); ++it) {
-    int cc = projection[it];
+    int cc = static_cast<int>(projection[it]);
     for (int jt = 0; jt < cc / ccMax; ++jt) {
       distribution.push_back((double)(it + 1));
     }
@@ -202,9 +201,9 @@ bool Tracking::objectDirection(const UMat &image, Point center, vector<double> &
   * @param[in] Method 0: minimal projection, 1: maximal projection, 2: average projection.
   * @return The background image.
 */
-UMat Tracking::backgroundExtraction(VideoReader &video, double n, const int method, const int registrationMethod) {
-  if (n > video.getImageCount()) {
-    n = double(video.getImageCount());
+UMat Tracking::backgroundExtraction(VideoReader &video, int n, const int method, const int registrationMethod) {
+  if (n > static_cast<int>(video.getImageCount())) {
+    n = video.getImageCount();
   }
 
   UMat background;
@@ -222,7 +221,7 @@ UMat Tracking::backgroundExtraction(VideoReader &video, double n, const int meth
   Mat H;
   int count = 1;
 
-  for (size_t i = 0; i < video.getImageCount(); i += step) {
+  for (int i = 0; i < static_cast<int>(video.getImageCount()); i += step) {
     if (registrationMethod != 0) registration(img0, cameraFrameReg, registrationMethod - 1);
     video.getImage(i, cameraFrameReg);
     if (cameraFrameReg.channels() >= 3) {
@@ -405,7 +404,7 @@ vector<vector<Point3d>> Tracking::objectPosition(const UMat &frame, int minSize,
       // Draws the object in a temporary black image to avoid selecting a
       // part of another object if two objects are very close.
       dst = UMat::zeros(frame.size(), CV_8U);
-      drawContours(dst, contours, i, Scalar(255, 255, 255), FILLED, 8);
+      drawContours(dst, contours, static_cast<int>(i), Scalar(255, 255, 255), FILLED, 8);
 
       // Computes the x, y and orientation of the object, in the
       // frame of reference of ROIFull image.
@@ -419,9 +418,9 @@ vector<vector<Point3d>> Tracking::objectPosition(const UMat &frame, int minSize,
       }
 
       // Rotates the image without cropping to have the object orientation as the x axis
-      Point2f center = Point2f(0.5 * RoiFull.cols, 0.5 * RoiFull.rows);
+      Point2d center = Point2d(0.5 * RoiFull.cols, 0.5 * RoiFull.rows);
       rotMatrix = getRotationMatrix2D(center, -(parameter[2] * 180) / M_PI, 1);
-      bbox = RotatedRect(center, RoiFull.size(), -(parameter[2] * 180) / M_PI).boundingRect();
+      bbox = RotatedRect(center, RoiFull.size(), static_cast<float>(-(parameter[2] * 180) / M_PI)).boundingRect();
       rotMatrix.at<double>(0, 2) += bbox.width * 0.5 - center.x;
       rotMatrix.at<double>(1, 2) += bbox.height * 0.5 - center.y;
       warpAffine(RoiFull, rotate, rotMatrix, bbox.size());
@@ -434,25 +433,25 @@ vector<vector<Point3d>> Tracking::objectPosition(const UMat &frame, int minSize,
       // Computes the direction of the object. If objectDirection return true, the
       // head is at the left and the tail at the right.
       Rect roiHead, roiTail;
-      if (objectDirection(rotate, Point(pp.at<double>(0, 0), pp.at<double>(1, 0)), parameter)) {
+      if (objectDirection(rotate, parameter)) {
         // Head ellipse. Parameters in the frame of reference of the RoiHead image.
-        roiHead = Rect(0, 0, pp.at<double>(0, 0), rotate.rows);
+        roiHead = Rect(0, 0, static_cast<int>(pp.at<double>(0, 0)), rotate.rows);
         RoiHead = rotate(roiHead);
         parameterHead = objectInformation(RoiHead);
 
         // Tail ellipse. Parameters in the frame of reference of ROITail image.
-        roiTail = Rect(pp.at<double>(0, 0), 0, rotate.cols - pp.at<double>(0, 0), rotate.rows);
+        roiTail = Rect(static_cast<int>(pp.at<double>(0, 0)), 0, static_cast<int>(rotate.cols - pp.at<double>(0, 0)), rotate.rows);
         RoiTail = rotate(roiTail);
         parameterTail = objectInformation(RoiTail);
       }
       else {
         // Head ellipse. Parameters in the frame of reference of the RoiHead image.
-        roiHead = Rect(pp.at<double>(0, 0), 0, rotate.cols - pp.at<double>(0, 0), rotate.rows);
+        roiHead = Rect(static_cast<int>(pp.at<double>(0, 0)), 0, static_cast<int>(rotate.cols - pp.at<double>(0, 0)), rotate.rows);
         RoiHead = rotate(roiHead);
         parameterHead = objectInformation(RoiHead);
 
         // Tail ellipse. Parameters in the frame of reference of RoiTail image.
-        roiTail = Rect(0, 0, pp.at<double>(0, 0), rotate.rows);
+        roiTail = Rect(0, 0, static_cast<int>(pp.at<double>(0, 0)), rotate.rows);
         RoiTail = rotate(roiTail);
         parameterTail = objectInformation(RoiTail);
       }
@@ -509,8 +508,8 @@ vector<vector<Point3d>> Tracking::objectPosition(const UMat &frame, int minSize,
   * @return The assignment vector containing the new index position to sort the pos vector. 
 */
 vector<int> Tracking::costFunc(const vector<vector<Point3d>> &prevPos, const vector<vector<Point3d>> &pos, double LENGTH, double ANGLE, double LO, double AREA, double PERIMETER) {
-  int n = prevPos[0].size();
-  int m = pos[0].size();
+  int n = static_cast<int>(prevPos[0].size());
+  int m = static_cast<int>(pos[0].size());
   vector<int> assignment;
 
   if (n == 0) {
@@ -568,7 +567,7 @@ vector<int> Tracking::findOcclusion(vector<int> assignment) {
   vector<int> occlusion;
   vector<int>::iterator index = find(assignment.begin(), assignment.end(), -1);
   while (index != assignment.end()) {
-    occlusion.push_back(index - assignment.begin());
+    occlusion.push_back(static_cast<int>(index - assignment.begin()));
     index = find(index + 1, assignment.end(), -1);
   }
   return occlusion;
@@ -620,7 +619,7 @@ vector<Point3d> Tracking::reassignment(const vector<Point3d> &past, const vector
   * @param[in] param_maximalTime 
   * @return The sorted vector.
 */
-void Tracking::cleaning(const vector<int> &occluded, vector<int> &lostCounter, vector<int> &id, vector<vector<Point3d>> &input, int param_maximalTime) {
+void Tracking::cleaning(const vector<int> &occluded, vector<int> &lostCounter, vector<int> &id, vector<vector<Point3d>> &input, double param_maximalTime) {
   vector<int> counter(lostCounter.size(), 0);
 
   // Increment the lost counter
@@ -671,16 +670,16 @@ vector<Point3d> Tracking::prevision(vector<Point3d> past, vector<Point3d> presen
   * @param[in] number The number of colors to generate.
   * @return The vector containing the n colors.
 */
-vector<Point3d> Tracking::color(int number) {
-  double a, b, c;
-  vector<Point3d> colorMap;
-  srand(time(NULL));
+vector<Point3i> Tracking::color(int number) {
+  int a, b, c;
+  vector<Point3i> colorMap;
+  srand((unsigned int)time(NULL));
   for (int j = 0; j < number; ++j) {
     a = rand() % 255;
     b = rand() % 255;
     c = rand() % 255;
 
-    colorMap.push_back(Point3d(a, b, c));
+    colorMap.push_back(Point3i(a, b, c));
   }
 
   return colorMap;
@@ -812,7 +811,7 @@ void Tracking::startProcess() {
     // Loads the background image is provided and check if the image has the correct size
     if (m_background.empty() && m_backgroundPath.empty()) {
       try {
-        m_background = backgroundExtraction(*video, param_nBackground, param_methodBackground, param_methodRegistrationBackground);
+        m_background = backgroundExtraction(*video, static_cast<int>(param_nBackground), param_methodBackground, param_methodRegistrationBackground);
       }
       catch (...) {
         emit(forceFinished());
@@ -832,7 +831,7 @@ void Tracking::startProcess() {
       }
     }
 
-    m_colorMap = color(9000);
+    //m_colorMap = color(9000);
     m_memory = vector<vector<Point>>(9000, vector<Point>());
     // First frame
     video->getImage(m_im, m_visuFrame);
@@ -854,7 +853,7 @@ void Tracking::startProcess() {
     m_out = objectPosition(m_binaryFrame, param_minArea, param_maxArea);
 
     // Assigns an id and a counter at each object detected
-    for (size_t i = 0; i < m_out[0].size(); i++) {
+    for (int i = 0; i < static_cast<int>(m_out[0].size()); i++) {
       m_id.push_back(i);
       m_lost.push_back(0);
     }
