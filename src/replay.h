@@ -18,7 +18,9 @@ This file is part of Fast Track.
 #ifndef REPLAY_H
 #define REPLAY_H
 
+#include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 #include <QAction>
 #include <QCheckBox>
 #include <QComboBox>
@@ -52,7 +54,6 @@ This file is part of Fast Track.
 #include <QTimer>
 #include <QUndoStack>
 #include <QWidget>
-#include <ctime>
 #include <fstream>
 #include <opencv2/core/ocl.hpp>
 #include <string>
@@ -93,7 +94,7 @@ class Replay : public QMainWindow {
   Data *trackingData;
   Annotation *annotation;
 
-  vector<Point3f> colorMap;     /*!< RGB color map to display each object in one color. */
+  vector<Point3i> colorMap;     /*!< RGB color map to display each object in one color. */
   QVector<int> occlusionEvents; /*!< Index of each occlusion event in the replayed images sequence. */
   int replayNumberObject;       /*!< Number of objects tracked in the replayed images sequence. */
   bool isReplayable;            /*!< True if user input is an images sequences that can be played. */

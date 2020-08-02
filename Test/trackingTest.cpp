@@ -454,7 +454,7 @@ TEST_F(TrackingTest, InformationOrientation) {
   imread("../dataSet/assymetric_left.png", IMREAD_GRAYSCALE).copyTo(imageReference);
   Point2d center(double(imageReference.cols) * .5, double(imageReference.rows) * .5);
   test = tracking.objectInformation(imageReference);
-  tracking.objectDirection(imageReference, Point(test.at(0), test.at(1)), test);
+  tracking.objectDirection(imageReference, test);
   EXPECT_EQ(round(test.at(2) * 1000), round(1000 * (M_PI)));
 }
 

@@ -18,6 +18,7 @@ This file is part of Fast Track.
 #ifndef TRACKING_H
 #define TRACKING_H
 #include <math.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 #include <QDate>
@@ -71,7 +72,7 @@ class Tracking : public QObject {
   QTextStream m_savefile;         /*!< Stream to output tracking data. */
   QFile m_outputFile;             /*!< Path to the file where to save tracking data. */
   vector<cv::String> m_files;     /*!< Vector containing the path for each image in the images sequence. */
-  vector<Point3d> m_colorMap;     /*!< Vector containing RBG color. */
+  vector<Point3i> m_colorMap;     /*!< Vector containing RBG color. */
   vector<vector<Point>> m_memory; /*!< Vector containing the last 50 tracking data. */
   vector<int> m_id;               /*!< Vector containing the objets Id. */
   vector<int> m_lost;             /*!< Vector containing the lost objects. */
@@ -116,17 +117,17 @@ class Tracking : public QObject {
   double modul(double angle);
   double divide(double a, double b);
   double angleDifference(double alpha, double beta);
-  bool objectDirection(const UMat &image, Point center, vector<double> &information);
+  bool objectDirection(const UMat &image, vector<double> &information);
   vector<double> objectInformation(const UMat &image);
   vector<Point3d> reassignment(const vector<Point3d> &past, const vector<Point3d> &input, const vector<int> &assignment);
-  UMat backgroundExtraction(VideoReader &video, double n, const int method, const int registrationMethod);
+  UMat backgroundExtraction(VideoReader &video, int n, const int method, const int registrationMethod);
   void registration(UMat imageReference, UMat &frame, int method);
   void binarisation(UMat &frame, char backgroundColor, int value);
   vector<vector<Point3d>> objectPosition(const UMat &frame, int minSize, int maxSize);
   vector<int> costFunc(const vector<vector<Point3d>> &prevPos, const vector<vector<Point3d>> &pos, double LENGHT, double ANGLE, double LO, double AREA, double PERIMETER);
-  void cleaning(const vector<int> &occluded, vector<int> &lostCounter, vector<int> &id, vector<vector<Point3d>> &input, int param_maximalTime);
+  void cleaning(const vector<int> &occluded, vector<int> &lostCounter, vector<int> &id, vector<vector<Point3d>> &input, double param_maximalTime);
   vector<Point3d> prevision(vector<Point3d> past, vector<Point3d> present);
-  vector<Point3d> color(int number);
+  vector<Point3i> color(int number);
   vector<int> findOcclusion(vector<int> assignment);
 
   UMat m_binaryFrame;                /*!< Binary image CV_8U */
@@ -175,7 +176,7 @@ class Tracking : public QObject {
   /**
   * @brief Emitted at the end of the analysis.
   */
-  void statistic(int time);
+  void statistic(long long int time);
 };
 
 #endif

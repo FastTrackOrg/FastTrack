@@ -44,13 +44,13 @@ Replay::Replay(QWidget* parent, bool standalone, QSlider* control) : QMainWindow
   ui->replayDisplay->setAttribute(Qt::WA_Hover);
 
   // Generates a color map.
-  double a, b, c;
-  srand(time(NULL));
+  int a, b, c;
+  srand((unsigned int)time(NULL));
   for (int j = 0; j < 90000; ++j) {
     a = rand() % 255;
     b = rand() % 255;
     c = rand() % 255;
-    colorMap.push_back(Point3f(a, b, c));
+    colorMap.push_back(Point3i(a, b, c));
   }
 
   QIcon img = QIcon(":/assets/buttons/play.png");
@@ -118,8 +118,8 @@ Replay::Replay(QWidget* parent, bool standalone, QSlider* control) : QMainWindow
   object1Replay->setStatusTip(tr("First selected object"));
   connect(object1Replay, QOverload<int>::of(&QComboBox::currentIndexChanged), [this](int index) {
     if (object1Replay->count() != 0) {
-      double id = object1Replay->itemText(index).toDouble();
-      updateInformation(id, ui->replaySlider->value(), ui->infoTableObject1);
+      int id = object1Replay->itemText(index).toInt();
+      updateInformation(static_cast<int>(id), ui->replaySlider->value(), ui->infoTableObject1);
       object1Replay->setStyleSheet("QComboBox { background-color: rgb(" + QString::number(colorMap[id].x) + "," + QString::number(colorMap[id].y) + "," + QString::number(colorMap[id].z) + "); }");
     }
   });
@@ -136,8 +136,8 @@ Replay::Replay(QWidget* parent, bool standalone, QSlider* control) : QMainWindow
   object2Replay->setStatusTip(tr("Second selected object"));
   connect(object2Replay, QOverload<int>::of(&QComboBox::currentIndexChanged), [this](int index) {
     if (object2Replay->count() != 0) {
-      double id = object2Replay->itemText(index).toDouble();
-      updateInformation(id, ui->replaySlider->value(), ui->infoTableObject2);
+      int id = object2Replay->itemText(index).toInt();
+      updateInformation(static_cast<int>(id), ui->replaySlider->value(), ui->infoTableObject2);
       object2Replay->setStyleSheet("QComboBox { background-color: rgb(" + QString::number(colorMap[id].x) + "," + QString::number(colorMap[id].y) + "," + QString::number(colorMap[id].z) + "); }");
     }
   });
@@ -317,12 +317,12 @@ Replay::Replay(QWidget* parent, bool standalone, QSlider* control) : QMainWindow
   // Info tables
   connect(ui->infoTableObject1, &QTableWidget::cellClicked, [this](int row, int col) {
     if (row == 1 && col == 0) {
-      ui->replaySlider->setValue(ui->infoTableObject1->item(row, col)->text().toDouble());
+      ui->replaySlider->setValue(ui->infoTableObject1->item(row, col)->text().toInt());
     }
   });
   connect(ui->infoTableObject2, &QTableWidget::cellClicked, [this](int row, int col) {
     if (row == 1 && col == 0) {
-      ui->replaySlider->setValue(ui->infoTableObject2->item(row, col)->text().toDouble());
+      ui->replaySlider->setValue(ui->infoTableObject2->item(row, col)->text().toInt());
     }
   });
 
@@ -464,20 +464,20 @@ void Replay::loadFrame(int frameIndex) {
       if (ui->ellipseBox->currentIndex() != 4) {
         switch (ui->ellipseBox->currentIndex()) {
           case 0:  // Head + Tail
-            cv::ellipse(frame, Point(coordinate.value("xHead"), coordinate.value("yHead")), Size(coordinate.value("headMajorAxisLength"), coordinate.value("headMinorAxisLength")), 180 - (coordinate.value("tHead") * 180) / M_PI, 0, 360, Scalar(colorMap[id].x, colorMap[id].y, colorMap[id].z), scale, 8);
-            cv::ellipse(frame, Point(coordinate.value("xTail"), coordinate.value("yTail")), Size(coordinate.value("tailMajorAxisLength"), coordinate.value("tailMinorAxisLength")), 180 - (coordinate.value("tTail") * 180) / M_PI, 0, 360, Scalar(colorMap[id].x, colorMap[id].y, colorMap[id].z), scale, cv::LINE_AA);
+            cv::ellipse(frame, Point(static_cast<int>(coordinate.value("xHead")), static_cast<int>(coordinate.value("yHead"))), Size(static_cast<int>(coordinate.value("headMajorAxisLength")), static_cast<int>(coordinate.value("headMinorAxisLength"))), 180 - (coordinate.value("tHead") * 180) / M_PI, 0, 360, Scalar(colorMap[id].x, colorMap[id].y, colorMap[id].z), scale, 8);
+            cv::ellipse(frame, Point(static_cast<int>(coordinate.value("xTail")), static_cast<int>(coordinate.value("yTail"))), Size(static_cast<int>(coordinate.value("tailMajorAxisLength")), static_cast<int>(coordinate.value("tailMinorAxisLength"))), 180 - (coordinate.value("tTail") * 180) / M_PI, 0, 360, Scalar(colorMap[id].x, colorMap[id].y, colorMap[id].z), scale, cv::LINE_AA);
             break;
 
           case 1:  // Head
-            cv::ellipse(frame, Point(coordinate.value("xHead"), coordinate.value("yHead")), Size(coordinate.value("headMajorAxisLength"), coordinate.value("headMinorAxisLength")), 180 - (coordinate.value("tHead") * 180) / M_PI, 0, 360, Scalar(colorMap[id].x, colorMap[id].y, colorMap[id].z), scale, 8);
+            cv::ellipse(frame, Point(static_cast<int>(coordinate.value("xHead")), static_cast<int>(coordinate.value("yHead"))), Size(static_cast<int>(coordinate.value("headMajorAxisLength")), static_cast<int>(coordinate.value("headMinorAxisLength"))), 180 - (coordinate.value("tHead") * 180) / M_PI, 0, 360, Scalar(colorMap[id].x, colorMap[id].y, colorMap[id].z), scale, 8);
             break;
 
           case 2:  // Tail
-            cv::ellipse(frame, Point(coordinate.value("xTail"), coordinate.value("yTail")), Size(coordinate.value("tailMajorAxisLength"), coordinate.value("tailMinorAxisLength")), 180 - (coordinate.value("tTail") * 180) / M_PI, 0, 360, Scalar(colorMap[id].x, colorMap[id].y, colorMap[id].z), scale, cv::LINE_AA);
+            cv::ellipse(frame, Point(static_cast<int>(coordinate.value("xTail")), static_cast<int>(coordinate.value("yTail"))), Size(static_cast<int>(coordinate.value("tailMajorAxisLength")), static_cast<int>(coordinate.value("tailMinorAxisLength"))), 180 - (coordinate.value("tTail") * 180) / M_PI, 0, 360, Scalar(colorMap[id].x, colorMap[id].y, colorMap[id].z), scale, cv::LINE_AA);
             break;
 
           case 3:  // Body
-            cv::ellipse(frame, Point(coordinate.value("xBody"), coordinate.value("yBody")), Size(coordinate.value("bodyMajorAxisLength"), coordinate.value("bodyMinorAxisLength")), 180 - (coordinate.value("tBody") * 180) / M_PI, 0, 360, Scalar(colorMap[id].x, colorMap[id].y, colorMap[id].z), scale, 8);
+            cv::ellipse(frame, Point(static_cast<int>(coordinate.value("xBody")), static_cast<int>(coordinate.value("yBody"))), Size(static_cast<int>(coordinate.value("bodyMajorAxisLength")), static_cast<int>(coordinate.value("bodyMinorAxisLength"))), 180 - (coordinate.value("tBody") * 180) / M_PI, 0, 360, Scalar(colorMap[id].x, colorMap[id].y, colorMap[id].z), scale, 8);
             break;
         }
       }
@@ -485,26 +485,26 @@ void Replay::loadFrame(int frameIndex) {
       if (ui->arrowBox->currentIndex() != 4) {
         switch (ui->arrowBox->currentIndex()) {
           case 0:
-            cv::arrowedLine(frame, Point(coordinate.value("xHead"), coordinate.value("yHead")), Point(coordinate.value("xHead") + coordinate.value("headMajorAxisLength") * cos(coordinate.value("tHead")), coordinate.value("yHead") - coordinate.value("headMajorAxisLength") * sin(coordinate.value("tHead"))), Scalar(colorMap[id].x, colorMap[id].y, colorMap[id].z), scale, cv::LINE_AA, 0, double(scale) / 10);
-            cv::arrowedLine(frame, Point(coordinate.value("xTail"), coordinate.value("yTail")), Point(coordinate.value("xTail") + coordinate.value("tailMajorAxisLength") * cos(coordinate.value("tTail")), coordinate.value("yTail") - coordinate.value("tailMajorAxisLength") * sin(coordinate.value("tTail"))), Scalar(colorMap[id].x, colorMap[id].y, colorMap[id].z), scale, cv::LINE_AA, 0, double(scale) / 10);
+            cv::arrowedLine(frame, Point(static_cast<int>(coordinate.value("xHead")), static_cast<int>(coordinate.value("yHead"))), Point(static_cast<int>(coordinate.value("xHead") + coordinate.value("headMajorAxisLength") * cos(coordinate.value("tHead"))), static_cast<int>(coordinate.value("yHead") - coordinate.value("headMajorAxisLength") * sin(coordinate.value("tHead")))), Scalar(colorMap[id].x, colorMap[id].y, colorMap[id].z), scale, cv::LINE_AA, 0, double(scale) / 10);
+            cv::arrowedLine(frame, Point(static_cast<int>(coordinate.value("xTail")), static_cast<int>(coordinate.value("yTail"))), Point(static_cast<int>(coordinate.value("xTail") + coordinate.value("tailMajorAxisLength") * cos(coordinate.value("tTail"))), static_cast<int>(coordinate.value("yTail") - coordinate.value("tailMajorAxisLength") * sin(coordinate.value("tTail")))), Scalar(colorMap[id].x, colorMap[id].y, colorMap[id].z), scale, cv::LINE_AA, 0, double(scale) / 10);
             break;
 
           case 1:
-            cv::arrowedLine(frame, Point(coordinate.value("xHead"), coordinate.value("yHead")), Point(coordinate.value("xHead") + coordinate.value("headMajorAxisLength") * cos(coordinate.value("tHead")), coordinate.value("yHead") - coordinate.value("headMajorAxisLength") * sin(coordinate.value("tHead"))), Scalar(colorMap[id].x, colorMap[id].y, colorMap[id].z), scale, cv::LINE_AA, 0, double(scale) / 10);
+            cv::arrowedLine(frame, Point(static_cast<int>(coordinate.value("xHead")), static_cast<int>(coordinate.value("yHead"))), Point(static_cast<int>(coordinate.value("xHead") + coordinate.value("headMajorAxisLength") * cos(coordinate.value("tHead"))), static_cast<int>(coordinate.value("yHead") - coordinate.value("headMajorAxisLength") * sin(coordinate.value("tHead")))), Scalar(colorMap[id].x, colorMap[id].y, colorMap[id].z), scale, cv::LINE_AA, 0, double(scale) / 10);
             break;
 
           case 2:
-            cv::arrowedLine(frame, Point(coordinate.value("xTail"), coordinate.value("yTail")), Point(coordinate.value("xTail") + coordinate.value("tailMajorAxisLength") * cos(coordinate.value("tTail")), coordinate.value("yTail") - coordinate.value("tailMajorAxisLength") * sin(coordinate.value("tTail"))), Scalar(colorMap[id].x, colorMap[id].y, colorMap[id].z), scale, cv::LINE_AA, 0, double(scale) / 10);
+            cv::arrowedLine(frame, Point(static_cast<int>(coordinate.value("xTail")), static_cast<int>(coordinate.value("yTail"))), Point(static_cast<int>(coordinate.value("xTail") + coordinate.value("tailMajorAxisLength") * cos(coordinate.value("tTail"))), static_cast<int>(coordinate.value("yTail") - coordinate.value("tailMajorAxisLength") * sin(coordinate.value("tTail")))), Scalar(colorMap[id].x, colorMap[id].y, colorMap[id].z), scale, cv::LINE_AA, 0, double(scale) / 10);
             break;
 
           case 3:
-            cv::arrowedLine(frame, Point(coordinate.value("xBody"), coordinate.value("yBody")), Point(coordinate.value("xBody") + coordinate.value("bodyMajorAxisLength") * cos(coordinate.value("tBody")), coordinate.value("yBody") - coordinate.value("bodyMajorAxisLength") * sin(coordinate.value("tBody"))), Scalar(colorMap[id].x, colorMap[id].y, colorMap[id].z), scale, cv::LINE_AA, 0, double(scale) / 10);
+            cv::arrowedLine(frame, Point(static_cast<int>(coordinate.value("xBody")), static_cast<int>(coordinate.value("yBody"))), Point(static_cast<int>(coordinate.value("xBody") + coordinate.value("bodyMajorAxisLength") * cos(coordinate.value("tBody"))), static_cast<int>(coordinate.value("yBody") - coordinate.value("bodyMajorAxisLength") * sin(coordinate.value("tBody")))), Scalar(colorMap[id].x, colorMap[id].y, colorMap[id].z), scale, cv::LINE_AA, 0, double(scale) / 10);
             break;
         }
       }
 
       if (ui->replayNumbers->isChecked()) {
-        cv::putText(frame, to_string(id), Point(coordinate.value("xHead") + coordinate.value("headMajorAxisLength") * cos(coordinate.value("tHead")), coordinate.value("yHead") - coordinate.value("headMajorAxisLength") * sin(coordinate.value("tHead"))), cv::FONT_HERSHEY_SIMPLEX, double(scale) * 0.5, Scalar(colorMap[id].x, colorMap[id].y, colorMap[id].z), scale * 1.2, cv::LINE_AA);
+        cv::putText(frame, to_string(id), Point(static_cast<int>(coordinate.value("xHead") + coordinate.value("headMajorAxisLength") * cos(coordinate.value("tHead"))), static_cast<int>(coordinate.value("yHead") - coordinate.value("headMajorAxisLength") * sin(coordinate.value("tHead")))), cv::FONT_HERSHEY_SIMPLEX, double(scale) * 0.5, Scalar(colorMap[id].x, colorMap[id].y, colorMap[id].z), scale, cv::LINE_AA);
       }
 
       if (ui->replayTrace->isChecked()) {
@@ -513,17 +513,17 @@ void Replay::loadFrame(int frameIndex) {
           if (j > 0) {
             QMap<QString, double> coordinate = trackingData->getData(j, a);
             if (coordinate.contains("xBody")) {
-              memory.push_back(Point(coordinate.value("xBody"), coordinate.value("yBody")));
+              memory.push_back(Point(static_cast<int>(coordinate.value("xBody")), static_cast<int>(coordinate.value("yBody"))));
             }
           }
         }
-        cv::polylines(frame, memory, false, Scalar(colorMap[id].x, colorMap[id].y, colorMap[id].z), scale * 1.2, cv::LINE_AA);
+        cv::polylines(frame, memory, false, Scalar(colorMap[id].x, colorMap[id].y, colorMap[id].z), scale, cv::LINE_AA);
       }
     }
 
-    double w = ui->replayDisplay->width();
-    double h = ui->replayDisplay->height();
-    QPixmap resizedPix = (QPixmap::fromImage(QImage(frame.data, frame.cols, frame.rows, frame.step, QImage::Format_RGB888)).scaled(w, h, Qt::KeepAspectRatio));
+    int w = ui->replayDisplay->width();
+    int h = ui->replayDisplay->height();
+    QPixmap resizedPix = (QPixmap::fromImage(QImage(frame.data, frame.cols, frame.rows, static_cast<int>(frame.step), QImage::Format_RGB888)).scaled(w, h, Qt::KeepAspectRatio));
     ui->replayDisplay->setPixmap(resizedPix);
     resizedFrame.setWidth(resizedPix.width());
     resizedFrame.setHeight(resizedPix.height());
@@ -595,7 +595,7 @@ bool Replay::eventFilter(QObject* target, QEvent* event) {
           }
 
           // Finds the minimal distance and updates the UI
-          int min = idList.at(std::min_element(distance.begin(), distance.end()) - distance.begin());
+          int min = idList.at(static_cast<int>(std::min_element(distance.begin(), distance.end()) - distance.begin()));
           if (object) {
             object1Replay->setCurrentIndex(object1Replay->findText(QString::number(min)));
             object = false;
@@ -618,8 +618,8 @@ bool Replay::eventFilter(QObject* target, QEvent* event) {
     // Hover screen
     if (event->type() == QEvent::HoverMove) {
       QHoverEvent* hoverEvent = static_cast<QHoverEvent*>(event);
-      int xPix = ((double(hoverEvent->pos().x()) - 0.5 * (ui->replayDisplay->width() - resizedFrame.width())) * double(originalImageSize.width())) / double(resizedFrame.width());
-      int yPix = ((double(hoverEvent->pos().y()) - 0.5 * (ui->replayDisplay->height() - resizedFrame.height())) * double(originalImageSize.height())) / double(resizedFrame.height());
+      int xPix = static_cast<int>(((double(hoverEvent->pos().x()) - 0.5 * (ui->replayDisplay->width() - resizedFrame.width())) * double(originalImageSize.width())) / double(resizedFrame.width()));
+      int yPix = static_cast<int>(((double(hoverEvent->pos().y()) - 0.5 * (ui->replayDisplay->height() - resizedFrame.height())) * double(originalImageSize.height())) / double(resizedFrame.height()));
       if (xPix > 0 && yPix > 0 && xPix < originalImageSize.width() && yPix < originalImageSize.height()) {
         this->statusBar()->showMessage("x: " + QString::number(xPix) + "\ty: " + QString::number(yPix));
       }
@@ -632,8 +632,8 @@ bool Replay::eventFilter(QObject* target, QEvent* event) {
     if (event->type() == QEvent::MouseMove) {
       QMouseEvent* moveEvent = static_cast<QMouseEvent*>(event);
       if (moveEvent->buttons() == Qt::MiddleButton) {
-        ui->scrollArea->horizontalScrollBar()->setValue(ui->scrollArea->horizontalScrollBar()->value() + (panReferenceClick.x() - moveEvent->localPos().x()));
-        ui->scrollArea->verticalScrollBar()->setValue(ui->scrollArea->verticalScrollBar()->value() + (panReferenceClick.y() - moveEvent->localPos().y()));
+        ui->scrollArea->horizontalScrollBar()->setValue(static_cast<int>(ui->scrollArea->horizontalScrollBar()->value() + (panReferenceClick.x() - moveEvent->localPos().x())));
+        ui->scrollArea->verticalScrollBar()->setValue(static_cast<int>(ui->scrollArea->verticalScrollBar()->value() + (panReferenceClick.y() - moveEvent->localPos().y())));
         panReferenceClick = moveEvent->localPos();
       }
     }
@@ -714,7 +714,7 @@ void Replay::nextOcclusionEvent() {
 void Replay::previousOcclusionEvent() {
   if (!occlusionEvents.isEmpty()) {
     int current = ui->replaySlider->value();
-    int previousOcclusion = occlusionEvents.at(std::upper_bound(occlusionEvents.begin(), occlusionEvents.end(), current) - occlusionEvents.begin() - 2);
+    int previousOcclusion = occlusionEvents.at(static_cast<int>(std::upper_bound(occlusionEvents.begin(), occlusionEvents.end(), current) - occlusionEvents.begin() - 2));
     ui->replaySlider->setValue(previousOcclusion);
   }
 }
@@ -730,7 +730,7 @@ void Replay::saveTrackedMovie() {
     cv::VideoWriter outputVideo(savePath.toStdString(), cv::VideoWriter::fourcc('M', 'J', 'P', 'G'), ui->replayFps->value(), Size(originalImageSize.width(), originalImageSize.height()));
     int scale = ui->replaySize->value();
 
-    for (size_t frameIndex = 0; frameIndex < video->getImageCount(); frameIndex++) {
+    for (int frameIndex = 0; frameIndex < static_cast<int>(video->getImageCount()); frameIndex++) {
       Mat frame;
       video->getImage(frameIndex, frame);
       cvtColor(frame, frame, COLOR_GRAY2BGR);
@@ -748,20 +748,20 @@ void Replay::saveTrackedMovie() {
         if (ui->ellipseBox->currentIndex() != 4) {
           switch (ui->ellipseBox->currentIndex()) {
             case 0:  // Head + Tail
-              cv::ellipse(frame, Point(coordinate.value("xHead"), coordinate.value("yHead")), Size(coordinate.value("headMajorAxisLength"), coordinate.value("headMinorAxisLength")), 180 - (coordinate.value("tHead") * 180) / M_PI, 0, 360, Scalar(colorMap[id].x, colorMap[id].y, colorMap[id].z), scale, 8);
-              cv::ellipse(frame, Point(coordinate.value("xTail"), coordinate.value("yTail")), Size(coordinate.value("tailMajorAxisLength"), coordinate.value("tailMinorAxisLength")), 180 - (coordinate.value("tTail") * 180) / M_PI, 0, 360, Scalar(colorMap[id].x, colorMap[id].y, colorMap[id].z), scale, cv::LINE_AA);
+              cv::ellipse(frame, Point(static_cast<int>(coordinate.value("xHead")), static_cast<int>(coordinate.value("yHead"))), Size(static_cast<int>(coordinate.value("headMajorAxisLength")), static_cast<int>(coordinate.value("headMinorAxisLength"))), 180 - (coordinate.value("tHead") * 180) / M_PI, 0, 360, Scalar(colorMap[id].x, colorMap[id].y, colorMap[id].z), scale, 8);
+              cv::ellipse(frame, Point(static_cast<int>(coordinate.value("xTail")), static_cast<int>(coordinate.value("yTail"))), Size(static_cast<int>(coordinate.value("tailMajorAxisLength")), static_cast<int>(coordinate.value("tailMinorAxisLength"))), 180 - (coordinate.value("tTail") * 180) / M_PI, 0, 360, Scalar(colorMap[id].x, colorMap[id].y, colorMap[id].z), scale, cv::LINE_AA);
               break;
 
             case 1:  // Head
-              cv::ellipse(frame, Point(coordinate.value("xHead"), coordinate.value("yHead")), Size(coordinate.value("headMajorAxisLength"), coordinate.value("headMinorAxisLength")), 180 - (coordinate.value("tHead") * 180) / M_PI, 0, 360, Scalar(colorMap[id].x, colorMap[id].y, colorMap[id].z), scale, 8);
+              cv::ellipse(frame, Point(static_cast<int>(coordinate.value("xHead")), static_cast<int>(coordinate.value("yHead"))), Size(static_cast<int>(coordinate.value("headMajorAxisLength")), static_cast<int>(coordinate.value("headMinorAxisLength"))), 180 - (coordinate.value("tHead") * 180) / M_PI, 0, 360, Scalar(colorMap[id].x, colorMap[id].y, colorMap[id].z), scale, 8);
               break;
 
             case 2:  // Tail
-              cv::ellipse(frame, Point(coordinate.value("xTail"), coordinate.value("yTail")), Size(coordinate.value("tailMajorAxisLength"), coordinate.value("tailMinorAxisLength")), 180 - (coordinate.value("tTail") * 180) / M_PI, 0, 360, Scalar(colorMap[id].x, colorMap[id].y, colorMap[id].z), scale, cv::LINE_AA);
+              cv::ellipse(frame, Point(static_cast<int>(coordinate.value("xTail")), static_cast<int>(coordinate.value("yTail"))), Size(static_cast<int>(coordinate.value("tailMajorAxisLength")), static_cast<int>(coordinate.value("tailMinorAxisLength"))), 180 - (coordinate.value("tTail") * 180) / M_PI, 0, 360, Scalar(colorMap[id].x, colorMap[id].y, colorMap[id].z), scale, cv::LINE_AA);
               break;
 
             case 3:  // Body
-              cv::ellipse(frame, Point(coordinate.value("xBody"), coordinate.value("yBody")), Size(coordinate.value("bodyMajorAxisLength"), coordinate.value("bodyMinorAxisLength")), 180 - (coordinate.value("tBody") * 180) / M_PI, 0, 360, Scalar(colorMap[id].x, colorMap[id].y, colorMap[id].z), scale, 8);
+              cv::ellipse(frame, Point(static_cast<int>(coordinate.value("xBody")), static_cast<int>(coordinate.value("yBody"))), Size(static_cast<int>(coordinate.value("bodyMajorAxisLength")), static_cast<int>(coordinate.value("bodyMinorAxisLength"))), 180 - (coordinate.value("tBody") * 180) / M_PI, 0, 360, Scalar(colorMap[id].x, colorMap[id].y, colorMap[id].z), scale, 8);
               break;
           }
         }
@@ -769,43 +769,43 @@ void Replay::saveTrackedMovie() {
         if (ui->arrowBox->currentIndex() != 4) {
           switch (ui->arrowBox->currentIndex()) {
             case 0:
-              cv::arrowedLine(frame, Point(coordinate.value("xHead"), coordinate.value("yHead")), Point(coordinate.value("xHead") + coordinate.value("headMajorAxisLength") * cos(coordinate.value("tHead")), coordinate.value("yHead") - coordinate.value("headMajorAxisLength") * sin(coordinate.value("tHead"))), Scalar(colorMap[id].x, colorMap[id].y, colorMap[id].z), scale, cv::LINE_AA, 0, double(scale) / 10);
-              cv::arrowedLine(frame, Point(coordinate.value("xTail"), coordinate.value("yTail")), Point(coordinate.value("xTail") + coordinate.value("tailMajorAxisLength") * cos(coordinate.value("tTail")), coordinate.value("yTail") - coordinate.value("tailMajorAxisLength") * sin(coordinate.value("tTail"))), Scalar(colorMap[id].x, colorMap[id].y, colorMap[id].z), scale, cv::LINE_AA, 0, double(scale) / 10);
+              cv::arrowedLine(frame, Point(static_cast<int>(coordinate.value("xHead")), static_cast<int>(coordinate.value("yHead"))), Point(static_cast<int>(coordinate.value("xHead") + coordinate.value("headMajorAxisLength") * cos(coordinate.value("tHead"))), static_cast<int>(coordinate.value("yHead") - coordinate.value("headMajorAxisLength") * sin(coordinate.value("tHead")))), Scalar(colorMap[id].x, colorMap[id].y, colorMap[id].z), scale, cv::LINE_AA, 0, double(scale) / 10);
+              cv::arrowedLine(frame, Point(static_cast<int>(coordinate.value("xTail")), static_cast<int>(coordinate.value("yTail"))), Point(static_cast<int>(coordinate.value("xTail") + coordinate.value("tailMajorAxisLength") * cos(coordinate.value("tTail"))), static_cast<int>(coordinate.value("yTail") - coordinate.value("tailMajorAxisLength") * sin(coordinate.value("tTail")))), Scalar(colorMap[id].x, colorMap[id].y, colorMap[id].z), scale, cv::LINE_AA, 0, double(scale) / 10);
               break;
 
             case 1:
-              cv::arrowedLine(frame, Point(coordinate.value("xHead"), coordinate.value("yHead")), Point(coordinate.value("xHead") + coordinate.value("headMajorAxisLength") * cos(coordinate.value("tHead")), coordinate.value("yHead") - coordinate.value("headMajorAxisLength") * sin(coordinate.value("tHead"))), Scalar(colorMap[id].x, colorMap[id].y, colorMap[id].z), scale, cv::LINE_AA, 0, double(scale) / 10);
+              cv::arrowedLine(frame, Point(static_cast<int>(coordinate.value("xHead")), static_cast<int>(coordinate.value("yHead"))), Point(static_cast<int>(coordinate.value("xHead") + coordinate.value("headMajorAxisLength") * cos(coordinate.value("tHead"))), static_cast<int>(coordinate.value("yHead") - coordinate.value("headMajorAxisLength") * sin(coordinate.value("tHead")))), Scalar(colorMap[id].x, colorMap[id].y, colorMap[id].z), scale, cv::LINE_AA, 0, double(scale) / 10);
               break;
 
             case 2:
-              cv::arrowedLine(frame, Point(coordinate.value("xTail"), coordinate.value("yTail")), Point(coordinate.value("xTail") + coordinate.value("tailMajorAxisLength") * cos(coordinate.value("tTail")), coordinate.value("yTail") - coordinate.value("tailMajorAxisLength") * sin(coordinate.value("tTail"))), Scalar(colorMap[id].x, colorMap[id].y, colorMap[id].z), scale, cv::LINE_AA, 0, double(scale) / 10);
+              cv::arrowedLine(frame, Point(static_cast<int>(coordinate.value("xTail")), static_cast<int>(coordinate.value("yTail"))), Point(static_cast<int>(coordinate.value("xTail") + coordinate.value("tailMajorAxisLength") * cos(coordinate.value("tTail"))), static_cast<int>(coordinate.value("yTail") - coordinate.value("tailMajorAxisLength") * sin(coordinate.value("tTail")))), Scalar(colorMap[id].x, colorMap[id].y, colorMap[id].z), scale, cv::LINE_AA, 0, double(scale) / 10);
               break;
 
             case 3:
-              cv::arrowedLine(frame, Point(coordinate.value("xBody"), coordinate.value("yBody")), Point(coordinate.value("xBody") + coordinate.value("bodyMajorAxisLength") * cos(coordinate.value("tBody")), coordinate.value("yBody") - coordinate.value("bodyMajorAxisLength") * sin(coordinate.value("tBody"))), Scalar(colorMap[id].x, colorMap[id].y, colorMap[id].z), scale, cv::LINE_AA, 0, double(scale) / 10);
+              cv::arrowedLine(frame, Point(static_cast<int>(coordinate.value("xBody")), static_cast<int>(coordinate.value("yBody"))), Point(static_cast<int>(coordinate.value("xBody") + coordinate.value("bodyMajorAxisLength") * cos(coordinate.value("tBody"))), static_cast<int>(coordinate.value("yBody") - coordinate.value("bodyMajorAxisLength") * sin(coordinate.value("tBody")))), Scalar(colorMap[id].x, colorMap[id].y, colorMap[id].z), scale, cv::LINE_AA, 0, double(scale) / 10);
               break;
           }
         }
 
         if (ui->replayNumbers->isChecked()) {
-          cv::putText(frame, to_string(id), Point(coordinate.value("xHead") + coordinate.value("headMajorAxisLength") * cos(coordinate.value("tHead")), coordinate.value("yHead") - coordinate.value("headMajorAxisLength") * sin(coordinate.value("tHead"))), cv::FONT_HERSHEY_SIMPLEX, double(scale) * 0.5, Scalar(colorMap[id].x, colorMap[id].y, colorMap[id].z), scale * 1.2, cv::LINE_AA);
+          cv::putText(frame, to_string(id), Point(static_cast<int>(coordinate.value("xHead") + coordinate.value("headMajorAxisLength") * cos(coordinate.value("tHead"))), static_cast<int>(coordinate.value("yHead") - coordinate.value("headMajorAxisLength") * sin(coordinate.value("tHead")))), cv::FONT_HERSHEY_SIMPLEX, double(scale) * 0.5, Scalar(colorMap[id].x, colorMap[id].y, colorMap[id].z), scale, cv::LINE_AA);
         }
 
         if (ui->replayTrace->isChecked()) {
           vector<Point> memory;
-          for (unsigned int j = frameIndex - ui->replayTraceLength->value(); j < frameIndex; j++) {
+          for (int j = frameIndex - ui->replayTraceLength->value(); j < frameIndex; j++) {
             if (j > 0) {
               QMap<QString, double> coordinate = trackingData->getData(j, a);
               if (coordinate.contains("xBody")) {
-                memory.push_back(Point(coordinate.value("xBody"), coordinate.value("yBody")));
+                memory.push_back(Point(static_cast<int>(coordinate.value("xBody")), static_cast<int>(coordinate.value("yBody"))));
               }
             }
           }
-          cv::polylines(frame, memory, false, Scalar(colorMap[id].x, colorMap[id].y, colorMap[id].z), scale * 1.2, cv::LINE_AA);
+          cv::polylines(frame, memory, false, Scalar(colorMap[id].x, colorMap[id].y, colorMap[id].z), scale, cv::LINE_AA);
         }
       }
       outputVideo.write(frame);
-      ui->replaySlider->setValue(frameIndex);
+      ui->replaySlider->setValue(static_cast<int>(frameIndex));
     }
     outputVideo.release();
   }

@@ -21,7 +21,7 @@ unix:!macx {
   UI_DIR=build
   RCC_DIR=build
 
-  QMAKE_CXXFLAGS += -std=c++17 -O3 -fopenmp -g
+  QMAKE_CXXFLAGS += -std=c++17 -O3 -fopenmp -g -Wconversion
   QMAKE_CXXFLAGS_RELEASE -= -O1
   QMAKE_CXXFLAGS_RELEASE -= -O2
   QMAKE_CXXFLAGS_RELEASE += -O3

@@ -50,10 +50,10 @@ class SwapData : public QUndoCommand {
   void redo() override;
 
  private:
-  Data *m_data;
   int m_firstObject;
   int m_secondObject;
   int m_from;
+  Data *m_data;
 };
 
 class DeleteData : public QUndoCommand {
@@ -63,9 +63,9 @@ class DeleteData : public QUndoCommand {
   void redo() override;
 
  private:
-  Data *m_data;
   int m_object;
   int m_from;
   int m_to;
+  Data *m_data;
 };
 #endif

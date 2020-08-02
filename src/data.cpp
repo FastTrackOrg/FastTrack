@@ -153,12 +153,11 @@ int Data::getObjectInformation(int objectId) {
     for (auto &a : objects) {
       if (a.id == objectId) {
         firstAppearance = i;
-        goto stop;
+        return firstAppearance;
       }
     }
   }
-stop:
-  return firstAppearance;
+  return 0;
 }
 
 /**
