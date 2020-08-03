@@ -261,11 +261,21 @@ Replay::Replay(QWidget* parent, bool standalone, QSlider* control) : QMainWindow
   // Zoom
   connect(ui->scrollArea->verticalScrollBar(), &QScrollBar::rangeChanged, [this]() {
     QScrollBar* vertical = ui->scrollArea->verticalScrollBar();
-    vertical->setValue(int(zoomReferencePosition.y() * (currentZoom - 1) + currentZoom * vertical->value()));
+    if (currentZoom > 0) {
+      vertical->setValue(int(zoomReferencePosition.y() * 0.25 + vertical->value() * 1.25));
+    }
+    else {
+      vertical->setValue(int(-zoomReferencePosition.y() * 0.25 + vertical->value() / 1.25));
+    }
   });
   connect(ui->scrollArea->horizontalScrollBar(), &QScrollBar::rangeChanged, [this]() {
     QScrollBar* horizontal = ui->scrollArea->horizontalScrollBar();
-    horizontal->setValue(int(zoomReferencePosition.x() * (currentZoom - 1) + currentZoom * horizontal->value()));
+    if (currentZoom > 0) {
+      horizontal->setValue(int(zoomReferencePosition.x() * 0.25 + horizontal->value() * 1.25));
+    }
+    else {
+      horizontal->setValue(int(-zoomReferencePosition.x() * 0.25 + horizontal->value() / 1.25));
+    }
   });
 
   isReplayable = false;
@@ -531,21 +541,28 @@ void Replay::loadFrame(int frameIndex) {
 }
 
 /**
-  * @brief Zoom the display from a scale factor.
+  * @brief Zooms in the display.
 */
 void Replay::zoomIn() {
-  (currentZoom >= 3) ? (currentZoom = 3) : (currentZoom += 0.2);
-  ui->replayDisplay->setFixedSize(ui->replayDisplay->size() * currentZoom);
-  loadFrame(ui->replaySlider->value());
+  currentZoom = abs(currentZoom);
+  if (currentZoom < 2.75) {
+    currentZoom += 0.25;
+    ui->replayDisplay->setFixedSize(ui->replayDisplay->size() * 1.25);
+    loadFrame(ui->replaySlider->value());
+  }
 }
 
 /**
-  * @brief Zoom the display from a scale factor.
+  * @brief Zooms out the display.
 */
 void Replay::zoomOut() {
-  ui->replayDisplay->setFixedSize((ui->replayDisplay->size()) / (currentZoom));
-  loadFrame(ui->replaySlider->value());
-  (currentZoom <= 1) ? (currentZoom = 1) : (currentZoom -= 0.2);
+  currentZoom = abs(currentZoom);
+  if (currentZoom > 0.75) {
+    currentZoom -= 0.25;
+    ui->replayDisplay->setFixedSize(ui->replayDisplay->size() / 1.25);
+    loadFrame(ui->replaySlider->value());
+  }
+  currentZoom *= -1;
 }
 
 /**

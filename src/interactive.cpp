@@ -344,11 +344,21 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   // Zoom
   connect(ui->scrollArea->verticalScrollBar(), &QScrollBar::rangeChanged, [this]() {
     QScrollBar *vertical = ui->scrollArea->verticalScrollBar();
-    vertical->setValue(int(zoomReferencePosition.y() * (currentZoom - 1) + currentZoom * vertical->value()));
+    if (currentZoom > 0) {
+      vertical->setValue(int(zoomReferencePosition.y() * 0.25 + vertical->value() * 1.25));
+    }
+    else {
+      vertical->setValue(int(-zoomReferencePosition.y() * 0.25 + vertical->value() / 1.25));
+    }
   });
   connect(ui->scrollArea->horizontalScrollBar(), &QScrollBar::rangeChanged, [this]() {
     QScrollBar *horizontal = ui->scrollArea->horizontalScrollBar();
-    horizontal->setValue(int(zoomReferencePosition.x() * (currentZoom - 1) + horizontal->value() * currentZoom));
+    if (currentZoom > 0) {
+      horizontal->setValue(int(zoomReferencePosition.x() * 0.25 + horizontal->value() * 1.25));
+    }
+    else {
+      horizontal->setValue(int(-zoomReferencePosition.x() * 0.25 + horizontal->value() / 1.25));
+    }
   });
 
   // Sets the roi limits
@@ -643,19 +653,25 @@ void Interactive::display(int index, int scale) {
   * @brief Zooms in the display.
 */
 void Interactive::zoomIn() {
-  (currentZoom >= 3) ? (currentZoom = 3) : (currentZoom += 0.2);
-  ui->display->setFixedSize(ui->display->size() * currentZoom);
-  display(ui->slider->value());
+  currentZoom = abs(currentZoom);
+  if (currentZoom < 2.75) {
+    currentZoom += 0.25;
+    ui->display->setFixedSize(ui->display->size() * 1.25);
+    display(ui->slider->value());
+  }
 }
 
 /**
   * @brief Zooms out the display.
 */
 void Interactive::zoomOut() {
-  if (currentZoom > 1) ui->display->setFixedSize((ui->display->size()) / (currentZoom));
-  if (currentZoom < 1) ui->display->setFixedSize((ui->display->size()) * (currentZoom));
-  display(ui->slider->value());
-  (currentZoom <= 0.2) ? (currentZoom = 0.2) : (currentZoom -= 0.2);
+  currentZoom = abs(currentZoom);
+  if (currentZoom > 0.75) {
+    currentZoom -= 0.25;
+    ui->display->setFixedSize(ui->display->size() / 1.25);
+    display(ui->slider->value());
+  }
+  currentZoom *= -1;
 }
 
 /**
