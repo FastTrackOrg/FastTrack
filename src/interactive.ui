@@ -53,8 +53,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>576</width>
-             <height>604</height>
+             <width>504</width>
+             <height>572</height>
             </rect>
            </property>
            <layout class="QGridLayout" name="gridLayout_2">
@@ -406,8 +406,8 @@ p, li { white-space: pre-wrap; }
   <widget class="QDockWidget" name="imageOptions">
    <property name="minimumSize">
     <size>
-     <width>281</width>
-     <height>318</height>
+     <width>353</width>
+     <height>350</height>
     </size>
    </property>
    <property name="features">
@@ -437,6 +437,13 @@ p, li { white-space: pre-wrap; }
          <string>Background</string>
         </attribute>
         <layout class="QGridLayout" name="gridLayout_6">
+         <item row="10" column="0" colspan="2">
+          <widget class="Line" name="line_8">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+          </widget>
+         </item>
          <item row="4" column="1">
           <widget class="QComboBox" name="registrationBack">
            <item>
@@ -461,6 +468,19 @@ p, li { white-space: pre-wrap; }
            </item>
           </widget>
          </item>
+         <item row="8" column="0">
+          <spacer name="verticalSpacer_7">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>40</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
          <item row="9" column="0" colspan="2">
           <widget class="QLabel" name="label_21">
            <property name="font">
@@ -473,29 +493,17 @@ p, li { white-space: pre-wrap; }
            </property>
           </widget>
          </item>
-         <item row="0" column="0" colspan="2">
-          <widget class="QLabel" name="label_20">
-           <property name="font">
-            <font>
-             <pointsize>10</pointsize>
-            </font>
-           </property>
+         <item row="11" column="0" colspan="2">
+          <widget class="QPushButton" name="backgroundSelectButton">
            <property name="text">
-            <string>Compute The Background</string>
+            <string>Open image</string>
            </property>
           </widget>
          </item>
-         <item row="4" column="0">
-          <widget class="QLabel" name="label_10">
-           <property name="text">
-            <string>Registration:</string>
-           </property>
-          </widget>
-         </item>
-         <item row="7" column="0" colspan="2">
-          <widget class="Line" name="line">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
+         <item row="6" column="0" colspan="2">
+          <widget class="QProgressBar" name="backgroundProgressBar">
+           <property name="value">
+            <number>0</number>
            </property>
           </widget>
          </item>
@@ -513,10 +521,31 @@ p, li { white-space: pre-wrap; }
            </property>
           </widget>
          </item>
-         <item row="6" column="0" colspan="2">
-          <widget class="QProgressBar" name="backgroundProgressBar">
-           <property name="value">
-            <number>0</number>
+         <item row="4" column="0">
+          <widget class="QLabel" name="label_10">
+           <property name="text">
+            <string>Registration:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0" colspan="2">
+          <layout class="QHBoxLayout" name="horizontalLayout_18">
+           <item>
+            <widget class="QLabel" name="label_2">
+             <property name="text">
+              <string>Number of images: </string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QSpinBox" name="nBack"/>
+           </item>
+          </layout>
+         </item>
+         <item row="7" column="0" colspan="2">
+          <widget class="Line" name="line">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
            </property>
           </widget>
          </item>
@@ -566,46 +595,17 @@ p, li { white-space: pre-wrap; }
            </property>
           </spacer>
          </item>
-         <item row="10" column="0" colspan="2">
-          <widget class="Line" name="line_8">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
+         <item row="0" column="0" colspan="2">
+          <widget class="QLabel" name="label_20">
+           <property name="font">
+            <font>
+             <pointsize>10</pointsize>
+            </font>
            </property>
-          </widget>
-         </item>
-         <item row="3" column="0" colspan="2">
-          <layout class="QHBoxLayout" name="horizontalLayout_18">
-           <item>
-            <widget class="QLabel" name="label_2">
-             <property name="text">
-              <string>Number of images: </string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QSpinBox" name="nBack"/>
-           </item>
-          </layout>
-         </item>
-         <item row="11" column="0" colspan="2">
-          <widget class="QPushButton" name="backgroundSelectButton">
            <property name="text">
-            <string>Open image</string>
+            <string>Compute The Background</string>
            </property>
           </widget>
-         </item>
-         <item row="8" column="0">
-          <spacer name="verticalSpacer_7">
-           <property name="orientation">
-            <enum>Qt::Vertical</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>20</width>
-             <height>40</height>
-            </size>
-           </property>
-          </spacer>
          </item>
         </layout>
        </widget>
@@ -1198,109 +1198,64 @@ corner: </string>
         <attribute name="title">
          <string>Control</string>
         </attribute>
-        <layout class="QGridLayout" name="gridLayout_18">
+        <layout class="QGridLayout" name="gridLayout_15">
          <item row="0" column="0">
-          <widget class="QFrame" name="frame">
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>68</height>
-            </size>
+          <widget class="Timeline" name="slider" native="true"/>
+         </item>
+         <item row="1" column="0">
+          <widget class="QProgressBar" name="progressBar">
+           <property name="value">
+            <number>0</number>
            </property>
-           <property name="frameShape">
-            <enum>QFrame::StyledPanel</enum>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="displayOptions">
+        <attribute name="title">
+         <string>Display</string>
+        </attribute>
+        <layout class="QGridLayout" name="gridLayout_3">
+         <item row="0" column="0">
+          <widget class="QGroupBox" name="imageDisplayGroup">
+           <property name="title">
+            <string>Image Display</string>
            </property>
-           <property name="frameShadow">
-            <enum>QFrame::Raised</enum>
+           <property name="checkable">
+            <bool>false</bool>
            </property>
            <layout class="QGridLayout" name="gridLayout_17">
             <item row="0" column="0">
-             <widget class="QSlider" name="slider">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
+             <widget class="QRadioButton" name="isOriginal">
+              <property name="text">
+               <string>Ori&amp;ginal</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
               </property>
              </widget>
             </item>
             <item row="0" column="1">
-             <widget class="QLabel" name="replayNumber">
+             <widget class="QRadioButton" name="isSub">
               <property name="text">
-               <string>000000</string>
+               <string>Backgro&amp;und Subtracted</string>
               </property>
-              <property name="scaledContents">
+              <property name="checkable">
                <bool>false</bool>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignCenter</set>
               </property>
              </widget>
             </item>
-            <item row="1" column="0" colspan="2">
-             <widget class="QProgressBar" name="progressBar">
-              <property name="value">
-               <number>0</number>
+            <item row="0" column="2">
+             <widget class="QRadioButton" name="isBin">
+              <property name="text">
+               <string>Binar&amp;y</string>
+              </property>
+              <property name="checkable">
+               <bool>false</bool>
               </property>
              </widget>
             </item>
            </layout>
-          </widget>
-         </item>
-         <item row="1" column="0">
-          <widget class="QSplitter" name="splitter">
-           <property name="maximumSize">
-            <size>
-             <width>402</width>
-             <height>16777215</height>
-            </size>
-           </property>
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <widget class="QGroupBox" name="imageDisplayGroup">
-            <property name="maximumSize">
-             <size>
-              <width>402</width>
-              <height>16777215</height>
-             </size>
-            </property>
-            <property name="title">
-             <string>Image Display</string>
-            </property>
-            <property name="checkable">
-             <bool>false</bool>
-            </property>
-            <layout class="QGridLayout" name="gridLayout_3">
-             <item row="0" column="0">
-              <widget class="QRadioButton" name="isOriginal">
-               <property name="text">
-                <string>Ori&amp;ginal</string>
-               </property>
-               <property name="checked">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="1">
-              <widget class="QRadioButton" name="isSub">
-               <property name="text">
-                <string>Backgro&amp;und Subtracted</string>
-               </property>
-               <property name="checkable">
-                <bool>false</bool>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="2">
-              <widget class="QRadioButton" name="isBin">
-               <property name="text">
-                <string>Binar&amp;y</string>
-               </property>
-               <property name="checkable">
-                <bool>false</bool>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
           </widget>
          </item>
         </layout>
@@ -1700,6 +1655,14 @@ corner: </string>
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>Timeline</class>
+   <extends>QWidget</extends>
+   <header>timeline.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

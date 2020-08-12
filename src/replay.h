@@ -62,6 +62,7 @@ This file is part of Fast Track.
 #include "data.h"
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
+#include "timeline.h"
 #include "videoreader.h"
 using namespace std;
 using namespace cv;
@@ -74,7 +75,7 @@ class Replay : public QMainWindow {
   Q_OBJECT
 
  public:
-  explicit Replay(QWidget *parent = nullptr, bool standalone = true, QSlider *control = nullptr);
+  explicit Replay(QWidget *parent = nullptr, bool standalone = true, Timeline *control = nullptr);
   ~Replay();
 
  private:

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>979</width>
-    <height>699</height>
+    <width>1121</width>
+    <height>841</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -42,8 +42,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>540</width>
-           <height>558</height>
+           <width>623</width>
+           <height>611</height>
           </rect>
          </property>
          <layout class="QGridLayout" name="gridLayout">
@@ -76,7 +76,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>979</width>
+     <width>1121</width>
      <height>20</height>
     </rect>
    </property>
@@ -229,6 +229,12 @@
    </widget>
   </widget>
   <widget class="QDockWidget" name="controls">
+   <property name="minimumSize">
+    <size>
+     <width>0</width>
+     <height>150</height>
+    </size>
+   </property>
    <property name="allowedAreas">
     <set>Qt::BottomDockWidgetArea|Qt::TopDockWidgetArea</set>
    </property>
@@ -238,38 +244,9 @@
    <widget class="QWidget" name="dockWidgetContents_3">
     <layout class="QGridLayout" name="gridLayout_3">
      <item row="0" column="0">
-      <widget class="QSlider" name="replaySlider">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="invertedAppearance">
-        <bool>false</bool>
-       </property>
-       <property name="invertedControls">
-        <bool>false</bool>
-       </property>
-      </widget>
+      <widget class="Timeline" name="replaySlider" native="true"/>
      </item>
      <item row="0" column="1">
-      <widget class="QLabel" name="replayNumber">
-       <property name="minimumSize">
-        <size>
-         <width>45</width>
-         <height>20</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>45</width>
-         <height>16777215</height>
-        </size>
-       </property>
-       <property name="text">
-        <string>0000000</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="2">
       <widget class="QPushButton" name="playReplay">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -303,8 +280,14 @@
        </property>
       </widget>
      </item>
-     <item row="0" column="3">
+     <item row="0" column="2">
       <widget class="QSpinBox" name="replayFps">
+       <property name="maximumSize">
+        <size>
+         <width>62</width>
+         <height>16777215</height>
+        </size>
+       </property>
        <property name="minimum">
         <number>1</number>
        </property>
@@ -486,6 +469,14 @@
    </widget>
   </widget>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>Timeline</class>
+   <extends>QWidget</extends>
+   <header>timeline.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

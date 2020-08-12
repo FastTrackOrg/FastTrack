@@ -38,8 +38,8 @@ using namespace std;
  *
 */
 
-Replay::Replay(QWidget* parent, bool standalone, QSlider* control) : QMainWindow(parent),
-                                                                     ui(new Ui::Replay) {
+Replay::Replay(QWidget* parent, bool standalone, Timeline* control) : QMainWindow(parent),
+                                                                      ui(new Ui::Replay) {
   ui->setupUi(this);
   ui->replayDisplay->setAttribute(Qt::WA_Hover);
 
@@ -181,7 +181,7 @@ Replay::Replay(QWidget* parent, bool standalone, QSlider* control) : QMainWindow
 
   deletedFrameNumber = new QSpinBox(this);
   deletedFrameNumber->setStatusTip(tr("Number of frames where to delete the selected object"));
-  connect(ui->replaySlider, &QSlider::valueChanged, [this]() {
+  connect(ui->replaySlider, &Timeline::valueChanged, [this]() {
     deletedFrameNumber->setMaximum(video->getImageCount() - ui->replaySlider->value());
     deletedFrameNumber->setValue(video->getImageCount() - ui->replaySlider->value());
   });
@@ -296,18 +296,11 @@ Replay::Replay(QWidget* parent, bool standalone, QSlider* control) : QMainWindow
     loadFrame(ui->replaySlider->value());
   });
 
-  connect(ui->replayNumbers, &QCheckBox::stateChanged, [this]() {
-    loadFrame(ui->replaySlider->value());
-  });
-
   connect(ui->replaySize, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [this]() {
     loadFrame(ui->replaySlider->value());
   });
 
-  connect(ui->replaySlider, &QSlider::valueChanged, this, &Replay::loadFrame);
-  connect(ui->replaySlider, &QSlider::valueChanged, [this](const int& newValue) {
-    ui->replayNumber->setText(QString::number(newValue));
-  });
+  connect(ui->replaySlider, &Timeline::valueChanged, this, &Replay::loadFrame);
 
   connect(framerate, &QTimer::timeout, [this]() {
     ui->replaySlider->setValue(autoPlayerIndex);
@@ -418,7 +411,7 @@ void Replay::loadReplayFolder(QString dir) {
 
     // Load annotation file
     annotation = new Annotation(trackingDir);
-    connect(ui->replaySlider, &QSlider::valueChanged, annotation, &Annotation::read);
+    connect(ui->replaySlider, &Timeline::valueChanged, annotation, &Annotation::read);
     connect(annotation, &Annotation::annotationText, ui->annotation, &QTextEdit::setPlainText);
     connect(ui->annotation, &QTextEdit::textChanged, annotation, [this]() {
       int index = ui->replaySlider->value();
@@ -436,7 +429,7 @@ void Replay::loadReplayFolder(QString dir) {
     });
 
     // Information
-    connect(ui->replaySlider, &QSlider::valueChanged, [this](int index) {
+    connect(ui->replaySlider, &Timeline::valueChanged, [this](int index) {
       updateInformation(ui->infoTableObject1->item(0, 0)->text().toInt(), index, ui->infoTableObject1);
       updateInformation(ui->infoTableObject2->item(0, 0)->text().toInt(), index, ui->infoTableObject2);
     });

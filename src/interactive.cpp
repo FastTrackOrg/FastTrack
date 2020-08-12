@@ -105,9 +105,8 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   });
   ui->menuView->addAction(replayAction);
 
-  connect(ui->slider, &QSlider::valueChanged, [this](const int &newValue) {
+  connect(ui->slider, &Timeline::valueChanged, [this](const int &newValue) {
     display(newValue);
-    ui->replayNumber->setText(QString::number(newValue));
   });
 
   // Loads prefered style

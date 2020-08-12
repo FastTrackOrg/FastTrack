@@ -81,6 +81,7 @@ SOURCES += \
         annotation.cpp \
         trackingmanager.cpp \
         videoreader.cpp \
+        timeline.cpp \ 
 
 
 HEADERS += \
@@ -94,6 +95,7 @@ HEADERS += \
         annotation.h \
         trackingmanager.h\
         videoreader.h \
+        timeline.h \ 
 
 
 FORMS += \
@@ -102,6 +104,7 @@ FORMS += \
         trackingmanager.ui \
         batch.ui \ 
         interactive.ui \ 
+        timeline.ui \ 
 
 RESOURCES += resources.qrc \
         assets/breeze.qrc
