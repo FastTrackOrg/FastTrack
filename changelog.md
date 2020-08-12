@@ -1,5 +1,16 @@
 # FastTrack changelog
 
+## 5.1.0
+
+### Fixed
+- Fixed the zoom.
+- Fixed the curvature computation.
+
+### Added
+- Added timeline replacing the slider.
+- Added native video reading.
+- Added area and perimeter in the cost function.
+
 ## 5.0.0
 
 ### Fixed
