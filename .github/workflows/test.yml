@@ -10,23 +10,17 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
 
     steps:
     - uses: actions/checkout@v2
     - name: install qt5
       run: |
-        sudo add-apt-repository ppa:ubuntu-toolchain-r/test
         sudo apt-get update
-        sudo apt-get install qt5-default qt5-qmake qtwebengine5-dev libgtest-dev gcc-9 g++-9
-        sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 90 --slave /usr/bin/g++ g++ /usr/bin/g++-9 --slave /usr/bin/gcov gcov /usr/bin/gcov-9
-        cd /usr/src/googletest/googletest
-        sudo mkdir build
-        cd build
-        sudo cmake ..
-        sudo make install
+        sudo apt-get install build-essential cmake
+        sudo apt-get install qt5-default qt5-qmake qtwebengine5-dev libgtest-dev
     - name: install opencv
-      run: sudo ./dependencies.sh opencv
+      run: sudo apt-get install libopencv-dev
     - uses: actions/setup-python@v2
       with:
         python-version: '3.8'
