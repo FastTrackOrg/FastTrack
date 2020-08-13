@@ -9,6 +9,7 @@
 #include <QGraphicsSimpleTextItem>
 #include <QMouseEvent>
 #include <QPen>
+#include <QScrollBar>
 #include <QString>
 #include <QVector>
 #include <QWidget>
@@ -40,6 +41,7 @@ class Timeline : public QWidget {
   int m_offset;
   int m_currentIndex;
   int m_currentIndexLeft;
+  int m_scale;
 
   QGraphicsScene *timelineScene;
   QGraphicsLineItem *cursor;

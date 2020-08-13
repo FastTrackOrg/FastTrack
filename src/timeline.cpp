@@ -42,6 +42,7 @@ Timeline::Timeline(QWidget *parent)
   m_offset = 30;
   m_currentIndex = 0;
   m_currentIndexLeft = 0;
+  m_scale = 1;
 
   // Scene setup
   timelineScene = new QGraphicsScene(this);
@@ -49,6 +50,14 @@ Timeline::Timeline(QWidget *parent)
   ui->timelineView->setAttribute(Qt::WA_Hover);
   ui->timelineView->installEventFilter(this);
   ui->timelineView->setScene(timelineScene);
+
+  //Connection
+  connect(ui->zoom, &QAbstractSlider::valueChanged, [this](int value) {
+    m_scale = value;
+    update(m_currentIndex);
+    int x = ((m_width * m_scale - m_offset) * m_currentIndexLeft) / m_imageNumber + static_cast<int>(m_offset * 0.5);
+    ui->timelineView->horizontalScrollBar()->setValue(x);
+  });
 }
 
 /**
@@ -58,14 +67,14 @@ Timeline::Timeline(QWidget *parent)
 */
 void Timeline::setLayout(const int width, const int imageNumber) {
   // Ruler
-  double step = static_cast<double>(width - m_offset) / static_cast<double>(imageNumber);
+  double step = static_cast<double>(width * m_scale - m_offset) / static_cast<double>(imageNumber);
   for (int i = 0; i < imageNumber + 1; i++) {
     QGraphicsLineItem *line = new QGraphicsLineItem(static_cast<double>(i) * step + m_offset * 0.5, 2, static_cast<double>(i) * step + m_offset * 0.5, 4);
     timelineScene->addItem(line);
   }
 
   // Miniature box
-  QGraphicsRectItem *timelineMiniature = new QGraphicsRectItem(15, 10, width - m_offset, 40);
+  QGraphicsRectItem *timelineMiniature = new QGraphicsRectItem(15, 10, width * m_scale - m_offset, 40);
   timelineMiniature->setBrush(QBrush(QColor(0, 0, 255, 127)));
   timelineScene->addItem(timelineMiniature);
 
@@ -73,7 +82,7 @@ void Timeline::setLayout(const int width, const int imageNumber) {
   cursor = new QGraphicsLineItem(0, 5, 0, 40);
   timelineScene->addItem(cursor);
   cursorLeft = new QGraphicsLineItem(m_offset * 0.5, 5, m_offset * 0.5, 40);
-  int x = ((width - m_offset) * m_currentIndexLeft) / imageNumber + static_cast<int>(m_offset * 0.5);
+  int x = ((width * m_scale - m_offset) * m_currentIndexLeft) / imageNumber + static_cast<int>(m_offset * 0.5);
   QPen cursorLeftPen = QPen(QColor("black"));
   cursorLeftPen.setWidth(2);
   cursorLeft->setPen(cursorLeftPen);
@@ -110,15 +119,15 @@ bool Timeline::eventFilter(QObject *target, QEvent *event) {
   // Move the cursor when the timeline is hovered by the mouse cursor
   if (target == ui->timelineView && event->type() == QEvent::HoverMove) {
     QHoverEvent *hoverEvent = static_cast<QHoverEvent *>(event);
-    int x = hoverEvent->pos().x();
-    int image = ((x - static_cast<int>(m_offset * 0.5)) * m_imageNumber) / (m_width - 30);
-    if (x >= 15 && x <= m_width - static_cast<int>(m_offset * 0.5)) {
-      int image = ((x - static_cast<int>(m_offset * 0.5)) * m_imageNumber) / (m_width - m_offset);
+    int x = static_cast<int>(ui->timelineView->mapToScene(hoverEvent->pos()).x());
+    int image = ((x - static_cast<int>(m_offset * 0.5)) * m_imageNumber) / (m_width * m_scale - 30);
+    if (x >= 15 && x <= m_width * m_scale - static_cast<int>(m_offset * 0.5)) {
+      int image = ((x - static_cast<int>(m_offset * 0.5)) * m_imageNumber) / (m_width * m_scale - m_offset);
       setCursorValue(image);
     }
   }
   if (target == ui->timelineView && event->type() == QEvent::HoverLeave) {
-    setValue(m_currentIndexLeft);
+    setCursorValue(m_currentIndexLeft);
   }
   // Left click to place left the cursor at a given position
   // Double left click to place marker
@@ -126,22 +135,23 @@ bool Timeline::eventFilter(QObject *target, QEvent *event) {
   if (target == ui->timelineView && event->type() == QEvent::MouseButtonDblClick) {
     QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
     if (mouseEvent->buttons() == Qt::LeftButton) {
-      int x = mouseEvent->pos().x();
-      int image = ((x - static_cast<int>(m_offset * 0.5)) * m_imageNumber) / (m_width - m_offset);
+      int x = static_cast<int>(ui->timelineView->mapToScene(mouseEvent->pos()).x());
+      int image = ((x - static_cast<int>(m_offset * 0.5)) * m_imageNumber) / (m_width * m_scale - m_offset);
       drawMarker(image);
+      markers.append(image);
     }
   }
   if (target == ui->timelineView && event->type() == QEvent::MouseButtonPress) {
     QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
     if (mouseEvent->buttons() == Qt::LeftButton) {
-      int x = mouseEvent->pos().x();
-      int image = ((x - static_cast<int>(m_offset * 0.5)) * m_imageNumber) / (m_width - m_offset);
-      x = ((m_width - m_offset) * image) / m_imageNumber + static_cast<int>(m_offset * 0.5);
+      int x = static_cast<int>(ui->timelineView->mapToScene(mouseEvent->pos()).x());
+      int image = ((x - static_cast<int>(m_offset * 0.5)) * m_imageNumber) / (m_width * m_scale - m_offset);
+      x = ((m_width * m_scale - m_offset) * image) / m_imageNumber + static_cast<int>(m_offset * 0.5);
       setValue(image);
     }
     else if (mouseEvent->buttons() == Qt::RightButton) {
-      int x = mouseEvent->pos().x();
-      int image = ((x - static_cast<int>(m_offset * 0.5)) * m_imageNumber) / (m_width - m_offset);
+      int x = static_cast<int>(ui->timelineView->mapToScene(mouseEvent->pos()).x());
+      int image = ((x - static_cast<int>(m_offset * 0.5)) * m_imageNumber) / (m_width * m_scale - m_offset);
       clearMarker(image);
     }
   }
@@ -153,11 +163,10 @@ bool Timeline::eventFilter(QObject *target, QEvent *event) {
   * @param[in] index Index.
 */
 void Timeline::drawMarker(const int index) {
-  int x = ((m_width - m_offset) * index) / m_imageNumber + static_cast<int>(m_offset * 0.5);
+  int x = ((m_width * m_scale - m_offset) * index) / m_imageNumber + static_cast<int>(m_offset * 0.5);
   QGraphicsLineItem *markerLine = new QGraphicsLineItem(x, 5, x, 40);
   markerLine->setPen(QPen(QColor("blue")));
   timelineScene->addItem(markerLine);
-  markers.append(index);
 }
 
 /**
@@ -193,7 +202,7 @@ void Timeline::setCursorValue(const int index) {
     return;
   }
 
-  int x = ((m_width - m_offset) * index) / m_imageNumber + static_cast<int>(m_offset * 0.5);
+  int x = ((m_width * m_scale - m_offset) * index) / m_imageNumber + static_cast<int>(m_offset * 0.5);
   QPen cursorPen = QPen(QColor("red"));
   cursor->setPen(cursorPen);
   cursor->setLine(x, 10, x, 40);
@@ -213,7 +222,7 @@ void Timeline::setValue(const int index) {
     return;
   }
 
-  int x = ((m_width - m_offset) * index) / m_imageNumber + static_cast<int>(m_offset * 0.5);
+  int x = ((m_width * m_scale - m_offset) * index) / m_imageNumber + static_cast<int>(m_offset * 0.5);
   QPen cursorLeftPen = QPen(QColor("black"));
   cursorLeftPen.setWidth(2);
   cursorLeft->setPen(cursorLeftPen);
