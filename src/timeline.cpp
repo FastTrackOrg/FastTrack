@@ -114,7 +114,7 @@ bool Timeline::eventFilter(QObject *target, QEvent *event) {
     int image = ((x - static_cast<int>(m_offset * 0.5)) * m_imageNumber) / (m_width - 30);
     if (x >= 15 && x <= m_width - static_cast<int>(m_offset * 0.5)) {
       int image = ((x - static_cast<int>(m_offset * 0.5)) * m_imageNumber) / (m_width - m_offset);
-      setValue(image);
+      setCursorValue(image);
     }
   }
   if (target == ui->timelineView && event->type() == QEvent::HoverLeave) {
@@ -137,11 +137,7 @@ bool Timeline::eventFilter(QObject *target, QEvent *event) {
       int x = mouseEvent->pos().x();
       int image = ((x - static_cast<int>(m_offset * 0.5)) * m_imageNumber) / (m_width - m_offset);
       x = ((m_width - m_offset) * image) / m_imageNumber + static_cast<int>(m_offset * 0.5);
-      QPen cursorLeftPen = QPen(QColor("black"));
-      cursorLeftPen.setWidth(2);
-      cursorLeft->setPen(cursorLeftPen);
-      cursorLeft->setLine(x, 0, x, 40);
-      m_currentIndexLeft = image;
+      setValue(image);
     }
     else if (mouseEvent->buttons() == Qt::RightButton) {
       int x = mouseEvent->pos().x();
@@ -192,19 +188,41 @@ void Timeline::update(const int index) {
   * @brief Set the cursor at a given value.
   * @param[in] index Index.
 */
-void Timeline::setValue(const int index) {
+void Timeline::setCursorValue(const int index) {
   if (m_imageNumber == 0) {
     return;
   }
 
   int x = ((m_width - m_offset) * index) / m_imageNumber + static_cast<int>(m_offset * 0.5);
-  cursor->setPen(QPen(QColor("red")));
+  QPen cursorPen = QPen(QColor("red"));
+  cursor->setPen(cursorPen);
   cursor->setLine(x, 10, x, 40);
   indexNumber->setBrush(QBrush(QColor("red")));
   indexNumber->setText(QString::number(index));
   indexNumber->setPos(x - 5, 55);
   m_currentIndex = index;
   emit(valueChanged(m_currentIndex));
+}
+
+/**
+  * @brief Set the left cursor (left click cursor) at a given value.
+  * @param[in] index Index.
+*/
+void Timeline::setValue(const int index) {
+  if ((m_imageNumber == 0) || (index < m_imageMin) | (index > m_imageNumber)) {
+    return;
+  }
+
+  int x = ((m_width - m_offset) * index) / m_imageNumber + static_cast<int>(m_offset * 0.5);
+  QPen cursorLeftPen = QPen(QColor("black"));
+  cursorLeftPen.setWidth(2);
+  cursorLeft->setPen(cursorLeftPen);
+  cursorLeft->setLine(x, 10, x, 40);
+  indexNumber->setBrush(QBrush(QColor("red")));
+  indexNumber->setText(QString::number(index));
+  indexNumber->setPos(x - 5, 55);
+  m_currentIndexLeft = index;
+  emit(valueChanged(m_currentIndexLeft));
 }
 
 /**

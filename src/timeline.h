@@ -26,6 +26,7 @@ class Timeline : public QWidget {
   Timeline(QWidget *parent = nullptr);
   ~Timeline();
   void setValue(const int index);
+  void setCursorValue(const int index);
   void setMaximum(const int max);
   void setMinimum(const int min);
   int value();
