@@ -1,5 +1,14 @@
 # FastTrack changelog
 
+## 5.1.1
+
+### Fixed
+- Fixed the timeline resizing.
+- Fixed the timeline memory overload.
+
+### Added
+- Added timeline zoom.
+
 ## 5.1.0
 
 ### Fixed
