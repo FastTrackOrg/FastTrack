@@ -53,7 +53,7 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>504</width>
+             <width>599</width>
              <height>572</height>
             </rect>
            </property>
@@ -86,12 +86,6 @@
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QDockWidget" name="trackingOptions">
-   <property name="minimumSize">
-    <size>
-     <width>310</width>
-     <height>439</height>
-    </size>
-   </property>
    <property name="features">
     <set>QDockWidget::AllDockWidgetFeatures</set>
    </property>
@@ -404,12 +398,6 @@ p, li { white-space: pre-wrap; }
    </widget>
   </widget>
   <widget class="QDockWidget" name="imageOptions">
-   <property name="minimumSize">
-    <size>
-     <width>353</width>
-     <height>350</height>
-    </size>
-   </property>
    <property name="features">
     <set>QDockWidget::AllDockWidgetFeatures</set>
    </property>
@@ -437,14 +425,38 @@ p, li { white-space: pre-wrap; }
          <string>Background</string>
         </attribute>
         <layout class="QGridLayout" name="gridLayout_6">
-         <item row="10" column="0" colspan="2">
-          <widget class="Line" name="line_8">
+         <item row="0" column="0" colspan="3">
+          <widget class="QLabel" name="label_20">
+           <property name="font">
+            <font>
+             <pointsize>10</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>Compute The Background</string>
+           </property>
+          </widget>
+         </item>
+         <item row="9" column="0" colspan="3">
+          <widget class="QLabel" name="label_21">
+           <property name="font">
+            <font>
+             <pointsize>10</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>Or Select The Background</string>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="0" colspan="3">
+          <widget class="Line" name="line">
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
            </property>
           </widget>
          </item>
-         <item row="4" column="1">
+         <item row="4" column="2">
           <widget class="QComboBox" name="registrationBack">
            <item>
             <property name="text">
@@ -468,6 +480,27 @@ p, li { white-space: pre-wrap; }
            </item>
           </widget>
          </item>
+         <item row="10" column="0" colspan="3">
+          <widget class="Line" name="line_8">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+          </widget>
+         </item>
+         <item row="11" column="0" colspan="3">
+          <widget class="QPushButton" name="backgroundSelectButton">
+           <property name="text">
+            <string>Open image</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0" colspan="3">
+          <widget class="Line" name="line_7">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+          </widget>
+         </item>
          <item row="8" column="0">
           <spacer name="verticalSpacer_7">
            <property name="orientation">
@@ -481,46 +514,6 @@ p, li { white-space: pre-wrap; }
            </property>
           </spacer>
          </item>
-         <item row="9" column="0" colspan="2">
-          <widget class="QLabel" name="label_21">
-           <property name="font">
-            <font>
-             <pointsize>10</pointsize>
-            </font>
-           </property>
-           <property name="text">
-            <string>Or Select The Background</string>
-           </property>
-          </widget>
-         </item>
-         <item row="11" column="0" colspan="2">
-          <widget class="QPushButton" name="backgroundSelectButton">
-           <property name="text">
-            <string>Open image</string>
-           </property>
-          </widget>
-         </item>
-         <item row="6" column="0" colspan="2">
-          <widget class="QProgressBar" name="backgroundProgressBar">
-           <property name="value">
-            <number>0</number>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0" colspan="2">
-          <widget class="Line" name="line_7">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-          </widget>
-         </item>
-         <item row="5" column="0" colspan="2">
-          <widget class="QPushButton" name="backgroundComputeButton">
-           <property name="text">
-            <string>Compute</string>
-           </property>
-          </widget>
-         </item>
          <item row="4" column="0">
           <widget class="QLabel" name="label_10">
            <property name="text">
@@ -528,7 +521,14 @@ p, li { white-space: pre-wrap; }
            </property>
           </widget>
          </item>
-         <item row="3" column="0" colspan="2">
+         <item row="5" column="0" colspan="3">
+          <widget class="QPushButton" name="backgroundComputeButton">
+           <property name="text">
+            <string>Compute</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0" colspan="3">
           <layout class="QHBoxLayout" name="horizontalLayout_18">
            <item>
             <widget class="QLabel" name="label_2">
@@ -542,14 +542,27 @@ p, li { white-space: pre-wrap; }
            </item>
           </layout>
          </item>
-         <item row="7" column="0" colspan="2">
-          <widget class="Line" name="line">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
+         <item row="6" column="0" colspan="3">
+          <widget class="QProgressBar" name="backgroundProgressBar">
+           <property name="value">
+            <number>0</number>
            </property>
           </widget>
          </item>
-         <item row="2" column="0" colspan="2">
+         <item row="12" column="2">
+          <spacer name="verticalSpacer">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>40</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item row="2" column="0" colspan="3">
           <layout class="QHBoxLayout" name="horizontalLayout_19">
            <item>
             <widget class="QLabel" name="label">
@@ -582,31 +595,6 @@ p, li { white-space: pre-wrap; }
            </item>
           </layout>
          </item>
-         <item row="12" column="1">
-          <spacer name="verticalSpacer">
-           <property name="orientation">
-            <enum>Qt::Vertical</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>20</width>
-             <height>40</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item row="0" column="0" colspan="2">
-          <widget class="QLabel" name="label_20">
-           <property name="font">
-            <font>
-             <pointsize>10</pointsize>
-            </font>
-           </property>
-           <property name="text">
-            <string>Compute The Background</string>
-           </property>
-          </widget>
-         </item>
         </layout>
        </widget>
        <widget class="QWidget" name="tabWidgetPage2">
@@ -615,23 +603,13 @@ p, li { white-space: pre-wrap; }
         </attribute>
         <layout class="QGridLayout" name="gridLayout_5">
          <item row="2" column="0">
-          <widget class="QPushButton" name="cropButton">
-           <property name="text">
-            <string>Crop</string>
-           </property>
-           <property name="checkable">
-            <bool>false</bool>
+          <widget class="Line" name="line_6">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
            </property>
           </widget>
          </item>
-         <item row="3" column="0">
-          <widget class="QPushButton" name="resetButton">
-           <property name="text">
-            <string>Reset</string>
-           </property>
-          </widget>
-         </item>
-         <item row="5" column="0">
+         <item row="6" column="0">
           <layout class="QHBoxLayout" name="horizontalLayout_2">
            <item>
             <widget class="QLabel" name="label_4">
@@ -657,7 +635,26 @@ corner</string>
            </item>
           </layout>
          </item>
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_27">
+           <property name="font">
+            <font>
+             <pointsize>10</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>Select The Region Of Interest</string>
+           </property>
+          </widget>
+         </item>
          <item row="4" column="0">
+          <widget class="QPushButton" name="resetButton">
+           <property name="text">
+            <string>Reset</string>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="0">
           <layout class="QHBoxLayout" name="horizontalLayout">
            <item>
             <widget class="QLabel" name="label_3">
@@ -683,7 +680,7 @@ corner: </string>
            </item>
           </layout>
          </item>
-         <item row="6" column="0">
+         <item row="7" column="0">
           <spacer name="verticalSpacer_2">
            <property name="orientation">
             <enum>Qt::Vertical</enum>
@@ -696,22 +693,25 @@ corner: </string>
            </property>
           </spacer>
          </item>
-         <item row="0" column="0">
-          <widget class="QLabel" name="label_27">
-           <property name="font">
-            <font>
-             <pointsize>10</pointsize>
-            </font>
-           </property>
+         <item row="3" column="0">
+          <widget class="QPushButton" name="cropButton">
            <property name="text">
-            <string>Select The Region Of Interest</string>
+            <string>Crop</string>
+           </property>
+           <property name="checkable">
+            <bool>false</bool>
            </property>
           </widget>
          </item>
          <item row="1" column="0">
-          <widget class="Line" name="line_6">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
+          <widget class="QLabel" name="label_29">
+           <property name="font">
+            <font>
+             <pointsize>8</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>Draw directly on the screen</string>
            </property>
           </widget>
          </item>
@@ -1159,7 +1159,7 @@ corner: </string>
    </widget>
    <widget class="QMenu" name="menuSettings">
     <property name="title">
-     <string>Settings</string>
+     <string>&amp;Settings</string>
     </property>
    </widget>
    <addaction name="menuOpen"/>
@@ -1198,64 +1198,56 @@ corner: </string>
         <attribute name="title">
          <string>Control</string>
         </attribute>
-        <layout class="QGridLayout" name="gridLayout_15">
-         <item row="0" column="0">
-          <widget class="Timeline" name="slider" native="true"/>
+        <layout class="QGridLayout" name="gridLayout_3">
+         <item row="2" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout_23">
+           <item>
+            <widget class="QRadioButton" name="isOriginal">
+             <property name="text">
+              <string>Ori&amp;ginal</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QRadioButton" name="isSub">
+             <property name="text">
+              <string>Backgro&amp;und Subtracted</string>
+             </property>
+             <property name="checkable">
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QRadioButton" name="isBin">
+             <property name="text">
+              <string>Binar&amp;y</string>
+             </property>
+             <property name="checkable">
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </item>
-         <item row="1" column="0">
+         <item row="2" column="0">
           <widget class="QProgressBar" name="progressBar">
            <property name="value">
             <number>0</number>
            </property>
           </widget>
          </item>
-        </layout>
-       </widget>
-       <widget class="QWidget" name="displayOptions">
-        <attribute name="title">
-         <string>Display</string>
-        </attribute>
-        <layout class="QGridLayout" name="gridLayout_3">
-         <item row="0" column="0">
-          <widget class="QGroupBox" name="imageDisplayGroup">
-           <property name="title">
-            <string>Image Display</string>
+         <item row="0" column="0" colspan="2">
+          <widget class="Timeline" name="slider" native="true"/>
+         </item>
+         <item row="1" column="0" colspan="2">
+          <widget class="Line" name="line_10">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
            </property>
-           <property name="checkable">
-            <bool>false</bool>
-           </property>
-           <layout class="QGridLayout" name="gridLayout_17">
-            <item row="0" column="0">
-             <widget class="QRadioButton" name="isOriginal">
-              <property name="text">
-               <string>Ori&amp;ginal</string>
-              </property>
-              <property name="checked">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="1">
-             <widget class="QRadioButton" name="isSub">
-              <property name="text">
-               <string>Backgro&amp;und Subtracted</string>
-              </property>
-              <property name="checkable">
-               <bool>false</bool>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="2">
-             <widget class="QRadioButton" name="isBin">
-              <property name="text">
-               <string>Binar&amp;y</string>
-              </property>
-              <property name="checkable">
-               <bool>false</bool>
-              </property>
-             </widget>
-            </item>
-           </layout>
           </widget>
          </item>
         </layout>

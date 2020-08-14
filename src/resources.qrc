@@ -2,6 +2,7 @@
     <qresource prefix='/'>
         <file>theme.qss</file>
         <file>assets/icon.png</file>
+        <file>assets/FiraCode.ttf</file>
         <file>assets/buttons/play.png</file>
         <file>assets/buttons/pause.png</file>
         <file>assets/buttons/resume.png</file>

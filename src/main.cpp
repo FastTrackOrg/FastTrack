@@ -16,6 +16,9 @@ This file is part of Fast Track.
 */
 
 #include <QApplication>
+#include <QFont>
+#include <QFontDatabase>
+#include <QString>
 #include "mainwindow.h"
 
 int main(int argc, char *argv[]) {
@@ -26,6 +29,8 @@ int main(int argc, char *argv[]) {
   a.setOrganizationName("FastTrackOrg");
   a.setOrganizationDomain("www.fasttrack.sh");
   w.setWindowIcon(QIcon(":/assets/icon.png"));
+  QFontDatabase::addApplicationFont(":/assets/FiraCode.ttf");
+  w.setStyleSheet("QWidget { font-family: 'FiraCode'; }");
   w.show();
   a.exec();
 }
