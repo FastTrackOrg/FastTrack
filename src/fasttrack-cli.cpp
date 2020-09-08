@@ -23,8 +23,24 @@ This file is part of Fast Track.
 #include <QMapIterator>
 #include <QObject>
 #include <QString>
+#include <QStringList>
+#include <QTextStream>
 
 using namespace std;
+
+void loadConfig(QString path, QMap<QString, QString> &parameters) {
+  QFile parameterFile(path);
+  if (parameterFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+    QTextStream in(&parameterFile);
+    QString line;
+    QStringList params;
+    while (in.readLineInto(&line)) {
+      params = line.split(" = ", QString::SkipEmptyParts);
+      parameters.insert(params[0], params[1]);
+    }
+    parameterFile.close();
+  }
+}
 
 void help() {
   printf(("Usage:  [OPTION]... [FILE]...\n"));
@@ -34,7 +50,7 @@ Use FastTrack from the command line.\n\
 "),
         stdout);
   fputs(("\
-All argument are mandatory except --backPath.\n\
+All argument are mandatory except --backPath --cfg. Loading a configuration file with --cfg overwrite any selected parameters.\n\
 "),
         stdout);
   fputs(("\
@@ -68,6 +84,8 @@ All argument are mandatory except --backPath.\n\
 \n\
   --path                     path to the movie or one image of a sequence\n\
   --backPath                 optional, path to a background image\n\
+\n\
+  --cfg                      optional, path to a configuration file\n\
 "),
         stdout);
 }
@@ -99,6 +117,7 @@ int main(int argc, char **argv) {
           {"morphType", required_argument, 0, 'u'},
           {"path", required_argument, 0, 'v'},
           {"backPath", required_argument, 0, 'w'},
+          {"cfg", required_argument, 0, 'A'},
           {"help", no_argument, 0, 'x'},
           {0, 0, 0, 0}};
 
@@ -106,10 +125,18 @@ int main(int argc, char **argv) {
   int c;
   QMap<QString, QString> parameters;
   while (1) {
-    c = getopt_long(argc, argv, "a:b:c:d:e:f:g:h:i:j:k:l:m:n:o:p:q:r:s:t:u:v:w:x", long_options, &option_index);
+    c = getopt_long(argc, argv, "a:b:c:d:e:f:g:h:i:j:k:l:m:n:o:p:q:r:s:t:u:v:w:x:y:z:A", long_options, &option_index);
 
     if (c == -1) {
       break;
+    }
+    else if (c == 'A') {
+      loadConfig(QString::fromStdString(optarg), parameters);
+      break;
+    }
+    else if (c == 'x') {
+      help();
+      return 0;
     }
 
     switch (c) {
@@ -184,9 +211,6 @@ int main(int argc, char **argv) {
         break;
       case 'z':
         parameters.insert("Normalization perimeter", QString::fromStdString(optarg));
-        break;
-      case 'x':
-        help();
         break;
     }
   }
