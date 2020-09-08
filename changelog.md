@@ -3,6 +3,11 @@
 ## 5.1.1
 
 ### Fixed
+- Fixed the image sequence opening.
+
+## 5.1.1
+
+### Fixed
 - Fixed the timeline resizing.
 - Fixed the timeline memory overload.
 
