@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=fasttrack-cli
+Comment=Fast tracking of multiple objects
+Exec=fasttrack-cli
+Icon=icon
+Categories=Science;Qt;
+X-AppImage-Version=
