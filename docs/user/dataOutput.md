@@ -4,7 +4,7 @@ title: Tracking Result
 sidebar_label: Tracking Result
 ---
 
-After a tracking analysis (or an analysis preview), FastTrack saves several files inside the **Tracking_Result** folder located inside the image sequence folder:
+After a tracking analysis (or an analysis preview), FastTrack saves several files inside the **Tracking_Result** folder located inside the image sequence folder or inside the **Tracking_Result_VideoFileName** for a video file:
 * *tracking.txt*: the tracking result
 * *annotation.txt*: the annotation
 * *background.pgm*: the background image

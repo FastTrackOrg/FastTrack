@@ -8,8 +8,8 @@ The Interactive panel provides a means to perform a tracking analysis, and revie
 Several steps have to be performed in the right order (some are mandatory, some are optional) to perform a successful tracking analysis.
 ![](assets/interactive_workflow.svg)
 
-## Open an image sequence
-The first step of a tracking analysis is to open an image sequence. In the menu bar, click on File then Open an image sequence and select the folder that contains the image sequence to analyze.
+## Open a file
+The first step of a tracking analysis is to open a video file. FastTrack support video files and image sequence. Click on the file or on an image of a sequence to automatically load the movie.
 ![](assets/interactive_open.gif)
 
 ## Compute the background
@@ -37,9 +37,11 @@ Objects are detected by their size. Select the maximum and minimum size of the d
 ![](assets/interactive_detec.gif)
 
 ## Tune the tracking parameters
-Several parameters can be modified to ensure a good tracking analysis:
+Several parameters can be modified to ensure a good tracking analysis, see [this page](http://www.fasttrack.sh/UserManual/docs/trackingParameters/) for more details:
 * Normalization distance (legacy Maximal lenght/ Typical lenght): typical distance traveled between two consecutive images.
 * Normalization angle (legacy Maximal angle/Typical lenght): typical reorientation possible between two consecutive images.
+* Normalization area: typical difference in the area.
+*  Normalization perimeter: typical difference in the perimeter.
 * Maximal distance: if an object traveled more than this distance between two consecutive images, it will be considered as a new object.
 * Maximal time: number of images an object is allowed to disappear. If an object reappears after this time, it will be considered as a new object.
 * Spot to track: part of the object features used to do the tracking. Select the part that reflects the better the direction of the object. Legacy parameter, head correspond to the smaller mid-part of the object, tail ellipse the wider mid-part og the object and body is the full object.
@@ -64,6 +66,6 @@ Several display options are available and unlocked at each step of the analysis.
 * Tracking: tracking data overlay. 
 
 ## Layout options
-Several layout options are available in the layout menu in the top bar. You can also build your layout by dragging the option docks in the window.
+Several layouts ant themes are available in the layout menu in the top bar. You can also build your layout by dragging the option docks in the window.
 
 [See a video demonstration](https://www.youtube.com/watch?v=grxAAX0J6CQ&feature=youtu.be)

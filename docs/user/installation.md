@@ -8,15 +8,11 @@ sidebar_label: Installation
 **NOTE**
 
 During the installation on Windows and Mac systems, security alerts are displayed due to the fact that the FastTrack executable does not possess an EV code signing certificate. You can ignore these alerts. FastTrack executable can be verified easily (and freely) by comparing the MD5 checksum.
-* 0e721fd36644edc72de202afc8a9144c  FastTrack.AppImage
-* 48fce2c287111f2301a1d086965297e6  FastTrack.dmg
-* bfa9ffea9ea459203c8f396de224a485  FastTrackInstaller.exe 
 
 ---
 
 ## Download
-Stable versions of FastTrack are released for Linux (as AppImage and Ubuntu 18 PPA), Mac
-(as dmg) and Windows (installer). The development version is accessible from source and can be compiled (please refer to the developer guide at http://www.fasttrack.sh/API/index.html).
+Stable versions of FastTrack are released for Linux (as AppImage and Ubuntu PPA), Mac (as dmg) and Windows (installer). The nightly version are available on the [GitHub repository](https://github.com/FastTrackOrg/FastTrack/releases)
 
 ## Installation
 1.  For Windows:
