@@ -40,7 +40,7 @@ VideoReader::VideoReader(const string &path) {
   if (imageExtensions.count(filesystem::path(path).extension().string()) > 0) {
     m_isSequence = true;
     string name = filesystem::path(path).filename().string();
-    regex e("\\D\\d+\\D");
+    regex e("\\D\\d+\\.");
     smatch match;
     if (std::regex_search(name, match, e)) {
       string pattern = string("%0") + to_string(match.length(0) - 2) + "d";
