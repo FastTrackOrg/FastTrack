@@ -234,8 +234,8 @@ UMat Tracking::backgroundExtraction(VideoReader &video, int n, const int method,
   int count = 1;
 
   for (int i = 0; i < static_cast<int>(video.getImageCount()); i += step) {
-    if (registrationMethod != 0) registration(img0, cameraFrameReg, registrationMethod - 1);
     video.getImage(i, cameraFrameReg);
+    if (registrationMethod != 0) registration(img0, cameraFrameReg, registrationMethod - 1);
     if (cameraFrameReg.channels() >= 3) {
       cvtColor(cameraFrameReg, cameraFrameReg, COLOR_BGR2GRAY);
     }
