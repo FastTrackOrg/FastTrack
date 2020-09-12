@@ -53,8 +53,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>599</width>
-             <height>572</height>
+             <width>595</width>
+             <height>604</height>
             </rect>
            </property>
            <layout class="QGridLayout" name="gridLayout_2">
@@ -538,7 +538,11 @@ p, li { white-space: pre-wrap; }
             </widget>
            </item>
            <item>
-            <widget class="QSpinBox" name="nBack"/>
+            <widget class="QSpinBox" name="nBack">
+             <property name="minimum">
+              <number>1</number>
+             </property>
+            </widget>
            </item>
           </layout>
          </item>

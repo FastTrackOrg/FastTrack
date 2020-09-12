@@ -56,6 +56,17 @@ VideoReader::VideoReader(const string &path) {
 }
 
 /**
+  * @brief Get the next image, always one channel.
+	* @param[in] destination UMat to store the image.
+*/
+void VideoReader::getNext(UMat &destination) {
+  read(destination);
+  if (destination.channels() >= 3) {
+    cvtColor(destination, destination, COLOR_BGR2GRAY);
+  }
+}
+
+/**
   * @brief Get the image at selected index, always one channel.
   * @param[in] index Index of the image.
 	* @param[in] destination UMat to store the image.

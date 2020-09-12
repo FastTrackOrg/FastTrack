@@ -35,6 +35,7 @@ class VideoReader : public VideoCapture {
 
  public:
   VideoReader(const string &path);
+  void getNext(UMat &destination);
   void getImage(int index, UMat &destination);
   void getImage(int index, Mat &destination);
   unsigned int getImageCount();

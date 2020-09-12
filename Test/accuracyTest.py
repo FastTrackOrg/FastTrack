@@ -159,7 +159,7 @@ def tracking(path, imagePath, normDist=None, normAngle=None, maxDist=None, maxTi
   morphType = str(int(groundParameter.loc["Kernel type"][1]))
 
 
-  cmd = "../build_cli/fasttrack-cli --maxArea " + maxArea + " --minArea " + minArea + " --lightBack "+ lightBack + " --thresh "+ thresh + " --reg " + reg + " --spot "+ spot + " --nBack "+ nBack + " --regBack "+ regBack + " --methBack " + methBack+ " --xTop "+ xTop + " --yTop "+ yTop + " --xBottom " + xBottom + " --yBottom " + yBottom+ " --morph " + morph + " --morphSize " + morphSize+ " --morphType " + morphType +" --normaArea" +str(normArea) + " --normPerim"+ str(normPerim) + " --normDist " + str(normDist) + " --normAngle " + str(normAngle) + " --maxDist " + str(maxDist) + " --maxTime " + str(maxTime) + " --path "+ path + imagePath + " > /dev/null 2>&1" 
+  cmd = "../build_cli/fasttrack-cli --maxArea " + maxArea + " --minArea " + minArea + " --lightBack "+ lightBack + " --thresh "+ thresh + " --reg " + reg + " --spot "+ spot + " --nBack "+ nBack + " --regBack "+ regBack + " --methBack " + methBack+ " --xTop "+ xTop + " --yTop "+ yTop + " --xBottom " + xBottom + " --yBottom " + yBottom+ " --morph " + morph + " --morphSize " + morphSize+ " --morphType " + morphType +" --normaArea" +str(normArea) + " --normPerim"+ str(normPerim) + " --normDist " + str(normDist) + " --normAngle " + str(normAngle) + " --maxDist " + str(maxDist) + " --maxTime " + str(maxTime) + " --path "+ path + imagePath + " --backPath dataSet/images/Groundtruth/Tracking_Result/background.pgm > /dev/null 2>&1" 
   out = os.system(cmd)
 
 

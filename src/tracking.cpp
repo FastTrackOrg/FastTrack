@@ -228,36 +228,44 @@ UMat Tracking::backgroundExtraction(VideoReader &video, int n, const int method,
   }
   background.convertTo(background, CV_32FC1);
   img0.convertTo(img0, CV_32FC1);
-  int step = video.getImageCount() / (n - 1);
+  int step = video.getImageCount() / (n);
   UMat cameraFrameReg;
   Mat H;
   int count = 1;
+  int i = 0;
 
-  for (int i = 0; i < static_cast<int>(video.getImageCount()); i += step) {
-    video.getImage(i, cameraFrameReg);
-    if (registrationMethod != 0) registration(img0, cameraFrameReg, registrationMethod - 1);
-    if (cameraFrameReg.channels() >= 3) {
-      cvtColor(cameraFrameReg, cameraFrameReg, COLOR_BGR2GRAY);
+  video.getImage(i, cameraFrameReg);
+  while (i < static_cast<int>(video.getImageCount()) - 1) {
+    if (i % step == 0) {
+      video.getNext(cameraFrameReg);
+      if (registrationMethod != 0) registration(img0, cameraFrameReg, registrationMethod - 1);
+      if (cameraFrameReg.channels() >= 3) {
+        cvtColor(cameraFrameReg, cameraFrameReg, COLOR_BGR2GRAY);
+      }
+      cameraFrameReg.convertTo(cameraFrameReg, CV_32FC1);
+      switch (method) {
+        case 0:
+          cv::min(background, cameraFrameReg, background);
+          break;
+
+        case 1:
+          cv::max(background, cameraFrameReg, background);
+          break;
+
+        case 2:
+          accumulate(cameraFrameReg, background);
+          break;
+        default:
+          cv::max(background, cameraFrameReg, background);
+      }
+
+      emit(backgroundProgress(count));
+      count++;
     }
-    cameraFrameReg.convertTo(cameraFrameReg, CV_32FC1);
-    switch (method) {
-      case 0:
-        cv::min(background, cameraFrameReg, background);
-        break;
-
-      case 1:
-        cv::max(background, cameraFrameReg, background);
-        break;
-
-      case 2:
-        accumulate(cameraFrameReg, background);
-        break;
-      default:
-        cv::max(background, cameraFrameReg, background);
+    else {
+      video.grab();
     }
-
-    emit(backgroundProgress(count));
-    count++;
+    i++;
   }
   if (method == 2) {
     background.convertTo(background, CV_8U, 1. / count);
@@ -704,7 +712,7 @@ void Tracking::imageProcessing() {
   while (m_im < m_stopImage) {
     try {
       // Reads the next image in the image sequence and applies the image processing workflow
-      video->getImage(m_im, m_visuFrame);
+      video->getNext(m_visuFrame);
       if (param_registration != 0) {
         registration(m_background, m_visuFrame, param_registration - 1);
       }
@@ -834,7 +842,7 @@ void Tracking::startProcess() {
       try {
         imread(m_backgroundPath, IMREAD_GRAYSCALE).copyTo(m_background);
         UMat test;
-        video->getImage(0, test);
+        video->getNext(test);
         subtract(test, m_background, test);
       }
       catch (...) {
