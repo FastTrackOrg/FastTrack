@@ -510,6 +510,7 @@ void Interactive::openFolder() {
       ui->nBack->setValue(video->getImageCount() - 1);
       ui->startImage->setRange(0, video->getImageCount() - 1);
       ui->startImage->setValue(0);
+      replay->loadReplayFolder(dir);
 
       Mat frame;
       video->getImage(0, frame);
