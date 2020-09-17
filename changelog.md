@@ -1,6 +1,19 @@
 # FastTrack changelog
 
-## 5.1.1
+## 5.1.2
+
+### Fixed
+- Fixed background registration.
+- Fixed annotation.
+- Fixed tracking inspector crash in the Interactive panel.
+
+### Added
+- Added configuration file loading in the cli.
+
+### Optimized
+- Optimized video opening for compressed format.
+
+## 5.1.2
 
 ### Fixed
 - Fixed the image sequence opening.
