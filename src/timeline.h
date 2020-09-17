@@ -31,6 +31,7 @@ class Timeline : public QWidget {
   void setMaximum(const int max);
   void setMinimum(const int min);
   int value();
+  int currentValue();
 
  private:
   Ui::Timeline *ui;

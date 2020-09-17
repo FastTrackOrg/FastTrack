@@ -35,7 +35,7 @@ This file is part of Fast Track.
   * @param[in] filePath Path to the tracking folder.
 */
 Annotation::Annotation(const QString &filePath) {
-  annotationFile = new QFile(filePath + "/annotation.txt");
+  annotationFile = new QFile(filePath + "annotation.txt");
   annotations = new QMap<int, QString>;
   if (!annotationFile->open(QIODevice::ReadOnly)) {
     qInfo() << "Can't open file";

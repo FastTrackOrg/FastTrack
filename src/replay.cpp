@@ -414,7 +414,7 @@ void Replay::loadReplayFolder(QString dir) {
     connect(ui->replaySlider, &Timeline::valueChanged, annotation, &Annotation::read);
     connect(annotation, &Annotation::annotationText, ui->annotation, &QTextEdit::setPlainText);
     connect(ui->annotation, &QTextEdit::textChanged, annotation, [this]() {
-      int index = ui->replaySlider->value();
+      int index = ui->replaySlider->currentValue();
       QString text = ui->annotation->toPlainText();
       annotation->write(index, text);
     });

@@ -235,10 +235,17 @@ void Timeline::setValue(const int index) {
 }
 
 /**
-  * @brief Return the current value.
+  * @brief Return the last left value.
 */
 int Timeline::value() {
   return m_currentIndexLeft;
+}
+
+/**
+  * @brief Return the current value.
+*/
+int Timeline::currentValue() {
+  return m_currentIndex;
 }
 
 /**
