@@ -1,6 +1,11 @@
 # FastTrack changelog
 
-## 5.1.2
+## 5.1.4
+
+### Fixed
+- Added ffmpeg dependency for Windows release
+
+## 5.1.3
 
 ### Fixed
 - Fixed background registration.
