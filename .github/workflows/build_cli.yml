@@ -29,6 +29,7 @@ jobs:
               export PATH=/opt/qt514/bin:$PATH
               export LD_LIBRARY_PATH=$QT_DIR/lib/x86_64-linux-gnu:$QT_DIR/lib:$LD_LIBRARY_PATH
               ./run.sh cli
+              make clean
         - name: appimage
           run: |
               cd build_cli
@@ -37,9 +38,17 @@ jobs:
               export LD_LIBRARY_PATH=$QT_DIR/lib/x86_64-linux-gnu:$QT_DIR/lib:$LD_LIBRARY_PATH
               wget -O deploy.AppImage https://github.com/probonopd/linuxdeployqt/releases/download/5/linuxdeployqt-5-x86_64.AppImage
               chmod +x deploy.AppImage
-              cp ../FastTrackCli.desktop .
-              cp ../src/assets/icon.png .
-              ./deploy.AppImage FastTrackCli.desktop -appimage -exclude-libs="libnss3.so,libnssutil3.so" -no-translations
+              mkdir -p appdir/usr/bin/
+              mv fasttrack-cli appdir/usr/bin/
+              mkdir -p appdir/usr/share/applications/
+              cp ../FastTrackCli.desktop appdir/usr/share/applications/
+              mkdir -p appdir/usr/share/icons/hicolor/256x256/
+              cp ../src/assets/icon.png appdir/usr/share/icons/hicolor/256x256/
+              ./deploy.AppImage ./appdir/usr/share/applications/FastTrackCli.desktop -exclude-libs="libnss3.so,libnssutil3.so" -no-translations -bundle-non-qt-libs
+              mkdir -p appdir/usr/optional/ ; wget -c https://github.com/darealshinji/AppImageKit-checkrt/releases/download/continuous/exec-x86_64.so -O ./appdir/usr/optional/exec.so
+              mkdir -p appdir/usr/optional/libstdc++/ ; cp /usr/lib/x86_64-linux-gnu/libstdc++.so.6 ./appdir/usr/optional/libstdc++/ ; cp /usr/lib/gcc/x86_64-linux-gnu/9/libstdc++.so ./appdir/usr/optional/libstdc++/
+              ( cd appdir ; rm AppRun ; wget -c https://github.com/darealshinji/AppImageKit-checkrt/releases/download/continuous/AppRun-patched-x86_64 -O AppRun ; chmod a+x AppRun)
+              ./deploy.AppImage ./appdir/usr/share/applications/FastTrackCli.desktop -appimage
         - name: Linux artefact
           uses: actions/upload-artifact@v1
           with:
