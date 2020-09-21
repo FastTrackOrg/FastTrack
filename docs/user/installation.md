@@ -28,15 +28,8 @@ Stable versions of FastTrack are released for Linux (as AppImage and Ubuntu PPA)
     -   Tick “Allow executing file as program”.
     * Check the [AppImage](https://appimage.org/) Launcher to integrate .appImage to the system.
     
-3. For Ubuntu 18.04 (automatic update and system integration):
-    ```
-    wget -O - https://www.fasttrack.sh/download/apt/conf/public.gpg.key | sudo apt-key add - 
-    echo "deb https://www.fasttrack.sh/download/apt/ sid main" | sudo tee -a /etc/apt/sources.list
-    sudo apt-get update 
-    sudo apt-get install fasttrack
-    ```
-
-5.  For Mac:
+3.  For Mac:
+    -   Minimal version required: 10.15.
     -   Download the FastTrack dmg [file](/download/FastTrack.dmg).
     -   Double click on the dmg file.
     -   Drag the application from the dmg window into the Applications
@@ -51,11 +44,5 @@ Search the *FastTrackUpdater* in the *Windows Start Menu* or execute directly th
 2. For Linux as AppImage:
 The FastTrack AppImage currently not support the automatic update. Replace the current AppImage with the latest AppImage released.
 
-3. For Ubuntu 18:
-```
-sudo apt-get update
-sudo apt-get dist-upgrade
-```
-
-4. For Mac
+3. For Mac
 The FastTrack App currently not support the automatic update. Replace the current App with the latest App released.

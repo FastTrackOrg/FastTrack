@@ -4,7 +4,7 @@ title: A step by step example
 sidebar_label: Step by step example
 ---
 
-This section details step by step the process to test FastTrack using data from the [Two-Dimensional Tracking Dataset](http://data.ljp.upmc.fr/datasets/TD2/).
+This section details step by step the process to test FastTrack using data from the [Two-Dimensional Tracking Dataset](http://data.ljp.upmc.fr/datasets/TD2/). Illustrations originate from v4.x.y and can differ from the current stable version.
 
  <video width="100%" muted autoplay controls loop>
   <source src="/UserManual/docs/assets/example_vid.webm" type="video/webm">
@@ -19,7 +19,7 @@ First, download the zip file and extract it. The image sequence is located insid
 ### Tracking
 
 1. Open **FastTrack** and select the **Interactive Tracking** panel. ![alt text](assets/example_0.png)
-2. Import the movie by clicking on **File** then **Open an image sequence** and by selecting the folder **images** previously downloaded. ![alt text](assets/example_1.png)
+2. Import the movie by clicking on **File** then **Open** and by selecting one image in the folder **images** previously downloaded. ![alt text](assets/example_1.png)
 3. Compute the background by clicking on the **Background** tab and selecting these parameters:
    * Method: **Max** (project the maximal intensity)
    * Number of images: **199** (all the images)
