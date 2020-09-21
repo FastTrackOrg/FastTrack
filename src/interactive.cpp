@@ -115,6 +115,11 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
     }
   });
 
+  // Stay on the same frame when changing tab
+  connect(ui->interactiveTab, &QTabWidget::currentChanged, [this]() {
+    ui->slider->setValue(ui->slider->value());
+  });
+
   // Loads prefered style
   QStringList styles = QStyleFactory::keys();
   QString defaultStyle = settings.value("style");
