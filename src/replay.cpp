@@ -237,20 +237,7 @@ Replay::Replay(QWidget* parent, bool standalone) : QMainWindow(parent),
     ui->controls->hide();
   }
 
-  // Keyboard shorcut
-  // AZERTY keyboard shorcuts are set in the ui
-  //QShortcut* wShortcut = new QShortcut(QKeySequence("w"), this);
-  //connect(wShortcut, &QShortcut::activated, [this](nextAction) { nextAction->triggered(); });
-
-  QShortcut* qShortcut = new QShortcut(QKeySequence("q"), this);
-  connect(qShortcut, &QShortcut::activated, [this]() { ui->replaySlider->setValue(ui->replaySlider->value() - 1); });
-
-  QShortcut* aShortcut = new QShortcut(QKeySequence("a"), this);
-  connect(aShortcut, &QShortcut::activated, [this]() { ui->replaySlider->setValue(ui->replaySlider->value() - 1); });
-
-  QShortcut* dShortcut = new QShortcut(QKeySequence("d"), this);
-  connect(dShortcut, &QShortcut::activated, [this]() { ui->replaySlider->setValue(ui->replaySlider->value() + 1); });
-
+  // Install event filters
   ui->replayDisplay->installEventFilter(this);
   ui->scrollArea->viewport()->installEventFilter(this);
 

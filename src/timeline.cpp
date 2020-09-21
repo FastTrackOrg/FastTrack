@@ -58,6 +58,17 @@ Timeline::Timeline(QWidget *parent)
     int x = ((m_width * m_scale - m_offset) * m_currentIndexLeft) / m_imageNumber + static_cast<int>(m_offset * 0.5);
     ui->timelineView->horizontalScrollBar()->setValue(x);
   });
+
+  // Keyboard shorcuts
+  // AZERTY keyboard shorcuts are set in the ui
+  QShortcut *qShortcut = new QShortcut(QKeySequence("q"), this);
+  connect(qShortcut, &QShortcut::activated, [this]() { setValue(m_currentIndexLeft - 1); });
+
+  QShortcut *aShortcut = new QShortcut(QKeySequence("a"), this);
+  connect(aShortcut, &QShortcut::activated, [this]() { setValue(m_currentIndexLeft - 1); });
+
+  QShortcut *dShortcut = new QShortcut(QKeySequence("d"), this);
+  connect(dShortcut, &QShortcut::activated, [this]() { setValue(m_currentIndexLeft + 1); });
 }
 
 /**

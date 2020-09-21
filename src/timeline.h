@@ -7,9 +7,11 @@
 #include <QGraphicsRectItem>
 #include <QGraphicsScene>
 #include <QGraphicsSimpleTextItem>
+#include <QKeySequence>
 #include <QMouseEvent>
 #include <QPen>
 #include <QScrollBar>
+#include <QShortcut>
 #include <QString>
 #include <QVector>
 #include <QWidget>
