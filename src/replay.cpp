@@ -117,6 +117,7 @@ Replay::Replay(QWidget* parent, bool standalone) : QMainWindow(parent),
 
   object1Replay = new QComboBox(this);
   object1Replay->setEditable(true);
+  object1Replay->setInsertPolicy(QComboBox::NoInsert);
   object1Replay->setStatusTip(tr("First selected object"));
   connect(object1Replay, QOverload<int>::of(&QComboBox::currentIndexChanged), [this](int index) {
     if (object1Replay->count() != 0) {
@@ -135,6 +136,7 @@ Replay::Replay(QWidget* parent, bool standalone) : QMainWindow(parent),
 
   object2Replay = new QComboBox(this);
   object2Replay->setEditable(true);
+  object2Replay->setInsertPolicy(QComboBox::NoInsert);
   object2Replay->setStatusTip(tr("Second selected object"));
   connect(object2Replay, QOverload<int>::of(&QComboBox::currentIndexChanged), [this](int index) {
     if (object2Replay->count() != 0) {
