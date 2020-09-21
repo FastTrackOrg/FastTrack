@@ -75,7 +75,7 @@ class Replay : public QMainWindow {
   Q_OBJECT
 
  public:
-  explicit Replay(QWidget *parent = nullptr, bool standalone = true, Timeline *control = nullptr);
+  explicit Replay(QWidget *parent = nullptr, bool standalone = true);
   ~Replay();
 
  private:

@@ -38,8 +38,8 @@ using namespace std;
  *
 */
 
-Replay::Replay(QWidget* parent, bool standalone, Timeline* control) : QMainWindow(parent),
-                                                                      ui(new Ui::Replay) {
+Replay::Replay(QWidget* parent, bool standalone) : QMainWindow(parent),
+                                                   ui(new Ui::Replay) {
   ui->setupUi(this);
   ui->replayDisplay->setAttribute(Qt::WA_Hover);
 
@@ -237,10 +237,6 @@ Replay::Replay(QWidget* parent, bool standalone, Timeline* control) : QMainWindo
     ui->controls->hide();
   }
 
-  if (control) {
-    ui->replaySlider = control;
-  }
-
   // Keyboard shorcut
   // AZERTY keyboard shorcuts are set in the ui
   //QShortcut* wShortcut = new QShortcut(QKeySequence("w"), this);
@@ -329,9 +325,9 @@ Replay::Replay(QWidget* parent, bool standalone, Timeline* control) : QMainWindo
     }
   });
 
-  annotation = new Annotation("");
-  trackingData = new Data("");
-  video = new VideoReader("");
+  annotation = nullptr;
+  trackingData = nullptr;
+  video = new VideoReader("");  // Dummy VideoReader needed for ui creation
 }
 
 Replay::~Replay() {
