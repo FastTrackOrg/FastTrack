@@ -477,7 +477,7 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   counterLabel = new QLabel(ui->scrollArea->viewport());
   counterLabel->move(20, 20);
 
-  video = new VideoReader("");
+  video = nullptr;
 }
 
 /**
@@ -568,7 +568,9 @@ void Interactive::openFolder() {
 void Interactive::display(int index, int scale) {
   if (videoStatus) {
     UMat frame;
-    video->getImage(index, frame);
+    if (!video->getImage(index, frame)) {
+      return;
+    }
     vector<vector<Point>> displayContours;
     vector<vector<Point>> rejectedContours;
 

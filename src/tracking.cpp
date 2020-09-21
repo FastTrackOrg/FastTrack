@@ -237,7 +237,10 @@ UMat Tracking::backgroundExtraction(VideoReader &video, int n, const int method,
   video.getImage(i, cameraFrameReg);
   while (i < static_cast<int>(video.getImageCount()) - 1) {
     if (i % step == 0) {
-      video.getNext(cameraFrameReg);
+      if (!video.getNext(cameraFrameReg)) {
+        i++;
+        continue;
+      }
       if (registrationMethod != 0) registration(img0, cameraFrameReg, registrationMethod - 1);
       if (cameraFrameReg.channels() >= 3) {
         cvtColor(cameraFrameReg, cameraFrameReg, COLOR_BGR2GRAY);
@@ -712,7 +715,10 @@ void Tracking::imageProcessing() {
   while (m_im < m_stopImage) {
     try {
       // Reads the next image in the image sequence and applies the image processing workflow
-      video->getNext(m_visuFrame);
+      if (!video->getNext(m_visuFrame)) {
+        emit(forceFinished());
+        break;
+      }
       if (param_registration != 0) {
         registration(m_background, m_visuFrame, param_registration - 1);
       }

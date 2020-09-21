@@ -35,6 +35,7 @@ This file is part of Fast Track.
   * @param[in] path Path to a video or image file.
 */
 VideoReader::VideoReader(const string &path) {
+  if (path.empty()) return;
   string normPath;
   std::set<string> imageExtensions{".pgm", ".png", ".jpeg", ".jpg", ".tiff", ".tif", ".bmp", ".dib", ".jpe", ".jp2", ".webp", ".pbm", ".ppm", ".sr", ".ras", ".tif"};
   if (imageExtensions.count(filesystem::path(path).extension().string()) > 0) {
@@ -52,18 +53,23 @@ VideoReader::VideoReader(const string &path) {
     m_isSequence = false;
     normPath = path;
   }
-  open(normPath);
+  if (!open(normPath)) {
+    throw std::invalid_argument("Invalid file");
+  }
 }
 
 /**
   * @brief Get the next image, always one channel.
 	* @param[in] destination UMat to store the image.
 */
-void VideoReader::getNext(UMat &destination) {
-  read(destination);
+bool VideoReader::getNext(UMat &destination) {
+  if (!read(destination) || destination.empty()) {
+    return false;
+  }
   if (destination.channels() >= 3) {
     cvtColor(destination, destination, COLOR_BGR2GRAY);
   }
+  return true;
 }
 
 /**
@@ -71,12 +77,15 @@ void VideoReader::getNext(UMat &destination) {
   * @param[in] index Index of the image.
 	* @param[in] destination UMat to store the image.
 */
-void VideoReader::getImage(int index, UMat &destination) {
+bool VideoReader::getImage(int index, UMat &destination) {
   set(CAP_PROP_POS_FRAMES, index);
-  read(destination);
+  if (!read(destination) || destination.empty()) {
+    return false;
+  }
   if (destination.channels() >= 3) {
     cvtColor(destination, destination, COLOR_BGR2GRAY);
   }
+  return true;
 }
 
 /**
@@ -84,12 +93,15 @@ void VideoReader::getImage(int index, UMat &destination) {
   * @param[in] index Index of the image.
 	* @param[in] destination Mat to store the image.
 */
-void VideoReader::getImage(int index, Mat &destination) {
+bool VideoReader::getImage(int index, Mat &destination) {
   set(CAP_PROP_POS_FRAMES, index);
-  read(destination);
+  if (!read(destination) || destination.empty()) {
+    return false;
+  }
   if (destination.channels() >= 3) {
     cvtColor(destination, destination, COLOR_BGR2GRAY);
   }
+  return true;
 }
 
 /**

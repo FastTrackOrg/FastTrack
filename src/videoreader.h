@@ -24,6 +24,7 @@ This file is part of Fast Track.
 #include <opencv2/videoio.hpp>
 #include <regex>
 #include <set>
+#include <stdexcept>
 #include <string>
 
 using namespace cv;
@@ -35,9 +36,9 @@ class VideoReader : public VideoCapture {
 
  public:
   VideoReader(const string &path);
-  void getNext(UMat &destination);
-  void getImage(int index, UMat &destination);
-  void getImage(int index, Mat &destination);
+  bool getNext(UMat &destination);
+  bool getImage(int index, UMat &destination);
+  bool getImage(int index, Mat &destination);
   unsigned int getImageCount();
   bool isSequence();
 };

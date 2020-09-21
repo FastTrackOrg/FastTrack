@@ -18,7 +18,7 @@ class TrackingTest : public ::testing::Test {
 
 //Curvature method test
 TEST_F(TrackingTest, CurvatureCenter) {
-  Tracking tracking("test", "");
+  Tracking tracking("", "");
   Point2d test = tracking.curvatureCenter(Point3d(1, 1, M_PI * 0.25), Point3d(2, 2, M_PI));
   EXPECT_NEAR(test.x, 2, 0.005);
   EXPECT_NEAR(test.y, 0, 0.005);
@@ -43,7 +43,7 @@ TEST_F(TrackingTest, CurvatureCenter) {
 
 //Registration test
 TEST_F(TrackingTest, RegistrationMethod0Lena) {
-  Tracking tracking("test", "");
+  Tracking tracking("", "");
 
   UMat imageReference, registered, diff;
   Mat H;
@@ -72,7 +72,7 @@ TEST_F(TrackingTest, RegistrationMethod0Lena) {
 }
 
 TEST_F(TrackingTest, RegistrationMethod1Lena) {
-  Tracking tracking("test", "");
+  Tracking tracking("", "");
 
   UMat imageReference, registered, diff;
   Mat H;
@@ -101,7 +101,7 @@ TEST_F(TrackingTest, RegistrationMethod1Lena) {
 
 // Not working pixel resolution
 TEST_F(TrackingTest, RegistrationMethod2Lena) {
-  Tracking tracking("test", "");
+  Tracking tracking("", "");
 
   UMat imageReference, registered, diff;
   Mat H;
@@ -133,7 +133,7 @@ TEST_F(TrackingTest, RegistrationMethod2Lena) {
 
 // Method not working for this type of image
 TEST_F(TrackingTest, RegistrationMethod0Dual) {
-  Tracking tracking("test", "");
+  Tracking tracking("", "");
 
   UMat imageReference, registered, diff;
   Mat H;
@@ -162,7 +162,7 @@ TEST_F(TrackingTest, RegistrationMethod0Dual) {
 }
 
 TEST_F(TrackingTest, RegistrationMethod1Dual) {
-  Tracking tracking("test", "");
+  Tracking tracking("", "");
 
   UMat imageReference, registered, diff;
   Mat H;
@@ -190,7 +190,7 @@ TEST_F(TrackingTest, RegistrationMethod1Dual) {
 }
 
 TEST_F(TrackingTest, RegistrationMethod2Dual) {
-  Tracking tracking("test", "");
+  Tracking tracking("", "");
 
   /*UMat imageReference, registered, diff;
   Mat H;
@@ -218,7 +218,7 @@ TEST_F(TrackingTest, RegistrationMethod2Dual) {
 }
 
 TEST_F(TrackingTest, Module) {
-  Tracking tracking("test", "");
+  Tracking tracking("", "");
   EXPECT_EQ(tracking.modul(0), 0);
   EXPECT_EQ(tracking.modul(M_PI), M_PI);
   EXPECT_EQ(tracking.modul(M_PI * 0.5 + 2 * M_PI), M_PI * 0.5);
@@ -233,7 +233,7 @@ TEST_F(TrackingTest, Module) {
 }
 
 TEST_F(TrackingTest, AngleDifferrence) {
-  Tracking tracking("test", "");
+  Tracking tracking("", "");
   EXPECT_EQ(tracking.angleDifference(M_PI, 0.5 * M_PI), -0.5 * M_PI);
   EXPECT_EQ(tracking.angleDifference(0.5 * M_PI, M_PI), 0.5 * M_PI);
   EXPECT_EQ(tracking.angleDifference(-0.5 * M_PI, -M_PI), -0.5 * M_PI);
@@ -253,7 +253,7 @@ TEST_F(TrackingTest, AngleDifferrence) {
 }
 
 TEST_F(TrackingTest, Divide) {
-  Tracking tracking("test", "");
+  Tracking tracking("", "");
   EXPECT_EQ(tracking.divide(1, 2), 0.5);
   EXPECT_EQ(tracking.divide(-1, 2), -0.5);
   EXPECT_EQ(tracking.divide(1, -2), -0.5);
@@ -261,7 +261,7 @@ TEST_F(TrackingTest, Divide) {
 }
 
 TEST_F(TrackingTest, Reassignement) {
-  Tracking tracking("test", "");
+  Tracking tracking("", "");
 
   vector<Point3d> past, input, comp;
   vector<int> order, id, lost, idComp, lostComp;
@@ -300,7 +300,7 @@ TEST_F(TrackingTest, Reassignement) {
 }
 
 TEST_F(TrackingTest, Occlusion) {
-  Tracking tracking("test", "");
+  Tracking tracking("", "");
 
   vector<Point3d> past, input, comp;
   vector<int> order;
@@ -344,7 +344,7 @@ TEST_F(TrackingTest, Occlusion) {
 }
 
 TEST_F(TrackingTest, Cleaning) {
-  Tracking tracking("test", "");
+  Tracking tracking("", "");
 
   vector<vector<Point3d>> input, comp;
   vector<int> occlusion, lost, id, lostComp, idComp;
@@ -444,7 +444,7 @@ TEST_F(TrackingTest, Cleaning) {
 }
 
 TEST_F(TrackingTest, Information) {
-  Tracking tracking("test", "");
+  Tracking tracking("", "");
   vector<double> info, test;
   Mat H;
   UMat imageReference, translate;
@@ -464,7 +464,7 @@ TEST_F(TrackingTest, Information) {
 }
 
 TEST_F(TrackingTest, InformationOrientation) {
-  Tracking tracking("test", "");
+  Tracking tracking("", "");
   vector<double> info, test;
   UMat imageReference, rotate;
 
@@ -476,7 +476,7 @@ TEST_F(TrackingTest, InformationOrientation) {
 }
 
 TEST_F(TrackingTest, costFunction) {
-  Tracking tracking("test", "");
+  Tracking tracking("", "");
   QMap<QString, QString> params;
   params["Spot to track"] = "0";
   tracking.updatingParameters(params);

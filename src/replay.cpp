@@ -445,9 +445,10 @@ void Replay::loadFrame(int frameIndex) {
   if (isReplayable) {
     object1Replay->clear();
 
-    //Mat frame = imread(replayFrames[frameIndex], IMREAD_COLOR | IMREAD_ANYDEPTH);
     Mat frame;
-    video->getImage(frameIndex, frame);
+    if (!video->getImage(frameIndex, frame)) {
+      return;
+    }
     cvtColor(frame, frame, COLOR_GRAY2BGR);
     int scale = ui->replaySize->value();
 
