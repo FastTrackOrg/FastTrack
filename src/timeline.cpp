@@ -115,6 +115,9 @@ bool Timeline::eventFilter(QObject *target, QEvent *event) {
   if (m_imageNumber == 0) {
     return false;
   }
+  if (!isEnabled()) {
+    return false;
+  }
 
   // Move the cursor when the timeline is hovered by the mouse cursor
   if (target == ui->timelineView && event->type() == QEvent::HoverMove) {

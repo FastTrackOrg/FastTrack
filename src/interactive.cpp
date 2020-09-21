@@ -710,11 +710,13 @@ void Interactive::computeBackground() {
     // Computes the background without blocking the ui
     QFuture<void> future = QtConcurrent::run([=]() {
       try {
+        ui->slider->setEnabled(false);
         background = tracking->backgroundExtraction(*video, static_cast<int>(nBack), method, registrationMethod);
       }
       catch (const std::exception &ex) {
         message("An error occurs. Please change the registration method");
       }
+      ui->slider->setEnabled(true);
       isBackground = true;
       ui->isBin->setCheckable(true);
       ui->isSub->setCheckable(true);
