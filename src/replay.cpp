@@ -53,6 +53,8 @@ Replay::Replay(QWidget* parent, bool standalone) : QMainWindow(parent),
     colorMap.push_back(Point3i(a, b, c));
   }
 
+  currentIndex = 0;
+
   QIcon img = QIcon(":/assets/buttons/play.png");
   ui->playReplay->setIcon(img);
   ui->playReplay->setIconSize(QSize(ui->playReplay->width(), ui->playReplay->height()));
@@ -91,7 +93,7 @@ Replay::Replay(QWidget* parent, bool standalone) : QMainWindow(parent),
     for (auto const& a : ids) {
       object2Replay->addItem(QString::number(a));
     }
-    loadFrame(ui->replaySlider->value());
+    loadFrame(currentIndex);
   });
   ui->toolBar->addAction(undoAction);
 
@@ -107,7 +109,7 @@ Replay::Replay(QWidget* parent, bool standalone) : QMainWindow(parent),
     for (auto const& a : ids) {
       object2Replay->addItem(QString::number(a));
     }
-    loadFrame(ui->replaySlider->value());
+    loadFrame(currentIndex);
   });
   ui->toolBar->addAction(redoAction);
 
@@ -156,7 +158,7 @@ Replay::Replay(QWidget* parent, bool standalone) : QMainWindow(parent),
       for (auto const& a : ids) {
         object2Replay->addItem(QString::number(a));
       }
-      loadFrame(ui->replaySlider->value());
+      loadFrame(currentIndex);
     }
   });
   ui->toolBar->addAction(deleteOneAction);
@@ -174,7 +176,7 @@ Replay::Replay(QWidget* parent, bool standalone) : QMainWindow(parent),
       for (auto const& a : ids) {
         object2Replay->addItem(QString::number(a));
       }
-      loadFrame(ui->replaySlider->value());
+      loadFrame(currentIndex);
     }
   });
   ui->toolBar->addAction(deleteAction);
@@ -265,22 +267,22 @@ Replay::Replay(QWidget* parent, bool standalone) : QMainWindow(parent),
   framerate = new QTimer();
   ui->ellipseBox->addItems({"Head + Tail", "Head", "Tail", "Body", "None"});
   connect(ui->ellipseBox, static_cast<void (QComboBox::*)(int)>(&QComboBox::activated), [this]() {
-    loadFrame(ui->replaySlider->value());
+    loadFrame(currentIndex);
   });
   ui->arrowBox->addItems({"Head + Tail", "Head", "Tail", "Body", "None"});
   connect(ui->arrowBox, static_cast<void (QComboBox::*)(int)>(&QComboBox::activated), [this]() {
-    loadFrame(ui->replaySlider->value());
+    loadFrame(currentIndex);
   });
 
   connect(ui->replayTrace, &QCheckBox::stateChanged, [this]() {
-    loadFrame(ui->replaySlider->value());
+    loadFrame(currentIndex);
   });
   connect(ui->replayTraceLength, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [this]() {
-    loadFrame(ui->replaySlider->value());
+    loadFrame(currentIndex);
   });
 
   connect(ui->replaySize, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [this]() {
-    loadFrame(ui->replaySlider->value());
+    loadFrame(currentIndex);
   });
 
   connect(ui->replaySlider, &Timeline::valueChanged, this, &Replay::loadFrame);
@@ -429,6 +431,7 @@ void Replay::loadReplayFolder(QString dir) {
   * @brief Displays the image and the tracking data in the ui->displayReplay. Triggered when the ui->replaySlider value is changed.
 */
 void Replay::loadFrame(int frameIndex) {
+  currentIndex = frameIndex;
   if (isReplayable) {
     object1Replay->clear();
 
@@ -522,10 +525,10 @@ void Replay::loadFrame(int frameIndex) {
 */
 void Replay::zoomIn() {
   currentZoom = abs(currentZoom);
-  if (currentZoom < 2.75) {
+  if (currentZoom < 3.75) {
     currentZoom += 0.25;
     ui->replayDisplay->setFixedSize(ui->replayDisplay->size() * 1.25);
-    loadFrame(ui->replaySlider->value());
+    loadFrame(currentIndex);
   }
 }
 
@@ -534,10 +537,10 @@ void Replay::zoomIn() {
 */
 void Replay::zoomOut() {
   currentZoom = abs(currentZoom);
-  if (currentZoom > 0.75) {
+  if (currentZoom > 0.25) {
     currentZoom -= 0.25;
     ui->replayDisplay->setFixedSize(ui->replayDisplay->size() / 1.25);
-    loadFrame(ui->replaySlider->value());
+    loadFrame(currentIndex);
   }
   currentZoom *= -1;
 }
@@ -687,7 +690,7 @@ void Replay::correctTracking() {
     int start = ui->replaySlider->value();
     SwapData* swap = new SwapData(firstObject, secondObject, start, trackingData);
     commandStack->push(swap);
-    loadFrame(ui->replaySlider->value());
+    loadFrame(currentIndex);
   }
 }
 

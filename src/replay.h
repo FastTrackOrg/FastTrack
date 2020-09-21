@@ -103,6 +103,7 @@ class Replay : public QMainWindow {
   bool object;                  /*!< Alternatively true or false to associate either object A or object B at each click of the user in the ui->replayDisplay. */
   QSize resizedFrame;           /*!< Width and height of displayed QPixmap to accomodate window size changment. */
   QSize originalImageSize;      /*!< Width and height of the original image in the images sequence. */
+  int currentIndex;             /*!< Current image index. */
   double currentZoom;
   QPointF panReferenceClick;
   QPointF zoomReferencePosition;

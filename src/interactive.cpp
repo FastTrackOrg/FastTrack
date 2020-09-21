@@ -667,7 +667,7 @@ void Interactive::display(int index, int scale) {
 */
 void Interactive::zoomIn() {
   currentZoom = abs(currentZoom);
-  if (currentZoom < 2.75) {
+  if (currentZoom < 3.75) {
     currentZoom += 0.25;
     ui->display->setFixedSize(ui->display->size() * 1.25);
     display(ui->slider->value());
@@ -679,7 +679,7 @@ void Interactive::zoomIn() {
 */
 void Interactive::zoomOut() {
   currentZoom = abs(currentZoom);
-  if (currentZoom > 0.75) {
+  if (currentZoom > 0.25) {
     currentZoom -= 0.25;
     ui->display->setFixedSize(ui->display->size() / 1.25);
     display(ui->slider->value());
