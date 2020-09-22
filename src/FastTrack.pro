@@ -10,7 +10,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = FastTrack
 TEMPLATE = app
-VERSION = 5.1.4
+VERSION = 5.1.5
 DEFINES += APP_VERSION=\\\"$$VERSION\\\"
 
 

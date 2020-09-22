@@ -1,5 +1,18 @@
 # FastTrack changelog
 
+## 5.1.5
+
+### Fixed
+- Fixed small ui related crashes.
+- Fixed ci libstdc AppImage.
+- Fixed zoom.
+
+### Added
+- Added keyboard shortcuts timeline. 
+
+### Optimized
+- Speed-up image display in the interactive panel.
+
 ## 5.1.4
 
 ### Fixed
