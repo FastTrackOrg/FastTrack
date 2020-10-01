@@ -43,6 +43,15 @@ Timeline::Timeline(QWidget *parent)
   m_currentIndex = 0;
   m_currentIndexLeft = 0;
   m_scale = 1;
+  timer = new QTimer(this);
+  connect(timer, &QTimer::timeout, [this]() {
+    if (m_currentIndexLeft < m_imageNumber) {
+      setValue(m_currentIndexLeft + 1);
+    }
+    else {
+      setValue(0);
+    }
+  });
 
   // Scene setup
   timelineScene = new QGraphicsScene(this);
@@ -69,6 +78,15 @@ Timeline::Timeline(QWidget *parent)
 
   QShortcut *dShortcut = new QShortcut(QKeySequence("d"), this);
   connect(dShortcut, &QShortcut::activated, [this]() { setValue(m_currentIndexLeft + 1); });
+
+  QShortcut *spaceShortcut = new QShortcut(Qt::Key_Space, this);
+  connect(spaceShortcut, &QShortcut::activated, [this]() { ui->playButton->animateClick(); });
+
+  //Ui
+  QIcon img = QIcon(":/assets/buttons/play.png");
+  ui->playButton->setIcon(img);
+  ui->playButton->setIconSize(QSize(ui->playButton->width(), ui->playButton->height()));
+  connect(ui->playButton, &QPushButton::clicked, this, &Timeline::togglePlay);
 }
 
 /**
@@ -276,4 +294,20 @@ void Timeline::setMaximum(const int max) {
 */
 void Timeline::setMinimum(const int min) {
   m_imageMin = 0;
+}
+
+/**
+  * @brief Start/Stop the autoplay of the replay.
+*/
+void Timeline::togglePlay() {
+  if (ui->playButton->isChecked()) {
+    QIcon img(":/assets/buttons/pause.png");
+    ui->playButton->setIcon(img);
+    timer->start(1000 / ui->fpsBox->value());
+  }
+  else if (!ui->playButton->isChecked()) {
+    QIcon img(":/assets/buttons/resume.png");
+    ui->playButton->setIcon(img);
+    timer->stop();
+  }
 }

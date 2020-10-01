@@ -33,10 +33,12 @@ using namespace std;
 
 class VideoReader : public VideoCapture {
   bool m_isSequence;
+  int m_index;
 
  public:
   VideoReader(const string &path);
   bool getNext(UMat &destination);
+  bool getNext(Mat &destination);
   bool getImage(int index, UMat &destination);
   bool getImage(int index, Mat &destination);
   unsigned int getImageCount();

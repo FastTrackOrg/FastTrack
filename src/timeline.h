@@ -13,6 +13,7 @@
 #include <QScrollBar>
 #include <QShortcut>
 #include <QString>
+#include <QTimer>
 #include <QVector>
 #include <QWidget>
 
@@ -34,6 +35,7 @@ class Timeline : public QWidget {
   void setMinimum(const int min);
   int value();
   int currentValue();
+  void togglePlay();
 
  private:
   Ui::Timeline *ui;
@@ -45,6 +47,7 @@ class Timeline : public QWidget {
   int m_currentIndex;
   int m_currentIndexLeft;
   int m_scale;
+  QTimer *timer;
 
   QGraphicsScene *timelineScene;
   QGraphicsLineItem *cursor;

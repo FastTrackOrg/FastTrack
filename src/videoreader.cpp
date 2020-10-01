@@ -47,6 +47,7 @@ VideoReader::VideoReader(const string &path) {
       string pattern = string("%0") + to_string(match.length(0) - 2) + "d";
       name.replace(match.position(0) + 1, match.length(0) - 2, pattern);
       normPath = (filesystem::path(path).parent_path() / name).string();
+      m_index = 0;
     }
   }
   else {
@@ -73,19 +74,41 @@ bool VideoReader::getNext(UMat &destination) {
 }
 
 /**
-  * @brief Get the image at selected index, always one channel.
-  * @param[in] index Index of the image.
+  * @brief Get the next image, always one channel.
 	* @param[in] destination UMat to store the image.
 */
-bool VideoReader::getImage(int index, UMat &destination) {
-  set(CAP_PROP_POS_FRAMES, index);
+bool VideoReader::getNext(Mat &destination) {
   if (!read(destination) || destination.empty()) {
     return false;
   }
   if (destination.channels() >= 3) {
     cvtColor(destination, destination, COLOR_BGR2GRAY);
   }
+  m_index++;
   return true;
+}
+
+/**
+  * @brief Get the image at selected index, always one channel.
+  * @param[in] index Index of the image.
+	* @param[in] destination UMat to store the image.
+*/
+bool VideoReader::getImage(int index, UMat &destination) {
+  if (m_index == index - 1) {
+    getNext(destination);
+    return true;
+  }
+  else {
+    m_index = index;
+    set(CAP_PROP_POS_FRAMES, index);
+    if (!read(destination) || destination.empty()) {
+      return false;
+    }
+    if (destination.channels() >= 3) {
+      cvtColor(destination, destination, COLOR_BGR2GRAY);
+    }
+    return true;
+  }
 }
 
 /**
@@ -94,14 +117,21 @@ bool VideoReader::getImage(int index, UMat &destination) {
 	* @param[in] destination Mat to store the image.
 */
 bool VideoReader::getImage(int index, Mat &destination) {
-  set(CAP_PROP_POS_FRAMES, index);
-  if (!read(destination) || destination.empty()) {
-    return false;
+  if (m_index == index - 1) {
+    getNext(destination);
+    return true;
   }
-  if (destination.channels() >= 3) {
-    cvtColor(destination, destination, COLOR_BGR2GRAY);
+  else {
+    m_index = index;
+    set(CAP_PROP_POS_FRAMES, index);
+    if (!read(destination) || destination.empty()) {
+      return false;
+    }
+    if (destination.channels() >= 3) {
+      cvtColor(destination, destination, COLOR_BGR2GRAY);
+    }
+    return true;
   }
-  return true;
 }
 
 /**
