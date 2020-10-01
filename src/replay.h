@@ -97,7 +97,6 @@ class Replay : public QMainWindow {
   QVector<int> occlusionEvents; /*!< Index of each occlusion event in the replayed images sequence. */
   int replayNumberObject;       /*!< Number of objects tracked in the replayed images sequence. */
   bool isReplayable;            /*!< True if user input is an images sequences that can be played. */
-  QTimer *framerate;            /*!< Sets the time at which a new image is displayed in autoplay mode in the replay. */
   int replayFps;                /*!< Frame rate value at which a new image is displayed in autoplay mode in the replay. */
   int autoPlayerIndex;          /*!< Index of the image displayed in autoplay mode in the replay. */
   bool object;                  /*!< Alternatively true or false to associate either object A or object B at each click of the user in the ui->replayDisplay. */
@@ -117,7 +116,6 @@ class Replay : public QMainWindow {
   void loadFrame(int frameIndex);
   void zoomIn();
   void zoomOut();
-  void toggleReplayPlay();
   bool eventFilter(QObject *target, QEvent *event);
   void updateInformation(int objectId, int imageIndex, QTableWidget *table);
   void correctTracking();

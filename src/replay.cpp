@@ -55,11 +55,7 @@ Replay::Replay(QWidget* parent, bool standalone) : QMainWindow(parent),
 
   currentIndex = 0;
 
-  QIcon img = QIcon(":/assets/buttons/play.png");
-  ui->playReplay->setIcon(img);
-  ui->playReplay->setIconSize(QSize(ui->playReplay->width(), ui->playReplay->height()));
-
-  img = QIcon(":/assets/buttons/open.png");
+  QIcon img = QIcon(":/assets/buttons/open.png");
   QAction* openAction = new QAction(img, tr("&Open"), this);
   openAction->setShortcuts(QKeySequence::Open);
   openAction->setStatusTip(tr("Open a tracked movie"));
@@ -266,7 +262,6 @@ Replay::Replay(QWidget* parent, bool standalone) : QMainWindow(parent),
   });
 
   isReplayable = false;
-  framerate = new QTimer();
   ui->ellipseBox->addItems({"Head + Tail", "Head", "Tail", "Body", "None"});
   connect(ui->ellipseBox, static_cast<void (QComboBox::*)(int)>(&QComboBox::activated), [this]() {
     loadFrame(currentIndex);
@@ -288,21 +283,6 @@ Replay::Replay(QWidget* parent, bool standalone) : QMainWindow(parent),
   });
 
   connect(ui->replaySlider, &Timeline::valueChanged, this, &Replay::loadFrame);
-
-  connect(framerate, &QTimer::timeout, [this]() {
-    ui->replaySlider->setValue(autoPlayerIndex);
-    autoPlayerIndex++;
-    if (autoPlayerIndex % int(video->getImageCount()) != autoPlayerIndex) {
-      autoPlayerIndex = 0;
-    }
-  });
-  connect(ui->replayFps, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [this]() {
-    if (isReplayable && ui->playReplay->isChecked()) {
-      framerate->stop();
-      framerate->start(1000 / ui->replayFps->value());
-    }
-  });
-  connect(ui->playReplay, &QPushButton::clicked, this, &Replay::toggleReplayPlay);
 
   // Info tables
   connect(ui->infoTableObject1, &QTableWidget::cellClicked, [this](int row, int col) {
@@ -352,7 +332,6 @@ void Replay::loadReplayFolder(QString dir) {
   object2Replay->clear();
   ui->replayDisplay->clear();
   ui->annotation->clear();
-  framerate->stop();
   object = true;
   currentZoom = 1;
   memoryDir.clear();
@@ -545,23 +524,6 @@ void Replay::zoomOut() {
     loadFrame(currentIndex);
   }
   currentZoom *= -1;
-}
-
-/**
-  * @brief Starts the autoplay of the replay. Triggered when ui->playreplay is clicked.
-*/
-void Replay::toggleReplayPlay() {
-  if (isReplayable && ui->playReplay->isChecked()) {
-    QIcon img(":/assets/buttons/pause.png");
-    ui->playReplay->setIcon(img);
-    framerate->start(1000 / ui->replayFps->value());
-    autoPlayerIndex = ui->replaySlider->value();
-  }
-  else if (isReplayable && !ui->playReplay->isChecked()) {
-    QIcon img(":/assets/buttons/resume.png");
-    ui->playReplay->setIcon(img);
-    framerate->stop();
-  }
 }
 
 /**
