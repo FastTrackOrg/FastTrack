@@ -13,7 +13,9 @@ Two main features are implemented in the software:
 -  An automatic tracking algorithm that can detect and track objects, conserving the objects' identities across the video recording.
 -  An ergonomic tool allowing the user to check, correct and annotate the tracking.
 
-FastTrack was first a PhD thesis side project started by [Benjamin Gallois](https://github.com/bgallois) on his spare time that has then taken dedicated time in his PhD project. The core of the software is still maintained on his spare time and new features implementation, bug fixes and help can take some time.
+The FastTrack user interface is implemented with Qt, the image analysis with the OpenCV library. This allows a performant and responsive software amenable to process large video recording.
+
+FastTrack was first a PhD thesis side project started by [Benjamin Gallois](https://github.com/bgallois) on his spare time that has then taken dedicated time in his PhD project. The core of the software is still maintained on his spare time therefore new features implementation, bug fixes and help can take some time.
 
 **Not sure if you want to use FastTrack? Check these five most common questions:**
 

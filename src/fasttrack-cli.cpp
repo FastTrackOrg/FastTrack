@@ -85,7 +85,7 @@ All argument are mandatory except --backPath --cfg. Loading a configuration file
   --path                     path to the movie or one image of a sequence\n\
   --backPath                 optional, path to a background image\n\
 \n\
-  --cfg                      optional, path to a configuration file\n\
+  --cfg                      optional, path to a configuration file, if path is not included in the configuration file, --path option need to be put before --cfg option\n\
 "),
         stdout);
 }
