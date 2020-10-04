@@ -341,13 +341,10 @@ void Replay::loadReplayFolder(QString dir) {
   try {
     // Gets the paths to all the frames in the folder and puts it in a vector.
     // Setups the ui by setting maximum and minimum of the slider bar.
-    delete annotation;
-    delete trackingData;
     delete video;
     video = new VideoReader(dir.toStdString());
     ui->replaySlider->setMinimum(0);
     ui->replaySlider->setMaximum(video->getImageCount() - 1);
-    //Mat frame = imread(replayFrames[0], IMREAD_COLOR | IMREAD_ANYDEPTH);
     Mat frame;
     video->getImage(0, frame);
     cvtColor(frame, frame, COLOR_GRAY2RGB);
@@ -369,6 +366,7 @@ void Replay::loadReplayFolder(QString dir) {
     else {
       trackingDir.append(QString("/Tracking_Result_") + savingFilename + QDir::separator());
     }
+    delete trackingData;
     trackingData = new Data(trackingDir);
     ids = trackingData->getId(0, video->getImageCount());
     for (auto const& a : ids) {
@@ -376,6 +374,7 @@ void Replay::loadReplayFolder(QString dir) {
     }
 
     // Load annotation file
+    delete annotation;
     annotation = new Annotation(trackingDir);
     connect(ui->replaySlider, &Timeline::valueChanged, annotation, &Annotation::read);
     connect(annotation, &Annotation::annotationText, ui->annotation, &QTextEdit::setPlainText);
@@ -405,6 +404,9 @@ void Replay::loadReplayFolder(QString dir) {
   }
   catch (...) {
     isReplayable = false;
+    QMessageBox msgBox;
+    msgBox.setText("No file found.");
+    msgBox.exec();
   }
 }
 

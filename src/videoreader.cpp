@@ -54,9 +54,7 @@ VideoReader::VideoReader(const string &path) {
     m_isSequence = false;
     normPath = path;
   }
-  if (!open(normPath)) {
-    throw std::invalid_argument("Invalid file");
-  }
+  open(normPath);
 }
 
 /**
