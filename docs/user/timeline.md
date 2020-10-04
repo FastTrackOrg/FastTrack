@@ -10,6 +10,7 @@ Keyboard shortcurts are available to move the cursor frame by frame:
 * D: move to the next frame.
 * Q: move to the previous frame (AZERTY layout).
 * A: move to the previous frame (QWERTY layout).
+* Space: start/stop autoplay.
 
 <video width="100%" muted autoplay controls loop>
   <source src="/UserManual/docs/assets/timeline.webm" type="video/webm">

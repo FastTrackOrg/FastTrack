@@ -11,12 +11,12 @@ This section details step by step the process to test FastTrack using data from 
 Your browser does not support the video tag.
 </video> 
 
-### Downloading
+## Downloading
 In this example, we will use the challenging movie [ZFJ_001](http://data.ljp.upmc.fr/datasets/TD2/datasets/ZFJ_001/ZFJ_001.zip).
 This movie features 14 very active juvenile zebrafish. The principal difficulty of this movie is the frequent and complex occlusions.
 First, download the zip file and extract it. The image sequence is located inside the **images** folder.
 
-### Tracking
+## Tracking
 
 1. Open **FastTrack** and select the **Interactive Tracking** panel. ![alt text](assets/example_0.png)
 2. Import the movie by clicking on **File** then **Open** and by selecting one image in the folder **images** previously downloaded. ![alt text](assets/example_1.png)
