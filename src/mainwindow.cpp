@@ -87,11 +87,19 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 
   manager->get(QNetworkRequest(QUrl("http://www.fasttrack.sh/download/FastTrack/platforms.txt")));
 
-  QWebEngineView *view = new QWebEngineView(this);
-  view->setUrl(QUrl("http://www.fasttrack.sh/soft.html"));
-  connect(view->page(), &QWebEnginePage::loadFinished, [this, view]() {
-    delete view;
-  });
+  QMessageBox *consent = new QMessageBox(this);
+  consent->setWindowTitle("Consent");
+  consent->setText("To help to monitor the development of the software, FastTrack would like to collect some information (IP address, operating system)");
+  consent->setStandardButtons(QMessageBox::Yes);
+  consent->addButton(QMessageBox::No);
+  QTimer::singleShot(5000, consent, &QMessageBox::close);
+  if (consent->exec() == QMessageBox::Yes) {
+    QWebEngineView *view = new QWebEngineView(this);
+    view->setUrl(QUrl("http://www.fasttrack.sh/soft.html"));
+    connect(view->page(), &QWebEnginePage::loadFinished, [this, view]() {
+      delete view;
+    });
+  }
 
   interactive = new Interactive(this);
   ui->tabWidget->addTab(interactive, tr("Interactive tracking"));
