@@ -1,5 +1,18 @@
 # FastTrack changelog
 
+## 5.1.6
+
+### Fixed
+- Fixed opening incorrect file crash in the Replay panel.
+
+### Added
+- Autoplay with the timeline.
+- Privacy settings.
+- Added version parameter in the cli.
+
+### Removed
+- Removed deprecated play button in the Replay panel.
+
 ## 5.1.5
 
 ### Fixed
