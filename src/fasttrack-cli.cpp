@@ -43,9 +43,15 @@ void loadConfig(QString path, QMap<QString, QString> &parameters) {
 }
 
 void help() {
-  printf(("Usage:  [OPTION]... [FILE]...\n"));
+  printf("Usage:  [OPTION]... [FILE]...\n");
   fputs(("\
-Use FastTrack from the command line.\n\
+Use FastTrack version \
+"),
+        stdout);
+  fputs((APP_VERSION),
+        stdout);
+  fputs(("\
+ from the command line.\n\
 \n\
 "),
         stdout);
@@ -119,6 +125,7 @@ int main(int argc, char **argv) {
           {"backPath", required_argument, 0, 'w'},
           {"cfg", required_argument, 0, 'A'},
           {"help", no_argument, 0, 'x'},
+          {"version", no_argument, 0, 'V'},
           {0, 0, 0, 0}};
 
   int option_index = 0;
@@ -133,6 +140,12 @@ int main(int argc, char **argv) {
     else if (c == 'A') {
       loadConfig(QString::fromStdString(optarg), parameters);
       break;
+    }
+    else if (c == 'V') {
+      printf("FastTrack ");
+      printf(APP_VERSION);
+      printf("\nLicense GPLv3+: GNU GPL version 3\nThis is free software: you are free to change and redistribute it.\nThere is NO WARRANTY, to the extent permitted by law.\nWritten by Benjamin Gallois\n");
+      return 0;
     }
     else if (c == 'x') {
       help();
