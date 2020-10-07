@@ -45,11 +45,13 @@ Timeline::Timeline(QWidget *parent)
   m_scale = 1;
   timer = new QTimer(this);
   connect(timer, &QTimer::timeout, [this]() {
-    if (m_currentIndexLeft < m_imageNumber) {
-      setValue(m_currentIndexLeft + 1);
-    }
-    else {
-      setValue(0);
+    if (isEnabled()) {
+      if (m_currentIndexLeft < m_imageNumber) {
+        setValue(m_currentIndexLeft + 1);
+      }
+      else {
+        setValue(0);
+      }
     }
   });
 

@@ -724,6 +724,7 @@ void Interactive::computeBackground() {
     QFuture<void> future = QtConcurrent::run([=]() {
       try {
         ui->slider->setEnabled(false);
+        this->setEnabled(false);
         background = tracking->backgroundExtraction(*video, static_cast<int>(nBack), method, registrationMethod);
       }
       catch (const std::exception &ex) {
@@ -733,6 +734,7 @@ void Interactive::computeBackground() {
       isBackground = true;
       ui->isBin->setCheckable(true);
       ui->isSub->setCheckable(true);
+      this->setEnabled(true);
 
       // Automatic background type selection based on the image mean
       int meanValue = int(mean(background)[0]);
