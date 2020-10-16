@@ -23,13 +23,13 @@ FastTrack was first a PhD thesis side project started by [Benjamin Gallois](http
 FastTrack is designed to work with any video quality and frame rate.
 
 **What type of objects and numbers can FastTrack handled?**
-See [this movie](https://youtu.be/zFz5YPjx7jA) to have a broad overview of what FastTrack is capable of.
+<iframe id="lbry-iframe" width="560" height="315" src="https://lbry.tv/$/embed/FastTrack-demo/b23ab74d4a632261ebd2bf4286e5ff7460395616" allowfullscreen></iframe>
 
 **How it performs?**
-Tracking performances depend on systems (number and type of objects). But with the build-in ergonomic tool, it is possible to achieve 100% tracking accuracy with a minimum of efforts.
+Tracking performances depend on systems (number and type of objects). But with the built-in ergonomic tool, it is possible to achieve 100% tracking accuracy with a minimum of efforts.
 
 **It is free?**
-FastTrack is open-source software under the [GPL3 license](https://www.gnu.org/licenses/gpl-3.0.en.html).
+FastTrack is a [free](https://www.gnu.org/philosophy/free-sw.en.html) software under the [GPL3 license](https://www.gnu.org/licenses/gpl-3.0.en.html).
 
 **Do I need programming skills?**
 No.

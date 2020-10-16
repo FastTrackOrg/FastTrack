@@ -4,14 +4,26 @@ title: FastTrack Command line interface
 sidebar_label: Tracking CLI
 ---
 
-A command line interface is available for MacOs, Linux and by using WSL for Windows. It can be downloaded on [the release page](https://github.com/FastTrackOrg/FastTrack/releases/tag/v5.1.5).
+## Installing fasttrack-cli
+A command line interface is available for MacOs, Linux and by using WSL for Windows. It can be downloaded on [the release page](https://github.com/FastTrackOrg/FastTrack/releases/).
 
 The full list of parameters can be found by calling ```./fasttrack-cli --help```. 
 Parameters can be declared individually by calling ```./fasttrack-cli --path path/to/movie.webm --parameter1 value --parameter2 value``` or in batch with a parameters file ```./fasttrack-cli --path path/to/movie.webm --cfg path/parameters.param```. Note that the path option need to be the first option.
 
+fasttrack-cli doesn't support natively Windows. The workaround is to use WSL.
+* Install WSL https://docs.microsoft.com/en-us/windows/wsl/install-win10.
+* Install FastTrack in a Linux terminal:
+```
+wget https://github.com/FastTrackOrg/FastTrack/releases/download/continuous_cli/fasttrack-cli-x86_64.AppImage
+chmod +x fasttrack-cli-x86_64.AppImage
+./fasttrack-cli-x86_64.AppImage --appimage-extract
+sudo ln -s ~/squashfs-root/usr/bin/fasttrack-cli /usr/local/bin/
+```
+* FastTrack-cli can now be called directly by typing fasttrack-cli --help 
+
 ## Calling FastTrack from a Python script
 
-FastTrack can be called inside a Python script to automate tracking. 
+FastTrack can be called inside a Python script to automate the tracking. 
 
 ```
 import os
