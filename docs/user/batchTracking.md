@@ -5,6 +5,7 @@ sidebar_label: Batch Tracking
 ---
 
 ![alt text](assets/batchTracking.svg)
+
 * 1: Open folder
 * 2: Unique background
 * 3: Suffix selection
@@ -19,7 +20,7 @@ sidebar_label: Batch Tracking
 * 12: Start tracking
 * 13: Clear stack
 * 14: Remove from stack
-* 
+
 The Batch Tracking panel is an advanced tool to track automatically a large amount of movies. Several behaviors can be combined to load image sequences in batch with specific background images or parameter files.
 
 ## Basic usage
@@ -36,11 +37,13 @@ To process the stack, click the **Start Tracking** (12) button.
 
 The user can append a suffix to the imported folders *folder_path/ + suffix/*
 For example, it can be usefull with a folder tree like this one:
+
 - /myExperiment/Run1/images
 - /myExperiment/Run2/images
 - /myExperiment/Run3/images
 
 The user can easily select in one time the folders
+
 - /myExperiment/Run1
 - /myExperiment/Run2
 - /myExperiment/Run3
@@ -55,17 +58,20 @@ The user can select a unique background image. Open an image with the **Unique b
 To apply the same parameters file to all the imported sequences:
 
 Manual selection:
+
 * Untick the **Autoload** (10).
 * Select a set of parameters in the **Parameters table** (9).
 * The sequences that will be imported will use this set of parameters.
 
 With a file:
+
 * Tick the **Autoload** (10)
 * Load the sequence with the right parameters file.
 * Untick the **Autoload** (10).
 * The sequences that will be imported will use this set of parameters.
 
 With a file:
+
 * Untick the **Autoload** (10).
 * Load a sequence.
 * Select the parameter file with the (6) button.

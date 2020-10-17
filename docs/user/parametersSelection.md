@@ -9,6 +9,7 @@ They are several tricks that can be used to increase tracking accuracy and selec
 
 ### Detection
 The detection parameters reject objects that are smaller or bigger than a certain size. To increase the tracking accuracy, we want to reject noise and artifacts, and reject blobs constitute of more of one object. If all the objects are of similar size, these two parameters can be selected easily in four steps:
+
 * Select an image where two objects are in contact forming a single blob.
 * Select the **Maximal Size** parameter just at the limit to reject this blob.
 * Select the **Maximal Size** parameter just at the limit to detect the smaller object of the movie.

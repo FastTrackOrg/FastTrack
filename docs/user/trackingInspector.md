@@ -5,6 +5,7 @@ sidebar_label: Tracking Inspector
 ---
 
 ![alt text](assets/tracking_inspector.svg)
+
 * 1: Open Folder
 * 2: Reload
 * 3: Export video
@@ -40,13 +41,14 @@ The software can only load a tracking analysis if the folder architecture is pre
 
 ## Display options
 Several tracking overlay options are available on the tracking overlay panel (24):
+
 * Ellipse: display the head, tail and or body ellipses on the tracked objects.
 * Arrows: display an arrow on the head, tail and or body of the tracked object indicating the orientation.
 * Numbers: display the ids of the tracked objects.
 * Traces: display the previous 50 positions of the tracked objects.
 * Size: the size of the tracking overlay.
 * Frame rate: display and saving frame rate.
-* 
+
 Several useful information on the selected object can be found in the information table (18). The user can go to the image where the object has appeared for the first time by clicking directly on the corresponding cell of the table.
 
 ## Inspect the tracking
@@ -59,22 +61,26 @@ The user can annotate any image of the tracking. Write the annotation in the ann
 ## Correct the tracking
 ### Swap the data of two objects
 The user can correct an error by swapping two object's ID from the current image to the end of the sequence as follow:
+
 * Left-click on the first object, the object ID and color are displayed on the first selection box (6).
 * Left-click on the second object, the object ID and color are displayed on the second selection box (8)
 * Right-click or click on the **Swap Button** (7) to exchange the ID of the two selected objects from the current image to the last image of the sequence.
 
 ### Delete the data of an object
 To delete one object of several frames:
+
 * Double left click on the object, the object ID and color are displayed on the second selection box (8).
 * Select the number of frames on which to delete the object in the box (11). Shortcut C is available to focus on the selection box.
 * Click on the **Delete** button (10) to delete the object from the current frame to the current frame plus the selected number.
 
 To delete one object on the current frame:
+
 * Double left-click on the object, the object ID and color are displayed on the second selection box (8).
 * Click on the **Delete One** button (9) to delete the object on the current frame.
 
 ### Keyboard shortcuts summary
 A set of keyboard shortcuts are available to speed-up the tracking correction.
+
 - Q/A: go to the previous image.
 - D: go to the next image.
 - F: delete the selected object on the current image.

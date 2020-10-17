@@ -5,12 +5,14 @@ sidebar_label: Tracking Result
 ---
 
 After a tracking analysis (or an analysis preview), FastTrack saves several files inside the **Tracking_Result** folder located inside the image sequence folder or inside the **Tracking_Result_VideoFileName** for a video file:
+
 * *tracking.txt*: the tracking result
 * *annotation.txt*: the annotation
 * *background.pgm*: the background image
 * *parameters.param*: the parameters used for the tracking
 
 The tracking result file is simply a text file with 20 columns separated by a '\t' character. This file can easily be loaded to subsequent analysis see [this example](http://www.fasttrack.sh/UserManual/blog/2019/06/21/Data-analysis-python/).
+
 * **xHead, yHead, tHead**: the position (x, y) and the absolute angle of the object's head.
 * **xTail, yTail, tTail**: the position (x, y) and the absolute angle of the object's tail.
 * **xBody, yBody, tBody**: the position (x, y) and the absolute angle of the object.
@@ -20,7 +22,7 @@ The tracking result file is simply a text file with 20 columns separated by a '\
 * **imageNumber**: index of the frame.
 * **id**: object unique identification number.
 
-<div>
+<div style="overflow-x:auto;">
 <style scoped>
     .dataframe tbody tr th:only-of-type {
         vertical-align: middle;
@@ -212,9 +214,9 @@ The tracking result file is simply a text file with 20 columns separated by a '\
 
 Positions are in pixels, in the frame of reference of the original image, zero is in the top left corner. Lengths and areas are in pixels. Angles are in radians in the intervale 0 to 2*pi.
 
-    0  --  ► x  
+    0  --  > x  
     ¦  
-    ▼  
+    v  
     y  
 
 **Note:** If several tracking analysis are performed on the same image sequence, the previous folder is not erased, it will be renamed as **Tracking_result_DateOfTheNewAnalysis**.
