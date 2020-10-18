@@ -1,5 +1,11 @@
 # FastTrack changelog
 
+## 5.1.7
+
+### Fixed
+- Fixed crash when computing the background and moving the timeline.
+- Fixed crash when moving the timeline to the last image in the Interactive panel.
+
 ## 5.1.6
 
 ### Fixed
