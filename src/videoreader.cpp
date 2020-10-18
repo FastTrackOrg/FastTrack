@@ -68,6 +68,7 @@ bool VideoReader::getNext(UMat &destination) {
   if (destination.channels() >= 3) {
     cvtColor(destination, destination, COLOR_BGR2GRAY);
   }
+  m_index++;
   return true;
 }
 
