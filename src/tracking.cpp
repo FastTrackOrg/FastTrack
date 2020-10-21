@@ -212,10 +212,12 @@ bool Tracking::objectDirection(const UMat &image, vector<double> &information) {
   * @param[in] n The number of images to average to computes the background.
   * @param[in] Method 0: minimal projection, 1: maximal projection, 2: average projection.
   * @return The background image.
+  TO DO: currently opening all the frames, to speed-up the process and if step is large can skip frames by replacing nextImage by getImage.
 */
 UMat Tracking::backgroundExtraction(VideoReader &video, int n, const int method, const int registrationMethod) {
-  if (n > static_cast<int>(video.getImageCount())) {
-    n = video.getImageCount();
+  int imageCount = video.getImageCount();
+  if (n > imageCount) {
+    n = imageCount;
   }
 
   UMat background;
@@ -228,16 +230,18 @@ UMat Tracking::backgroundExtraction(VideoReader &video, int n, const int method,
   }
   background.convertTo(background, CV_32FC1);
   img0.convertTo(img0, CV_32FC1);
-  int step = video.getImageCount() / (n);
-  UMat cameraFrameReg;
-  Mat H;
-  int count = 1;
-  int i = 0;
 
-  video.getImage(i, cameraFrameReg);
-  while (i < static_cast<int>(video.getImageCount()) - 1) {
+  UMat cameraFrameReg;
+  video.getImage(0, cameraFrameReg);
+  Mat H;
+  int step = imageCount / n;
+  int count = 1;
+  int i = 1;
+
+  while (i < imageCount) {
     if (i % step == 0) {
       if (!video.getNext(cameraFrameReg)) {
+        emit(forceFinished());
         i++;
         continue;
       }
@@ -261,9 +265,8 @@ UMat Tracking::backgroundExtraction(VideoReader &video, int n, const int method,
         default:
           cv::max(background, cameraFrameReg, background);
       }
-
-      emit(backgroundProgress(count));
       count++;
+      emit(backgroundProgress(count));
     }
     else {
       video.grab();

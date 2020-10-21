@@ -94,8 +94,7 @@ bool VideoReader::getNext(Mat &destination) {
 */
 bool VideoReader::getImage(int index, UMat &destination) {
   if (m_index == index - 1) {
-    getNext(destination);
-    return true;
+    return getNext(destination);
   }
   else {
     m_index = index;
@@ -117,8 +116,7 @@ bool VideoReader::getImage(int index, UMat &destination) {
 */
 bool VideoReader::getImage(int index, Mat &destination) {
   if (m_index == index - 1) {
-    getNext(destination);
-    return true;
+    return getNext(destination);
   }
   else {
     m_index = index;

@@ -464,7 +464,7 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   tracking = new Tracking("", "");
   connect(tracking, &Tracking::backgroundProgress, ui->backgroundProgressBar, &QProgressBar::setValue);
   connect(tracking, &Tracking::forceFinished, [this]() {
-    message("An error occured.");
+    message("An error occured, at least one image is not readable.");
   });
 
   // Sets a color map
@@ -500,6 +500,7 @@ void Interactive::openFolder() {
 
   // Resets the ui
   ui->display->clear();
+  ui->backgroundProgressBar->setValue(0);
   ui->isBin->setCheckable(false);
   ui->isSub->setCheckable(false);
   ui->isOriginal->setChecked(true);
@@ -517,8 +518,8 @@ void Interactive::openFolder() {
       ui->slider->setMaximum(video->getImageCount() - 1);
       ui->previewButton->setDisabled(true);
       ui->trackButton->setDisabled(true);
-      ui->nBack->setMaximum(video->getImageCount() - 1);
-      ui->nBack->setValue(video->getImageCount() - 1);
+      ui->nBack->setMaximum(video->getImageCount());
+      ui->nBack->setValue(video->getImageCount());
       ui->startImage->setRange(0, video->getImageCount() - 1);
       ui->startImage->setValue(0);
       replay->loadReplayFolder(dir);
@@ -714,18 +715,18 @@ void Interactive::display(UMat image) {
 */
 void Interactive::computeBackground() {
   if (videoStatus) {
-    double nBack = double(ui->nBack->value());
+    int nBack = ui->nBack->value();
     int method = ui->back->currentIndex();
     int registrationMethod = ui->registrationBack->currentIndex();
 
-    ui->backgroundProgressBar->setMaximum(int(nBack));
+    ui->backgroundProgressBar->setMaximum(nBack);
 
     // Computes the background without blocking the ui
     QFuture<void> future = QtConcurrent::run([=]() {
       try {
         ui->slider->setEnabled(false);
         this->setEnabled(false);
-        background = tracking->backgroundExtraction(*video, static_cast<int>(nBack), method, registrationMethod);
+        background = tracking->backgroundExtraction(*video, nBack, method, registrationMethod);
       }
       catch (const std::exception &ex) {
         message("An error occurs. Please change the registration method");
