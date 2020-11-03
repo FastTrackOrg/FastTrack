@@ -28,7 +28,7 @@ FastTrack can be called inside a Python script to automate the tracking.
 ```
 import os
 
-cmd = "./fasttrack-cli --maxArea 500 --minArea 50 --lightBack 0 --thresh 80 --reg 0 --spot 0 --nBack 50 --regBack 0 --methBack 1 --xTop 0 --yTop 0 --xBottom 0 --yBottom 0 --morph 0 --morphSize 0 --morphType 0 --normaArea 0 --normPerim 0 --normDist 50 --normAngle 45 --maxDist 150 --maxTime 10 --path ZFJ_001.avi --backPath dataSet/images/Groundtruth/Tracking_Result/background.pgm " 
+cmd = "./fasttrack-cli --maxArea 500 --minArea 50 --lightBack 0 --thresh 80 --reg 0 --spot 0 --nBack 50 --regBack 0 --methBack 1 --xTop 0 --yTop 0 --xBottom 0 --yBottom 0 --morph 0 --morphSize 0 --morphType 0 --normArea 0 --normPerim 0 --normDist 50 --normAngle 45 --maxDist 150 --maxTime 10 --path ZFJ_001.avi --backPath dataSet/images/Groundtruth/Tracking_Result/background.pgm " 
 os.system(cmd)
 ```
 
