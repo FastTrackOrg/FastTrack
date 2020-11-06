@@ -18,6 +18,8 @@ This file is part of Fast Track.
 #define AUTOLEVEL_H
 
 #include <QMap>
+#include <algorithm>
+#include <functional>
 #include <opencv2/core/types.hpp>
 #include <string>
 #include "data.h"
@@ -28,15 +30,19 @@ using namespace std;
 class AutoLevel : public QObject {
   Q_OBJECT
 
-  Data *data; /*!< Tracking data. */
+  int m_endImage;                      /*!< Optimal ending image index. */
+  string m_path;                       /*!< Path to video file/image sequence. */
+  string m_background;                 /*!< Path to video file/image sequence. */
+  QMap<QString, QString> m_parameters; /*!< Optimal ending image index. */
 
   double computeStdAngle(const Data &data);
   double computeStdDistance(const Data &data);
   double computeStdArea(const Data &data);
   double computeStdPerimeter(const Data &data);
+  double stdev(const QVector<double> &vect);
 
  public:
-  AutoLevel(string path, UMat background);
+  AutoLevel(string path, UMat background, QMap<QString, QString>);
   ~AutoLevel();
 
  public slots:
