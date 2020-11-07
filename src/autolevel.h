@@ -32,18 +32,18 @@ class AutoLevel : public QObject {
 
   int m_endImage;                      /*!< Optimal ending image index. */
   string m_path;                       /*!< Path to video file/image sequence. */
-  string m_background;                 /*!< Path to video file/image sequence. */
+  UMat m_background;                   /*!< Path to video file/image sequence. */
   QMap<QString, QString> m_parameters; /*!< Optimal ending image index. */
 
   double computeStdAngle(const Data &data);
   double computeStdDistance(const Data &data);
   double computeStdArea(const Data &data);
   double computeStdPerimeter(const Data &data);
-  double stdev(const QVector<double> &vect);
 
  public:
-  AutoLevel(string path, UMat background, QMap<QString, QString>);
+  AutoLevel(const string &path, const UMat &background, const QMap<QString, QString> &parameters);
   ~AutoLevel();
+  static double stdev(const QVector<double> &vect);
 
  public slots:
   QMap<QString, double> level();

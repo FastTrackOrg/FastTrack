@@ -37,6 +37,8 @@ SOURCES += \
         ../src/tracking.cpp \
         ../src/videoreader.cpp \
         ../src/Hungarian.cpp \
+        ../src/autolevel.cpp \
+        ../src/data.cpp \
 
 QMAKE_CXXFLAGS += -std=c++17 -O3 -fopenmp -g
 
@@ -47,6 +49,8 @@ HEADERS += \
         ../src/tracking.h \
         ../src/videoreader.h \
         ../src/Hungarian.h \
+        ../src/autolevel.h \
+        ../src/data.h \
         /usr/include/gtest/gtest.h \
 
 

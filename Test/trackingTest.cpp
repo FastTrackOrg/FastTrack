@@ -1,5 +1,6 @@
 #include <QMap>
 #include <string>
+#include "../src/autolevel.cpp"
 #include "../src/tracking.cpp"
 #include "gtest/gtest.h"
 
@@ -16,13 +17,22 @@ class TrackingTest : public ::testing::Test {
   }
 };
 
+class AutoLevelTest : public ::testing::Test {
+ protected:
+  virtual void SetUp() {
+  }
+
+  virtual void TearDown() {
+  }
+};
+
 //Curvature method test
 TEST_F(TrackingTest, CurvatureCenter) {
   Tracking tracking("", "");
   Point2d test = tracking.curvatureCenter(Point3d(1, 1, M_PI * 0.25), Point3d(2, 2, M_PI));
   EXPECT_NEAR(test.x, 2, 0.005);
   EXPECT_NEAR(test.y, 0, 0.005);
-  test = tracking.curvatureCenter(Point3d(2, 2, M_PI), Point3d(1, 1, M_PI*0.25));
+  test = tracking.curvatureCenter(Point3d(2, 2, M_PI), Point3d(1, 1, M_PI * 0.25));
   EXPECT_NEAR(test.x, 2, 0.005);
   EXPECT_NEAR(test.y, 0, 0.005);
   test = tracking.curvatureCenter(Point3d(1, 1, 0.5 * M_PI), Point3d(2, 2, 0.5 * M_PI + 0.5 * M_PI));
@@ -654,6 +664,47 @@ TEST_F(TrackingTest, costFunction) {
   order = tracking.costFunc(past, current, 0, 0, 200, 0, 1);
   test = {2, 0, 1};
   EXPECT_EQ(order, test);
+}
+
+// AutoSet test
+TEST_F(AutoLevelTest, AutoLevel) {
+  UMat background;
+  imread("../dataSet/images/Groundtruth/Tracking_Result/background.pgm", IMREAD_GRAYSCALE).copyTo(background);
+  QMap<QString, QString> parameters;
+  parameters.insert("Background method", "1");
+  parameters.insert("Background registration method", "0");
+  parameters.insert("Binary threshold", "60");
+  parameters.insert("Kernel size", "0");
+  parameters.insert("Kernel type", "2");
+  parameters.insert("Light background", "0");
+  parameters.insert("Maximal angle", "90");
+  parameters.insert("Maximal length", "100");
+  parameters.insert("Maximal occlusion", "200");
+  parameters.insert("Maximal size", "170");
+  parameters.insert("Maximal time", "100");
+  parameters.insert("Minimal size", "50");
+  parameters.insert("Morphological operation", "8");
+  parameters.insert("Number of images background", "20");
+  parameters.insert("ROI bottom x", "0");
+  parameters.insert("ROI bottom y", "0");
+  parameters.insert("ROI top x", "0");
+  parameters.insert("ROI top y", "0");
+  parameters.insert("Registration", "0");
+  parameters.insert("Spot to track", "0");
+  parameters.insert("Normalization area", "0");
+  parameters.insert("Normalization perimeter", "0");
+
+  AutoLevel autolevel("../dataSet/images/frame_000001.pgm", background, parameters);
+  QMap<QString, double> test = autolevel.level();
+  EXPECT_EQ(std::lround(test.value("Normalization area")), 11);
+  EXPECT_EQ(std::lround(test.value("Normalization perimeter")), 8);
+  EXPECT_EQ(std::lround(test.value("Maximal angle")), 18);
+  EXPECT_EQ(std::lround(test.value("Maximal length")), 2);
+}
+TEST_F(AutoLevelTest, AutoLevelStd) {
+  QVector<double> test{8.504, 23.595, 81.471, 17.786, 97.959, 50.48, 96.469, 93.478, 79.251, 85.518, 69.064, 84.745, 53.369, 92.446, 86.935, 79.377, 67.804, 16.93, 49.407, 31.369, 16.355, 65.729, 67.652, 92.545, 56.909, 41.386, 6.141, 46.579, 29.573, 92.854, 35.241, 95.463, 42.066, 78.556, 92.12, 67.968, 20.008, 66.805, 63.092, 38.044, 74.936, 63.188, 25.586, 52.291, 41.38, 50.23, 1.072, 71.48, 66.107, 44.628, 42.135, 4.703, 87.119, 80.56, 43.915, 73.213, 86.908, 41.986, 80.081, 75.481, 92.773, 44.169, 29.05, 39.353, 59.543, 30.848, 97.805, 65.71, 90.388, 38.274, 98.07, 1.811, 45.201, 7.668, 91.251, 98.431, 58.871, 36.679, 7.002, 40.137, 37.95, 78.639, 77.687, 73.302, 66.698, 75.623, 61.33, 54.43, 17.075, 56.37, 54.612, 61.175, 53.911, 55.865, 56.265, 96.036, 87.017, 43.591, 60.39, 29.949};
+  double sd = AutoLevel::stdev(test);
+  EXPECT_EQ(sd, 26.517632067020994);
 }
 }  // namespace
 

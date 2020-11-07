@@ -18,7 +18,7 @@ This file is part of Fast Track.
 #include "autolevel.h"
 
 /**
- * @class Autoleveli
+ * @class Autolevel
  *
  * @brief This class is entended to level the soft tracking parameters.
  *
@@ -35,11 +35,11 @@ This file is part of Fast Track.
   * @param[in] path Path to the movie to track.
   * @param[in] background Background image.
 */
-AutoLevel::AutoLevel(string path, UMat background, QMap<QString, QString> parameters) {
+AutoLevel::AutoLevel(const string &path, const UMat &background, const QMap<QString, QString> &parameters) {
   m_path = path;
-  UMat m_background = background;
-  QMap<QString, QString> m_parameters = parameters;
-  m_endImage = 100;  //TODO evaluate the tracking of 10 images to determinate an optimum time for the process
+  m_background = background;
+  m_parameters = parameters;
+  m_endImage = -1;  //TODO evaluate the tracking of 10 images to determinate an optimum time for the process
 }
 
 AutoLevel::~AutoLevel() {
@@ -50,16 +50,14 @@ AutoLevel::~AutoLevel() {
   * @return Map containing the levelled parameters.
 */
 QMap<QString, double> AutoLevel::level() {
-  Tracking tracking = Tracking(m_path, m_background, 0, m_endImage);
-  tracking.updatingParameters(m_parameters);
-  tracking.startProcess();
-  const Data data = Data(QString::fromStdString(m_path));
-  double stdAngle = computeStdAngle(data);
-  double stdDist = computeStdDistance(data);
-  double stdArea = computeStdArea(data);
-  double stdPerimeter = computeStdPerimeter(data);
-  // TODO verif key
-  while (abs(stdAngle - m_parameters.value("Maximal angle").toDouble()) < 1E-3 && abs(stdDist - m_parameters.value("Maximal length").toDouble()) < 1E-3 && abs(stdArea - m_parameters.value("Normalization area").toDouble()) < 1E-3 && abs(stdPerimeter - m_parameters.value("Normalization area").toDouble()) < 1E-3) {
+  QDir directory = QDir(QFileInfo(QString::fromStdString(m_path)).dir().absolutePath() + "/Tracking_Result/");
+  srand(time(NULL));
+  double stdAngle = rand() % 360 + 1;
+  double stdDist = rand() % 500 + 1;
+  double stdArea = rand() % 500 + 1;
+  double stdPerimeter = rand() % 500 + 1;
+  int counter = 0;
+  while (abs(stdAngle - m_parameters.value("Maximal angle").toDouble()) > 1E-3 && abs(stdDist - m_parameters.value("Maximal length").toDouble()) > 1E-3 && abs(stdArea - m_parameters.value("Normalization area").toDouble()) > 1E-3 && abs(stdPerimeter - m_parameters.value("Normalization area").toDouble()) > 1E-3) {
     m_parameters.insert("Maximal angle", QString::number(stdAngle));
     m_parameters.insert("Maximal length", QString::number(stdDist));
     m_parameters.insert("Normalization area ", QString::number(stdArea));
@@ -67,17 +65,20 @@ QMap<QString, double> AutoLevel::level() {
     Tracking tracking = Tracking(m_path, m_background, 0, m_endImage);
     tracking.updatingParameters(m_parameters);
     tracking.startProcess();
-    const Data data = Data(QString::fromStdString(m_path));
-    stdAngle = computeStdAngle(data);
+    Data data = Data(directory.absolutePath());
+    stdAngle = 180 * computeStdAngle(data) / M_PI;
     stdDist = computeStdDistance(data);
     stdArea = computeStdArea(data);
     stdPerimeter = computeStdPerimeter(data);
+    directory.removeRecursively();
+    counter++;
   }
   QMap<QString, double> levelParameters;
   levelParameters.insert("Maximal angle", stdAngle);
   levelParameters.insert("Maximal length", stdDist);
-  levelParameters.insert("Normalization area ", stdArea);
+  levelParameters.insert("Normalization area", stdArea);
   levelParameters.insert("Normalization perimeter", stdPerimeter);
+  levelParameters.insert("Iteration number", double(counter));
   return levelParameters;
 }
 
@@ -87,8 +88,9 @@ QMap<QString, double> AutoLevel::level() {
   * @return Std.
 */
 double AutoLevel::stdev(const QVector<double> &vect) {
-  double mean = std::accumulate(vect.begin(), vect.end(), 0);
-  double std = std::accumulate(vect.begin(), vect.end(), 0, [&mean](double a, double b) { return a + (b - mean) * (b - mean); });
+  double mean = std::accumulate(vect.begin(), vect.end(), 0.0);
+  mean /= double(vect.size());
+  double std = std::accumulate(vect.begin(), vect.end(), 0.0, [&mean](double a, double b) { return a + (b - mean) * (b - mean); });
   std = std::pow(std / double(vect.size()), 0.5);
   return std;
 }
@@ -103,8 +105,9 @@ double AutoLevel::computeStdAngle(const Data &data) {
   QList<int> ids = data.getId(0, data.maxFrameIndex);
   for (const int &a : ids) {
     QMap<QString, QVector<double>> i = data.getDataId(a);
-    QVector<double> angleDiff;
-    std::adjacent_difference(i.value("tBody").begin(), i.value("tBody").end(), angleDiff.begin(), [](double a, double b) { return -(((a - b + M_PI) - M_PI) - 2 * M_PI * floor(((a - b + M_PI) - M_PI) / (2 * M_PI))); });
+    QVector<double> angleDiff(i.value("tBody").size());
+    std::adjacent_difference(i.value("tBody").begin(), i.value("tBody").end(), angleDiff.begin(), [](double a, double b) { return Tracking::angleDifference(b, a); });
+    angleDiff.removeFirst();
     angle.append(angleDiff);
   }
   return stdev(angle);
@@ -120,15 +123,16 @@ double AutoLevel::computeStdDistance(const Data &data) {
   QList<int> ids = data.getId(0, data.maxFrameIndex);
   for (const int &a : ids) {
     QMap<QString, QVector<double>> i = data.getDataId(a);
-    QVector<double> xDiff;
+    QVector<double> xDiff(i.value("xBody").size());
     std::adjacent_difference(i.value("xBody").begin(), i.value("xBody").end(), xDiff.begin());
-    QVector<double> yDiff;
+    QVector<double> yDiff(i.value("yBody").size());
     std::adjacent_difference(i.value("yBody").begin(), i.value("yBody").end(), yDiff.begin());
-    QVector<double> tDiff;
-    std::adjacent_difference(i.value("tBody").begin(), i.value("tBody").end(), tDiff.begin());
-    QVector<double> dist;
+    QVector<double> tDiff(i.value("imageNumber").size());
+    std::adjacent_difference(i.value("imageNumber").begin(), i.value("imageNumber").end(), tDiff.begin());
+    QVector<double> dist(xDiff.size());
     std::transform(xDiff.begin(), xDiff.end(), yDiff.begin(), dist.begin(), [](double a, double b) { return std::pow(std::pow(a, 2) + std::pow(b, 2), 0.5); });
     std::transform(dist.begin(), dist.end(), tDiff.begin(), dist.begin(), std::divides<double>{});  // Divide the time distance by the time to account for time gaps
+    dist.removeFirst();
     distance.append(dist);
   }
   return stdev(distance);
@@ -144,8 +148,9 @@ double AutoLevel::computeStdArea(const Data &data) {
   QList<int> ids = data.getId(0, data.maxFrameIndex);
   for (const int &a : ids) {
     QMap<QString, QVector<double>> i = data.getDataId(a);
-    QVector<double> areaDiff;
+    QVector<double> areaDiff(i.value("areaBody").size());
     std::adjacent_difference(i.value("areaBody").begin(), i.value("areaBody").end(), areaDiff.begin());
+    areaDiff.removeFirst();
     area.append(areaDiff);
   }
   return stdev(area);
@@ -161,8 +166,9 @@ double AutoLevel::computeStdPerimeter(const Data &data) {
   QList<int> ids = data.getId(0, data.maxFrameIndex);
   for (const int &a : ids) {
     QMap<QString, QVector<double>> i = data.getDataId(a);
-    QVector<double> perimDiff;
-    std::adjacent_difference(i.value("areaBody").begin(), i.value("areaBody").end(), perimDiff.begin());
+    QVector<double> perimDiff(i.value("perimeterBody").size());
+    std::adjacent_difference(i.value("perimeterBody").begin(), i.value("perimeterBody").end(), perimDiff.begin());
+    perimDiff.removeFirst();
     perimeter.append(perimDiff);
   }
   return stdev(perimeter);

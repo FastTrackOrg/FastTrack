@@ -110,7 +110,7 @@ QMap<QString, double> Data::getData(int imageIndex, int id) const {
 
 QMap<QString, QVector<double>> Data::getDataId(int id) const {
   QMap<QString, QVector<double>> idData;
-  for (int i = 0; i < maxFrameIndex; i++) {
+  for (int i = 0; i < maxFrameIndex + 1; i++) {
     QMap<QString, double> tmp = getData(i, id);
     QMap<QString, double>::const_iterator j = tmp.constBegin();
     while (j != tmp.constEnd()) {
@@ -166,7 +166,7 @@ QList<int> Data::getId(int imageIndexFirst, int imageIndexLast) const {
 */
 int Data::getObjectInformation(int objectId) const {
   int firstAppearance;
-  for (int i = 0; i < maxFrameIndex; i++) {
+  for (int i = 0; i < maxFrameIndex + 1; i++) {
     QVector<object> objects = data.value(i);
     for (auto &a : objects) {
       if (a.id == objectId) {
