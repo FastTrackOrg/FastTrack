@@ -347,8 +347,8 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   connect(ui->lo, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [this](int scale) {
     display(ui->slider->value(), scale);
   });
-  connect(ui->maxL, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [this](int scale) {
-    display(ui->slider->value(), scale);
+  connect(ui->maxL, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [this](int scale) {
+    display(ui->slider->value(), static_cast<int>(scale));
   });
 
   // Zoom
