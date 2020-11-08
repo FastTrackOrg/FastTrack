@@ -82,6 +82,7 @@ SOURCES += \
         trackingmanager.cpp \
         videoreader.cpp \
         timeline.cpp \ 
+        autolevel.cpp \ 
 
 
 HEADERS += \
@@ -96,6 +97,7 @@ HEADERS += \
         trackingmanager.h\
         videoreader.h \
         timeline.h \ 
+        autolevel.h \ 
 
 
 FORMS += \

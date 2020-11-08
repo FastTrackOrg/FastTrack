@@ -166,17 +166,17 @@ Batch::Batch(QWidget *parent) : QWidget(parent),
 
   ui->tableParameters->insertRow(14);
   ui->tableParameters->setItem(14, 0, new QTableWidgetItem("Maximal length"));
-  QSpinBox *maxLength = new QSpinBox(ui->tableParameters);
+  QDoubleSpinBox *maxLength = new QDoubleSpinBox(ui->tableParameters);
   maxLength->setRange(0, 9999999);
   ui->tableParameters->setCellWidget(14, 1, maxLength);
-  connect(maxLength, QOverload<int>::of(&QSpinBox::valueChanged), this, &Batch::updateParameters);
+  connect(maxLength, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &Batch::updateParameters);
 
   ui->tableParameters->insertRow(15);
   ui->tableParameters->setItem(15, 0, new QTableWidgetItem("Maximal angle"));
-  QSpinBox *maxAngle = new QSpinBox(ui->tableParameters);
+  QDoubleSpinBox *maxAngle = new QDoubleSpinBox(ui->tableParameters);
   maxAngle->setRange(0, 360);
   ui->tableParameters->setCellWidget(15, 1, maxAngle);
-  connect(maxAngle, QOverload<int>::of(&QSpinBox::valueChanged), this, &Batch::updateParameters);
+  connect(maxAngle, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &Batch::updateParameters);
 
   ui->tableParameters->insertRow(16);
   ui->tableParameters->setItem(16, 0, new QTableWidgetItem("Maximal time"));
@@ -483,8 +483,8 @@ void Batch::startTracking() {
 void Batch::updateParameters() {
   if (isEditable) {
     // Updates SpinBox parameters
-    QVector<int> spinBoxIndexes = {1, 2, 4, 5, 6, 7, 11, 12, 13, 14, 15, 16, 17};
-    QVector<int> doubleSpinBoxIndexes = {20, 21};
+    QVector<int> spinBoxIndexes = {1, 2, 4, 5, 6, 7, 11, 12, 13, 16, 17};
+    QVector<int> doubleSpinBoxIndexes = {14, 15, 20, 21};
     QVector<int> comboBoxIndexes = {3, 8, 9, 10, 18, 19};
 
     for (auto &a : spinBoxIndexes) {

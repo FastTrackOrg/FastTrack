@@ -114,9 +114,9 @@ class Tracking : public QObject {
 
   Point2d curvatureCenter(const Point3d &tail, const Point3d &head);
   double curvature(Point2d center, const Mat &image);
-  double modul(double angle);
+  static double modul(double angle);
   double divide(double a, double b);
-  double angleDifference(double alpha, double beta);
+  static double angleDifference(double alpha, double beta);
   bool objectDirection(const UMat &image, vector<double> &information);
   vector<double> objectInformation(const UMat &image);
   vector<Point3d> reassignment(const vector<Point3d> &past, const vector<Point3d> &input, const vector<int> &assignment);

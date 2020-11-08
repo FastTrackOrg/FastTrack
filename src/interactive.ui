@@ -53,7 +53,7 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>595</width>
+             <width>601</width>
              <height>604</height>
             </rect>
            </property>
@@ -110,69 +110,14 @@
          <string>Tracking parameters</string>
         </attribute>
         <layout class="QGridLayout" name="gridLayout_11">
-         <item row="0" column="0">
-          <layout class="QHBoxLayout" name="horizontalLayout_11">
-           <item>
-            <widget class="QLabel" name="label_13">
-             <property name="text">
-              <string>Normalization distance (D): </string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QSpinBox" name="maxL">
-             <property name="minimum">
-              <number>0</number>
-             </property>
-             <property name="maximum">
-              <number>99999999</number>
-             </property>
-             <property name="value">
-              <number>100</number>
-             </property>
-            </widget>
-           </item>
-          </layout>
+         <item row="4" column="0">
+          <widget class="Line" name="line_9">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+          </widget>
          </item>
-         <item row="1" column="0">
-          <layout class="QHBoxLayout" name="horizontalLayout_12">
-           <item>
-            <widget class="QLabel" name="label_14">
-             <property name="text">
-              <string>Normalization angle (A): </string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QSpinBox" name="maxT">
-             <property name="minimum">
-              <number>0</number>
-             </property>
-             <property name="maximum">
-              <number>360</number>
-             </property>
-             <property name="value">
-              <number>90</number>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
-         <item row="2" column="0">
-          <layout class="QHBoxLayout" name="horizontalLayout_21">
-           <item>
-            <widget class="QLabel" name="label_19">
-             <property name="text">
-              <string>Normalization area (AR):</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QDoubleSpinBox" name="normArea"/>
-           </item>
-          </layout>
-         </item>
-         <item row="3" column="0">
+         <item row="9" column="0">
           <layout class="QHBoxLayout" name="horizontalLayout_22">
            <item>
             <widget class="QLabel" name="label_28">
@@ -182,24 +127,36 @@
             </widget>
            </item>
            <item>
-            <widget class="QDoubleSpinBox" name="normPerim"/>
+            <widget class="QDoubleSpinBox" name="normPerim">
+             <property name="maximum">
+              <double>99999.000000000000000</double>
+             </property>
+            </widget>
            </item>
           </layout>
          </item>
-         <item row="4" column="0">
-          <spacer name="horizontalSpacer">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
+         <item row="7" column="0">
+          <layout class="QHBoxLayout" name="horizontalLayout_12">
+           <item>
+            <widget class="QLabel" name="label_14">
+             <property name="text">
+              <string>Normalization angle (A): </string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QDoubleSpinBox" name="maxT">
+             <property name="maximum">
+              <double>9999.000000000000000</double>
+             </property>
+             <property name="value">
+              <double>90.000000000000000</double>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </item>
-         <item row="5" column="0">
+         <item row="2" column="0">
           <layout class="QHBoxLayout" name="horizontalLayout_13">
            <item>
             <widget class="QLabel" name="label_15">
@@ -220,7 +177,110 @@
            </item>
           </layout>
          </item>
+         <item row="18" column="0">
+          <widget class="QTextBrowser" name="textBrowser">
+           <property name="html">
+            <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Sans Serif'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;The program will compute a cost for each pair of objects in two successive images using the distance &lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;d&lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600; vertical-align:sub;&quot;&gt;ij&lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;, the angular difference &lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;a&lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600; vertical-align:sub;&quot;&gt;ij ,&lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt; the area difference &lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;ar&lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600; vertical-align:sub;&quot;&gt;ij &lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt; and the perimeter difference &lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;p&lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600; vertical-align:sub;&quot;&gt;ij&lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt; between two objects. These two parameters can be computed using the direction and barycenter of the head, tail or body by selecting the&lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt; Spot to track &lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;accordingly.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;The cost is computed as follow:&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;c&lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600; vertical-align:sub;&quot;&gt;ij&lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt; = d&lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600; vertical-align:sub;&quot;&gt;ij&lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;/D + a&lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600; vertical-align:sub;&quot;&gt;ij&lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;/A +  ar&lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600; vertical-align:sub;&quot;&gt;ij&lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;/AR +  p&lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600; vertical-align:sub;&quot;&gt;ij&lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;/P&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;if d&lt;/span&gt;&lt;span style=&quot; font-size:8pt; vertical-align:sub;&quot;&gt;ij &lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;&amp;gt; &lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;L&lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt; the object i can be assigned with the object j.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;if the object is lost more images than &lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;T&lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt; then a new object is assigned.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;Normalization parameters can be set to 0 to remove the associated contribution in the cost function.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;The normalization parameters &lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;D &lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;and&lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt; A &lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;have to be adjusted:&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;1. &lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Set&lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt; D &lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;as the typical distance traveled by an object.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;2. &lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Set&lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt; A&lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt; as the typical angular change performed by an object. &lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;2. &lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Set&lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt; A&lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt; as the typical angular change performed by an object. &lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;3&lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;. Decrease &lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;D&lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt; or increase &lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;A&lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt; to be more sensitive to the traveled distance. Increase &lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;D&lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt; or decrease &lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;A&lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt; to be more sensitive to the angular change. Fine tune &lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;AR&lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt; and &lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;P &lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;to enhanced the accuracy.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;The best assignment is found by using the Hungarian algorithm.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+          </widget>
+         </item>
+         <item row="13" column="0">
+          <widget class="Line" name="line_11">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+          </widget>
+         </item>
          <item row="6" column="0">
+          <layout class="QHBoxLayout" name="horizontalLayout_11">
+           <item>
+            <widget class="QLabel" name="label_13">
+             <property name="text">
+              <string>Normalization distance (D): </string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QDoubleSpinBox" name="maxL">
+             <property name="maximum">
+              <double>9999.000000000000000</double>
+             </property>
+             <property name="value">
+              <double>100.000000000000000</double>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item row="17" column="0">
+          <layout class="QHBoxLayout" name="horizontalLayout_17"/>
+         </item>
+         <item row="5" column="0">
+          <spacer name="horizontalSpacer">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item row="14" column="0">
+          <spacer name="horizontalSpacer_2">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item row="8" column="0">
+          <layout class="QHBoxLayout" name="horizontalLayout_21">
+           <item>
+            <widget class="QLabel" name="label_19">
+             <property name="text">
+              <string>Normalization area (AR):</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QDoubleSpinBox" name="normArea">
+             <property name="maximum">
+              <double>99999.000000000000000</double>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item row="1" column="0">
           <layout class="QHBoxLayout" name="horizontalLayout_14">
            <item>
             <widget class="QLabel" name="label_16">
@@ -244,20 +304,17 @@
            </item>
           </layout>
          </item>
-         <item row="7" column="0">
-          <spacer name="horizontalSpacer_2">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
+         <item row="12" column="0">
+          <widget class="QPushButton" name="levelButton">
+           <property name="toolTip">
+            <string>Set parameters to a neutral weight, do not replace the manual tuning</string>
            </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
+           <property name="text">
+            <string>Level</string>
            </property>
-          </spacer>
+          </widget>
          </item>
-         <item row="8" column="0">
+         <item row="3" column="0">
           <layout class="QHBoxLayout" name="horizontalLayout_15">
            <item>
             <widget class="QLabel" name="label_17">
@@ -286,37 +343,6 @@
             </widget>
            </item>
           </layout>
-         </item>
-         <item row="9" column="0">
-          <layout class="QHBoxLayout" name="horizontalLayout_17"/>
-         </item>
-         <item row="10" column="0">
-          <widget class="QTextBrowser" name="textBrowser">
-           <property name="html">
-            <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Sans Serif'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;The program will compute a cost for each pair of objects in two successive images using the distance &lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;d&lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600; vertical-align:sub;&quot;&gt;ij&lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;, the angular difference &lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;a&lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600; vertical-align:sub;&quot;&gt;ij ,&lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt; the area difference &lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;ar&lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600; vertical-align:sub;&quot;&gt;ij &lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt; and the perimeter difference &lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;p&lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600; vertical-align:sub;&quot;&gt;ij&lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt; between two objects. These two parameters can be computed using the direction and barycenter of the head, tail or body by selecting the&lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt; Spot to track &lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;accordingly.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;The cost is computed as follow:&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;c&lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600; vertical-align:sub;&quot;&gt;ij&lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt; = d&lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600; vertical-align:sub;&quot;&gt;ij&lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;/D + a&lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600; vertical-align:sub;&quot;&gt;ij&lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;/A +  ar&lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600; vertical-align:sub;&quot;&gt;ij&lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;/AR +  p&lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600; vertical-align:sub;&quot;&gt;ij&lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;/P&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;if d&lt;/span&gt;&lt;span style=&quot; font-size:8pt; vertical-align:sub;&quot;&gt;ij &lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;&amp;gt; &lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;L&lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt; the object i can be assigned with the object j.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;if the object is lost more images than &lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;T&lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt; then a new object is assigned.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;Normalization parameters can be set to 0 to remove the associated contribution in the cost function.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;The normalization parameters &lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;D &lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;and&lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt; A &lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;have to be adjusted:&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;1. &lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Set&lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt; D &lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;as the typical distance traveled by an object.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;2. &lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Set&lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt; A&lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt; as the typical angular change performed by an object. &lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;2. &lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Set&lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt; A&lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt; as the typical angular change performed by an object. &lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;3&lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;. Decrease &lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;D&lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt; or increase &lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;A&lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt; to be more sensitive to the traveled distance. Increase &lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;D&lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt; or decrease &lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;A&lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt; to be more sensitive to the angular change. Fine tune &lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;AR&lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt; and &lt;/span&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;P &lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;to enhanced the accuracy.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;The best assignment is found by using the Hungarian algorithm.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-           </property>
-          </widget>
          </item>
         </layout>
        </widget>
