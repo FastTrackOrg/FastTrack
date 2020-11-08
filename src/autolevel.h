@@ -47,6 +47,11 @@ class AutoLevel : public QObject {
 
  public slots:
   QMap<QString, double> level();
+
+ signals:
+  void forceFinished();
+  void levelParametersChanged(QMap<QString, double>);
+  void finished();
 };
 
 #endif

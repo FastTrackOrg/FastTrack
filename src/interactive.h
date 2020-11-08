@@ -34,6 +34,7 @@ This file is part of Fast Track.
 #include <QMainWindow>
 #include <QMap>
 #include <QMessageBox>
+#include <QMetaType>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
@@ -49,6 +50,7 @@ This file is part of Fast Track.
 #include <QUrl>
 #include <QWidget>
 #include <QtConcurrent/QtConcurrentRun>
+#include "autolevel.h"
 #include "data.h"
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
@@ -94,6 +96,8 @@ class Interactive : public QMainWindow {
 
   void loadSettings();
   void saveSettings();
+
+  void level();
 
  private:
   Ui::Interactive *ui;

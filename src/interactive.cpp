@@ -47,6 +47,9 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   loadSettings();
   videoStatus = false;
 
+  // MetaType
+  qRegisterMetaType<QMap<QString, double>>("QMap<QString, double>");
+
   //DockWidget
   connect(ui->imageOptions, &QDockWidget::dockLocationChanged, [this](Qt::DockWidgetArea area) {
     switch (area) {
@@ -455,6 +458,7 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   });
   connect(ui->cropButton, &QPushButton::clicked, this, &Interactive::crop);
   connect(ui->resetButton, &QPushButton::clicked, this, &Interactive::reset);
+  connect(ui->levelButton, &QPushButton::clicked, this, &Interactive::level);
 
   // Sets information table
   ui->informationTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
@@ -1087,6 +1091,7 @@ void Interactive::loadSettings() {
     settings.insert(a, settingsFile->value(a).toString());
   }
 }
+
 /**
   * @brief Saves the settings.
 */
@@ -1094,5 +1099,40 @@ void Interactive::saveSettings() {
   QList<QString> keys = settings.keys();
   for (auto &a : keys) {
     settingsFile->setValue(a, settings.value(a));
+  }
+}
+
+/**
+  * @brief Level the parameters.
+*/
+void Interactive::level() {
+  if (videoStatus) {
+    QThread *thread = new QThread;
+    getParameters();
+    AutoLevel *autolevel = new AutoLevel(memoryDir.toStdString(), background, parameters);
+    autolevel->moveToThread(thread);
+
+    connect(thread, &QThread::started, autolevel, &AutoLevel::level);
+    connect(tracking, &Tracking::forceFinished, [this]() {
+      this->setEnabled(true);
+      message("An error occurs during the tracking.");
+    });
+    connect(autolevel, &AutoLevel::finished, this, [this]() {
+      this->setEnabled(true);
+    });
+    connect(autolevel, &AutoLevel::levelParametersChanged, this, [this](QMap<QString, double> levelParameters) {
+      ui->maxT->setValue(levelParameters.value("Maximal angle"));
+      ui->maxL->setValue(levelParameters.value("Maximal length"));
+      ui->normArea->setValue(levelParameters.value("Normalization area"));
+      ui->normPerim->setValue(levelParameters.value("Normalization perimeter"));
+    });
+    connect(autolevel, &AutoLevel::finished, thread, &QThread::quit);
+    connect(autolevel, &AutoLevel::forceFinished, thread, &QThread::quit);
+    connect(autolevel, &AutoLevel::forceFinished, autolevel, &AutoLevel::deleteLater);
+    connect(autolevel, &AutoLevel::finished, autolevel, &AutoLevel::deleteLater);
+    connect(thread, &QThread::finished, thread, &QThread::deleteLater);
+
+    thread->start();
+    this->setEnabled(false);
   }
 }

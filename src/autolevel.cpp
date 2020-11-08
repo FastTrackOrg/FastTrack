@@ -50,36 +50,43 @@ AutoLevel::~AutoLevel() {
   * @return Map containing the levelled parameters.
 */
 QMap<QString, double> AutoLevel::level() {
-  QDir directory = QDir(QFileInfo(QString::fromStdString(m_path)).dir().absolutePath() + "/Tracking_Result/");
-  srand(time(NULL));
-  double stdAngle = rand() % 360 + 1;
-  double stdDist = rand() % 500 + 1;
-  double stdArea = rand() % 500 + 1;
-  double stdPerimeter = rand() % 500 + 1;
-  int counter = 0;
-  while (abs(stdAngle - m_parameters.value("Maximal angle").toDouble()) > 1E-3 && abs(stdDist - m_parameters.value("Maximal length").toDouble()) > 1E-3 && abs(stdArea - m_parameters.value("Normalization area").toDouble()) > 1E-3 && abs(stdPerimeter - m_parameters.value("Normalization area").toDouble()) > 1E-3) {
-    m_parameters.insert("Maximal angle", QString::number(stdAngle));
-    m_parameters.insert("Maximal length", QString::number(stdDist));
-    m_parameters.insert("Normalization area ", QString::number(stdArea));
-    m_parameters.insert("Normalization perimeter", QString::number(stdPerimeter));
-    Tracking tracking = Tracking(m_path, m_background, 0, m_endImage);
-    tracking.updatingParameters(m_parameters);
-    tracking.startProcess();
-    Data data = Data(directory.absolutePath());
-    stdAngle = 180 * computeStdAngle(data) / M_PI;
-    stdDist = computeStdDistance(data);
-    stdArea = computeStdArea(data);
-    stdPerimeter = computeStdPerimeter(data);
-    directory.removeRecursively();
-    counter++;
+  try {
+    QDir directory = QDir(QFileInfo(QString::fromStdString(m_path)).dir().absolutePath() + "/Tracking_Result/");
+    srand(time(NULL));
+    double stdAngle = rand() % 360 + 1;
+    double stdDist = rand() % 500 + 1;
+    double stdArea = rand() % 500 + 1;
+    double stdPerimeter = rand() % 500 + 1;
+    int counter = 0;
+    while (abs(stdAngle - m_parameters.value("Maximal angle").toDouble()) > 1E-3 && abs(stdDist - m_parameters.value("Maximal length").toDouble()) > 1E-3 && abs(stdArea - m_parameters.value("Normalization area").toDouble()) > 1E-3 && abs(stdPerimeter - m_parameters.value("Normalization area").toDouble()) > 1E-3) {
+      m_parameters.insert("Maximal angle", QString::number(stdAngle));
+      m_parameters.insert("Maximal length", QString::number(stdDist));
+      m_parameters.insert("Normalization area ", QString::number(stdArea));
+      m_parameters.insert("Normalization perimeter", QString::number(stdPerimeter));
+      Tracking tracking = Tracking(m_path, m_background, 0, m_endImage);
+      tracking.updatingParameters(m_parameters);
+      tracking.startProcess();
+      Data data = Data(directory.absolutePath());
+      stdAngle = 180 * computeStdAngle(data) / M_PI;
+      stdDist = computeStdDistance(data);
+      stdArea = computeStdArea(data);
+      stdPerimeter = computeStdPerimeter(data);
+      directory.removeRecursively();
+      counter++;
+    }
+    QMap<QString, double> levelParameters;
+    levelParameters.insert("Maximal angle", stdAngle);
+    levelParameters.insert("Maximal length", stdDist);
+    levelParameters.insert("Normalization area", stdArea);
+    levelParameters.insert("Normalization perimeter", stdPerimeter);
+    levelParameters.insert("Iteration number", double(counter));
+    emit(levelParametersChanged(levelParameters));
+    emit(finished());
+    return levelParameters;
   }
-  QMap<QString, double> levelParameters;
-  levelParameters.insert("Maximal angle", stdAngle);
-  levelParameters.insert("Maximal length", stdDist);
-  levelParameters.insert("Normalization area", stdArea);
-  levelParameters.insert("Normalization perimeter", stdPerimeter);
-  levelParameters.insert("Iteration number", double(counter));
-  return levelParameters;
+  catch (...) {
+    emit(forceFinished());
+  }
 }
 
 /**
