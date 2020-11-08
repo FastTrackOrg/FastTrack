@@ -32,6 +32,7 @@ class AutoLevel : public QObject {
 
   int m_endImage;                      /*!< Optimal ending image index. */
   string m_path;                       /*!< Path to video file/image sequence. */
+  QString m_spotSuffix;                /*!< Spot to track. */
   UMat m_background;                   /*!< Path to video file/image sequence. */
   QMap<QString, QString> m_parameters; /*!< Optimal ending image index. */
 

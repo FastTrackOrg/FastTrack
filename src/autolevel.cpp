@@ -52,11 +52,21 @@ AutoLevel::~AutoLevel() {
 QMap<QString, double> AutoLevel::level() {
   try {
     QDir directory = QDir(QFileInfo(QString::fromStdString(m_path)).dir().absolutePath() + "/Tracking_Result/");
-    srand(time(NULL));
-    double stdAngle = rand() % 360 + 1;
-    double stdDist = rand() % 500 + 1;
-    double stdArea = rand() % 500 + 1;
-    double stdPerimeter = rand() % 500 + 1;
+    srand(static_cast<unsigned int>(time(NULL)));
+    double stdAngle = static_cast<double>(rand() % 360 + 1);
+    double stdDist = static_cast<double>(rand() % 500 + 1);
+    double stdArea = static_cast<double>(rand() % 500 + 1);
+    double stdPerimeter = static_cast<double>(rand() % 500 + 1);
+    int spot = m_parameters.value("Spot to track").toInt();
+    if (spot == 0) {
+      m_spotSuffix = "Head";
+    }
+    else if (spot == 1) {
+      m_spotSuffix = "Tail";
+    }
+    else if (spot == 2) {
+      m_spotSuffix = "Body";
+    }
     int counter = 0;
     while (abs(stdAngle - m_parameters.value("Maximal angle").toDouble()) > 1E-3 && abs(stdDist - m_parameters.value("Maximal length").toDouble()) > 1E-3 && abs(stdArea - m_parameters.value("Normalization area").toDouble()) > 1E-3 && abs(stdPerimeter - m_parameters.value("Normalization area").toDouble()) > 1E-3) {
       m_parameters.insert("Maximal angle", QString::number(stdAngle));
@@ -86,6 +96,8 @@ QMap<QString, double> AutoLevel::level() {
   }
   catch (...) {
     emit(forceFinished());
+    QMap<QString, double> levelParameters;
+    return levelParameters;
   }
 }
 
@@ -112,8 +124,11 @@ double AutoLevel::computeStdAngle(const Data &data) {
   QList<int> ids = data.getId(0, data.maxFrameIndex);
   for (const int &a : ids) {
     QMap<QString, QVector<double>> i = data.getDataId(a);
-    QVector<double> angleDiff(i.value("tBody").size());
-    std::adjacent_difference(i.value("tBody").begin(), i.value("tBody").end(), angleDiff.begin(), [](double a, double b) { return Tracking::angleDifference(b, a); });
+    QVector<double> angleDiff(i.value("t" + m_spotSuffix).size());
+    std::adjacent_difference(i.value("t" + m_spotSuffix).begin(), i.value("t" + m_spotSuffix).end(), angleDiff.begin(), [](double a, double b) { return Tracking::angleDifference(b, a); });
+    QVector<double> tDiff(i.value("imageNumber").size());
+    std::adjacent_difference(i.value("imageNumber").begin(), i.value("imageNumber").end(), tDiff.begin());
+    std::transform(angleDiff.begin(), angleDiff.end(), tDiff.begin(), angleDiff.begin(), std::divides<double>{});  // Divide the time distance by the time to account for time gaps
     angleDiff.removeFirst();
     angle.append(angleDiff);
   }
@@ -130,10 +145,10 @@ double AutoLevel::computeStdDistance(const Data &data) {
   QList<int> ids = data.getId(0, data.maxFrameIndex);
   for (const int &a : ids) {
     QMap<QString, QVector<double>> i = data.getDataId(a);
-    QVector<double> xDiff(i.value("xBody").size());
-    std::adjacent_difference(i.value("xBody").begin(), i.value("xBody").end(), xDiff.begin());
-    QVector<double> yDiff(i.value("yBody").size());
-    std::adjacent_difference(i.value("yBody").begin(), i.value("yBody").end(), yDiff.begin());
+    QVector<double> xDiff(i.value("x" + m_spotSuffix).size());
+    std::adjacent_difference(i.value("x" + m_spotSuffix).begin(), i.value("x" + m_spotSuffix).end(), xDiff.begin());
+    QVector<double> yDiff(i.value("y" + m_spotSuffix).size());
+    std::adjacent_difference(i.value("y" + m_spotSuffix).begin(), i.value("y" + m_spotSuffix).end(), yDiff.begin());
     QVector<double> tDiff(i.value("imageNumber").size());
     std::adjacent_difference(i.value("imageNumber").begin(), i.value("imageNumber").end(), tDiff.begin());
     QVector<double> dist(xDiff.size());

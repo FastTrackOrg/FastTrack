@@ -110,7 +110,32 @@
          <string>Tracking parameters</string>
         </attribute>
         <layout class="QGridLayout" name="gridLayout_11">
-         <item row="6" column="0">
+         <item row="4" column="0">
+          <widget class="Line" name="line_9">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+          </widget>
+         </item>
+         <item row="9" column="0">
+          <layout class="QHBoxLayout" name="horizontalLayout_22">
+           <item>
+            <widget class="QLabel" name="label_28">
+             <property name="text">
+              <string>Normalization perimeter (P)</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QDoubleSpinBox" name="normPerim">
+             <property name="maximum">
+              <double>99999.000000000000000</double>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item row="7" column="0">
           <layout class="QHBoxLayout" name="horizontalLayout_12">
            <item>
             <widget class="QLabel" name="label_14">
@@ -131,51 +156,28 @@
            </item>
           </layout>
          </item>
-         <item row="13" column="0">
-          <spacer name="horizontalSpacer_2">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item row="12" column="0">
-          <widget class="Line" name="line_11">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-          </widget>
-         </item>
-         <item row="5" column="0">
-          <layout class="QHBoxLayout" name="horizontalLayout_11">
+         <item row="2" column="0">
+          <layout class="QHBoxLayout" name="horizontalLayout_13">
            <item>
-            <widget class="QLabel" name="label_13">
+            <widget class="QLabel" name="label_15">
              <property name="text">
-              <string>Normalization distance (D): </string>
+              <string>Maximal distance (L): </string>
              </property>
             </widget>
            </item>
            <item>
-            <widget class="QDoubleSpinBox" name="maxL">
+            <widget class="QSpinBox" name="lo">
              <property name="maximum">
-              <double>9999.000000000000000</double>
+              <number>999999</number>
              </property>
              <property name="value">
-              <double>100.000000000000000</double>
+              <number>200</number>
              </property>
             </widget>
            </item>
           </layout>
          </item>
-         <item row="16" column="0">
-          <layout class="QHBoxLayout" name="horizontalLayout_17"/>
-         </item>
-         <item row="17" column="0">
+         <item row="18" column="0">
           <widget class="QTextBrowser" name="textBrowser">
            <property name="html">
             <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
@@ -203,7 +205,64 @@ p, li { white-space: pre-wrap; }
            </property>
           </widget>
          </item>
-         <item row="7" column="0">
+         <item row="13" column="0">
+          <widget class="Line" name="line_11">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="0">
+          <layout class="QHBoxLayout" name="horizontalLayout_11">
+           <item>
+            <widget class="QLabel" name="label_13">
+             <property name="text">
+              <string>Normalization distance (D): </string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QDoubleSpinBox" name="maxL">
+             <property name="maximum">
+              <double>9999.000000000000000</double>
+             </property>
+             <property name="value">
+              <double>100.000000000000000</double>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item row="17" column="0">
+          <layout class="QHBoxLayout" name="horizontalLayout_17"/>
+         </item>
+         <item row="5" column="0">
+          <spacer name="horizontalSpacer">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item row="14" column="0">
+          <spacer name="horizontalSpacer_2">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item row="8" column="0">
           <layout class="QHBoxLayout" name="horizontalLayout_21">
            <item>
             <widget class="QLabel" name="label_19">
@@ -217,36 +276,6 @@ p, li { white-space: pre-wrap; }
              <property name="maximum">
               <double>99999.000000000000000</double>
              </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
-         <item row="15" column="0">
-          <layout class="QHBoxLayout" name="horizontalLayout_15">
-           <item>
-            <widget class="QLabel" name="label_17">
-             <property name="text">
-              <string>Spot to track: </string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QComboBox" name="spot">
-             <item>
-              <property name="text">
-               <string>Head</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>Tail</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>Body</string>
-              </property>
-             </item>
             </widget>
            </item>
           </layout>
@@ -275,14 +304,7 @@ p, li { white-space: pre-wrap; }
            </item>
           </layout>
          </item>
-         <item row="3" column="0">
-          <widget class="Line" name="line_9">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-          </widget>
-         </item>
-         <item row="11" column="0">
+         <item row="12" column="0">
           <widget class="QPushButton" name="levelButton">
            <property name="toolTip">
             <string>Set parameters to a neutral weight, do not replace the manual tuning</string>
@@ -292,54 +314,32 @@ p, li { white-space: pre-wrap; }
            </property>
           </widget>
          </item>
-         <item row="4" column="0">
-          <spacer name="horizontalSpacer">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item row="2" column="0">
-          <layout class="QHBoxLayout" name="horizontalLayout_13">
+         <item row="3" column="0">
+          <layout class="QHBoxLayout" name="horizontalLayout_15">
            <item>
-            <widget class="QLabel" name="label_15">
+            <widget class="QLabel" name="label_17">
              <property name="text">
-              <string>Maximal distance (L): </string>
+              <string>Spot to track: </string>
              </property>
             </widget>
            </item>
            <item>
-            <widget class="QSpinBox" name="lo">
-             <property name="maximum">
-              <number>999999</number>
-             </property>
-             <property name="value">
-              <number>200</number>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
-         <item row="8" column="0">
-          <layout class="QHBoxLayout" name="horizontalLayout_22">
-           <item>
-            <widget class="QLabel" name="label_28">
-             <property name="text">
-              <string>Normalization perimeter (P)</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QDoubleSpinBox" name="normPerim">
-             <property name="maximum">
-              <double>99999.000000000000000</double>
-             </property>
+            <widget class="QComboBox" name="spot">
+             <item>
+              <property name="text">
+               <string>Head</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Tail</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Body</string>
+              </property>
+             </item>
             </widget>
            </item>
           </layout>

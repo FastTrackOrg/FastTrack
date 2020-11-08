@@ -698,7 +698,7 @@ TEST_F(AutoLevelTest, AutoLevel) {
   QMap<QString, double> test = autolevel.level();
   EXPECT_EQ(std::lround(test.value("Normalization area")), 11);
   EXPECT_EQ(std::lround(test.value("Normalization perimeter")), 8);
-  EXPECT_EQ(std::lround(test.value("Maximal angle")), 18);
+  EXPECT_EQ(std::lround(test.value("Maximal angle")), 19);
   EXPECT_EQ(std::lround(test.value("Maximal length")), 2);
 }
 TEST_F(AutoLevelTest, AutoLevelStd) {
