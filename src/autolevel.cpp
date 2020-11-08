@@ -39,7 +39,7 @@ AutoLevel::AutoLevel(const string &path, const UMat &background, const QMap<QStr
   m_path = path;
   m_background = background;
   m_parameters = parameters;
-  m_endImage = -1;  //TODO evaluate the tracking of 10 images to determinate an optimum time for the process
+  m_endImage = 200;
 }
 
 AutoLevel::~AutoLevel() {
