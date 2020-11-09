@@ -41,13 +41,22 @@ Objects are detected by their size. Select the maximum and minimum size of the d
 ## Tune the tracking parameters
 Several parameters can be modified to ensure a good tracking analysis, see [this page](http://www.fasttrack.sh/UserManual/docs/trackingParameters/) for more details:
 
-* Normalization distance (legacy Maximal lenght/ Typical lenght): typical distance traveled between two consecutive images.
-* Normalization angle (legacy Maximal angle/Typical lenght): typical reorientation possible between two consecutive images.
-* Normalization area: typical difference in the area.
-*  Normalization perimeter: typical difference in the perimeter.
+### Hard parameters
+
+Hard parameters have to be set manually by the user:
+
 * Maximal distance: if an object traveled more than this distance between two consecutive images, it will be considered as a new object.
-* Maximal time: number of images an object is allowed to disappear. If an object reappears after this time, it will be considered as a new object.
-* Spot to track: part of the object features used to do the tracking. Select the part that reflects the better the direction of the object. Legacy parameter, head correspond to the smaller mid-part of the object, tail ellipse the wider mid-part og the object and body is the full object.
+* Maximal time: number of images an object is allowed to disappear. If an object reappears after this time, it will be considered as a new object. If the number of objects is constant throughout  the movie, set the Maximal Time equal to the number of frames in the movie.
+* Spot to track: part of the object features used to do the tracking. Select the part that reflects the better the direction of the object. Legacy parameter, head correspond to the smaller mid-part of the object, tail ellipse the wider mid-part of the object and body is the full object.
+
+### Soft parameters
+
+The soft parameters can be leveled automatically by clicking on the Level button. This will automatically compute the soft parameters as each contribution weight one quarter in the total cost. It has to be manually tuning by the user to find the optimal soft parameters with the knowledge of the system. For example, for a system where the direction of the objects is not relevant, the user will select the Normalization angle equal to 0.
+
+* Normalization distance (legacy Maximal length/ Typical length): typical distance traveled between two consecutive images.
+* Normalization angle (legacy Maximal angle/Typical angle): typical reorientation possible between two consecutive images.
+* Normalization area: typical difference in area.
+* Normalization perimeter: typical difference in perimeter.
 
 ## Registration
 The image registration is the process to correct small displacements and rotation of the camera that can occur during the movie. Fast Track provides several methods for registering the movie: 
