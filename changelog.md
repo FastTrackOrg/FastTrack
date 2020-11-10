@@ -1,5 +1,14 @@
 # FastTrack changelog
 
+## 5.2.0
+
+### Fixed
+- Fixed crash when the video file contains illegible frames.
+- Fixed background computation to take all the frames.
+
+### Added
+- Added auto level of the soft tracking parameters.
+
 ## 5.1.7
 
 ### Fixed
