@@ -109,6 +109,7 @@ jobs:
               brew update
               brew install pkg-config
               brew install opencv
+              brew install openssl@1.1
               export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig/
         - name: build
           run: |
