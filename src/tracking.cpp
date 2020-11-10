@@ -237,11 +237,12 @@ UMat Tracking::backgroundExtraction(VideoReader &video, int n, const int method,
   int step = imageCount / n;
   int count = 1;
   int i = 1;
+  int error = 0;
 
   while (i < imageCount) {
     if (i % step == 0) {
       if (!video.getNext(cameraFrameReg)) {
-        emit(forceFinished());
+        error++;
         i++;
         continue;
       }
@@ -278,6 +279,9 @@ UMat Tracking::backgroundExtraction(VideoReader &video, int n, const int method,
   }
   else {
     background.convertTo(background, CV_8U);
+  }
+  if (error > 0) {
+    emit(forceFinished());
   }
   return background;
 }

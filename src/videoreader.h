@@ -41,7 +41,7 @@ class VideoReader : public VideoCapture {
   bool getNext(Mat &destination);
   bool getImage(int index, UMat &destination);
   bool getImage(int index, Mat &destination);
-  unsigned int getImageCount();
+  unsigned int getImageCount() const;
   bool isSequence();
 };
 

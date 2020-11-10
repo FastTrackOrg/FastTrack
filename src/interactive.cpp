@@ -469,6 +469,7 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   connect(tracking, &Tracking::backgroundProgress, ui->backgroundProgressBar, &QProgressBar::setValue);
   connect(tracking, &Tracking::forceFinished, [this]() {
     message("An error occured, at least one image is not readable.");
+    ui->backgroundProgressBar->setValue(ui->backgroundProgressBar->maximum());
   });
 
   // Sets a color map
@@ -728,14 +729,12 @@ void Interactive::computeBackground() {
     // Computes the background without blocking the ui
     QFuture<void> future = QtConcurrent::run([=]() {
       try {
-        ui->slider->setEnabled(false);
         this->setEnabled(false);
         background = tracking->backgroundExtraction(*video, nBack, method, registrationMethod);
       }
       catch (const std::exception &ex) {
         message("An error occurs. Please change the registration method");
       }
-      ui->slider->setEnabled(true);
       isBackground = true;
       ui->isBin->setCheckable(true);
       ui->isSub->setCheckable(true);

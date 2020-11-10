@@ -135,7 +135,7 @@ bool VideoReader::getImage(int index, Mat &destination) {
   * @brief Get the total number of images in the video.
   * @return total number of images.
 */
-unsigned int VideoReader::getImageCount() {
+unsigned int VideoReader::getImageCount() const {
   return static_cast<unsigned int>(get(CAP_PROP_FRAME_COUNT));
 }
 
