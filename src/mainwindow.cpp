@@ -56,6 +56,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 
   QNetworkAccessManager *manager = new QNetworkAccessManager(this);
   connect(manager, &QNetworkAccessManager::finished, [this](QNetworkReply *reply) {
+    if (reply->error() != QNetworkReply::NoError) {
+      return;
+    }
+
     QByteArray downloadedData = reply->readAll();
     reply->deleteLater();
 
@@ -85,7 +89,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
     }
   });
 
-  manager->get(QNetworkRequest(QUrl("http://www.fasttrack.sh/download/FastTrack/platforms.txt")));
+  manager->get(QNetworkRequest(QUrl("https://www.fasttrack.sh/download/FastTrack/platforms.txt")));
 
   QMessageBox *consent = new QMessageBox(this);
   consent->setWindowTitle("Consent");
@@ -95,7 +99,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
   QTimer::singleShot(5000, consent, &QMessageBox::close);
   if (consent->exec() == QMessageBox::Yes) {
     QWebEngineView *view = new QWebEngineView(this);
-    view->setUrl(QUrl("http://www.fasttrack.sh/soft.html"));
+    view->setUrl(QUrl("https://www.fasttrack.sh/soft.html"));
     connect(view->page(), &QWebEnginePage::loadFinished, [this, view]() {
       delete view;
     });
