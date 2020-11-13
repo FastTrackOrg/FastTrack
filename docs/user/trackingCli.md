@@ -8,7 +8,7 @@ sidebar_label: Tracking CLI
 A command line interface is available for MacOs, Linux and by using WSL for Windows. It can be downloaded on [the release page](https://github.com/FastTrackOrg/FastTrack/releases/).
 
 The full list of parameters can be found by calling ```./fasttrack-cli --help```. 
-Parameters can be declared individually by calling ```./fasttrack-cli --path path/to/movie.webm --parameter1 value --parameter2 value``` or in batch with a parameters file ```./fasttrack-cli --path path/to/movie.webm --cfg path/parameters.param```. Note that the path option need to be the first option.
+Parameters can be declared individually by calling ```./fasttrack-cli --path path/to/movie.webm --parameter1 value --parameter2 value``` or in batch with a parameters file ```./fasttrack-cli --path path/to/movie.webm --cfg path/cfg.toml```. Note that the path option need to be the first option.
 
 fasttrack-cli doesn't support natively Windows. The workaround is to use WSL.
 * Install WSL https://docs.microsoft.com/en-us/windows/wsl/install-win10.
@@ -35,6 +35,6 @@ os.system(cmd)
 ```
 import os
 
-cmd = "./fasttrack-cli --path ZFJ_001.avi --cfg Tracking_Result_ZFJ_001/parameters.param"
+cmd = "./fasttrack-cli --path ZFJ_001.avi --cfg Tracking_Result_ZFJ_001/cfg.toml"
 os.system(cmd)
 ```

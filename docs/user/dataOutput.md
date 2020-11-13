@@ -9,7 +9,7 @@ After a tracking analysis (or an analysis preview), FastTrack saves several file
 * *tracking.txt*: the tracking result
 * *annotation.txt*: the annotation
 * *background.pgm*: the background image
-* *parameters.param*: the parameters used for the tracking
+* *cfg.toml*: the parameters used for the tracking
 
 The tracking result file is simply a text file with 20 columns separated by a '\t' character. This file can easily be loaded to subsequent analysis see [this example](http://www.fasttrack.sh/UserManual/blog/2019/06/21/Data-analysis-python/).
 
