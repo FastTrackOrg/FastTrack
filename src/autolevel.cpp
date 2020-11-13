@@ -81,10 +81,10 @@ QMap<QString, double> AutoLevel::level() {
       m_spotSuffix = "Body";
     }
     int counter = 0;
-    while (abs(stdAngle - m_parameters.value("Maximal angle").toDouble()) > 1E-3 && abs(stdDist - m_parameters.value("Maximal length").toDouble()) > 1E-3 && abs(stdArea - m_parameters.value("Normalization area").toDouble()) > 1E-3 && abs(stdPerimeter - m_parameters.value("Normalization area").toDouble()) > 1E-3) {
+    while (abs(stdAngle - m_parameters.value("Maximal angle").toDouble()) > 1E-3 && abs(stdDist - m_parameters.value("Maximal length").toDouble()) > 1E-3 && abs(stdArea - m_parameters.value("Normalization area").toDouble()) > 1E-3 && abs(stdPerimeter - m_parameters.value("Normalization perimeter").toDouble()) > 1E-3) {
       m_parameters.insert("Maximal angle", QString::number(stdAngle));
       m_parameters.insert("Maximal length", QString::number(stdDist));
-      m_parameters.insert("Normalization area ", QString::number(stdArea));
+      m_parameters.insert("Normalization area", QString::number(stdArea));
       m_parameters.insert("Normalization perimeter", QString::number(stdPerimeter));
       Tracking tracking = Tracking(m_path, m_background, 0, m_endImage);
       tracking.updatingParameters(m_parameters);

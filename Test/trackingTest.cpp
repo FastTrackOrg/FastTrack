@@ -696,9 +696,9 @@ TEST_F(AutoLevelTest, AutoLevel) {
 
   AutoLevel autolevel("../dataSet/images/frame_000001.pgm", background, parameters);
   QMap<QString, double> test = autolevel.level();
-  EXPECT_EQ(std::lround(test.value("Normalization area")), 11);
+  EXPECT_EQ(std::lround(test.value("Normalization area")), 10);
   EXPECT_EQ(std::lround(test.value("Normalization perimeter")), 8);
-  EXPECT_EQ(std::lround(test.value("Maximal angle")), 19);
+  EXPECT_EQ(std::lround(test.value("Maximal angle")), 20);
   EXPECT_EQ(std::lround(test.value("Maximal length")), 2);
 }
 TEST_F(AutoLevelTest, AutoLevelStd) {
