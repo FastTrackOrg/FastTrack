@@ -547,6 +547,20 @@ void Interactive::openFolder() {
       isBackground = false;
       reset();
 
+      // Load parameters
+      QFileInfo savingInfo(dir);
+      QString savingFilename = savingInfo.baseName();
+      QString cfgFile = savingInfo.absolutePath();
+      if (video->isSequence()) {
+        cfgFile.append(QString("/Tracking_Result") + QDir::separator() + "cfg.toml");
+      }
+      else {
+        cfgFile.append(QString("/Tracking_Result_") + savingFilename + QDir::separator() + "cfg.toml");
+      }
+      if (QFileInfo(cfgFile).exists()) {
+        loadParameters(cfgFile);
+      }
+
       // Automatic background computation type selection based on the image mean
       int meanValue = int(mean(frame)[0]);
       if (meanValue > 128) {
@@ -1134,4 +1148,47 @@ void Interactive::level() {
     thread->start();
     this->setEnabled(false);
   }
+}
+
+/**
+  * @brief Reads a parameter file, updates parameters.
+*/
+void Interactive::loadParameters(QString path) {
+  QFile parameterFile(path);
+  if (parameterFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+    QTextStream in(&parameterFile);
+    QString line;
+    QStringList parameters;
+    QMap<QString, QString> parameterList;
+    while (in.readLineInto(&line)) {
+      if (line.contains("=")) {
+        parameters = line.split("=", QString::SkipEmptyParts);
+        parameterList.insert(parameters[0].trimmed(), parameters[1].trimmed());
+      }
+    }
+    ui->maxSize->setValue(parameterList.value("maxArea").toInt());
+    ui->minSize->setValue(parameterList.value("minArea").toInt());
+    ui->spot->setCurrentIndex(parameterList.value("spot").toInt());
+    ui->maxL->setValue(parameterList.value("normDist").toDouble());
+    ui->maxT->setValue((M_PI * parameterList.value("normAngle").toDouble() / 180));
+    ui->lo->setValue(parameterList.value("maxDist").toInt());
+    ui->to->setValue(parameterList.value("maxTime").toInt());
+    ui->normArea->setValue(parameterList.value("normArea").toDouble());
+    ui->normPerim->setValue(parameterList.value("normPerim").toDouble());
+
+    ui->threshBox->setValue(parameterList.value("thresh").toInt());
+    ui->nBack->setValue(parameterList.value("nBack").toInt());
+    ui->back->setCurrentIndex(parameterList.value("methBack").toInt());
+    ui->registrationBack->setCurrentIndex(parameterList.value("regBack").toInt());
+    ui->x1->setValue(parameterList.value("xTop").toInt());
+    ui->y1->setValue(parameterList.value("yTop").toInt());
+    ui->x2->setValue(parameterList.value("xBottom").toInt());
+    ui->y2->setValue(parameterList.value("yBottom").toInt());
+    ui->reg->setCurrentIndex(parameterList.value("reg").toInt());
+    ui->backColor->setCurrentIndex(parameterList.value("lightBack").toInt());
+    ui->morphOperation->setCurrentIndex(parameterList.value("morph").toInt());
+    ui->kernelSize->setValue(parameterList.value("morphSize").toInt());
+    ui->kernelType->setCurrentIndex(parameterList.value("morphType").toInt());
+  }
+  parameterFile.close();
 }

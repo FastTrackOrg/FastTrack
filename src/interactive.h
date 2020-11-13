@@ -96,7 +96,7 @@ class Interactive : public QMainWindow {
 
   void loadSettings();
   void saveSettings();
-
+  void loadParameters(QString path);
   void level();
 
  private:
