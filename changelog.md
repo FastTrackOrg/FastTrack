@@ -1,5 +1,17 @@
 # FastTrack changelog
 
+## 5.2.1
+
+### Fixed
+- Fixed normalization parameters convergence.
+
+###Changed
+- Changed parameter.param to cfg.toml that will break the loading of old parameter files.
+
+### Added
+- Added cfg.toml loading in the Interactive panel.
+
+
 ## 5.2.0
 
 ### Fixed
