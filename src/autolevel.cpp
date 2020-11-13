@@ -70,7 +70,7 @@ QMap<QString, double> AutoLevel::level() {
     double stdDist = static_cast<double>(rand() % 500 + 1);
     double stdArea = static_cast<double>(rand() % 500 + 1);
     double stdPerimeter = static_cast<double>(rand() % 500 + 1);
-    int spot = m_parameters.value("Spot to track").toInt();
+    int spot = m_parameters.value("spot").toInt();
     if (spot == 0) {
       m_spotSuffix = "Head";
     }
@@ -81,11 +81,11 @@ QMap<QString, double> AutoLevel::level() {
       m_spotSuffix = "Body";
     }
     int counter = 0;
-    while (abs(stdAngle - m_parameters.value("Maximal angle").toDouble()) > 1E-3 && abs(stdDist - m_parameters.value("Maximal length").toDouble()) > 1E-3 && abs(stdArea - m_parameters.value("Normalization area").toDouble()) > 1E-3 && abs(stdPerimeter - m_parameters.value("Normalization perimeter").toDouble()) > 1E-3) {
-      m_parameters.insert("Maximal angle", QString::number(stdAngle));
-      m_parameters.insert("Maximal length", QString::number(stdDist));
-      m_parameters.insert("Normalization area", QString::number(stdArea));
-      m_parameters.insert("Normalization perimeter", QString::number(stdPerimeter));
+    while (abs(stdAngle - m_parameters.value("normAngle").toDouble()) > 1E-3 && abs(stdDist - m_parameters.value("normDist").toDouble()) > 1E-3 && abs(stdArea - m_parameters.value("normArea").toDouble()) > 1E-3 && abs(stdPerimeter - m_parameters.value("normParam").toDouble()) > 1E-3) {
+      m_parameters.insert("normAngle", QString::number(stdAngle));
+      m_parameters.insert("normDist", QString::number(stdDist));
+      m_parameters.insert("normArea", QString::number(stdArea));
+      m_parameters.insert("normPerim", QString::number(stdPerimeter));
       Tracking tracking = Tracking(m_path, m_background, 0, m_endImage);
       tracking.updatingParameters(m_parameters);
       tracking.startProcess();
@@ -101,11 +101,11 @@ QMap<QString, double> AutoLevel::level() {
       }
     }
     QMap<QString, double> levelParameters;
-    levelParameters.insert("Maximal angle", stdAngle);
-    levelParameters.insert("Maximal length", stdDist);
-    levelParameters.insert("Normalization area", stdArea);
-    levelParameters.insert("Normalization perimeter", stdPerimeter);
-    levelParameters.insert("Iteration number", double(counter));
+    levelParameters.insert("normAngle", stdAngle);
+    levelParameters.insert("normDist", stdDist);
+    levelParameters.insert("normArea", stdArea);
+    levelParameters.insert("normPerim", stdPerimeter);
+    levelParameters.insert("nIterations", double(counter));
     emit(levelParametersChanged(levelParameters));
     emit(finished());
     return levelParameters;

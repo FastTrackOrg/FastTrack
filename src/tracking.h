@@ -92,7 +92,6 @@ class Tracking : public QObject {
   double param_perimeter;                 /*!< Normalization perimeter. */
   double param_lo;                        /*!< Maximal distance allowed by an object to travel during an occlusion event. */
   double param_to;                        /*!< Maximal time. */
-  int param_arrowSize;                    /*!< Size of the arrow in the displayed image. */
   int param_thresh;                       /*!< Value of the threshold to binarize the image. */
   double param_nBackground;               /*!< Number of images to average to compute the background. */
   int param_methodBackground;             /*!< The method used to compute the background. */

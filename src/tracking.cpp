@@ -912,7 +912,7 @@ void Tracking::startProcess() {
     QDir().mkdir(savingPath);
     savingPath.append(QDir::separator());
 
-    QFile parameterFile(savingPath + "parameter.param");
+    QFile parameterFile(savingPath + "cfg.toml");
     if (!parameterFile.open(QFile::WriteOnly | QFile::Text)) {
       QMessageBox errorBox;
       errorBox.setText("You don't have the right to write in the selected folder!");
@@ -920,6 +920,7 @@ void Tracking::startProcess() {
     }
     else {
       QTextStream out(&parameterFile);
+      out << "title = \"FastTrack cfg\"\"\n\n[parameters]\n";
       QList<QString> keyList = parameters.keys();
       for (auto a : keyList) {
         out << a << " = " << parameters.value(a) << endl;
@@ -958,7 +959,7 @@ void Tracking::startProcess() {
     }
     m_outPrev = m_out;
     m_im++;
-    connect(this, SIGNAL(finishedProcessFrame()), this, SLOT(imageProcessing()));
+    connect(this, &Tracking::finishedProcessFrame, this, &Tracking::imageProcessing);
 
     emit(finishedProcessFrame());
   }
@@ -973,31 +974,30 @@ void Tracking::startProcess() {
 */
 void Tracking::updatingParameters(const QMap<QString, QString> &parameterList) {
   parameters = parameterList;
-  param_maxArea = parameterList.value("Maximal size").toInt();
-  param_minArea = parameterList.value("Minimal size").toInt();
-  param_spot = parameterList.value("Spot to track").toInt();
-  param_len = parameterList.value("Maximal length").toDouble();
-  param_angle = (M_PI * parameterList.value("Maximal angle").toDouble() / 180);
-  param_lo = parameterList.value("Maximal occlusion").toDouble();
-  param_to = parameterList.value("Maximal time").toDouble();
-  param_area = parameterList.value("Normalization area").toDouble();
-  param_perimeter = parameterList.value("Normalization perimeter").toDouble();
-  param_arrowSize = parameterList.value("Arrow size").toInt();
+  param_maxArea = parameterList.value("maxArea").toInt();
+  param_minArea = parameterList.value("minArea").toInt();
+  param_spot = parameterList.value("spot").toInt();
+  param_len = parameterList.value("normDist").toDouble();
+  param_angle = (M_PI * parameterList.value("normAngle").toDouble() / 180);
+  param_lo = parameterList.value("maxDist").toDouble();
+  param_to = parameterList.value("maxTime").toDouble();
+  param_area = parameterList.value("normArea").toDouble();
+  param_perimeter = parameterList.value("normPerim").toDouble();
 
-  param_thresh = parameterList.value("Binary threshold").toInt();
-  param_nBackground = parameterList.value("Number of images background").toDouble();
-  param_methodBackground = parameterList.value("Background method").toInt();
-  param_methodRegistrationBackground = parameterList.value("Background registration method").toInt();
-  param_x1 = parameterList.value("ROI top x").toInt();
-  param_y1 = parameterList.value("ROI top y").toInt();
-  param_x2 = parameterList.value("ROI bottom x").toInt();
-  param_y2 = parameterList.value("ROI bottom y").toInt();
+  param_thresh = parameterList.value("thresh").toInt();
+  param_nBackground = parameterList.value("nBack").toDouble();
+  param_methodBackground = parameterList.value("methBack").toInt();
+  param_methodRegistrationBackground = parameterList.value("regBack").toInt();
+  param_x1 = parameterList.value("xTop").toInt();
+  param_y1 = parameterList.value("yTop").toInt();
+  param_x2 = parameterList.value("xBottom").toInt();
+  param_y2 = parameterList.value("yBottom").toInt();
   m_ROI = Rect(param_x1, param_y1, param_x2 - param_x1, param_y2 - param_y1);
-  param_registration = parameterList.value("Registration").toInt();
-  statusBinarisation = (parameterList.value("Light background") == "0") ? true : false;
-  param_morphOperation = parameterList.value("Morphological operation").toInt();
-  param_kernelSize = parameterList.value("Kernel size").toInt();
-  param_kernelType = parameterList.value("Kernel type").toInt();
+  param_registration = parameterList.value("reg").toInt();
+  statusBinarisation = (parameterList.value("lightBack") == "0") ? true : false;
+  param_morphOperation = parameterList.value("morph").toInt();
+  param_kernelSize = parameterList.value("morphSize").toInt();
+  param_kernelType = parameterList.value("morphType").toInt();
 }
 
 /**

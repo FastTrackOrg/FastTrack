@@ -35,9 +35,12 @@ void loadConfig(QString path, QMap<QString, QString> &parameters) {
     QString line;
     QStringList params;
     while (in.readLineInto(&line)) {
-      params = line.split(" = ", QString::SkipEmptyParts);
-      parameters.insert(params[0], params[1]);
+      if (line.contains("=")) {
+        params = line.split("=", QString::SkipEmptyParts);
+        parameters.insert(params[0].trimmed(), params[1].trimmed());
+      }
     }
+    parameters.remove("title");
     parameterFile.close();
   }
 }
@@ -154,64 +157,64 @@ int main(int argc, char **argv) {
 
     switch (c) {
       case 'a':
-        parameters.insert("Maximal size", QString::QString::fromStdString(optarg));
+        parameters.insert("maxArea", QString::QString::fromStdString(optarg));
         break;
       case 'b':
-        parameters.insert("Minimal size", QString::fromStdString(optarg));
+        parameters.insert("minArea", QString::fromStdString(optarg));
         break;
       case 'c':
-        parameters.insert("Spot to track", QString::fromStdString(optarg));
+        parameters.insert("spot", QString::fromStdString(optarg));
         break;
       case 'd':
-        parameters.insert("Maximal length", QString::fromStdString(optarg));
+        parameters.insert("normDist", QString::fromStdString(optarg));
         break;
       case 'e':
-        parameters.insert("Maximal angle", QString::fromStdString(optarg));
+        parameters.insert("normAngle", QString::fromStdString(optarg));
         break;
       case 'g':
-        parameters.insert("Maximal occlusion", QString::fromStdString(optarg));
+        parameters.insert("maxDist", QString::fromStdString(optarg));
         break;
       case 'h':
-        parameters.insert("Maximal time", QString::fromStdString(optarg));
+        parameters.insert("maxTime", QString::fromStdString(optarg));
         break;
       case 'i':
-        parameters.insert("Binary threshold", QString::fromStdString(optarg));
+        parameters.insert("thresh", QString::fromStdString(optarg));
         break;
       case 'j':
-        parameters.insert("Number of images background", QString::fromStdString(optarg));
+        parameters.insert("nBack", QString::fromStdString(optarg));
         break;
       case 'k':
-        parameters.insert("Background method", QString::fromStdString(optarg));
+        parameters.insert("methBack", QString::fromStdString(optarg));
         break;
       case 'l':
-        parameters.insert("Background registration method", QString::fromStdString(optarg));
+        parameters.insert("regBack", QString::fromStdString(optarg));
         break;
       case 'm':
-        parameters.insert("ROI top x", QString::fromStdString(optarg));
+        parameters.insert("xTop", QString::fromStdString(optarg));
         break;
       case 'n':
-        parameters.insert("ROI top y", QString::fromStdString(optarg));
+        parameters.insert("yTop", QString::fromStdString(optarg));
         break;
       case 'o':
-        parameters.insert("ROI bottom x", QString::fromStdString(optarg));
+        parameters.insert("xBottom", QString::fromStdString(optarg));
         break;
       case 'p':
-        parameters.insert("ROI bottom y", QString::fromStdString(optarg));
+        parameters.insert("yBottom", QString::fromStdString(optarg));
         break;
       case 'q':
-        parameters.insert("Registration", QString::fromStdString(optarg));
+        parameters.insert("reg", QString::fromStdString(optarg));
         break;
       case 'r':
-        parameters.insert("Light background", QString::fromStdString(optarg));
+        parameters.insert("lightBack", QString::fromStdString(optarg));
         break;
       case 's':
-        parameters.insert("Morphological operation", QString::fromStdString(optarg));
+        parameters.insert("morph", QString::fromStdString(optarg));
         break;
       case 't':
-        parameters.insert("Kernel size", QString::fromStdString(optarg));
+        parameters.insert("morphSize", QString::fromStdString(optarg));
         break;
       case 'u':
-        parameters.insert("Kernel type", QString::fromStdString(optarg));
+        parameters.insert("morphType", QString::fromStdString(optarg));
         break;
       case 'v':
         parameters.insert("path", QString::fromStdString(optarg));
@@ -220,10 +223,10 @@ int main(int argc, char **argv) {
         parameters.insert("backPath", QString::fromStdString(optarg));
         break;
       case 'y':
-        parameters.insert("Normalization area", QString::fromStdString(optarg));
+        parameters.insert("normArea", QString::fromStdString(optarg));
         break;
       case 'z':
-        parameters.insert("Normalization perimeter", QString::fromStdString(optarg));
+        parameters.insert("normPerim", QString::fromStdString(optarg));
         break;
     }
   }

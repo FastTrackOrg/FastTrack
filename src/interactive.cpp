@@ -795,29 +795,29 @@ void Interactive::selectBackground() {
   * @brief Gets all the tracking parameters from the ui and updates the parameter map that will be passed to the tracking object.
 */
 void Interactive::getParameters() {
-  parameters.insert("Maximal size", QString::number(ui->maxSize->value()));
-  parameters.insert("Minimal size", QString::number(ui->minSize->value()));
-  parameters.insert("Spot to track", QString::number(ui->spot->currentIndex()));
-  parameters.insert("Maximal length", QString::number(ui->maxL->value()));
-  parameters.insert("Maximal angle", QString::number(ui->maxT->value()));
-  parameters.insert("Maximal occlusion", QString::number(ui->lo->value()));
-  parameters.insert("Maximal time", QString::number(ui->to->value()));
-  parameters.insert("Normalization area", QString::number(ui->normArea->value()));
-  parameters.insert("Normalization perimeter", QString::number(ui->normPerim->value()));
+  parameters.insert("maxArea", QString::number(ui->maxSize->value()));
+  parameters.insert("minArea", QString::number(ui->minSize->value()));
+  parameters.insert("spot", QString::number(ui->spot->currentIndex()));
+  parameters.insert("normDist", QString::number(ui->maxL->value()));
+  parameters.insert("normAngle", QString::number(ui->maxT->value()));
+  parameters.insert("maxDist", QString::number(ui->lo->value()));
+  parameters.insert("maxTime", QString::number(ui->to->value()));
+  parameters.insert("normArea", QString::number(ui->normArea->value()));
+  parameters.insert("normPerim", QString::number(ui->normPerim->value()));
 
-  parameters.insert("Binary threshold", QString::number(ui->threshBox->value()));
-  parameters.insert("Number of images background", QString::number(ui->nBack->value()));
-  parameters.insert("Background method", QString::number(ui->back->currentIndex()));
-  parameters.insert("Background registration method", QString::number(ui->registrationBack->currentIndex()));
-  parameters.insert("ROI top x", QString::number(roi.tl().x));
-  parameters.insert("ROI top y", QString::number(roi.tl().y));
-  parameters.insert("ROI bottom x", QString::number(roi.br().x));
-  parameters.insert("ROI bottom y", QString::number(roi.br().y));
-  parameters.insert("Registration", QString::number(ui->reg->currentIndex()));
-  parameters.insert("Morphological operation", QString::number(ui->morphOperation->currentIndex()));
-  parameters.insert("Kernel size", QString::number(ui->kernelSize->value()));
-  parameters.insert("Kernel type", QString::number(ui->kernelType->currentIndex()));
-  parameters.insert("Light background", QString::number(ui->backColor->currentIndex()));
+  parameters.insert("thresh", QString::number(ui->threshBox->value()));
+  parameters.insert("nBack", QString::number(ui->nBack->value()));
+  parameters.insert("methBack", QString::number(ui->back->currentIndex()));
+  parameters.insert("regBack", QString::number(ui->registrationBack->currentIndex()));
+  parameters.insert("xTop", QString::number(roi.tl().x));
+  parameters.insert("yTop", QString::number(roi.tl().y));
+  parameters.insert("xBottom", QString::number(roi.br().x));
+  parameters.insert("yBottom", QString::number(roi.br().y));
+  parameters.insert("reg", QString::number(ui->reg->currentIndex()));
+  parameters.insert("morph", QString::number(ui->morphOperation->currentIndex()));
+  parameters.insert("morphSize", QString::number(ui->kernelSize->value()));
+  parameters.insert("morphType", QString::number(ui->kernelType->currentIndex()));
+  parameters.insert("lightBack", QString::number(ui->backColor->currentIndex()));
 }
 
 /**
@@ -1120,10 +1120,10 @@ void Interactive::level() {
       this->setEnabled(true);
     });
     connect(autolevel, &AutoLevel::levelParametersChanged, this, [this](QMap<QString, double> levelParameters) {
-      ui->maxT->setValue(levelParameters.value("Maximal angle"));
-      ui->maxL->setValue(levelParameters.value("Maximal length"));
-      ui->normArea->setValue(levelParameters.value("Normalization area"));
-      ui->normPerim->setValue(levelParameters.value("Normalization perimeter"));
+      ui->maxT->setValue(levelParameters.value("normAngle"));
+      ui->maxL->setValue(levelParameters.value("normDist"));
+      ui->normArea->setValue(levelParameters.value("normArea"));
+      ui->normPerim->setValue(levelParameters.value("normPerim"));
     });
     connect(autolevel, &AutoLevel::finished, thread, &QThread::quit);
     connect(autolevel, &AutoLevel::finished, autolevel, &AutoLevel::deleteLater);
