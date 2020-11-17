@@ -26,6 +26,15 @@ class AutoLevelTest : public ::testing::Test {
   }
 };
 
+class DataTest : public ::testing::Test {
+ protected:
+  virtual void SetUp() {
+  }
+
+  virtual void TearDown() {
+  }
+};
+
 //Curvature method test
 TEST_F(TrackingTest, CurvatureCenter) {
   Tracking tracking("", "");
@@ -701,10 +710,113 @@ TEST_F(AutoLevelTest, AutoLevel) {
   EXPECT_EQ(std::lround(test.value("normAngle")), 20);
   EXPECT_EQ(std::lround(test.value("normDist")), 2);
 }
+
 TEST_F(AutoLevelTest, AutoLevelStd) {
   QVector<double> test{8.504, 23.595, 81.471, 17.786, 97.959, 50.48, 96.469, 93.478, 79.251, 85.518, 69.064, 84.745, 53.369, 92.446, 86.935, 79.377, 67.804, 16.93, 49.407, 31.369, 16.355, 65.729, 67.652, 92.545, 56.909, 41.386, 6.141, 46.579, 29.573, 92.854, 35.241, 95.463, 42.066, 78.556, 92.12, 67.968, 20.008, 66.805, 63.092, 38.044, 74.936, 63.188, 25.586, 52.291, 41.38, 50.23, 1.072, 71.48, 66.107, 44.628, 42.135, 4.703, 87.119, 80.56, 43.915, 73.213, 86.908, 41.986, 80.081, 75.481, 92.773, 44.169, 29.05, 39.353, 59.543, 30.848, 97.805, 65.71, 90.388, 38.274, 98.07, 1.811, 45.201, 7.668, 91.251, 98.431, 58.871, 36.679, 7.002, 40.137, 37.95, 78.639, 77.687, 73.302, 66.698, 75.623, 61.33, 54.43, 17.075, 56.37, 54.612, 61.175, 53.911, 55.865, 56.265, 96.036, 87.017, 43.591, 60.39, 29.949};
   double sd = AutoLevel::stdev(test);
   EXPECT_EQ(sd, 26.517632067020994);
+}
+
+TEST_F(DataTest, getData) {
+  Data data("../dataSet/images/Groundtruth/Tracking_Result/");
+  QMap<QString, double> test = data.getData(2, 12);
+  EXPECT_EQ(test.value("xHead"), 506.779);
+  test = data.getData(198, 3);
+  EXPECT_EQ(test.value("yHead"), 25.838);
+}
+
+TEST_F(DataTest, getDataId) {
+  Data data("../dataSet/images/Groundtruth/Tracking_Result/");
+  QMap<QString, QVector<double>> test = data.getDataId(12);
+  EXPECT_EQ(test.value("xHead")[2], 506.779);
+  EXPECT_EQ(test.value("xHead")[3], 512.988);
+  EXPECT_EQ(test.value("xHead")[4], 512.512);
+  EXPECT_EQ(test.value("xHead").last(), 360.181);
+}
+
+TEST_F(DataTest, getData_2) {
+  Data data("../dataSet/images/Groundtruth/Tracking_Result/");
+  QVector<object> test = data.getData(2);
+  double testValue;
+  for (auto &a : test) {
+    if (a.id == 12) {
+      testValue = a.data.value("xHead");
+    }
+  }
+  EXPECT_EQ(testValue, 506.779);
+  test = data.getData(198);
+  for (auto &a : test) {
+    if (a.id == 3) {
+      testValue = a.data.value("yHead");
+    }
+  }
+  EXPECT_EQ(testValue, 25.838);
+}
+
+TEST_F(DataTest, swapData) {
+  Data data("../dataSet/images/Groundtruth/Tracking_Result_Copy/");
+  QMap<QString, double> a_prev = data.getData(2, 12);
+  QMap<QString, double> b_prev = data.getData(2, 11);
+  QMap<QString, double> a_next = data.getData(180, 12);
+  QMap<QString, double> b_next = data.getData(180, 11);
+  data.swapData(12, 11, 5);
+  QMap<QString, double> a_prev_test = data.getData(2, 12);
+  QMap<QString, double> b_prev_test = data.getData(2, 11);
+  QMap<QString, double> a_next_test = data.getData(180, 12);
+  QMap<QString, double> b_next_test = data.getData(180, 11);
+  EXPECT_EQ(a_prev, a_prev_test);
+  EXPECT_EQ(b_prev, b_prev_test);
+  EXPECT_EQ(b_next, a_next_test);
+  EXPECT_EQ(a_next, b_next_test);
+}
+
+TEST_F(DataTest, deleteInsertData) {
+  Data data("../dataSet/images/Groundtruth/Tracking_Result_Copy/");
+  QMap<QString, double> a_prev = data.getData(2, 12);
+  QMap<QString, double> a_mid = data.getData(60, 12);
+  QMap<QString, double> a_next = data.getData(100, 12);
+  data.deleteData(12, 40, 80);
+  QMap<QString, double> a_prev_test = data.getData(2, 12);
+  QMap<QString, double> a_mid_test = data.getData(60, 12);
+  QMap<QString, double> a_next_test = data.getData(100, 12);
+  QMap<QString, double> err;
+  err.insert("NAN", -1);
+  EXPECT_EQ(a_prev, a_prev_test);
+  EXPECT_NE(a_mid, err);
+  EXPECT_EQ(a_mid_test, err);
+  EXPECT_EQ(a_next, a_next_test);
+  data.insertData(12, 40, 80);
+  a_mid_test = data.getData(60, 12);
+  EXPECT_EQ(a_mid_test, a_mid);
+}
+
+TEST_F(DataTest, id) {
+  Data data("../dataSet/images/Groundtruth/Tracking_Result/");
+  EXPECT_EQ(data.getId(0, 999), QList({0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13}));
+  EXPECT_EQ(data.getId(29), QList({0, 2, 3, 5, 6, 7, 8, 9, 10, 11, 12, 13}));
+}
+
+TEST_F(DataTest, info) {
+  Data data("../dataSet/images/Groundtruth/Tracking_Result_Copy/");
+  data.deleteData(12, 0, 20);
+  EXPECT_EQ(data.getObjectInformation(12), 21);
+}
+
+TEST_F(DataTest, crossCheck) {
+  Data data("../dataSet/images/Groundtruth/Tracking_Result/");
+  QVector<object> test;
+  test = data.getData(2);
+  for (auto &a : test) {
+    if (a.id == 12) {
+      EXPECT_EQ(a.data, data.getData(2, 12));
+    }
+    if (a.id == 1) {
+      EXPECT_EQ(a.data, data.getData(2, 1));
+    }
+    if (a.id == 7) {
+      EXPECT_EQ(a.data, data.getData(2, 7));
+    }
+  }
 }
 }  // namespace
 

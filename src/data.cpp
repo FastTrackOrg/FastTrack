@@ -31,7 +31,7 @@ This file is part of Fast Track.
  */
 
 /**
-  * @brief Constructs the data object from a tracking result file.
+  * @brief Construct the data object from a tracking result file.
   * @param[in] dataPath Path to the tracking data file.
 */
 Data::Data(QString dataPath) {
@@ -81,7 +81,7 @@ Data::Data(QString dataPath) {
 }
 
 /**
-  * @brief Gets the tracking data at the selected image number for all the objects.
+  * @brief Get the tracking data at the selected image number for all the objects.
   * @param[in] imageIndex The index of the image where to extracts the data.
   * @return The tracking data in a QVector that contains a structure with the Id of the object and data for this object. The data are stored in a QMap<dataName, value>. 
 */
@@ -90,7 +90,7 @@ QVector<object> Data::getData(int imageIndex) const {
 }
 
 /**
-  * @brief Gets the tracking data at the selected image number for one selected object.
+  * @brief Get the tracking data at the selected image number for one selected object.
   * @param[in] imageIndex The index of the image where to extracts the data.
   * @param[in] id The id of the object.
   * @return The tracking data for for the selected object at the selected image. The data are stored in a QMap<dataName, value>. 
@@ -108,6 +108,11 @@ QMap<QString, double> Data::getData(int imageIndex, int id) const {
   return tmp;
 }
 
+/**
+  * @brief Get the tracking data for the selected id.
+  * @param[in] id The id of the object.
+  * @return The tracking data for for the selected object in a map with the key and a vector with the value for all the images.
+*/
 QMap<QString, QVector<double>> Data::getDataId(int id) const {
   QMap<QString, QVector<double>> idData;
   for (int i = 0; i < maxFrameIndex + 1; i++) {
@@ -127,7 +132,7 @@ QMap<QString, QVector<double>> Data::getDataId(int id) const {
 }
 
 /**
-  * @brief Gets the ids of all the objects in the frame.
+  * @brief Get the ids of all the objects in the frame.
   * @arg[in] imageIndex Index of the frame.
   * @return List of indexes.
 */
@@ -141,7 +146,7 @@ QList<int> Data::getId(int imageIndex) const {
 }
 
 /**
-  * @brief Gets the ids of all the objects in several frames.
+  * @brief Get the ids of all the objects in several frames.
   * @arg[in] imageIndexFirst Index of the first frame.
   * @arg[in] imageIndexLast Index of the last frame.
   * @return List of indexes.
@@ -160,7 +165,7 @@ QList<int> Data::getId(int imageIndexFirst, int imageIndexLast) const {
 }
 
 /**
-  * @brief Gets the object's information.
+  * @brief Get the object's information.
   * @arg[in] objectId Id of the object.
   * @return First appearance image index.
 */
@@ -213,7 +218,7 @@ void Data::swapData(int firstObject, int secondObject, int from) {
 }
 
 /**
-  * @brief Deletes the tracking data of one object from a selected index to the end.
+  * @brief Delete the tracking data of one object from a selected index to the end.
   * @arg[in] objectId The object id.
   * @arg[in] from Start index from which the data will be swapped.
   * @arg[in] to End index from which the data will be swapped.
@@ -262,7 +267,7 @@ void Data::insertData(int objectId, int from, int to) {
   save();
 }
 /**
-  * @brief Saves the data in the tracking result file.
+  * @brief Save the data in the tracking result file.
 */
 void Data::save() {
   QFile file(dir + QDir::separator() + "tracking.txt");
