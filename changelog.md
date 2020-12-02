@@ -1,5 +1,10 @@
 # FastTrack changelog
 
+## 5.2.2
+
+### Fixed
+- Fixed video decoding errors by upgrading OpenCv (> 4.5.0).
+
 ## 5.2.1
 
 ### Fixed
@@ -10,7 +15,6 @@
 
 ### Added
 - Added cfg.toml loading in the Interactive panel.
-
 
 ## 5.2.0
 
