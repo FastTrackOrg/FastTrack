@@ -37,7 +37,7 @@ unix:!macx {
 
 win32 {
   QMAKE_CXXFLAGS += /std:c++latest
-  LIBS += -LC:\opencv\build\x64\vc15\lib -lopencv_world430
+  LIBS += -LC:\opencv\build\x64\vc15\lib -lopencv_world450
   INCLUDEPATH += C:\opencv\build\include
   DEPENDPATH += C:\opencv\build\include
 }
