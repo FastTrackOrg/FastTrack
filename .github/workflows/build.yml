@@ -107,6 +107,7 @@ jobs:
         - name: install opencv
           run: |
               brew update
+              brew upgrade
               brew install pkg-config
               brew install opencv
               brew install openssl@1.1
@@ -118,7 +119,7 @@ jobs:
               cd build/
               macdeployqt FastTrack.app -always-overwrite
               wget https://raw.githubusercontent.com/arl/macdeployqtfix/master/macdeployqtfix.py
-              python macdeployqtfix.py FastTrack.app/Contents/MacOS/FastTrack ../../Qt/5.13.2/
+              python2.7 macdeployqtfix.py FastTrack.app/Contents/MacOS/FastTrack ../../Qt/5.15.0/
               hdiutil create -volname FastTrack -srcfolder FastTrack.app -ov -format UDZO FastTrack.dmg
 
 

@@ -71,6 +71,7 @@ jobs:
         - name: install opencv
           run: |
               brew update
+              brew upgrade
               brew install pkg-config
               brew install opencv
               export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig/
@@ -81,7 +82,7 @@ jobs:
               cd build_cli/
               macdeployqt fasttrack-cli.app -always-overwrite
               wget https://raw.githubusercontent.com/arl/macdeployqtfix/master/macdeployqtfix.py
-              python macdeployqtfix.py fasttrack_cli.app/Contents/MacOS/fasttrack-cli ../../Qt/5.13.2/
+              python2.7 macdeployqtfix.py fasttrack_cli.app/Contents/MacOS/fasttrack-cli ../../Qt/5.15.0/
               hdiutil create -volname fasttrack-cli -srcfolder fasttrack-cli.app -ov -format UDZO fasttrack-cli.dmg
 
 
