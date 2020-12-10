@@ -12,9 +12,9 @@ jobs:
         - uses: actions/checkout@v2
         - name: install qt5
           run: |
-             sudo add-apt-repository ppa:beineri/opt-qt-5.14.2-xenial
+             sudo add-apt-repository ppa:beineri/opt-qt-5.15.2-xenial
              sudo apt-get update
-             sudo apt-get install libgl1-mesa-dev qt514base qt514webengine ffmpeg
+             sudo apt-get install libgl1-mesa-dev qt515base qt515webengine ffmpeg
              sudo add-apt-repository ppa:ubuntu-toolchain-r/test
              sudo apt-get update
              sudo apt-get install libavcodec-dev libavformat-dev libswscale-dev
@@ -25,16 +25,16 @@ jobs:
           run: sudo ./dependencies.sh opencv
         - name: build
           run: |
-              export QTDIR=/opt/qt514
-              export PATH=/opt/qt514/bin:$PATH
+              export QTDIR=/opt/qt515
+              export PATH=/opt/qt515/bin:$PATH
               export LD_LIBRARY_PATH=$QT_DIR/lib/x86_64-linux-gnu:$QT_DIR/lib:$LD_LIBRARY_PATH
               ./run.sh cli
               make clean
         - name: appimage
           run: |
               cd build_cli
-              export QTDIR=/opt/qt514
-              export PATH=/opt/qt514/bin:$PATH
+              export QTDIR=/opt/qt515
+              export PATH=/opt/qt515/bin:$PATH
               export LD_LIBRARY_PATH=$QT_DIR/lib/x86_64-linux-gnu:$QT_DIR/lib:$LD_LIBRARY_PATH
               wget -O deploy.AppImage https://github.com/probonopd/linuxdeployqt/releases/download/5/linuxdeployqt-5-x86_64.AppImage
               chmod +x deploy.AppImage
@@ -60,7 +60,6 @@ jobs:
         - uses: actions/checkout@v2
         - uses: jurplel/install-qt-action@v2
           with:
-            version: '5.15.0'
             host: 'mac'
             target: 'desktop'
             dir: '${{ github.workspace }}/Qt/'

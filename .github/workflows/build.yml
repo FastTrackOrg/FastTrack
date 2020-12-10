@@ -63,7 +63,6 @@ jobs:
         - uses: ilammy/msvc-dev-cmd@v1
         - uses: jurplel/install-qt-action@v2
           with:
-            version: '5.15.0'
             host: 'windows'
             target: 'desktop'
             arch: 'win64_msvc2019_64'
@@ -96,7 +95,6 @@ jobs:
         - uses: actions/checkout@v2
         - uses: jurplel/install-qt-action@v2
           with:
-            version: '5.15.0'
             host: 'mac'
             target: 'desktop'
             dir: '${{ github.workspace }}/Qt/'
@@ -110,7 +108,7 @@ jobs:
               brew upgrade
               brew install pkg-config
               brew install opencv
-              brew install openssl@1.1
+              brew install openssl
               export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig/
         - name: build
           run: |
