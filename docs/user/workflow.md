@@ -5,7 +5,7 @@ sidebar_label: Workflow
 ---
 
 ### I have very different movies to track 
-In this case, the best way to use FastTrack is the **Interactive** panel. You can easily find the right set of parameters for each movie with the help of the interactive environment.
+In this case, the best way to use FastTrack is the **Interactive** panel. You can easily find the right set of parameters for each movie with the interactive environment's help.
 
 
 ### I have a large number of similar movies

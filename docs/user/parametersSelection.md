@@ -5,24 +5,24 @@ sidebar_label: Parameters
 ---
 
 ## Setting the parameters
-They are several tricks that can be used to increase tracking accuracy and select the optimal set of parameters.
+They are several tricks that can be used to increase tracking accuracy and select the optimal parameters.
 
 ### Detection
-The detection parameters reject objects that are smaller or bigger than a certain size. To increase the tracking accuracy, we want to reject noise and artifacts, and reject blobs constitute of more of one object. If all the objects are of similar size, these two parameters can be selected easily in four steps:
+The detection parameters reject objects that are smaller or bigger than a specific size. To increase the tracking accuracy, we want to reject noise and artifacts and reject blobs constitute of more of one object. If all the objects are of similar size, these two parameters can be selected easily in four steps:
 
 * Select an image where two objects are in contact forming a single blob.
 * Select the **Maximal Size** parameter just at the limit to reject this blob.
-* Select the **Maximal Size** parameter just at the limit to detect the smaller object of the movie.
+* Select the **Maximal Size** parameter just at the limit to detect the movie's smaller object.
 * Fine tune these parameters to account for size variability across the movie.
 
 ### Tracking
-Tracking parameters are mostly found by trials and errors. But some rules of thumbs can be applied. 
+Tracking parameters are mostly found by trials and errors. However, some rules of thumbs can be applied. 
 
-**Spot to track** has to be set to **Body** for quasi-symmetric objects and low-resolution objects. For deformable objects with enough resolution, select **Head** or **Tail** according to the part that predicts best the traveling direction of the object.
+**Spot to track** has to be set to **Body** for quasi-symmetric objects and low-resolution objects. For deformable objects with enough resolution, select **Head** or **Tail** according to the part that predicts best the object's traveling direction.
 
 ## Parameters file
 For each tracking analysis, FastTrack will save the parameters used in `cfg.toml` that can be reloaded in the software or in fasttrack_cli.
-Before FastTrack version 5.2.1, the software used to saved the parameters in `parameter.param`, these file can be converted as following (left: old file, right: new file):
+Before FastTrack version 5.2.1, the software used to saved the parameters in `parameter.param`, these files can be converted as following (left: old file, right: new file):
 
 ```
                                       title = "FastTrack cfg""

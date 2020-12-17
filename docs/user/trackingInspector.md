@@ -32,27 +32,27 @@ sidebar_label: Tracking Inspector
 * 24: Overlay
 
 
-**The Tracking Inspector** is a tool to display the result of a tracking analysis and to manually correct the tracking if necessary. For example, the user can delete an object to remove an artifact or change the object ID to correct a tracking error. To make the user's life easier, an ergonomic interface with build-in keyboard shortcuts are provided. FastTrack alleviates the tedious work of review and correction, and the user can achieve 100% tracking accuracy rapidly and easily.
+**The Tracking Inspector** is a tool to display the result of a tracking analysis and to correct the tracking manually if necessary. For example, the user can delete an object to remove an artifact or change the object ID to correct a tracking error. To make the user's life easier, an ergonomic interface with build-in keyboard shortcuts are provided. FastTrack alleviates the tedious work of review and correction, and the user can achieve 100% tracking accuracy rapidly and efficiently.
 
 ## Load an image sequence
-To load a tracking analysis previously tracked in FastTrack, click on the **Open Folder** button (1) and select the **Tracking_Result** folder of the analysis to review. In the case where the image sequence was tracked several times, the last tracking analysis is stored in the **Tracking_Result** folder and the previous tracking analysis in the **Tracking_Result_Date** folders.
+To load a tracking analysis previously tracked in FastTrack, click on the **Open Folder** button (1) and select the **Tracking_Result** folder of the analysis to review. If the image sequence was tracked several times, the last tracking analysis is stored in the **Tracking_Result** folder and the previous tracking analysis in the **Tracking_Result_Date** folders.
 Click on the **Reload** button (2) to reload the tracking data if necessary.
 The software can only load a tracking analysis if the folder architecture is preserved, .ie the folder with the image sequence has to have a sub-folder named **Tracking_Result** containing at least the *tracking.txt* file.
 
 ## Display options
 Several tracking overlay options are available on the tracking overlay panel (24):
 
-* Ellipse: display the head, tail and or body ellipses on the tracked objects.
-* Arrows: display an arrow on the head, tail and or body of the tracked object indicating the orientation.
+* Ellipse: display the head, tail, and or body ellipses on the tracked objects.
+* Arrows: display an arrow on the head, tail, and or body of the tracked object indicating the orientation.
 * Numbers: display the ids of the tracked objects.
 * Traces: display the previous 50 positions of the tracked objects.
 * Size: the size of the tracking overlay.
 * Frame rate: display and saving frame rate.
 
-Several useful information on the selected object can be found in the information table (18). The user can go to the image where the object has appeared for the first time by clicking directly on the corresponding cell of the table.
+Several useful information on the selected object can be found in the information table (18). The user can go to the image where the object has appeared for the first time by clicking directly on the table's corresponding cell.
 
 ## Inspect the tracking
-The tracking can be inspected by moving the display cursor (19), see the image number (20) and automatically play the movie (21) at a selected frame rate (22).
+The tracking can be inspected by moving the display cursor (19), see the image number (20), and automatically play the movie (21) at a selected frame rate (22).
 Automatically detected occlusions (overlapped objects) can be reviewed by clicking on the **Previous** (12) and **Next** (13) occlusion buttons (this function is experimental and can miss some occlusions).
 
 ## Annotate the tracking
@@ -91,8 +91,8 @@ A set of keyboard shortcuts are available to speed-up the tracking correction.
 All the changes made in the inspector are automatically saved in the original *tracking.txt* file. 
 
 ## Export a movie
-To export a movie of a tracking analysis, select the desired display overlay and click on the **Save** button (3). Select a folder and a name to save the file, only .avi format is supported.
+To export a movie of a tracking analysis, select the desired display overlay and click on the **Save** button (3). Select a folder and a name to save the file. Only .avi format is supported.
 
-Note: Movie with a large number of objects by frame can be difficult to load and review in the tracking Inspector.
+Note: Movie with many objects by frame can be challenging to load and review in the tracking Inspector.
 
 [See a video demonstration](https://youtu.be/5lhx-r_DHLY)

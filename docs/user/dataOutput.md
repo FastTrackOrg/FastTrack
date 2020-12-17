@@ -219,7 +219,7 @@ Positions are in pixels, in the frame of reference of the original image, zero i
     v  
     y  
 
-**Note:** If several tracking analysis are performed on the same image sequence, the previous folder is not erased, it will be renamed as **Tracking_result_DateOfTheNewAnalysis**.
+**Note:** If several tracking analyses are performed on the same image sequence, the previous folder is not erased. It will be renamed as **Tracking_result_DateOfTheNewAnalysis**.
 
 ## Data analysis
 

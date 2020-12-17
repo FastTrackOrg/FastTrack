@@ -5,12 +5,12 @@ sidebar_label: Tracking CLI
 ---
 
 ## Installing fasttrack-cli
-A command line interface is available for MacOs, Linux and by using WSL for Windows. It can be downloaded on [the release page](https://github.com/FastTrackOrg/FastTrack/releases/).
+A command-line interface is available for macOS, Linux, and by using WSL for Windows. It can be downloaded on [the release page](https://github.com/FastTrackOrg/FastTrack/releases/).
 
 The full list of parameters can be found by calling ```./fasttrack-cli --help```. 
 Parameters can be declared individually by calling ```./fasttrack-cli --path path/to/movie.webm --parameter1 value --parameter2 value``` or in batch with a parameters file ```./fasttrack-cli --path path/to/movie.webm --cfg path/cfg.toml```. Note that the path option need to be the first option.
 
-fasttrack-cli doesn't support natively Windows. The workaround is to use WSL.
+fasttrack-cli does not support Windows natively. The workaround is to use WSL.
 * Install WSL https://docs.microsoft.com/en-us/windows/wsl/install-win10.
 * Install FastTrack in a Linux terminal:
 ```

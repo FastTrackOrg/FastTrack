@@ -4,7 +4,7 @@ title: Tracking parameters
 sidebar_label: Tracking
 ---
 
-In this section, we detail how to select the relevant tracking features to be included in the cost function and how to tune them.
+This section details how to select the relevant tracking features to be included in the cost function and how to tune them.
 
 ## How it works
 FastTrack uses the so-called Hungarian method to solve the assignment problem of each object between two frames. This method is based on minimizing the global cost of the association pairs of objects.
@@ -25,18 +25,18 @@ The best way to set the parameter is to first set the normalization parameters t
 * $A = mean(a_{ij})$ where i and j are the same object.
 * $AR = mean(ar_{ij})$ where i and j are the same object.
 * $P = mean(p_{ij})$ where i and j are the same object.
-In this case, each tracking feature has the same contribution to the cost. To tune the cost function by weighting more (resp. less) a tracking feature, decrease (resp. increase) the normalization parameter of this feature or increase (resp. decrease) all the normalization parameters of the others.
+In this case, each tracking feature has the same contribution to the cost. To tune the cost function by weighting more (resp. less) a tracking feature, decrease (resp. increase) the normalization parameter of this feature, or increase (resp. decrease) all the normalization parameters of the others.
 
 ### Memory and distance
-A parameter of memory named maximal time can be set to account for disappearing objects. If the maximal time is set to m, one object can only disappears during m image, if it reappears after, it will be considered as a new object.
+A parameter of memory named maximal time can be set to account for disappearing objects. If the maximal time is set to m, one object can only disappear during m image. If it reappears after, it will be considered as a new object.
 
 To speed-up the tracking, the maximal distance (L) parameter sets an infinite cost for all the pairs of objects to such as $d_{ij} > L$. In practice, L is corresponding to the maximal distance an object can disappear.
 
 ### Spot
-The spot to track will determine if the distance and the angular difference will be calculated from the head, the tail, or the body of the object. Area and perimeter are always computed from the body. Head is defined as the bigger half of the object, separated alongside the minor axis of the object.
+The spot to track will determine if the distance and the angular difference will be calculated from the head, the tail, or the body of the object. Area and perimeter are always computed from the body. Head is defined as the bigger half of the object, separated alongside the object's minor axis.
 
 ## Conclusion
 Setting the tracking parameters can be tedious. It can be best achieved by trials and errors (see the Preview option in the Interactive panel). to summarize:
 1. Choose the right tracking features.
-2. Set the normalization parameters equal to the mean of the tracking feature, ie the typical value.
+2. Set the normalization parameters equal to the tracking feature's std, ie, the typical value change.
 3. Tune the normalization parameters to increase or decrease the relative weight between each contribution.

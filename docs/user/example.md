@@ -59,7 +59,7 @@ First, download the zip file and extract it. The image sequence is located insid
 
 When the tracking is completed, FastTrack automatically opens the **Tracking Inspector** which allows the user to review and correct the tracking.
 
-With the previous tracking analysis, only 7 corrections and 6 deletions are necessary to achieve a perfect tracking accuracy.
+With the previous tracking analysis, only seven corrections and six deletions are necessary to achieve a perfect tracking accuracy.
 
 | image    | id    | delete    | swap with    |
 | --- | --- | --- | --- |
