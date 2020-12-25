@@ -41,6 +41,7 @@ This file is part of Fast Track.
 Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
                                             ui(new Ui::Interactive) {
   ui->setupUi(this);
+  ui->menuBar->setNativeMenuBar(false);
 
   // Loads settings
   settingsFile = new QSettings("FastTrack", "Benjamin Gallois", this);
