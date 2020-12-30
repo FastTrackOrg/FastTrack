@@ -1,5 +1,18 @@
 # FastTrack changelog
 
+## 5.2.3
+
+### Fixed
+- Fixed Replay panel objects' selection not working inside the Interactive panel.
+- Fixed configuration loading in the Interactive panel.
+- Update Qt for Windows and Mac to the latest LTS.
+
+### Added
+- Added errors message and log.
+
+### Changed
+- Changed behavior when images are not readable, they are now skipped and index added to the error log and message.
+
 ## 5.2.2
 
 ### Fixed
