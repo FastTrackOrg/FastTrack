@@ -51,7 +51,7 @@ class AutoLevel : public QObject {
   QMap<QString, double> level();
 
  signals:
-  void forceFinished();
+  void forceFinished(QString message);
   void levelParametersChanged(QMap<QString, double>);
   void finished();
 };

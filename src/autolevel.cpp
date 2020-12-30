@@ -111,7 +111,7 @@ QMap<QString, double> AutoLevel::level() {
     return levelParameters;
   }
   catch (...) {
-    emit(forceFinished());
+    emit(forceFinished("Autoleveling not converging"));
     QMap<QString, double> levelParameters;
     return levelParameters;
   }

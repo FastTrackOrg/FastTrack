@@ -246,8 +246,8 @@ int main(int argc, char **argv) {
   QObject::connect(tracking, &Tracking::finished, []() {
     cout << "Tracking ended normally" << endl;
   });
-  QObject::connect(tracking, &Tracking::forceFinished, []() {
-    cout << "An error occurs during the tracking" << endl;
+  QObject::connect(tracking, &Tracking::forceFinished, [](QString message) {
+    cout << message.toStdString() << endl;
   });
 
   tracking->updatingParameters(parameters);

@@ -66,11 +66,13 @@ class Tracking : public QObject {
 
   VideoReader *video;
   int m_im;                       /*!< Index of the next image to process in the m_files list. */
+  QString m_error;                /*!< QString containing unreadable images. */
   int m_startImage;               /*!< Index of the next image to process in the m_files list. */
   int m_stopImage;                /*!< Index of the next image to process in the m_files list. */
   Rect m_ROI;                     /*!< Rectangular region of interest. */
   QTextStream m_savefile;         /*!< Stream to output tracking data. */
   QFile m_outputFile;             /*!< Path to the file where to save tracking data. */
+  QFile m_logFile;                /*!< Path to the file where to save logs. */
   vector<cv::String> m_files;     /*!< Vector containing the path for each image in the images sequence. */
   vector<Point3i> m_colorMap;     /*!< Vector containing RBG color. */
   vector<vector<Point>> m_memory; /*!< Vector containing the last 50 tracking data. */
@@ -165,7 +167,7 @@ class Tracking : public QObject {
   /**
   * @brief Emitted when a crash occurs during the analysis.
   */
-  void forceFinished();
+  void forceFinished(QString message);
 
   /**
   * @brief Emitted when an error occurs.

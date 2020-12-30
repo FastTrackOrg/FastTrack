@@ -281,7 +281,7 @@ UMat Tracking::backgroundExtraction(VideoReader &video, int n, const int method,
     background.convertTo(background, CV_8U);
   }
   if (error > 0) {
-    emit(forceFinished());
+    emit(forceFinished("Background computation error: " + QString::number(error) + " images can not be read. The background was computed ignoring them"));
   }
   return background;
 }
@@ -723,8 +723,10 @@ void Tracking::imageProcessing() {
     try {
       // Reads the next image in the image sequence and applies the image processing workflow
       if (!video->getNext(m_visuFrame)) {
-        emit(forceFinished());
-        break;
+        m_error += QString::number(m_im) + ", ";
+        m_im++;
+        emit(progress(m_im));
+        continue;
       }
       if (param_registration != 0) {
         registration(m_background, m_visuFrame, param_registration - 1);
@@ -787,14 +789,23 @@ void Tracking::imageProcessing() {
     catch (...) {
       m_savefile.flush();
       m_outputFile.close();
-      emit(forceFinished());
+      m_logFile.close();
+      emit(forceFinished("Fatal error during the processing of the image " + QString::number(m_im)));
       break;
     }
   }
-  m_savefile.flush();
-  m_outputFile.close();
-  emit(finished());
-  emit(statistic(timer->elapsed()));
+  if (m_error.isEmpty()) {
+    m_savefile.flush();
+    m_outputFile.close();
+    emit(finished());
+    emit(statistic(timer->elapsed()));
+  }
+  else {
+    m_savefile.flush();
+    m_outputFile.close();
+    emit(forceFinished("Images " + m_error + " where skipped because unreadable"));
+    emit(statistic(timer->elapsed()));
+  }
 }
 
 /**
@@ -833,7 +844,7 @@ Tracking::Tracking(string path, UMat background, int startImage, int stopImage) 
 void Tracking::startProcess() {
   try {
     if (!video->isOpened()) {
-      emit(forceFinished());
+      emit(forceFinished("Fatal error, the video can be opened"));
       return;
     }
     timer = new QElapsedTimer();
@@ -847,7 +858,7 @@ void Tracking::startProcess() {
         m_background = backgroundExtraction(*video, static_cast<int>(param_nBackground), param_methodBackground, param_methodRegistrationBackground);
       }
       catch (...) {
-        emit(forceFinished());
+        emit(forceFinished("Fatal error during background computation"));
         return;
       }
     }
@@ -859,7 +870,7 @@ void Tracking::startProcess() {
         subtract(test, m_background, test);
       }
       catch (...) {
-        emit(forceFinished());
+        emit(forceFinished("Select background image has the wrong size"));
         return;
       }
     }
@@ -935,8 +946,20 @@ void Tracking::startProcess() {
       msgBox.setText("Permission denied to write in the folder");
       msgBox.exec();
     }
-
     m_savefile.setDevice(&m_outputFile);
+
+    m_logFile.setFileName(savingPath + "log");
+    if (!m_logFile.open(QFile::WriteOnly | QFile::Text)) {
+      QMessageBox msgBox;
+      msgBox.setText("Permission denied to write in the folder");
+      msgBox.exec();
+    }
+    else {
+      connect(this, &Tracking::forceFinished, [this](QString message) {
+        QTextStream out(&m_logFile);
+        out << QDate::currentDate().toString("dd-MMM-yyyy-") + QTime::currentTime().toString("hh-mm-ss") + '\t' + message.toLower() + '\n';
+      });
+    }
 
     // Saving
 
@@ -964,7 +987,7 @@ void Tracking::startProcess() {
     emit(finishedProcessFrame());
   }
   catch (...) {
-    emit(forceFinished());
+    emit(forceFinished("Fatal error, tracking initialization failed"));
   }
 }
 

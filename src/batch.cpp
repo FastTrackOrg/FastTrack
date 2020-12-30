@@ -439,12 +439,12 @@ void Batch::startTracking() {
       });
       connect(tracking, &Tracking::finished, thread, &QThread::quit);
       connect(tracking, &Tracking::finished, tracking, &Tracking::deleteLater);
-      connect(tracking, &Tracking::forceFinished, progressBar, [this, progressBar, count, logMap]() {
+      connect(tracking, &Tracking::forceFinished, progressBar, [this, progressBar, count, logMap](QString errorMessage) {
         ui->tablePath->item(currentPathCount, 4)->setText("Error");
         ;
         currentPathCount++;
         emit(next());
-        logMap->insert("status", "Error");
+        logMap->insert("status", errorMessage);
         emit(log(*logMap));
       });
       connect(tracking, &Tracking::statistic, [this, logMap](int time) {

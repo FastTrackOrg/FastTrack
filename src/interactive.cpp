@@ -335,7 +335,9 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
 
   connect(this, &Interactive::message, this, [this](QString msg) {
     QMessageBox msgBox;
-    msgBox.setText(msg);
+    msgBox.setIcon(QMessageBox::Critical);
+    msgBox.setText("Error");
+    msgBox.setInformativeText(msg);
     msgBox.exec();
   });
 
@@ -468,8 +470,8 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   isBackground = false;
   tracking = new Tracking("", "");
   connect(tracking, &Tracking::backgroundProgress, ui->backgroundProgressBar, &QProgressBar::setValue);
-  connect(tracking, &Tracking::forceFinished, [this]() {
-    message("An error occured, at least one image is not readable.");
+  connect(tracking, &Tracking::forceFinished, [this](QString errorMessage) {
+    message(errorMessage);
     ui->backgroundProgressBar->setValue(ui->backgroundProgressBar->maximum());
   });
 
@@ -843,12 +845,6 @@ void Interactive::previewTracking() {
 
     connect(thread, &QThread::started, tracking, &Tracking::startProcess);
     connect(tracking, &Tracking::progress, ui->progressBar, &QProgressBar::setValue);
-    connect(tracking, &Tracking::forceFinished, [this]() {
-      ui->slider->setDisabled(false);
-      ui->previewButton->setDisabled(false);
-      ui->trackButton->setDisabled(false);
-      message("An error occurs during the tracking.");
-    });
     connect(tracking, &Tracking::statistic, [this](int time) {
       ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Analysis rate", Qt::MatchExactly)[0]), 1)->setText(QString::number(double(ui->stopImage->value() * 1000) / double(time)));
     });
@@ -858,12 +854,14 @@ void Interactive::previewTracking() {
       ui->trackButton->setDisabled(false);
       replayAction->setChecked(true);
     });
-    connect(tracking, &Tracking::forceFinished, this, [this]() {
+    connect(tracking, &Tracking::forceFinished, this, [this](QString errorMessage) {
       ui->slider->setDisabled(false);
       ui->previewButton->setDisabled(false);
       ui->trackButton->setDisabled(false);
+      message(errorMessage);
     });
-    connect(tracking, &Tracking::finished, thread, &QThread::quit);
+    connect(tracking, &Tracking::forceFinished, thread, &QThread::quit);
+    connect(tracking, &Tracking::forceFinished, tracking, &Tracking::deleteLater);
     connect(tracking, &Tracking::finished, tracking, &Tracking::deleteLater);
     connect(thread, &QThread::finished, thread, &QThread::deleteLater);
 
@@ -894,18 +892,19 @@ void Interactive::track() {
     tracking->moveToThread(thread);
 
     connect(thread, &QThread::started, tracking, &Tracking::startProcess);
-    connect(tracking, &Tracking::forceFinished, [this, logMap]() {
-      ui->slider->setDisabled(false);
-      ui->previewButton->setDisabled(false);
-      ui->trackButton->setDisabled(false);
-      logMap->insert("status", "Error");
-      emit(log(*logMap));
-      message("An error occurs during the tracking.");
-    });
     connect(tracking, &Tracking::progress, ui->progressBar, &QProgressBar::setValue);
     connect(tracking, &Tracking::statistic, [this, logMap](int time) {
       ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Analysis rate", Qt::MatchExactly)[0]), 1)->setText(QString::number(double(video->getImageCount() * 1000) / double(time)));
       logMap->insert("time", QString::number(time));
+    });
+    connect(tracking, &Tracking::forceFinished, this, [this, logMap](QString errorMessage) {
+      ui->slider->setDisabled(false);
+      ui->previewButton->setDisabled(false);
+      ui->trackButton->setDisabled(false);
+      replayAction->setChecked(true);
+      logMap->insert("status", errorMessage);
+      emit(log(*logMap));
+      message(errorMessage);
     });
     connect(tracking, &Tracking::finished, thread, &QThread::quit);
     connect(tracking, &Tracking::finished, this, [this, logMap]() {
@@ -914,14 +913,6 @@ void Interactive::track() {
       ui->trackButton->setDisabled(false);
       replayAction->setChecked(true);
       logMap->insert("status", "Done");
-      emit(log(*logMap));
-    });
-    connect(tracking, &Tracking::forceFinished, this, [this, logMap]() {
-      ui->slider->setDisabled(false);
-      ui->previewButton->setDisabled(false);
-      ui->trackButton->setDisabled(false);
-      replayAction->setChecked(true);
-      logMap->insert("status", "Error");
       emit(log(*logMap));
     });
     connect(tracking, &Tracking::forceFinished, thread, &QThread::quit);
@@ -1118,9 +1109,9 @@ void Interactive::level() {
     autolevel->moveToThread(thread);
 
     connect(thread, &QThread::started, autolevel, &AutoLevel::level);
-    connect(autolevel, &AutoLevel::forceFinished, [this]() {
+    connect(autolevel, &AutoLevel::forceFinished, [this](QString errorMessage) {
       this->setEnabled(true);
-      message("An error occurs please check your file.");
+      message(errorMessage);
     });
     connect(autolevel, &AutoLevel::finished, this, [this]() {
       this->setEnabled(true);
