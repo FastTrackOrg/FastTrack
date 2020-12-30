@@ -561,15 +561,6 @@ void Interactive::openFolder() {
       if (QFileInfo(cfgFile).exists()) {
         loadParameters(cfgFile);
       }
-
-      // Automatic background computation type selection based on the image mean
-      int meanValue = int(mean(frame)[0]);
-      if (meanValue > 128) {
-        ui->back->setCurrentIndex(0);
-      }
-      else {
-        ui->back->setCurrentIndex(1);
-      }
       if (video->isOpened()) {
         videoStatus = true;
       }
