@@ -38,8 +38,8 @@ using namespace std;
  *
 */
 
-Replay::Replay(QWidget* parent, bool standalone) : QMainWindow(parent),
-                                                   ui(new Ui::Replay) {
+Replay::Replay(QWidget* parent, bool standalone, Timeline* slider) : QMainWindow(parent),
+                                                                     ui(new Ui::Replay) {
   ui->setupUi(this);
   ui->replayDisplay->setAttribute(Qt::WA_Hover);
 
@@ -235,6 +235,7 @@ Replay::Replay(QWidget* parent, bool standalone) : QMainWindow(parent),
 
   if (!standalone) {
     ui->controls->hide();
+    ui->replaySlider = slider;
   }
 
   // Install event filters

@@ -388,7 +388,7 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   });
 
   // Replay tab
-  replay = new Replay(this, false);
+  replay = new Replay(this, false, ui->slider);
   connect(ui->interactiveTab, &QTabWidget::tabCloseRequested, [this](int index) {
     if (index != 0) {
       ui->interactiveTab->removeTab(index);

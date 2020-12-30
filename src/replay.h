@@ -73,7 +73,7 @@ class Replay : public QMainWindow {
   Q_OBJECT
 
  public:
-  explicit Replay(QWidget *parent = nullptr, bool standalone = true);
+  explicit Replay(QWidget *parent = nullptr, bool standalone = true, Timeline *slider = nullptr);
   ~Replay();
 
  private:
