@@ -377,16 +377,6 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
     }
   });
 
-  // Sets the roi limits
-  connect(ui->x2, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [this](int value) {
-    ui->x1->setMaximum(value - 1);
-    ui->x1->setMinimum(0);
-  });
-  connect(ui->y2, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [this](int value) {
-    ui->y1->setMaximum(value - 1);
-    ui->y1->setMinimum(0);
-  });
-
   // Replay tab
   replay = new Replay(this, false, ui->slider);
   connect(ui->interactiveTab, &QTabWidget::tabCloseRequested, [this](int index) {
@@ -539,8 +529,10 @@ void Interactive::openFolder() {
       originalImageSize.setHeight(frame.rows);
       cropedImageSize.setWidth(originalImageSize.width());
       cropedImageSize.setHeight(originalImageSize.height());
-      ui->x2->setMaximum(frame.cols);
-      ui->y2->setMaximum(frame.rows);
+      ui->x1->setMaximum(originalImageSize.width());
+      ui->y1->setMaximum(originalImageSize.height());
+      ui->x2->setMaximum(originalImageSize.width());
+      ui->y2->setMaximum(originalImageSize.height());
 
       ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Path", Qt::MatchExactly)[0]), 1)->setText(dir);
       ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Image number", Qt::MatchExactly)[0]), 1)->setText(QString::number(video->getImageCount()));
@@ -567,6 +559,7 @@ void Interactive::openFolder() {
         videoStatus = true;
       }
       display(0);
+      crop();
     }
     // If an error occurs during the opening, resets the information table and warns the user
     catch (...) {
@@ -967,10 +960,31 @@ bool Interactive::eventFilter(QObject *target, QEvent *event) {
         ui->display->setPixmap(tmpImage);
 
         // Updates ui value
-        ui->x1->setValue(clicks.first.x());
-        ui->y1->setValue(clicks.first.y());
-        ui->x2->setValue(clicks.second.x());
-        ui->y2->setValue(clicks.second.y());
+        // Find the rectangle top corner
+        int xTop, yTop, xBottom, yBottom;
+        if (clicks.first.y() < clicks.second.y()) {
+          xTop = clicks.first.x();
+          yTop = clicks.first.y();
+          xBottom = clicks.second.x();
+          yBottom = clicks.second.y();
+        }
+        else {
+          xBottom = clicks.first.x();
+          yBottom = clicks.first.y();
+          xTop = clicks.second.x();
+          yTop = clicks.second.y();
+        }
+        // Find the left corner of the rectangle
+        int width = xBottom - xTop;
+        if (width < 0) {
+          xTop += width;
+          xBottom -= width;
+        }
+        // Converts clicks from display widget frame of reference to original image frame of reference
+        ui->x1->setValue(int(double(xTop) * double(cropedImageSize.height()) / double(resizedFrame.height()) + roi.tl().x));
+        ui->y1->setValue(int(double(yTop) * double(cropedImageSize.height()) / double(resizedFrame.height()) + roi.tl().y));
+        ui->x2->setValue(int(double(xBottom) * double(cropedImageSize.height()) / double(resizedFrame.height()) + roi.tl().x));
+        ui->y2->setValue(int(double(yBottom) * double(cropedImageSize.height()) / double(resizedFrame.height()) + roi.tl().y));
       }
     }
   }
@@ -1020,25 +1034,14 @@ bool Interactive::eventFilter(QObject *target, QEvent *event) {
    * @brief Crops the image from a rectangle drawed by the user with the mouse on the display. Triggered when the QPushButton ui->crop is clicked.
  */
 void Interactive::crop() {
-  // Converts clicks from display widget frame of reference to original image frame of reference
-  int xTop = int(double(clicks.first.x()) * double(cropedImageSize.height()) / double(resizedFrame.height()) + roi.tl().x);
-  int yTop = int(double(clicks.first.y()) * double(cropedImageSize.height()) / double(resizedFrame.height()) + roi.tl().y);
-  int xBottom = int(double(clicks.second.x()) * double(cropedImageSize.height()) / double(resizedFrame.height()) + roi.tl().x);
-  int yBottom = int(double(clicks.second.y()) * double(cropedImageSize.height()) / double(resizedFrame.height()) + roi.tl().y);
-
-  // Find the true left corner of the rectangle
-  int width = xBottom - xTop;
-  int height = yBottom - yTop;
-  if (width < 0) {
-    xTop += width;
-    width = -width;
-  }
-  if (height < 0) {
-    yTop += height;
-    height = -height;
-  }
+  int xTop = ui->x1->value();
+  int yTop = ui->y1->value();
+  int xBottom = ui->x2->value();
+  int yBottom = ui->y2->value();
 
   //Checks for wrong values
+  int width = xBottom - xTop;
+  int height = yBottom - yTop;
   if (xTop < roi.tl().x) xTop = roi.tl().x;
   if (yTop < roi.tl().y) yTop = roi.tl().y;
   if (width > cropedImageSize.width() - xTop + roi.tl().x) width = cropedImageSize.width() - xTop + roi.tl().x;
@@ -1050,6 +1053,16 @@ void Interactive::crop() {
   ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Image width", Qt::MatchExactly)[0]), 1)->setText(QString::number(roi.width));
   ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Image height", Qt::MatchExactly)[0]), 1)->setText(QString::number(roi.height));
   display(ui->slider->value());
+
+  // Sets the roi limits
+  ui->x1->setMaximum(roi.tl().x + roi.width);
+  ui->y1->setMaximum(roi.tl().y + roi.height);
+  ui->x2->setMaximum(roi.tl().x + roi.width);
+  ui->y2->setMaximum(roi.tl().y + roi.height);
+  ui->x1->setMinimum(roi.tl().x);
+  ui->y1->setMinimum(roi.tl().y);
+  ui->x2->setMinimum(roi.tl().x);
+  ui->y2->setMinimum(roi.tl().y);
 }
 
 /**
@@ -1058,6 +1071,14 @@ void Interactive::crop() {
 void Interactive::reset() {
   cropedImageSize.setWidth(originalImageSize.width());
   cropedImageSize.setHeight(originalImageSize.height());
+  ui->x1->setMaximum(originalImageSize.width());
+  ui->y1->setMaximum(originalImageSize.height());
+  ui->x2->setMaximum(originalImageSize.width());
+  ui->y2->setMaximum(originalImageSize.height());
+  ui->x1->setMinimum(0);
+  ui->y1->setMinimum(0);
+  ui->x2->setMinimum(0);
+  ui->y2->setMinimum(0);
   ui->x1->setValue(0);
   ui->y1->setValue(0);
   ui->x2->setValue(originalImageSize.width());
