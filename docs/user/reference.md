@@ -6,7 +6,7 @@ sidebar_label: Reference
 
 ## Want to cite FastTrack
 
-* ["Benjamin Gallois, Raphaël Candelier "FastTrack: an open-source software for tracking varying numbers of deformable objects](https://arxiv.org/abs/2011.06837)
+* [Gallois, Benjamin, and Raphaël Candelier. "FastTrack: An open-source software for tracking varying numbers of deformable objects." PLOS Computational Biology 17.2 (2021): e1008697.](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1008697)
 
 ## Papers that use FastTrack
 
