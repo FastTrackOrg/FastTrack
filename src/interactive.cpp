@@ -787,7 +787,7 @@ void Interactive::selectBackground() {
     }
     else {
       isBackground = false;
-      emit(message("No image found."));
+      emit(message("The width or height of the background image does not match the video width or height."));
     }
   }
 }
