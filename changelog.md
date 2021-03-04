@@ -1,5 +1,12 @@
 # FastTrack changelog
 
+## 5.2.4
+
+### Fixed
+- ROI loading from cfg file.
+- Crashing when accessing image.
+- Clearer error when input background image not matching video size.
+
 ## 5.2.3
 
 ### Fixed
@@ -23,7 +30,7 @@
 ### Fixed
 - Fixed normalization parameters convergence.
 
-###Changed
+### Changed
 - Changed parameter.param to cfg.toml that will break the loading of old parameter files.
 
 ### Added
