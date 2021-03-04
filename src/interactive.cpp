@@ -673,6 +673,9 @@ void Interactive::display(int index, int scale) {
   * @brief Zooms in the display.
 */
 void Interactive::zoomIn() {
+  if (!isEnabled()) {
+    return;
+  }
   currentZoom = abs(currentZoom);
   if (currentZoom < 3.75) {
     currentZoom += 0.25;
@@ -685,6 +688,9 @@ void Interactive::zoomIn() {
   * @brief Zooms out the display.
 */
 void Interactive::zoomOut() {
+  if (!isEnabled()) {
+    return;
+  }
   currentZoom = abs(currentZoom);
   if (currentZoom > 0.25) {
     currentZoom -= 0.25;
