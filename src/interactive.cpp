@@ -332,6 +332,7 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
     aboutBox.setText("FastTrack is a desktop tracking software, easy to install, easy to use, and performant.<br>Created and maintained by Benjamin Gallois.<br>Distributed under the terms of the <a href='https://www.gnu.org/licenses/gpl-3.0'>GPL3.0 license</a>.<br>");
     aboutBox.exec();
   });
+  connect(ui->actionAboutQt, &QAction::triggered, qApp, &QApplication::aboutQt);
 
   connect(this, &Interactive::message, this, [this](QString msg) {
     QMessageBox msgBox;
