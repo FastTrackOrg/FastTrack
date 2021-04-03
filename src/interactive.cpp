@@ -1181,7 +1181,7 @@ void Interactive::loadParameters(QString path) {
     ui->minSize->setValue(parameterList.value("minArea").toInt());
     ui->spot->setCurrentIndex(parameterList.value("spot").toInt());
     ui->maxL->setValue(parameterList.value("normDist").toDouble());
-    ui->maxT->setValue((M_PI * parameterList.value("normAngle").toDouble() / 180));
+    ui->maxT->setValue(parameterList.value("normAngle").toDouble());
     ui->lo->setValue(parameterList.value("maxDist").toInt());
     ui->to->setValue(parameterList.value("maxTime").toInt());
     ui->normArea->setValue(parameterList.value("normArea").toDouble());
