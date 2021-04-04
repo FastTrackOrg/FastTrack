@@ -44,7 +44,7 @@ using namespace std;
   * @param[in] head The parameters of the head ellipse: coordinate and direction of the major axis.
   * @return Coordinate of the curvature center.
 */
-Point2d Tracking::curvatureCenter(const Point3d &tail, const Point3d &head) {
+Point2d Tracking::curvatureCenter(const Point3d &tail, const Point3d &head) const {
   Point2d center;
 
   // Computes the equation of the slope of the two minors axis of each ellipse
@@ -87,7 +87,7 @@ Point2d Tracking::curvatureCenter(const Point3d &tail, const Point3d &head) {
 	* @param[in] image Binary image CV_8U.
   * @return Radius of curvature.
 */
-double Tracking::curvature(Point2d center, const Mat &image) {
+double Tracking::curvature(Point2d center, const Mat &image) const {
   double d = 0;
   double count = 0;
 
@@ -116,7 +116,7 @@ double Tracking::modul(double angle) {
   * @param[in] a Divisor.
   * @return Division result, 0 if b = 0.
 */
-double Tracking::divide(double a, double b) {
+double Tracking::divide(double a, double b) const {
   if (b != 0) {
     return a / b;
   }
@@ -143,7 +143,7 @@ double Tracking::angleDifference(double alpha, double beta) {
   * @return The equivalent ellipse parameters: the object center of mass coordinate and its orientation.
   * @note: This function computes the object orientation, not its direction.
 */
-vector<double> Tracking::objectInformation(const UMat &image) {
+vector<double> Tracking::objectInformation(const UMat &image) const {
   Moments moment = moments(image);
 
   double x = moment.m10 / moment.m00;
@@ -171,7 +171,7 @@ vector<double> Tracking::objectInformation(const UMat &image) {
   * @param[in, out] information The parameters of the object (x coordinate, y coordinate, orientation).
   * @return True if the direction angle is the orientation angle. False if the direction angle is the orientation angle plus pi.
 */
-bool Tracking::objectDirection(const UMat &image, vector<double> &information) {
+bool Tracking::objectDirection(const UMat &image, vector<double> &information) const {
   // Computes the distribution of the image on the horizontal axis.
 
   vector<double> projection;
@@ -214,7 +214,7 @@ bool Tracking::objectDirection(const UMat &image, vector<double> &information) {
   * @return The background image.
   TO DO: currently opening all the frames, to speed-up the process and if step is large can skip frames by replacing nextImage by getImage.
 */
-UMat Tracking::backgroundExtraction(VideoReader &video, int n, const int method, const int registrationMethod) {
+UMat Tracking::backgroundExtraction(VideoReader &video, int n, const int method, const int registrationMethod) const {
   int imageCount = video.getImageCount();
   if (n > imageCount) {
     n = imageCount;
@@ -292,7 +292,7 @@ UMat Tracking::backgroundExtraction(VideoReader &video, int n, const int method,
   * @param[in, out] frame The image to register.
   * @param[in] method The method of registration: 0 = simple (phase correlation), 1 = ECC, 2 = Features based.
 */
-void Tracking::registration(UMat imageReference, UMat &frame, const int method) {
+void Tracking::registration(UMat imageReference, UMat &frame, const int method) const {
   switch (method) {
     // Simple registration by phase correlation
     case 0: {
@@ -379,7 +379,7 @@ void Tracking::registration(UMat imageReference, UMat &frame, const int method) 
   * @param[in] backgroundColor If equals to 'w' the thresholded image will be inverted, if equal to 'b' it will not be inverted.
   * @param[in] value The value at which to threshold the image.
 */
-void Tracking::binarisation(UMat &frame, char backgroundColor, int value) {
+void Tracking::binarisation(UMat &frame, char backgroundColor, int value) const {
   frame.convertTo(frame, CV_8U);
 
   if (backgroundColor == 'b') {
@@ -398,7 +398,7 @@ void Tracking::binarisation(UMat &frame, char backgroundColor, int value) {
   * @param[in] maxSize: The maximal size of an object.
   * @return All the parameters of all the objects formated as follows: one vector, inside of this vector, four vectors for parameters of the head, tail, body and features with number of object size. {  { Point(xHead, yHead, thetaHead), ...}, Point({xTail, yTail, thetaHead), ...}, {Point(xBody, yBody, thetaBody), ...}, {Point(curvature, 0, 0), ...}}
 */
-vector<vector<Point3d>> Tracking::objectPosition(const UMat &frame, int minSize, int maxSize) {
+vector<vector<Point3d>> Tracking::objectPosition(const UMat &frame, int minSize, int maxSize) const {
   vector<vector<Point>> contours;
   vector<Point3d> positionHead;
   vector<Point3d> positionTail;
@@ -537,7 +537,7 @@ vector<vector<Point3d>> Tracking::objectPosition(const UMat &frame, int minSize,
   * @param[in] LO The maximal assignment distance in pixels.
   * @return The assignment vector containing the new index position to sort the pos vector. 
 */
-vector<int> Tracking::costFunc(const vector<vector<Point3d>> &prevPos, const vector<vector<Point3d>> &pos, double LENGTH, double ANGLE, double LO, double AREA, double PERIMETER) {
+vector<int> Tracking::costFunc(const vector<vector<Point3d>> &prevPos, const vector<vector<Point3d>> &pos, double LENGTH, double ANGLE, double LO, double AREA, double PERIMETER) const {
   int n = static_cast<int>(prevPos[0].size());
   int m = static_cast<int>(pos[0].size());
   vector<int> assignment;
@@ -593,7 +593,7 @@ vector<int> Tracking::costFunc(const vector<vector<Point3d>> &prevPos, const vec
   * @param[in] assignment The vector with the new indexes that will be used to sort the input vector.
   * @return The vector with the indexes of occluded objects.
 */
-vector<int> Tracking::findOcclusion(vector<int> assignment) {
+vector<int> Tracking::findOcclusion(vector<int> assignment) const {
   vector<int> occlusion;
   vector<int>::iterator index = find(assignment.begin(), assignment.end(), -1);
   while (index != assignment.end()) {
@@ -612,7 +612,7 @@ vector<int> Tracking::findOcclusion(vector<int> assignment) {
   * @param[in] id The vector with the id of the objects.
   * @return The sorted vector.
 */
-vector<Point3d> Tracking::reassignment(const vector<Point3d> &past, const vector<Point3d> &input, const vector<int> &assignment) {
+vector<Point3d> Tracking::reassignment(const vector<Point3d> &past, const vector<Point3d> &input, const vector<int> &assignment) const {
   vector<Point3d> tmp = past;
 
   // Reassignes matched object
@@ -649,7 +649,7 @@ vector<Point3d> Tracking::reassignment(const vector<Point3d> &past, const vector
   * @param[in] param_maximalTime 
   * @return The sorted vector.
 */
-void Tracking::cleaning(const vector<int> &occluded, vector<int> &lostCounter, vector<int> &id, vector<vector<Point3d>> &input, double param_maximalTime) {
+void Tracking::cleaning(const vector<int> &occluded, vector<int> &lostCounter, vector<int> &id, vector<vector<Point3d>> &input, double param_maximalTime) const {
   vector<int> counter(lostCounter.size(), 0);
 
   // Increment the lost counter
@@ -677,7 +677,7 @@ void Tracking::cleaning(const vector<int> &occluded, vector<int> &lostCounter, v
   * @param present: The current position parameters.
   * @return The predicted positions.
 */
-vector<Point3d> Tracking::prevision(vector<Point3d> past, vector<Point3d> present) {
+vector<Point3d> Tracking::prevision(vector<Point3d> past, vector<Point3d> present) const {
   double l = 0;
   for (unsigned int i = 0; i < past.size(); i++) {
     if (past[i] != present[i]) {
@@ -700,7 +700,7 @@ vector<Point3d> Tracking::prevision(vector<Point3d> past, vector<Point3d> presen
   * @param[in] number The number of colors to generate.
   * @return The vector containing the n colors.
 */
-vector<Point3i> Tracking::color(int number) {
+vector<Point3i> Tracking::color(int number) const {
   int a, b, c;
   vector<Point3i> colorMap;
   srand((unsigned int)time(NULL));
@@ -799,6 +799,7 @@ void Tracking::imageProcessing() {
     m_outputFile.close();
     emit(finished());
     emit(statistic(timer->elapsed()));
+    delete timer;
   }
   else {
     m_savefile.flush();
@@ -815,12 +816,8 @@ void Tracking::imageProcessing() {
   * @param[in] startImage Index of the beginning image.
   * @param[in] stopImage Index of the ending image.
 */
-Tracking::Tracking(string path, string backgroundPath, int startImage, int stopImage) {
-  m_path = path;
+Tracking::Tracking(string path, string backgroundPath, int startImage, int stopImage) : m_path(path), m_backgroundPath(backgroundPath), m_startImage(startImage), m_stopImage(stopImage) {
   video = new VideoReader(m_path);
-  m_backgroundPath = backgroundPath;
-  m_startImage = startImage;
-  m_stopImage = stopImage;
 }
 
 /**
@@ -830,12 +827,8 @@ Tracking::Tracking(string path, string backgroundPath, int startImage, int stopI
   * @param[in] startImage Index of the beginning image.
   * @param[in] stopImage Index of the ending image.
 */
-Tracking::Tracking(string path, UMat background, int startImage, int stopImage) {
-  m_path = path;
+Tracking::Tracking(string path, UMat background, int startImage, int stopImage) : m_path(path), m_background(background), m_startImage(startImage), m_stopImage(stopImage) {
   video = new VideoReader(m_path);
-  m_background = background;
-  m_startImage = startImage;
-  m_stopImage = stopImage;
 }
 
 /**

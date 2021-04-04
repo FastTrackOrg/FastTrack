@@ -109,27 +109,30 @@ class Tracking : public QObject {
   QMap<QString, QString> parameters;      /*!< map of all the parameters for the tracking. */
 
  public:
+  Tracking() = default;
   Tracking(string path, string background, int startImage = 0, int stopImage = -1);
   Tracking(string path, UMat background, int startImage = 0, int stopImage = -1);
+  Tracking(const Tracking &) = delete;
+  Tracking &operator=(const Tracking &) = delete;
   ~Tracking();
 
-  Point2d curvatureCenter(const Point3d &tail, const Point3d &head);
-  double curvature(Point2d center, const Mat &image);
+  Point2d curvatureCenter(const Point3d &tail, const Point3d &head) const;
+  double curvature(Point2d center, const Mat &image) const;
   static double modul(double angle);
-  double divide(double a, double b);
+  double divide(double a, double b) const;
   static double angleDifference(double alpha, double beta);
-  bool objectDirection(const UMat &image, vector<double> &information);
-  vector<double> objectInformation(const UMat &image);
-  vector<Point3d> reassignment(const vector<Point3d> &past, const vector<Point3d> &input, const vector<int> &assignment);
-  UMat backgroundExtraction(VideoReader &video, int n, const int method, const int registrationMethod);
-  void registration(UMat imageReference, UMat &frame, int method);
-  void binarisation(UMat &frame, char backgroundColor, int value);
-  vector<vector<Point3d>> objectPosition(const UMat &frame, int minSize, int maxSize);
-  vector<int> costFunc(const vector<vector<Point3d>> &prevPos, const vector<vector<Point3d>> &pos, double LENGHT, double ANGLE, double LO, double AREA, double PERIMETER);
-  void cleaning(const vector<int> &occluded, vector<int> &lostCounter, vector<int> &id, vector<vector<Point3d>> &input, double param_maximalTime);
-  vector<Point3d> prevision(vector<Point3d> past, vector<Point3d> present);
-  vector<Point3i> color(int number);
-  vector<int> findOcclusion(vector<int> assignment);
+  bool objectDirection(const UMat &image, vector<double> &information) const;
+  vector<double> objectInformation(const UMat &image) const;
+  vector<Point3d> reassignment(const vector<Point3d> &past, const vector<Point3d> &input, const vector<int> &assignment) const;
+  UMat backgroundExtraction(VideoReader &video, int n, const int method, const int registrationMethod) const;
+  void registration(UMat imageReference, UMat &frame, int method) const;
+  void binarisation(UMat &frame, char backgroundColor, int value) const;
+  vector<vector<Point3d>> objectPosition(const UMat &frame, int minSize, int maxSize) const;
+  vector<int> costFunc(const vector<vector<Point3d>> &prevPos, const vector<vector<Point3d>> &pos, double LENGHT, double ANGLE, double LO, double AREA, double PERIMETER) const;
+  void cleaning(const vector<int> &occluded, vector<int> &lostCounter, vector<int> &id, vector<vector<Point3d>> &input, double param_maximalTime) const;
+  vector<Point3d> prevision(vector<Point3d> past, vector<Point3d> present) const;
+  vector<Point3i> color(int number) const;
+  vector<int> findOcclusion(vector<int> assignment) const;
 
   UMat m_binaryFrame;                /*!< Binary image CV_8U */
   UMat m_visuFrame;                  /*!< Image 8 bit CV_8U */
@@ -146,38 +149,38 @@ class Tracking : public QObject {
   * @brief Emitted when an image is processed.
   * @param int Index of the processed image.
   */
-  void progress(int);
+  void progress(int) const;
 
   /**
   * @brief Emitted when an image to compute the background is processed.
   * @param int The number of processed image.
   */
-  void backgroundProgress(int);
+  void backgroundProgress(int) const;
 
   /**
   * @brief Emitted when the first image has been processed to trigger the starting of the analysis.
   */
-  void finishedProcessFrame();
+  void finishedProcessFrame() const;
 
   /**
   * @brief Emitted when all images have been processed.
   */
-  void finished();
+  void finished() const;
 
   /**
   * @brief Emitted when a crash occurs during the analysis.
   */
-  void forceFinished(QString message);
+  void forceFinished(QString message) const;
 
   /**
   * @brief Emitted when an error occurs.
   */
-  void error(int code);
+  void error(int code) const;
 
   /**
   * @brief Emitted at the end of the analysis.
   */
-  void statistic(long long int time);
+  void statistic(long long int time) const;
 };
 
 #endif
