@@ -100,7 +100,7 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   connect(replayAction, &QAction::toggled, [this](bool isChecked) {
     if (isChecked) {
       ui->interactiveTab->addTab(replay, tr("Replay"));
-      replay->loadReplayFolder(dir, video);
+      replay->loadReplayFolder(dir);
       ui->interactiveTab->setCurrentIndex(1);
     }
     else {
@@ -379,7 +379,8 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   });
 
   // Replay tab
-  replay = new Replay(this, false, ui->slider);
+  video = new VideoReader();
+  replay = new Replay(this, false, ui->slider, video);
   connect(ui->interactiveTab, &QTabWidget::tabCloseRequested, [this](int index) {
     if (index != 0) {
       ui->interactiveTab->removeTab(index);
@@ -389,7 +390,7 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   connect(ui->interactiveTab, &QTabWidget::currentChanged, [this](int index) {
     if (index == 1) {
       int frame = ui->slider->value();
-      replay->loadReplayFolder(dir, video);
+      replay->loadReplayFolder(dir);
       ui->slider->setValue(frame);
     }
   });
@@ -480,8 +481,6 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   // Sets the object counter on top of the display
   counterLabel = new QLabel(ui->scrollArea->viewport());
   counterLabel->move(20, 20);
-
-  video = new VideoReader();
 }
 
 /**
@@ -542,7 +541,7 @@ void Interactive::openFolder() {
       reset();
 
       // Load replay
-      replay->loadReplayFolder(dir, video);
+      replay->loadReplayFolder(dir);
 
       // Load parameters
       QFileInfo savingInfo(dir);

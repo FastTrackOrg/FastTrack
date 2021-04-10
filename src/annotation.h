@@ -37,8 +37,12 @@ class Annotation : public QWidget {
   void annotationText(const QString &text);
 
  public:
-  explicit Annotation(const QString &annotationFile);
+  Annotation();
+  Annotation(const QString &annotationFile);
+  Annotation(const Annotation &T) = delete;
+  Annotation &operator=(const Annotation &T) = delete;
   ~Annotation();
+  bool setPath(const QString &annotationFile);
 };
 
 #endif

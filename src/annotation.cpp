@@ -24,21 +24,26 @@ This file is part of Fast Track.
  *
  * @author Benjamin Gallois
  *
- * @version $Revision: 4.8 $
+ * @version $Revision: 5 $
  *
  * Contact: benjamin.gallois@fasttrack.sh
  *
  */
 
 /**
-  * @brief Constructs the annotation object from a file path.
+  * @brief Set the path for the annotation.
   * @param[in] filePath Path to the tracking folder.
 */
-Annotation::Annotation(const QString &filePath) {
-  annotationFile = new QFile(filePath + "annotation.txt");
-  annotations = new QMap<int, QString>;
+bool Annotation::setPath(const QString &filePath) {
+  if (!annotationFile->fileName().isEmpty()) {
+    writeToFile();
+  }
+  findIndexes.clear();
+  findIndex = -1;
+  annotationFile->setFileName(filePath + "annotation.txt");
+  annotations->clear();
   if (!annotationFile->open(QIODevice::ReadOnly)) {
-    qInfo() << "Can't open file";
+    return false;
   }
 
   QTextStream in(annotationFile);
@@ -52,6 +57,25 @@ Annotation::Annotation(const QString &filePath) {
     }
   }
   annotationFile->close();
+  return true;
+}
+
+/**
+  * @brief Constructs the annotation object from a file path.
+  * @param[in] filePath Path to the tracking folder.
+*/
+Annotation::Annotation(const QString &filePath) {
+  annotationFile = new QFile();
+  annotations = new QMap<int, QString>();
+  setPath(filePath);
+}
+
+/**
+  * @brief Constructs the annotation object from a file path.
+*/
+Annotation::Annotation() {
+  annotationFile = new QFile();
+  annotations = new QMap<int, QString>();
 }
 
 /**
@@ -110,24 +134,36 @@ void Annotation::find(const QString &expression) {
   * @brief Returns the next element of the findIndexes list of annotations that contains the expression to find.
 */
 int Annotation::next() {
-  findIndex++;
+  ++findIndex;
   if (findIndex >= findIndexes.length()) {
     findIndex = 0;
   }
-  return findIndexes[findIndex];
+  if (!findIndexes.isEmpty()) {
+    return findIndexes[findIndex];
+  }
+  else {
+    return 0;
+  }
 }
 
 /**
   * @brief Returns the previous element of the findIndexes list of annotations that contains the expression to find.
 */
 int Annotation::prev() {
-  findIndex--;
+  --findIndex;
   if (findIndex < 0) {
     findIndex = findIndexes.length() - 1;
   }
-  return findIndexes[findIndex];
+  if (!findIndexes.isEmpty()) {
+    return findIndexes[findIndex];
+  }
+  else {
+    return 0;
+  }
 }
 
 Annotation::~Annotation() {
   writeToFile();
+  delete annotationFile;
+  delete annotations;
 }

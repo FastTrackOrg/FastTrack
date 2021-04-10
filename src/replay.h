@@ -73,12 +73,13 @@ class Replay : public QMainWindow {
   Q_OBJECT
 
  public:
-  explicit Replay(QWidget *parent = nullptr, bool standalone = true, Timeline *slider = nullptr);
+  explicit Replay(QWidget *parent = nullptr, bool standalone = true, Timeline *slider = nullptr, VideoReader *videoReader = nullptr);
   ~Replay();
 
  private:
   Ui::Replay *ui;
   QShortcut *deletedFrameFocus; /*!< Keyboard shortcut to next frame. */
+  bool isStandalone;
 
   QUndoStack *commandStack;
   QAction *undoAction;
@@ -113,7 +114,6 @@ class Replay : public QMainWindow {
 
   void openReplayFolder();
   void loadReplayFolder(QString dir);
-  void loadReplayFolder(QString dir, VideoReader *videoReader);
   void loadFrame(int frameIndex);
   void zoomIn();
   void zoomOut();
