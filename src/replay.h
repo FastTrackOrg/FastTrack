@@ -113,6 +113,7 @@ class Replay : public QMainWindow {
 
   void openReplayFolder();
   void loadReplayFolder(QString dir);
+  void loadReplayFolder(QString dir, VideoReader *videoReader);
   void loadFrame(int frameIndex);
   void zoomIn();
   void zoomOut();

@@ -299,7 +299,7 @@ Replay::Replay(QWidget* parent, bool standalone, Timeline* slider) : QMainWindow
 
   annotation = nullptr;
   trackingData = nullptr;
-  video = new VideoReader("");  // Dummy VideoReader needed for ui creation
+  video = new VideoReader();
 }
 
 Replay::~Replay() {
@@ -312,6 +312,96 @@ Replay::~Replay() {
 void Replay::openReplayFolder() {
   QString dir = QFileDialog::getOpenFileName(this, tr("Open Directory"), memoryDir);
   loadReplayFolder(dir);
+}
+
+/**
+  * @brief Load a folder containing an image sequence and the tracking data if it exists. Triggerred when ui->pathButton is pressed.
+  * @arg[in] dir Path to the folder where the image sequence is stored.
+  * @arg[in] VideoReader VideoReader object.
+*/
+void Replay::loadReplayFolder(QString dir, VideoReader* videoReader) {
+  if (!dir.length()) return;
+
+  commandStack->clear();
+  occlusionEvents.clear();
+  object1Replay->clear();
+  object2Replay->clear();
+  ui->replayDisplay->clear();
+  ui->annotation->clear();
+  object = true;
+  currentZoom = 1;
+  memoryDir.clear();
+  memoryDir = dir;
+
+  try {
+    // Gets the paths to all the frames in the folder and puts it in a vector.
+    // Setups the ui by setting maximum and minimum of the slider bar.
+    video = videoReader;
+    ui->replaySlider->setMinimum(0);
+    ui->replaySlider->setMaximum(video->getImageCount() - 1);
+    Mat frame;
+    video->getImage(0, frame);
+    cvtColor(frame, frame, COLOR_GRAY2RGB);
+    originalImageSize.setWidth(frame.cols);
+    originalImageSize.setHeight(frame.rows);
+    deletedFrameNumber->setRange(1, video->getImageCount());
+    deletedFrameNumber->setValue(video->getImageCount());
+    if (video->isOpened()) {
+      isReplayable = true;
+    }
+
+    QFileInfo savingInfo(dir);
+    QString savingFilename = savingInfo.baseName();
+    QString savingPath = savingInfo.absolutePath();
+    QString trackingDir = savingPath;
+    if (video->isSequence()) {
+      trackingDir.append(QString("/Tracking_Result") + QDir::separator());
+    }
+    else {
+      trackingDir.append(QString("/Tracking_Result_") + savingFilename + QDir::separator());
+    }
+    delete trackingData;
+    trackingData = new Data(trackingDir);
+    ids = trackingData->getId(0, video->getImageCount());
+    for (auto const& a : ids) {
+      object2Replay->addItem(QString::number(a));
+    }
+
+    // Load annotation file
+    delete annotation;
+    annotation = new Annotation(trackingDir);
+    connect(ui->replaySlider, &Timeline::valueChanged, annotation, &Annotation::read);
+    connect(annotation, &Annotation::annotationText, ui->annotation, &QTextEdit::setPlainText);
+    connect(ui->annotation, &QTextEdit::textChanged, annotation, [this]() {
+      int index = ui->replaySlider->currentValue();
+      QString text = ui->annotation->toPlainText();
+      annotation->write(index, text);
+    });
+    connect(ui->findLine, &QLineEdit::textEdited, annotation, &Annotation::find);
+    connect(ui->findNext, &QPushButton::pressed, annotation, [this]() {
+      int index = annotation->next();
+      ui->replaySlider->setValue(index);
+    });
+    connect(ui->findPrev, &QPushButton::pressed, annotation, [this]() {
+      int index = annotation->prev();
+      ui->replaySlider->setValue(index);
+    });
+
+    // Information
+    connect(ui->replaySlider, &Timeline::valueChanged, [this](int index) {
+      updateInformation(ui->infoTableObject1->item(0, 0)->text().toInt(), index, ui->infoTableObject1);
+      updateInformation(ui->infoTableObject2->item(0, 0)->text().toInt(), index, ui->infoTableObject2);
+    });
+
+    ui->replaySlider->setValue(1);  // To force the change
+    ui->replaySlider->setValue(0);
+  }
+  catch (...) {
+    isReplayable = false;
+    QMessageBox msgBox;
+    msgBox.setText("No file found.");
+    msgBox.exec();
+  }
 }
 
 /**
@@ -342,8 +432,7 @@ void Replay::loadReplayFolder(QString dir) {
   try {
     // Gets the paths to all the frames in the folder and puts it in a vector.
     // Setups the ui by setting maximum and minimum of the slider bar.
-    delete video;
-    video = new VideoReader(dir.toStdString());
+    video->open(dir.toStdString());
     ui->replaySlider->setMinimum(0);
     ui->replaySlider->setMaximum(video->getImageCount() - 1);
     Mat frame;

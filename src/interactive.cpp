@@ -100,7 +100,7 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   connect(replayAction, &QAction::toggled, [this](bool isChecked) {
     if (isChecked) {
       ui->interactiveTab->addTab(replay, tr("Replay"));
-      replay->loadReplayFolder(dir);
+      replay->loadReplayFolder(dir, video);
       ui->interactiveTab->setCurrentIndex(1);
     }
     else {
@@ -389,7 +389,7 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   connect(ui->interactiveTab, &QTabWidget::currentChanged, [this](int index) {
     if (index == 1) {
       int frame = ui->slider->value();
-      replay->loadReplayFolder(dir);
+      replay->loadReplayFolder(dir, video);
       ui->slider->setValue(frame);
     }
   });
@@ -481,7 +481,7 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   counterLabel = new QLabel(ui->scrollArea->viewport());
   counterLabel->move(20, 20);
 
-  video = nullptr;
+  video = new VideoReader();
 }
 
 /**
@@ -511,8 +511,7 @@ void Interactive::openFolder() {
     // Setups the class member
     try {
       memoryDir = dir;
-      delete video;
-      video = new VideoReader(dir.toStdString());
+      video->open(dir.toStdString());
       ui->slider->setMinimum(0);
       ui->slider->setMaximum(video->getImageCount() - 1);
       ui->previewButton->setDisabled(true);
@@ -521,7 +520,6 @@ void Interactive::openFolder() {
       ui->nBack->setValue(video->getImageCount());
       ui->startImage->setRange(0, video->getImageCount() - 1);
       ui->startImage->setValue(0);
-      replay->loadReplayFolder(dir);
 
       Mat frame;
       video->getImage(0, frame);
@@ -542,6 +540,9 @@ void Interactive::openFolder() {
 
       isBackground = false;
       reset();
+
+      // Load replay
+      replay->loadReplayFolder(dir, video);
 
       // Load parameters
       QFileInfo savingInfo(dir);

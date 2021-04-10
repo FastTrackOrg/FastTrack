@@ -35,7 +35,25 @@ This file is part of Fast Track.
   * @param[in] path Path to a video or image file.
 */
 VideoReader::VideoReader(const string &path) {
-  if (path.empty()) return;
+  open(path);
+}
+
+/**
+  * @brief Copy constructor.
+  * @param[in] video.
+*/
+VideoReader::VideoReader(const VideoReader &video) {
+  open(video.m_path);
+}
+
+VideoReader &VideoReader::operator=(const VideoReader &video) {
+  open(video.m_path);
+  return *this;
+}
+
+bool VideoReader::open(const String &path, int apiPreference) {
+  if (path.empty()) return false;
+  m_path = path;
   string normPath;
   std::set<string> imageExtensions{".pgm", ".png", ".jpeg", ".jpg", ".tiff", ".tif", ".bmp", ".dib", ".jpe", ".jp2", ".webp", ".pbm", ".ppm", ".sr", ".ras", ".tif"};
   if (imageExtensions.count(filesystem::path(path).extension().string()) > 0) {
@@ -54,7 +72,7 @@ VideoReader::VideoReader(const string &path) {
     m_isSequence = false;
     normPath = path;
   }
-  open(normPath);
+  return VideoCapture::open(normPath);
 }
 
 /**

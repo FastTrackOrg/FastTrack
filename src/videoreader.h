@@ -20,12 +20,12 @@ This file is part of Fast Track.
 
 #include <filesystem>
 #include <iostream>
+#include <mutex>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/videoio.hpp>
 #include <regex>
 #include <set>
 #include <stdexcept>
-#include <string>
 
 using namespace cv;
 namespace fs = std::filesystem;
@@ -34,13 +34,18 @@ using namespace std;
 class VideoReader : public VideoCapture {
   bool m_isSequence;
   int m_index;
+  string m_path;
 
  public:
+  VideoReader() = default;
   VideoReader(const string &path);
+  VideoReader(const VideoReader &);
+  VideoReader &operator=(const VideoReader &);
   bool getNext(UMat &destination);
   bool getNext(Mat &destination);
   bool getImage(int index, UMat &destination);
   bool getImage(int index, Mat &destination);
+  bool open(const String &path, int apiPreference = CAP_ANY) override;
   unsigned int getImageCount() const;
   bool isSequence();
 };
