@@ -100,7 +100,6 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   connect(replayAction, &QAction::toggled, [this](bool isChecked) {
     if (isChecked) {
       ui->interactiveTab->addTab(replay, tr("Replay"));
-      replay->loadReplayFolder(dir);
       ui->interactiveTab->setCurrentIndex(1);
     }
     else {
@@ -387,13 +386,6 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
       replayAction->setChecked(false);
     }
   });
-  connect(ui->interactiveTab, &QTabWidget::currentChanged, [this](int index) {
-    if (index == 1) {
-      int frame = ui->slider->value();
-      replay->loadReplayFolder(dir);
-      ui->slider->setValue(frame);
-    }
-  });
 
   // Updates the display after each operation
   connect(ui->morphOperation, static_cast<void (QComboBox::*)(int)>(&QComboBox::activated), [this]() {
@@ -542,6 +534,9 @@ void Interactive::openFolder() {
 
       // Load replay
       replay->loadReplayFolder(dir);
+      if (!replay->trackingData->isEmpty) {
+        replayAction->setChecked(true);
+      }
 
       // Load parameters
       QFileInfo savingInfo(dir);
@@ -852,12 +847,15 @@ void Interactive::previewTracking() {
       ui->slider->setDisabled(false);
       ui->previewButton->setDisabled(false);
       ui->trackButton->setDisabled(false);
+      replay->loadReplayFolder(dir);
       replayAction->setChecked(true);
     });
     connect(tracking, &Tracking::forceFinished, this, [this](QString errorMessage) {
       ui->slider->setDisabled(false);
       ui->previewButton->setDisabled(false);
       ui->trackButton->setDisabled(false);
+      replay->loadReplayFolder(dir);
+      replayAction->setChecked(true);
       message(errorMessage);
     });
     connect(tracking, &Tracking::forceFinished, thread, &QThread::quit);
@@ -901,6 +899,7 @@ void Interactive::track() {
       ui->slider->setDisabled(false);
       ui->previewButton->setDisabled(false);
       ui->trackButton->setDisabled(false);
+      replay->loadReplayFolder(dir);
       replayAction->setChecked(true);
       logMap->insert("status", errorMessage);
       emit(log(*logMap));
@@ -911,6 +910,7 @@ void Interactive::track() {
       ui->slider->setDisabled(false);
       ui->previewButton->setDisabled(false);
       ui->trackButton->setDisabled(false);
+      replay->loadReplayFolder(dir);
       replayAction->setChecked(true);
       logMap->insert("status", "Done");
       emit(log(*logMap));

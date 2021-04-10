@@ -21,15 +21,17 @@ struct object
 class Data {
  private:
   QString dir; /*!< Path to the tracking result file. */
+  QMap<int, QVector<object>> dataCopy;
+  QMap<int, QVector<object>> data; /*!< Tracking data stored in a QMap, the keys are the image index and the value a vector of data stored in a structure with a field containing the object id and a field containing the data stored in a QMap where the keys are the data name and the velue the data value. */
 
  public:
-  explicit Data(QString dataPath);
+  Data() = default;
+  explicit Data(const QString &dataPath);
+  Data(const Data &T) = delete;
+  Data &operator=(const Data &T) = delete;
   ~Data();
 
-  QMap<int, QVector<object>> data; /*!< Tracking data stored in a QMap, the keys are the image index and the value a vector of data stored in a structure with a field containing the object id and a field containing the data stored in a QMap where the keys are the data name and the velue the data value. */
-  int maxId;
-  int maxFrameIndex;
-
+  bool setPath(const QString &dataPath);
   QVector<object> getData(int imageIndex) const;
   QMap<QString, double> getData(int imageIndex, int id) const;
   QMap<QString, QVector<double>> getDataId(int id) const;
@@ -40,8 +42,9 @@ class Data {
   void deleteData(int objectId, int from, int to);
   void insertData(int objectId, int from, int to);
   void save();
-
-  QMap<int, QVector<object>> dataCopy;
+  int maxId;
+  int maxFrameIndex;
+  bool isEmpty;
 };
 
 class SwapData : public QUndoCommand {

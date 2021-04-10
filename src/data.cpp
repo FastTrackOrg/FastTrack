@@ -31,10 +31,13 @@ This file is part of Fast Track.
  */
 
 /**
-  * @brief Construct the data object from a tracking result file.
+  * @brief Set the path to a tracking data file.
   * @param[in] dataPath Path to the tracking data file.
 */
-Data::Data(QString dataPath) {
+bool Data::setPath(const QString &dataPath) {
+  data.clear();
+  dataCopy.clear();
+
   QVector<QString> replayTracking;
   dir = dataPath;
   maxId = 0;
@@ -76,8 +79,22 @@ Data::Data(QString dataPath) {
       tmpVector.append(tmpObject);
       data.insert(frameIndex, tmpVector);
     }
+    dataCopy = data;
+    isEmpty = false;
+    return true;
   }
-  dataCopy = data;
+  else {
+    isEmpty = true;
+    return false;
+  }
+}
+
+/**
+  * @brief Construct the data object from a tracking result file.
+  * @param[in] dataPath Path to the tracking data file.
+*/
+Data::Data(const QString &dataPath) {
+  setPath(dataPath);
 }
 
 /**

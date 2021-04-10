@@ -324,7 +324,8 @@ Replay::Replay(QWidget* parent, bool standalone, Timeline* slider, VideoReader* 
     ui->replaySlider->setValue(index);
   });
 
-  trackingData = nullptr;
+  trackingData = new Data();
+  ;
 }
 
 Replay::~Replay() {
@@ -393,8 +394,7 @@ void Replay::loadReplayFolder(QString dir) {
     else {
       trackingDir.append(QString("/Tracking_Result_") + savingFilename + QDir::separator());
     }
-    delete trackingData;
-    trackingData = new Data(trackingDir);
+    trackingData->setPath(trackingDir);
     ids = trackingData->getId(0, video->getImageCount());
     for (auto const& a : ids) {
       object2Replay->addItem(QString::number(a));

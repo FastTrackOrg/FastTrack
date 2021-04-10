@@ -75,6 +75,8 @@ class Replay : public QMainWindow {
  public:
   explicit Replay(QWidget *parent = nullptr, bool standalone = true, Timeline *slider = nullptr, VideoReader *videoReader = nullptr);
   ~Replay();
+  Data *trackingData;
+  Annotation *annotation;
 
  private:
   Ui::Replay *ui;
@@ -90,9 +92,6 @@ class Replay : public QMainWindow {
   QSpinBox *deletedFrameNumber;
 
   QString memoryDir; /*!< Saves the path of the last opened folder.*/
-
-  Data *trackingData;
-  Annotation *annotation;
 
   vector<Point3i> colorMap;     /*!< RGB color map to display each object in one color. */
   QVector<int> occlusionEvents; /*!< Index of each occlusion event in the replayed images sequence. */
