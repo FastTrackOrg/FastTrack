@@ -140,9 +140,9 @@ class Tracking : public QObject {
   vector<vector<Point3d>> m_outPrev; /*!< Objects information at current iteration */
 
  public slots:
-  void startProcess();
+  virtual void startProcess();
   void updatingParameters(const QMap<QString, QString> &);
-  void imageProcessing();
+  virtual void imageProcessing();
 
  signals:
   /**
