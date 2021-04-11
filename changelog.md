@@ -1,5 +1,15 @@
 # FastTrack changelog
 
+## 5.3.0
+
+### Changed
+- Refactoring ui with major performance improvement on the display.
+- Default style changed.
+- Ui settings file architecture.
+
+### Fixed
+- Fixed normAngle cfg loading.
+
 ## 5.2.4
 
 ### Fixed
