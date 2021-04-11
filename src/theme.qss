@@ -2,7 +2,7 @@ QWidget {
     background: #FFFFFF;
     alternate-background-color: #DEE4E7;
     selection-background-color: #37474F;
-    font-family: "Lato"
+    font-family: 'Lato', sans-serif;
 }
 
 QPushButton {

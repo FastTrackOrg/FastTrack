@@ -30,7 +30,7 @@ int main(int argc, char *argv[]) {
   a.setOrganizationDomain("www.fasttrack.sh");
   w.setWindowIcon(QIcon(":/assets/icon.png"));
   QFontDatabase::addApplicationFont(":/assets/Font.ttf");
-  w.setStyleSheet("QWidget { font-family: 'Lato'; }");
+  w.setStyleSheet("QWidget {font-family: 'Lato', sans-serif;}");
   w.show();
   a.exec();
 }
