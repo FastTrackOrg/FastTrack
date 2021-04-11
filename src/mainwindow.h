@@ -55,6 +55,7 @@ class MainWindow : public QMainWindow {
   Batch *batch;
   Replay *replay;
   TrackingManager *trackingManager;
+  QWebEngineView *manual;
 };
 
 #endif  // MAINWINDOW_H

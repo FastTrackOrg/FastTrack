@@ -164,6 +164,9 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   QAction *lightColor = new QAction(tr("Breeze Light"), this);
   lightColor->setCheckable(true);
   menuPalette->addAction(lightColor);
+  QAction *ftColor = new QAction(tr("FastTrack"), this);
+  ftColor->setCheckable(true);
+  menuPalette->addAction(ftColor);
   connect(defaultColor, &QAction::triggered, [this, defaultColor, menuPalette]() {
     foreach (QAction *action, menuPalette->actions()) {
       action->setChecked(false);
@@ -194,6 +197,17 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
     qApp->setStyleSheet(stream.readAll());
     settings.insert("color", "light");
   });
+  connect(ftColor, &QAction::triggered, [this, ftColor, menuPalette]() {
+    foreach (QAction *action, menuPalette->actions()) {
+      action->setChecked(false);
+    }
+    ftColor->setChecked(true);
+    QFile file(":/theme.qss");
+    file.open(QFile::ReadOnly | QFile::Text);
+    QTextStream stream(&file);
+    qApp->setStyleSheet(stream.readAll());
+    settings.insert("color", "ft");
+  });
 
   QString defaultColorTheme = settings.value("color");
   if (defaultColorTheme == "light") {
@@ -201,6 +215,9 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   }
   else if (defaultColorTheme == "dark") {
     darkColor->trigger();
+  }
+  else if (defaultColorTheme == "ft") {
+    ftColor->trigger();
   }
   else {
     defaultColor->trigger();

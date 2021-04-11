@@ -1,0 +1,55 @@
+QWidget {
+    background: #FFFFFF;
+    alternate-background-color: #DEE4E7;
+    selection-background-color: #37474F;
+    font-family: "Lato"
+}
+
+QPushButton {
+    background-color: #DEE4E7;
+    selection-background-color: #37474F;
+}
+
+QPushButton::hover {
+    background-color: #37474F;
+    color: #DEE4E7;
+}
+
+QTabBar {
+    background: #37474F;
+    color: #DEE4E7;
+}
+
+QTabBar::tab:selected, QTabBar::tab:hover {
+    color: #37474F;
+    background: #FFFFFF;
+}
+
+QDockWidget {
+    background: #37474F;
+    color: #DEE4E7;
+    padding: 0;
+    margin: 0;
+}
+
+QDockWidget > QWidget {
+    background: #FFFFF;
+    border: 1px;
+    border-style: solid;
+    border-color: #DEE4E7;
+}
+
+QDockWidget::title {
+    text-align: left;
+    background: #37474F;
+    color: #DEE4E7;
+}
+
+QMenuBar {
+    background: #FFFFFF;
+    color: #37474F;
+}
+
+QTextBrowser {
+    font-family: "Lato"
+}

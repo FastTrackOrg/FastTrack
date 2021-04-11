@@ -47,7 +47,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
   setWindowTitle(qApp->applicationName() + " " + APP_VERSION);
 
   // Setup style
-  QFile stylesheet(":/theme.qss");
+  QFile stylesheet("");
 
   if (stylesheet.open(QIODevice::ReadOnly | QIODevice::Text)) {  // Read the theme file
     qApp->setStyleSheet(stylesheet.readAll());
@@ -118,6 +118,14 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
   ui->tabWidget->addTab(trackingManager, tr("Tracking Manager"));
   connect(interactive, &Interactive::log, trackingManager, &TrackingManager::addLogEntry);
   connect(batch, &Batch::log, trackingManager, &TrackingManager::addLogEntry);
+
+  manual = new QWebEngineView(this);
+  ui->tabWidget->addTab(manual, tr("User Manual"));
+  connect(ui->tabWidget, &QTabWidget::currentChanged, [this](int index) {
+    if (index == 4) {
+      manual->setUrl(QUrl("https://www.fasttrack.sh/UserManual/docs/intro.html"));
+    }
+  });
 
 }  // Constructor
 

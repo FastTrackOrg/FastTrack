@@ -106,8 +106,11 @@ void Timeline::setLayout(const int width, const int imageNumber) {
 
   // Miniature box
   QGraphicsRectItem *timelineMiniature = new QGraphicsRectItem(15, 10, width * m_scale - m_offset, 40);
-  timelineMiniature->setBrush(QBrush(QColor(0, 0, 255, 127)));
+  timelineMiniature->setBrush(QBrush(QColor(104, 104, 242, 255)));
   timelineScene->addItem(timelineMiniature);
+
+  // Background
+  timelineScene->setBackgroundBrush(QBrush(QColor(55, 71, 79, 50)));
 
   // Cursors
   cursor = new QGraphicsLineItem(0, 5, 0, 40);

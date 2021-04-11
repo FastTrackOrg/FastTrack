@@ -29,8 +29,8 @@ int main(int argc, char *argv[]) {
   a.setOrganizationName("FastTrackOrg");
   a.setOrganizationDomain("www.fasttrack.sh");
   w.setWindowIcon(QIcon(":/assets/icon.png"));
-  QFontDatabase::addApplicationFont(":/assets/FiraCode.ttf");
-  w.setStyleSheet("QWidget { font-family: 'FiraCode'; }");
+  QFontDatabase::addApplicationFont(":/assets/Font.ttf");
+  w.setStyleSheet("QWidget { font-family: 'Lato'; }");
   w.show();
   a.exec();
 }
