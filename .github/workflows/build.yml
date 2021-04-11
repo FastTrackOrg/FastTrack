@@ -2,193 +2,191 @@ name: Continous Builds
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
 
 jobs:
-
   job_1:
-      runs-on: ubuntu-16.04
-      steps:
-        - uses: actions/checkout@v2
-        - name: install qt5
-          run: |
-             sudo add-apt-repository ppa:beineri/opt-qt-5.14.2-xenial
-             sudo apt-get update
-             sudo apt-get install libgl1-mesa-dev qt514base qt514webengine ffmpeg
-             sudo add-apt-repository ppa:ubuntu-toolchain-r/test
-             sudo apt-get update
-             sudo apt-get install libavcodec-dev libavformat-dev libswscale-dev
-             sudo apt-get install libgstreamer-plugins-base1.0-dev libgstreamer1.0-dev
-             sudo apt-get install gcc-9 g++-9
-             sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 90 --slave /usr/bin/g++ g++ /usr/bin/g++-9 --slave /usr/bin/gcov gcov /usr/bin/gcov-9
-             sudo apt-get install libstdc++6
-        - name: install opencv
-          run: sudo ./dependencies.sh opencv
-        - name: build
-          run: |
-              export QTDIR=/opt/qt514
-              export PATH=/opt/qt514/bin:$PATH
-              export LD_LIBRARY_PATH=$QT_DIR/lib/x86_64-linux-gnu:$QT_DIR/lib:$LD_LIBRARY_PATH
-              ./run.sh ci
-              make clean
-        - name: appimage
-          run: |
-              cd build
-              export QTDIR=/opt/qt514
-              export PATH=/opt/qt514/bin:$PATH
-              export LD_LIBRARY_PATH=$QT_DIR/lib/x86_64-linux-gnu:$QT_DIR/lib:$LD_LIBRARY_PATH
-              wget -O deploy.AppImage https://github.com/probonopd/linuxdeployqt/releases/download/7/linuxdeployqt-7-x86_64.AppImage
-              chmod +x deploy.AppImage
-              mkdir -p appdir/usr/bin/
-              mv FastTrack appdir/usr/bin/
-              mkdir -p appdir/usr/share/applications/
-              cp ../FastTrack.desktop appdir/usr/share/applications/
-              mkdir -p appdir/usr/share/icons/hicolor/256x256/
-              cp ../src/assets/icon.png appdir/usr/share/icons/hicolor/256x256/
-              ./deploy.AppImage ./appdir/usr/share/applications/FastTrack.desktop -exclude-libs="libnss3.so,libnssutil3.so" -no-translations -bundle-non-qt-libs
-              mkdir -p appdir/usr/optional/ ; wget -c https://github.com/darealshinji/AppImageKit-checkrt/releases/download/continuous/exec-x86_64.so -O ./appdir/usr/optional/exec.so
-              mkdir -p appdir/usr/optional/libstdc++/ ; cp /usr/lib/x86_64-linux-gnu/libstdc++.so.6 ./appdir/usr/optional/libstdc++/ ; cp /usr/lib/gcc/x86_64-linux-gnu/9/libstdc++.so ./appdir/usr/optional/libstdc++/
-              ( cd appdir ; rm AppRun ; wget -c https://github.com/darealshinji/AppImageKit-checkrt/releases/download/continuous/AppRun-patched-x86_64 -O AppRun ; chmod a+x AppRun)
-              ./deploy.AppImage ./appdir/usr/share/applications/FastTrack.desktop -appimage
-              mv FastTrack*.AppImage FastTrack-x86_64.AppImage
-        - name: Linux artefact
-          uses: actions/upload-artifact@v1
-          with:
-            name: FastTrackLinux
-            path: ./build/FastTrack-x86_64.AppImage
+    runs-on: ubuntu-16.04
+    steps:
+      - uses: actions/checkout@v2
+      - name: install qt5
+        run: |
+          sudo add-apt-repository ppa:beineri/opt-qt-5.15.2-xenial
+          sudo apt-get update
+          sudo apt-get install libgl1-mesa-dev qt515base qt515webengine ffmpeg qt515webchannel
+          sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+          sudo apt-get update
+          sudo apt-get install libavcodec-dev libavformat-dev libswscale-dev libnss3
+          sudo apt-get install libgstreamer-plugins-base1.0-dev libgstreamer1.0-dev
+          sudo apt-get install gcc-9 g++-9
+          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 90 --slave /usr/bin/g++ g++ /usr/bin/g++-9 --slave /usr/bin/gcov gcov /usr/bin/gcov-9
+          sudo apt-get install libstdc++6
+      - name: install opencv
+        run: sudo ./dependencies.sh opencv
+      - name: build
+        run: |
+          export QTDIR=/opt/qt515
+          export PATH=/opt/qt515/bin:$PATH
+          export LD_LIBRARY_PATH=$QT_DIR/lib/x86_64-linux-gnu:$QT_DIR/lib:$LD_LIBRARY_PATH
+          ./run.sh ci
+          make clean
+      - name: appimage
+        run: |
+          cd build
+          export QTDIR=/opt/qt515
+          export PATH=/opt/qt515/bin:$PATH
+          export LD_LIBRARY_PATH=$QT_DIR/lib/x86_64-linux-gnu:$QT_DIR/lib:$LD_LIBRARY_PATH
+          wget -O deploy.AppImage https://github.com/probonopd/linuxdeployqt/releases/download/7/linuxdeployqt-7-x86_64.AppImage
+          chmod +x deploy.AppImage
+          mkdir -p appdir/usr/bin/
+          mv FastTrack appdir/usr/bin/
+          mkdir -p appdir/usr/share/applications/
+          cp ../FastTrack.desktop appdir/usr/share/applications/
+          mkdir -p appdir/usr/share/icons/hicolor/256x256/
+          cp ../src/assets/icon.png appdir/usr/share/icons/hicolor/256x256/
+          ./deploy.AppImage ./appdir/usr/share/applications/FastTrack.desktop -exclude-libs="libnss3.so,libnssutil3.so" -no-translations -bundle-non-qt-libs
+          mkdir -p appdir/usr/optional/ ; wget -c https://github.com/darealshinji/AppImageKit-checkrt/releases/download/continuous/exec-x86_64.so -O ./appdir/usr/optional/exec.so
+          mkdir -p appdir/usr/optional/libstdc++/ ; cp /usr/lib/x86_64-linux-gnu/libstdc++.so.6 ./appdir/usr/optional/libstdc++/ ; cp /usr/lib/gcc/x86_64-linux-gnu/9/libstdc++.so ./appdir/usr/optional/libstdc++/
+          ( cd appdir ; rm AppRun ; wget -c https://github.com/darealshinji/AppImageKit-checkrt/releases/download/continuous/AppRun-patched-x86_64 -O AppRun ; chmod a+x AppRun)
+          ./deploy.AppImage ./appdir/usr/share/applications/FastTrack.desktop -appimage
+          mv FastTrack*.AppImage FastTrack-x86_64.AppImage
+      - name: Linux artefact
+        uses: actions/upload-artifact@v1
+        with:
+          name: FastTrackLinux
+          path: ./build/FastTrack-x86_64.AppImage
   job_2:
-      runs-on: windows-latest
-      steps:
-        - uses: actions/checkout@v2
-        - uses: ilammy/msvc-dev-cmd@v1
-        - uses: jurplel/install-qt-action@v2
-          with:
-            host: 'windows'
-            target: 'desktop'
-            arch: 'win64_msvc2019_64'
-            dir: '${{ github.workspace }}/Qt/'
-            install-deps: 'true'
-            modules: 'qtwebengine'
-            cached: 'false'
-        - name: install opencv
-          shell: cmd
-          run: |
-              bitsadmin.exe /transfer debjob /download /priority normal https://downloads.sourceforge.net/project/opencvlibrary/4.5.0/opencv-4.5.0-vc14_vc15.exe C:\opencv-4.5.0-vc14_vc15.exe
-              C:\opencv-4.5.0-vc14_vc15.exe -o"C:\" -y
-        - name: build
-          shell: cmd
-          run : |
-               cd src/
-               qmake FastTrack.pro -spec win32-msvc "CONFIG+=qtquickcompiler"
-               nmake release
-               bitsadmin.exe /transfer debjob /download /priority normal http://www.fasttrack.sh/download/FastTrack/FastTrack/template.zip C:\FastTrack.zip
-               cd release
-               7z a C:\FastTrack.zip FastTrack.exe
-        - name: Windows artefact
-          uses: actions/upload-artifact@v1
-          with:
-            name: FastTrackWindows
-            path: C:/FastTrack.zip
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ilammy/msvc-dev-cmd@v1
+      - uses: jurplel/install-qt-action@v2
+        with:
+          host: "windows"
+          target: "desktop"
+          arch: "win64_msvc2019_64"
+          dir: "${{ github.workspace }}/Qt/"
+          install-deps: "true"
+          modules: "qtwebengine"
+          cached: "false"
+      - name: install opencv
+        shell: cmd
+        run: |
+          bitsadmin.exe /transfer debjob /download /priority normal https://downloads.sourceforge.net/project/opencvlibrary/4.5.0/opencv-4.5.0-vc14_vc15.exe C:\opencv-4.5.0-vc14_vc15.exe
+          C:\opencv-4.5.0-vc14_vc15.exe -o"C:\" -y
+      - name: build
+        shell: cmd
+        run: |
+          cd src/
+          qmake FastTrack.pro -spec win32-msvc "CONFIG+=qtquickcompiler"
+          nmake release
+          bitsadmin.exe /transfer debjob /download /priority normal http://www.fasttrack.sh/download/FastTrack/FastTrack/template.zip C:\FastTrack.zip
+          cd release
+          7z a C:\FastTrack.zip FastTrack.exe
+      - name: Windows artefact
+        uses: actions/upload-artifact@v1
+        with:
+          name: FastTrackWindows
+          path: C:/FastTrack.zip
   job_3:
-      runs-on: macos-latest
-      steps:
-        - uses: actions/checkout@v2
-        - uses: jurplel/install-qt-action@v2
-          with:
-            host: 'mac'
-            target: 'desktop'
-            dir: '${{ github.workspace }}/Qt/'
-            install-deps: 'true'
-            modules: 'qtwebengine'
-            cached: 'false'
-            extra: '--external 7z'
-        - name: install opencv
-          run: |
-              rm -rf /usr/local/bin/2to3
-              brew update
-              brew upgrade
-              brew install pkg-config
-              brew install opencv
-              brew install openssl
-              export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig/
-        - name: build
-          run: |
-              qmake src/FastTrack.pro
-              make
-              cd build/
-              macdeployqt FastTrack.app -always-overwrite
-              wget https://raw.githubusercontent.com/arl/macdeployqtfix/master/macdeployqtfix.py
-              python2.7 macdeployqtfix.py FastTrack.app/Contents/MacOS/FastTrack ../../Qt/5.15.0/
-              hdiutil create -volname FastTrack -srcfolder FastTrack.app -ov -format UDZO FastTrack.dmg
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: jurplel/install-qt-action@v2
+        with:
+          host: "mac"
+          target: "desktop"
+          dir: "${{ github.workspace }}/Qt/"
+          install-deps: "true"
+          modules: "qtwebengine"
+          cached: "false"
+          extra: "--external 7z"
+      - name: install opencv
+        run: |
+          rm -rf /usr/local/bin/2to3
+          brew update
+          brew upgrade
+          brew install pkg-config
+          brew install opencv
+          brew install openssl
+          export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig/
+      - name: build
+        run: |
+          qmake src/FastTrack.pro
+          make
+          cd build/
+          macdeployqt FastTrack.app -always-overwrite
+          wget https://raw.githubusercontent.com/arl/macdeployqtfix/master/macdeployqtfix.py
+          python2.7 macdeployqtfix.py FastTrack.app/Contents/MacOS/FastTrack ../../Qt/5.15.0/
+          hdiutil create -volname FastTrack -srcfolder FastTrack.app -ov -format UDZO FastTrack.dmg
 
-
-        - name: Mac artefact
-          uses: actions/upload-artifact@v1
-          with:
-            name: FastTrackMac
-            path: ./build/FastTrack.dmg
+      - name: Mac artefact
+        uses: actions/upload-artifact@v1
+        with:
+          name: FastTrackMac
+          path: ./build/FastTrack.dmg
 
   job_4:
-      needs: [job_1, job_2, job_3]
-      runs-on: ubuntu-latest
-      steps:
-        - name: Delete previous release
-          uses: dev-drprasad/delete-tag-and-release@v0.1.2
-          with:
-            delete_release: true
-            tag_name: continuous
-          env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        - name: create release
-          id: create_release
-          uses: actions/create-release@v1
-          env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          with:
-            tag_name: continuous
-            release_name: Continuous release
-            draft: false
-            prerelease: true
+    needs: [job_1, job_2, job_3]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete previous release
+        uses: dev-drprasad/delete-tag-and-release@v0.1.2
+        with:
+          delete_release: true
+          tag_name: continuous
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: create release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: continuous
+          release_name: Continuous release
+          draft: false
+          prerelease: true
 
-        - name: Download linux
-          uses: actions/download-artifact@v1
-          with:
-            name: FastTrackLinux
-        - name: upload release asset
-          id: upload-release-asset-Linux
-          uses: actions/upload-release-asset@v1
-          env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          with:
-            upload_url: ${{ steps.create_release.outputs.upload_url }} 
-            asset_path: FastTrackLinux/FastTrack-x86_64.AppImage
-            asset_name: FastTrack-x86_64.AppImage
-            asset_content_type: application/zip
-        - name: Download Windows
-          uses: actions/download-artifact@v1
-          with:
-            name: FastTrackWindows
-        - name: upload release asset-Win
-          id: upload-release-asset-Win
-          uses: actions/upload-release-asset@v1
-          env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          with:
-            upload_url: ${{ steps.create_release.outputs.upload_url }} 
-            asset_path: FastTrackWindows/astTrack.zip
-            asset_name: FastTrack.zip
-            asset_content_type: application/zip
-        - name: Download Mac
-          uses: actions/download-artifact@v1
-          with:
-            name: FastTrackMac
-        - name: upload release asset_mac
-          id: upload-release-asset_mac
-          uses: actions/upload-release-asset@v1
-          env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          with:
-            upload_url: ${{ steps.create_release.outputs.upload_url }} 
-            asset_path: FastTrackMac/FastTrack.dmg
-            asset_name: FastTrack.dmg
-            asset_content_type: application/zip
+      - name: Download linux
+        uses: actions/download-artifact@v1
+        with:
+          name: FastTrackLinux
+      - name: upload release asset
+        id: upload-release-asset-Linux
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: FastTrackLinux/FastTrack-x86_64.AppImage
+          asset_name: FastTrack-x86_64.AppImage
+          asset_content_type: application/zip
+      - name: Download Windows
+        uses: actions/download-artifact@v1
+        with:
+          name: FastTrackWindows
+      - name: upload release asset-Win
+        id: upload-release-asset-Win
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: FastTrackWindows/astTrack.zip
+          asset_name: FastTrack.zip
+          asset_content_type: application/zip
+      - name: Download Mac
+        uses: actions/download-artifact@v1
+        with:
+          name: FastTrackMac
+      - name: upload release asset_mac
+        id: upload-release-asset_mac
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: FastTrackMac/FastTrack.dmg
+          asset_name: FastTrack.dmg
+          asset_content_type: application/zip
