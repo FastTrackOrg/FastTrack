@@ -505,8 +505,9 @@ void Batch::updateParameters() {
   * @brief Loads the settings file at the startup of the program and updates the ui->parameterTable with the new parameters.
 */
 void Batch::loadSettings() {
-  settingsFile = new QSettings("FastTrack", "FastTrack", this);
+  settingsFile = new QSettings("FastTrack", "FastTrackOrg", this);
   settingsFile->setFallbacksEnabled(false);  // Shadows global variables added in MacOs system
+  settingsFile->beginGroup("batch");
   QStringList keyList = settingsFile->allKeys();
   for (auto a : keyList) {
     parameterList.insert(a, settingsFile->value(a).toString());

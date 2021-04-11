@@ -94,16 +94,13 @@ class Interactive : public QMainWindow {
   void crop();
   void reset();
 
-  void loadSettings();
   void saveSettings();
   void loadParameters(QString path);
   void level();
 
  private:
   Ui::Interactive *ui;
-  QSettings *settingsFile;
   int currentLayout;
-  QMap<QString, QString> settings;
   QLabel *counterLabel;
   QAction *replayAction;
   QString memoryDir;                 /*!< Saves the path to the last opened folder in dialog. */
@@ -127,6 +124,10 @@ class Interactive : public QMainWindow {
   Replay *replay;
   VideoReader *video;
   bool videoStatus;
+
+  QString style;
+  QString color;
+  int layout;
 
  signals:
   void message(QString message);

@@ -44,8 +44,9 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   ui->menuBar->setNativeMenuBar(false);
 
   // Loads settings
-  settingsFile = new QSettings("FastTrack", "Benjamin Gallois", this);
-  loadSettings();
+  QSettings settingsFile("FastTrack", "FastTrackOrg");
+  resize(settingsFile.value("window/size").toSize());
+  move(settingsFile.value("window/pos").toPoint());
   videoStatus = false;
 
   // MetaType
@@ -125,7 +126,7 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
 
   // Loads prefered style
   QStringList styles = QStyleFactory::keys();
-  QString defaultStyle = settings.value("style");
+  style = settingsFile.value("window/style", "Fusion").toString();
   QMenu *menuStyle = new QMenu(tr("Appearance"), this);
   ui->menuSettings->addMenu(menuStyle);
 
@@ -134,7 +135,7 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
     styleAction->setCheckable(true);
     connect(styleAction, &QAction::triggered, [this, styleAction, menuStyle]() {
       qApp->setStyle(QStyleFactory::create(styleAction->text()));
-      settings.insert("style", styleAction->text());
+      style = styleAction->text();
       foreach (QAction *action, menuStyle->actions()) {
         action->setChecked(false);
       }
@@ -143,10 +144,10 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
     menuStyle->addAction(styleAction);
   }
 
-  if (styles.contains(defaultStyle)) {
-    qApp->setStyle(QStyleFactory::create(defaultStyle));
+  if (styles.contains(style)) {
+    qApp->setStyle(QStyleFactory::create(style));
     foreach (QAction *action, menuStyle->actions()) {
-      if (action->text() == defaultStyle) {
+      if (action->text() == style) {
         action->setChecked(true);
       }
     }
@@ -171,9 +172,9 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
     foreach (QAction *action, menuPalette->actions()) {
       action->setChecked(false);
     }
-    defaultColor->setChecked(true);
+    defaultColor->setChecked(false);
     qApp->setStyleSheet("");
-    settings.insert("color", "default");
+    color = "default";
   });
   connect(darkColor, &QAction::triggered, [this, darkColor, menuPalette]() {
     foreach (QAction *action, menuPalette->actions()) {
@@ -184,7 +185,7 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
     file.open(QFile::ReadOnly | QFile::Text);
     QTextStream stream(&file);
     qApp->setStyleSheet(stream.readAll());
-    settings.insert("color", "dark");
+    color = "dark";
   });
   connect(lightColor, &QAction::triggered, [this, lightColor, menuPalette]() {
     foreach (QAction *action, menuPalette->actions()) {
@@ -195,7 +196,7 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
     file.open(QFile::ReadOnly | QFile::Text);
     QTextStream stream(&file);
     qApp->setStyleSheet(stream.readAll());
-    settings.insert("color", "light");
+    color = "light";
   });
   connect(ftColor, &QAction::triggered, [this, ftColor, menuPalette]() {
     foreach (QAction *action, menuPalette->actions()) {
@@ -206,21 +207,18 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
     file.open(QFile::ReadOnly | QFile::Text);
     QTextStream stream(&file);
     qApp->setStyleSheet(stream.readAll());
-    settings.insert("color", "ft");
+    color = "ft";
   });
 
-  QString defaultColorTheme = settings.value("color");
-  if (defaultColorTheme == "light") {
+  color = settingsFile.value("window/color", "ft").toString();
+  if (color == "light") {
     lightColor->trigger();
   }
-  else if (defaultColorTheme == "dark") {
+  else if (color == "dark") {
     darkColor->trigger();
   }
-  else if (defaultColorTheme == "ft") {
+  else if (color == "ft") {
     ftColor->trigger();
-  }
-  else {
-    defaultColor->trigger();
   }
 
   // Layout options
@@ -245,7 +243,7 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
     ui->actionLayout3->setChecked(false);
     ui->actionLayout4->setChecked(false);
 
-    settings.insert("layout", "1");
+    layout = 1;
   });
   connect(ui->actionLayout2, &QAction::triggered, [this]() {
     ui->controlOptions->setVisible(true);
@@ -266,7 +264,7 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
     ui->actionLayout3->setChecked(false);
     ui->actionLayout4->setChecked(false);
 
-    settings.insert("layout", "2");
+    layout = 2;
   });
   connect(ui->actionLayout3, &QAction::triggered, [this]() {
     ui->controlOptions->setVisible(true);
@@ -286,7 +284,7 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
     ui->actionLayout3->setChecked(true);
     ui->actionLayout4->setChecked(false);
 
-    settings.insert("layout", "3");
+    layout = 3;
   });
   connect(ui->actionLayout4, &QAction::triggered, [this]() {
     ui->controlOptions->setVisible(true);
@@ -307,13 +305,13 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
     ui->actionLayout3->setChecked(false);
     ui->actionLayout4->setChecked(true);
 
-    settings.insert("layout", "4");
+    layout = 4;
   });
 
   // Loads previous layout
-  int preferedLayout = settings.value("layout").toInt();
+  layout = settingsFile.value("window/layout", 1).toInt();
 
-  switch (preferedLayout) {
+  switch (layout) {
     case 1:
       ui->actionLayout1->activate(QAction::Trigger);
       break;
@@ -1108,23 +1106,15 @@ Interactive::~Interactive() {
 }
 
 /**
-  * @brief Loads the settings.
-*/
-void Interactive::loadSettings() {
-  QList<QString> keys = settingsFile->allKeys();
-  for (auto &a : keys) {
-    settings.insert(a, settingsFile->value(a).toString());
-  }
-}
-
-/**
   * @brief Saves the settings.
 */
 void Interactive::saveSettings() {
-  QList<QString> keys = settings.keys();
-  for (auto &a : keys) {
-    settingsFile->setValue(a, settings.value(a));
-  }
+  QSettings settingsFile("FastTrack", "FastTrackOrg");
+  settingsFile.setValue("window/size", this->size());
+  settingsFile.setValue("window/fullScreen", this->isFullScreen());
+  settingsFile.setValue("window/style", style);
+  settingsFile.setValue("window/color", color);
+  settingsFile.setValue("window/layout", layout);
 }
 
 /**

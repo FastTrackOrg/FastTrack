@@ -91,18 +91,42 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 
   manager->get(QNetworkRequest(QUrl("https://www.fasttrack.sh/download/FastTrack/platforms.txt")));
 
-  QMessageBox *consent = new QMessageBox(this);
-  consent->setWindowTitle("Consent");
-  consent->setText("To help to monitor the development of the software, FastTrack would like to collect some information (IP address, operating system)");
-  consent->setStandardButtons(QMessageBox::Yes);
-  consent->addButton(QMessageBox::No);
-  QTimer::singleShot(5000, consent, &QMessageBox::close);
-  if (consent->exec() == QMessageBox::Yes) {
-    QWebEngineView *view = new QWebEngineView(this);
-    view->setUrl(QUrl("https://www.fasttrack.sh/soft.html"));
-    connect(view->page(), &QWebEnginePage::loadFinished, [this, view]() {
-      delete view;
-    });
+  QSettings settingsFile("FastTrack", "FastTrackOrg");
+  int isChosed = settingsFile.value("main/consent", -1).toInt();
+  switch (isChosed) {
+    case -1: {
+      QMessageBox *consent = new QMessageBox(this);
+      consent->setWindowTitle("Consent");
+      consent->setText("To help to monitor the development of the software, FastTrack would like to collect some information (IP address, operating system)");
+      consent->setStandardButtons(QMessageBox::Yes);
+      consent->addButton(QMessageBox::No);
+      QTimer::singleShot(5000, consent, &QMessageBox::close);
+      if (consent->exec() == QMessageBox::Yes) {
+        QWebEngineView *view = new QWebEngineView(this);
+        view->setUrl(QUrl("https://www.fasttrack.sh/soft.html"));
+        connect(view->page(), &QWebEnginePage::loadFinished, [this, view]() {
+          delete view;
+        });
+        settingsFile.setValue("main/consent", 0);
+      }
+      else {
+        settingsFile.setValue("main/consent", 1);
+      }
+      break;
+    }
+    case 0: {
+      QWebEngineView *view = new QWebEngineView(this);
+      view->setUrl(QUrl("https://www.fasttrack.sh/soft.html"));
+      connect(view->page(), &QWebEnginePage::loadFinished, [this, view]() {
+        delete view;
+      });
+      view = new QWebEngineView(this);
+      view->setUrl(QUrl("https://www.fasttrack.sh/soft.html"));
+      connect(view->page(), &QWebEnginePage::loadFinished, [this, view]() {
+        delete view;
+      });
+      break;
+    }
   }
 
   interactive = new Interactive(this);
@@ -130,7 +154,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 }  // Constructor
 
 /**
-  * @brief Close event reimplemented to ask confirmation before closing. 
+  * @brief Close event reimplemented to ask confirmation before closing.
 */
 void MainWindow::closeEvent(QCloseEvent *event) {
   QMessageBox::StandardButton reply;
@@ -144,7 +168,7 @@ void MainWindow::closeEvent(QCloseEvent *event) {
 }
 
 /**
-  * @brief Destructs the MainWindow object and saves the previous set of parameters.  
+  * @brief Destructs the MainWindow object and saves the previous set of parameters.
 */
 MainWindow::~MainWindow() {
   delete ui;
