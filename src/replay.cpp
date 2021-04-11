@@ -181,10 +181,6 @@ Replay::Replay(QWidget* parent, bool standalone, Timeline* slider, VideoReader* 
 
   deletedFrameNumber = new QSpinBox(this);
   deletedFrameNumber->setStatusTip(tr("Number of frames where to delete the selected object"));
-  connect(ui->replaySlider, &Timeline::valueChanged, [this]() {
-    deletedFrameNumber->setMaximum(video->getImageCount() - ui->replaySlider->value());
-    deletedFrameNumber->setValue(video->getImageCount() - ui->replaySlider->value());
-  });
   deletedFrameFocus = new QShortcut(QKeySequence("c"), this);
   connect(deletedFrameFocus, &QShortcut::activated, deletedFrameNumber, static_cast<void (QSpinBox::*)(void)>(&QSpinBox::setFocus));
   connect(deletedFrameFocus, &QShortcut::activated, deletedFrameNumber, &QSpinBox::selectAll);
@@ -233,18 +229,6 @@ Replay::Replay(QWidget* parent, bool standalone, Timeline* slider, VideoReader* 
   infoAction->setStatusTip(tr("Information"));
   ui->toolBar->addAction(infoAction);
 
-  // Is standalone replace control.
-  isStandalone = standalone;
-  if (!standalone) {
-    ui->controls->hide();
-    ui->replaySlider = slider;
-    video = videoReader;
-  }
-  // If not standalone create video reader
-  else {
-    video = new VideoReader();
-  }
-
   // Install event filters
   ui->replayDisplay->installEventFilter(this);
   ui->scrollArea->viewport()->installEventFilter(this);
@@ -290,8 +274,6 @@ Replay::Replay(QWidget* parent, bool standalone, Timeline* slider, VideoReader* 
     loadFrame(currentIndex);
   });
 
-  connect(ui->replaySlider, &Timeline::valueChanged, this, &Replay::loadFrame);
-
   // Info tables
   connect(ui->infoTableObject1, &QTableWidget::cellClicked, [this](int row, int col) {
     if (row == 1 && col == 0) {
@@ -307,7 +289,6 @@ Replay::Replay(QWidget* parent, bool standalone, Timeline* slider, VideoReader* 
   // Annotation object
   annotation = new Annotation();
   // Load annotation file
-  connect(ui->replaySlider, &Timeline::valueChanged, annotation, &Annotation::read);
   connect(annotation, &Annotation::annotationText, ui->annotation, &QTextEdit::setPlainText);
   connect(ui->annotation, &QTextEdit::textChanged, annotation, [this]() {
     int index = ui->replaySlider->currentValue();
@@ -325,7 +306,31 @@ Replay::Replay(QWidget* parent, bool standalone, Timeline* slider, VideoReader* 
   });
 
   trackingData = new Data();
-  ;
+
+  // In not standalone mode, the user need to manually connect the slider to the loadFrame
+  // signal to avoid double connections and increase performance.
+  isStandalone = standalone;
+  if (!standalone) {
+    delete ui->controls;
+    ui->replaySlider = slider;
+    video = videoReader;
+  }
+  // If standalone create video reader and timeline connections
+  else {
+    video = new VideoReader();
+    connect(ui->replaySlider, &Timeline::valueChanged, this, &Replay::sliderConnection);
+  }
+}
+
+void Replay::sliderConnection(const int index) {
+  if (!ui->replaySlider->isAutoplay && !trackingData->isEmpty) {
+    updateInformation(ui->infoTableObject1->item(0, 0)->text().toInt(), index, ui->infoTableObject1);
+    updateInformation(ui->infoTableObject2->item(0, 0)->text().toInt(), index, ui->infoTableObject2);
+    deletedFrameNumber->setMaximum(maxIndex - index);
+    deletedFrameNumber->setValue(maxIndex - index);
+    annotation->read(index);
+  }
+  loadFrame(index);
 }
 
 Replay::~Replay() {
@@ -372,6 +377,7 @@ void Replay::loadReplayFolder(QString dir) {
     }
     ui->replaySlider->setMinimum(0);
     ui->replaySlider->setMaximum(video->getImageCount() - 1);
+    maxIndex = video->getImageCount();
 
     Mat frame;
     video->getImage(0, frame);
@@ -403,12 +409,6 @@ void Replay::loadReplayFolder(QString dir) {
     // Load annotation file
     annotation->setPath(trackingDir);
 
-    // Information
-    connect(ui->replaySlider, &Timeline::valueChanged, [this](int index) {
-      updateInformation(ui->infoTableObject1->item(0, 0)->text().toInt(), index, ui->infoTableObject1);
-      updateInformation(ui->infoTableObject2->item(0, 0)->text().toInt(), index, ui->infoTableObject2);
-    });
-
     ui->replaySlider->setValue(1);  // To force the change
     ui->replaySlider->setValue(0);
   }
@@ -424,18 +424,22 @@ void Replay::loadReplayFolder(QString dir) {
   * @brief Displays the image and the tracking data in the ui->displayReplay. Triggered when the ui->replaySlider value is changed.
 */
 void Replay::loadFrame(int frameIndex) {
+  if (!isReplayable) {
+    return;
+  }
+
   currentIndex = frameIndex;
-  if (isReplayable) {
-    object1Replay->clear();
+  object1Replay->clear();
 
-    Mat frame;
-    if (!video->getImage(frameIndex, frame)) {
-      return;
-    }
-    cvtColor(frame, frame, COLOR_GRAY2BGR);
-    int scale = ui->replaySize->value();
+  Mat frame;
+  if (!video->getImage(frameIndex, frame)) {
+    return;
+  }
+  cvtColor(frame, frame, COLOR_GRAY2BGR);
 
+  if (!trackingData->isEmpty) {
     // Takes the tracking data corresponding to the replayed frame and parse data to display
+    int scale = ui->replaySize->value();
     QList<int> idList = trackingData->getId(frameIndex);
     std::sort(idList.begin(), idList.end());
     for (auto const& a : idList) {
@@ -503,14 +507,14 @@ void Replay::loadFrame(int frameIndex) {
         cv::polylines(frame, memory, false, Scalar(colorMap[id].x, colorMap[id].y, colorMap[id].z), scale, cv::LINE_AA);
       }
     }
-
-    int w = ui->replayDisplay->width();
-    int h = ui->replayDisplay->height();
-    QPixmap resizedPix = (QPixmap::fromImage(QImage(frame.data, frame.cols, frame.rows, static_cast<int>(frame.step), QImage::Format_RGB888)).scaled(w, h, Qt::KeepAspectRatio));
-    ui->replayDisplay->setPixmap(resizedPix);
-    resizedFrame.setWidth(resizedPix.width());
-    resizedFrame.setHeight(resizedPix.height());
   }
+
+  int w = ui->replayDisplay->width();
+  int h = ui->replayDisplay->height();
+  QPixmap resizedPix = (QPixmap::fromImage(QImage(frame.data, frame.cols, frame.rows, static_cast<int>(frame.step), QImage::Format_RGB888)).scaled(w, h, Qt::KeepAspectRatio));
+  ui->replayDisplay->setPixmap(resizedPix);
+  resizedFrame.setWidth(resizedPix.width());
+  resizedFrame.setHeight(resizedPix.height());
 }
 
 /**

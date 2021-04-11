@@ -114,7 +114,7 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
       display(newValue);
     }
     else if (index == 1) {
-      replay->loadFrame(newValue);
+      replay->sliderConnection(newValue);
     }
   });
 
@@ -591,95 +591,79 @@ void Interactive::openFolder() {
   * @param[in] scale Optional scale to display.
 */
 void Interactive::display(int index, int scale) {
-  if (videoStatus) {
-    UMat frame;
-    if (!video->getImage(index, frame)) {
-      return;
+  if (!videoStatus) {
+    return;
+  }
+
+  UMat frame;
+  if (!video->getImage(index, frame)) {
+    return;
+  }
+
+  // Crops the image
+  if (roi.width != 0 || roi.height != 0) {
+    frame = frame(roi);
+  }
+
+  // Computes the image with the background subtracted
+  if (ui->isSub->isChecked() && isBackground) {
+    (ui->backColor->currentText() == "Light background") ? (subtract(background, frame, frame)) : (subtract(frame, background, frame));
+    cvtColor(frame, frame, COLOR_GRAY2RGB);
+  }
+  // Computes the binary image an applies morphological operations
+  else if (ui->isBin->isChecked() && isBackground) {
+    (ui->backColor->currentText() == "Light background") ? (subtract(background, frame, frame)) : (subtract(frame, background, frame));
+    tracking->binarisation(frame, 'b', ui->threshBox->value());
+    if (ui->morphOperation->currentIndex() != 8) {
+      Mat element = getStructuringElement(ui->kernelType->currentIndex(), Size(2 * ui->kernelSize->value() + 1, 2 * ui->kernelSize->value() + 1), Point(ui->kernelSize->value(), ui->kernelSize->value()));
+      morphologyEx(frame, frame, ui->morphOperation->currentIndex(), element);  // MorphTypes enum and QComboBox indexes have to match
     }
+
+    vector<vector<Point>> contours;
+    findContours(frame, contours, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
+
+    double min = ui->minSize->value();
+    double max = ui->maxSize->value();
+
+    // If too many contours are detected to be displayed without slowdowns, ask the user what to do
+    if (contours.size() > 10000) {
+      QMessageBox::StandardButton reply;
+      reply = QMessageBox::question(this, "Confirmation", "Too many objects detected to be displayed. \n Do you want to display them anyway (the program can be slow)? ", QMessageBox::No | QMessageBox::Yes);
+      if (reply == QMessageBox::No) {
+        return;
+      }
+    }
+
     vector<vector<Point>> displayContours;
     vector<vector<Point>> rejectedContours;
-
-    // Computes the image with the background subtracted
-    if (ui->isSub->isChecked() && isBackground) {
-      (ui->backColor->currentText() == "Light background") ? (subtract(background, frame, frame)) : (subtract(frame, background, frame));
-      // Crops the image
-      if (roi.width != 0 || roi.height != 0) {
-        frame = frame(roi);
+    displayContours.reserve(contours.size());
+    rejectedContours.reserve(contours.size());
+    for (auto const &a : contours) {
+      double size = contourArea(a);
+      if (size > min && size < max) {
+        displayContours.push_back(a);
+      }
+      else {
+        rejectedContours.push_back(a);
       }
     }
-
-    // Computes the binary image an applies morphological operations
-    else if (ui->isBin->isChecked() && isBackground) {
-      (ui->backColor->currentText() == "Light background") ? (subtract(background, frame, frame)) : (subtract(frame, background, frame));
-      tracking->binarisation(frame, 'b', ui->threshBox->value());
-      if (ui->morphOperation->currentIndex() != 8) {
-        Mat element = getStructuringElement(ui->kernelType->currentIndex(), Size(2 * ui->kernelSize->value() + 1, 2 * ui->kernelSize->value() + 1), Point(ui->kernelSize->value(), ui->kernelSize->value()));
-        morphologyEx(frame, frame, ui->morphOperation->currentIndex(), element);  // MorphTypes enum and QComboBox indexes have to match
-      }
-
-      // Keeps only right sized objects
-      // To benchmark: pushBack contours vs loop over index and call drawContours multiple times
-
-      // Crops the image
-      if (roi.width != 0 || roi.height != 0) {
-        frame = frame(roi);
-      }
-
-      vector<vector<Point>> contours;
-      findContours(frame, contours, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
-      displayContours.reserve(contours.size());
-      rejectedContours.reserve(contours.size());
-
-      double min = ui->minSize->value();
-      double max = ui->maxSize->value();
-
-      // If too many contours are detected to be displayed without slowdowns, ask the user what to do
-      if (contours.size() > 10000) {
-        QMessageBox::StandardButton reply;
-        reply = QMessageBox::question(this, "Confirmation", "Too many objects detected to be displayed. \n Do you want to display them anyway (the program can be slow)? ", QMessageBox::No | QMessageBox::Yes);
-        if (reply == QMessageBox::No) {
-          return;
-        }
-      }
-
-      for (auto const &a : contours) {
-        double size = contourArea(a);
-        if (size > min && size < max) {
-          displayContours.push_back(a);
-        }
-        else {
-          rejectedContours.push_back(a);
-        }
-      }
-      counterLabel->setText("Objects detected: " + QString::number(displayContours.size()));
-      counterLabel->adjustSize();
-    }
-
-    else {
-      // Crops the image
-      if (roi.width != 0 || roi.height != 0) {
-        frame = frame(roi);
-      }
-    }
-
-    // Displays the image in the QLabel
     cvtColor(frame, frame, COLOR_GRAY2RGB);
-
-    // Draws the scale
-    if (scale != 0) {
-      line(frame, Point(20, 20), Point(20 + scale, 20), Scalar(255, 0, 0), 2);
-    }
-
-    if (ui->isBin->isChecked()) {
-      drawContours(frame, displayContours, -1, Scalar(0, 255, 0), FILLED, 8);
-      drawContours(frame, rejectedContours, -1, Scalar(255, 0, 0), FILLED, 8);
-    }
-    Mat image = frame.getMat(ACCESS_READ);
-    resizedPix = (QPixmap::fromImage(QImage(image.data, image.cols, image.rows, static_cast<int>(image.step), QImage::Format_RGB888)).scaled(ui->display->size(), Qt::KeepAspectRatio));
-    ui->display->setPixmap(resizedPix);
-    resizedFrame.setWidth(resizedPix.width());
-    resizedFrame.setHeight(resizedPix.height());
+    drawContours(frame, displayContours, -1, Scalar(0, 255, 0), FILLED, 8);
+    drawContours(frame, rejectedContours, -1, Scalar(255, 0, 0), FILLED, 8);
+    counterLabel->setText("Objects detected: " + QString::number(displayContours.size()));
+    counterLabel->adjustSize();
   }
+  else {
+    cvtColor(frame, frame, COLOR_GRAY2RGB);
+  }
+
+  // Draws the scale
+  if (scale != 0) {
+    line(frame, Point(20, 20), Point(20 + scale, 20), Scalar(255, 0, 0), 2);
+  }
+
+  Mat image = frame.getMat(ACCESS_READ);
+  display(QImage(image.data, image.cols, image.rows, static_cast<int>(image.step), QImage::Format_RGB888));
 }
 
 /**
@@ -716,7 +700,7 @@ void Interactive::zoomOut() {
 /**
   * @brief This is an overloaded function to display a QImage in the display.
 */
-void Interactive::display(QImage image) {
+void Interactive::display(const QImage &image) {
   resizedPix = (QPixmap::fromImage(image).scaled(ui->display->size(), Qt::KeepAspectRatio));
   ui->display->setPixmap(resizedPix);
   resizedFrame.setWidth(resizedPix.width());
@@ -726,9 +710,9 @@ void Interactive::display(QImage image) {
 /**
   * @brief This is an overloaded function to display a UMat in the display.
 */
-void Interactive::display(UMat image) {
-  cvtColor(image, image, COLOR_GRAY2RGB);
+void Interactive::display(const UMat &image) {
   Mat frame = image.getMat(ACCESS_READ);
+  cvtColor(frame, frame, COLOR_GRAY2RGB);
   resizedPix = (QPixmap::fromImage(QImage(frame.data, frame.cols, frame.rows, static_cast<int>(frame.step), QImage::Format_RGB888)).scaled(ui->display->size(), Qt::KeepAspectRatio));
   ui->display->setPixmap(resizedPix);
   resizedFrame.setWidth(resizedPix.width());

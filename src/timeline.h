@@ -36,6 +36,7 @@ class Timeline : public QWidget {
   int value();
   int currentValue();
   void togglePlay();
+  int isAutoplay;
 
  private:
   Ui::Timeline *ui;

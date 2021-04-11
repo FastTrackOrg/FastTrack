@@ -76,8 +76,8 @@ class Interactive : public QMainWindow {
   void openFolder();
 
   void display(int index, int scale = 0);
-  void display(QImage image);
-  void display(UMat image);
+  void display(const QImage &image);
+  void display(const UMat &image);
 
   void zoomIn();
   void zoomOut();

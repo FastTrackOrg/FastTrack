@@ -33,7 +33,7 @@ QDockWidget {
 }
 
 QDockWidget > QWidget {
-    background: #FFFFF;
+    background: #FFFFFF;
     border: 1px;
     border-style: solid;
     border-color: #DEE4E7;

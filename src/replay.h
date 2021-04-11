@@ -96,6 +96,7 @@ class Replay : public QMainWindow {
   vector<Point3i> colorMap;     /*!< RGB color map to display each object in one color. */
   QVector<int> occlusionEvents; /*!< Index of each occlusion event in the replayed images sequence. */
   int replayNumberObject;       /*!< Number of objects tracked in the replayed images sequence. */
+  int maxIndex;                 /*!< Number of images. */
   bool isReplayable;            /*!< True if user input is an images sequences that can be played. */
   int replayFps;                /*!< Frame rate value at which a new image is displayed in autoplay mode in the replay. */
   int autoPlayerIndex;          /*!< Index of the image displayed in autoplay mode in the replay. */
@@ -122,6 +123,7 @@ class Replay : public QMainWindow {
   void nextOcclusionEvent();
   void previousOcclusionEvent();
   void saveTrackedMovie();
+  void sliderConnection(const int index);
 };
 
 #endif  // REPLAY_H

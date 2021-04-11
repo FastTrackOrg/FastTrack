@@ -82,7 +82,7 @@ Timeline::Timeline(QWidget *parent)
   connect(dShortcut, &QShortcut::activated, [this]() { setValue(m_currentIndexLeft + 1); });
 
   QShortcut *spaceShortcut = new QShortcut(Qt::Key_Space, this);
-  connect(spaceShortcut, &QShortcut::activated, [this]() { ui->playButton->animateClick(); });
+  connect(spaceShortcut, &QShortcut::activated, [this]() { ui->playButton->animateClick(0); });
 
   //Ui
   QIcon img = QIcon(":/assets/buttons/play.png");
@@ -309,10 +309,12 @@ void Timeline::togglePlay() {
     QIcon img(":/assets/buttons/pause.png");
     ui->playButton->setIcon(img);
     timer->start(1000 / ui->fpsBox->value());
+    isAutoplay = true;
   }
   else if (!ui->playButton->isChecked()) {
     QIcon img(":/assets/buttons/resume.png");
     ui->playButton->setIcon(img);
     timer->stop();
+    isAutoplay = false;
   }
 }
