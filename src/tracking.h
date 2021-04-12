@@ -60,29 +60,26 @@ class Tracking : public QObject {
 
   QElapsedTimer *timer; /*!< Timer that measured the time during the analysis execution. */
 
-  UMat m_background; /*!< Background image CV_8U. */
-
   bool statusBinarisation; /*!< True if wite objects on dark background, flase otherwise. */
-
-  VideoReader *video;
-  int m_im;                       /*!< Index of the next image to process in the m_files list. */
-  QString m_error;                /*!< QString containing unreadable images. */
-  int m_startImage;               /*!< Index of the next image to process in the m_files list. */
-  int m_stopImage;                /*!< Index of the next image to process in the m_files list. */
-  Rect m_ROI;                     /*!< Rectangular region of interest. */
-  QTextStream m_savefile;         /*!< Stream to output tracking data. */
-  QFile m_outputFile;             /*!< Path to the file where to save tracking data. */
-  QFile m_logFile;                /*!< Path to the file where to save logs. */
-  vector<cv::String> m_files;     /*!< Vector containing the path for each image in the images sequence. */
-  vector<Point3i> m_colorMap;     /*!< Vector containing RBG color. */
-  vector<vector<Point>> m_memory; /*!< Vector containing the last 50 tracking data. */
-  vector<int> m_id;               /*!< Vector containing the objets Id. */
-  vector<int> m_lost;             /*!< Vector containing the lost objects. */
-  int m_idMax;
 
   string m_path;           /*!< Path to an image sequence. */
   string m_backgroundPath; /*!< Path to an image background. */
+  UMat m_background;       /*!< Background image CV_8U. */
   int m_displayTime;       /*!< Binary image CV_8U. */
+
+  VideoReader *video;
+  int m_im;                   /*!< Index of the next image to process in the m_files list. */
+  QString m_error;            /*!< QString containing unreadable images. */
+  int m_startImage;           /*!< Index of the next image to process in the m_files list. */
+  int m_stopImage;            /*!< Index of the next image to process in the m_files list. */
+  Rect m_ROI;                 /*!< Rectangular region of interest. */
+  QTextStream m_savefile;     /*!< Stream to output tracking data. */
+  QFile m_outputFile;         /*!< Path to the file where to save tracking data. */
+  QFile m_logFile;            /*!< Path to the file where to save logs. */
+  vector<cv::String> m_files; /*!< Vector containing the path for each image in the images sequence. */
+  vector<int> m_id;           /*!< Vector containing the objets Id. */
+  vector<int> m_lost;         /*!< Vector containing the lost objects. */
+  int m_idMax;
 
   int param_n;                            /*!< Number of objects. */
   int param_maxArea;                      /*!< Maximal area of an object. */
@@ -131,7 +128,6 @@ class Tracking : public QObject {
   vector<int> costFunc(const vector<vector<Point3d>> &prevPos, const vector<vector<Point3d>> &pos, double LENGHT, double ANGLE, double LO, double AREA, double PERIMETER) const;
   void cleaning(const vector<int> &occluded, vector<int> &lostCounter, vector<int> &id, vector<vector<Point3d>> &input, double param_maximalTime) const;
   vector<Point3d> prevision(vector<Point3d> past, vector<Point3d> present) const;
-  vector<Point3i> color(int number) const;
   vector<int> findOcclusion(vector<int> assignment) const;
 
   UMat m_binaryFrame;                /*!< Binary image CV_8U */

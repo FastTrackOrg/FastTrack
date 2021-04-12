@@ -42,7 +42,7 @@ VideoReader::VideoReader(const string &path) {
   * @brief Copy constructor.
   * @param[in] video.
 */
-VideoReader::VideoReader(const VideoReader &video) {
+VideoReader::VideoReader(const VideoReader &video) : VideoCapture(video) {
   open(video.m_path);
 }
 

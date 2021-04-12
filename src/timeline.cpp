@@ -157,7 +157,6 @@ bool Timeline::eventFilter(QObject *target, QEvent *event) {
   if (target == ui->timelineView && event->type() == QEvent::HoverMove) {
     QHoverEvent *hoverEvent = static_cast<QHoverEvent *>(event);
     int x = static_cast<int>(ui->timelineView->mapToScene(hoverEvent->pos()).x());
-    int image = ((x - static_cast<int>(m_offset * 0.5)) * m_imageNumber) / (m_width * m_scale - 30);
     if (x >= 15 && x <= m_width * m_scale - static_cast<int>(m_offset * 0.5)) {
       int image = ((x - static_cast<int>(m_offset * 0.5)) * m_imageNumber) / (m_width * m_scale - m_offset);
       setCursorValue(image);

@@ -696,26 +696,6 @@ vector<Point3d> Tracking::prevision(vector<Point3d> past, vector<Point3d> presen
 }
 
 /**
-  * @brief Computes a random set of colors.
-  * @param[in] number The number of colors to generate.
-  * @return The vector containing the n colors.
-*/
-vector<Point3i> Tracking::color(int number) const {
-  int a, b, c;
-  vector<Point3i> colorMap;
-  srand((unsigned int)time(NULL));
-  for (int j = 0; j < number; ++j) {
-    a = rand() % 255;
-    b = rand() % 255;
-    c = rand() % 255;
-
-    colorMap.push_back(Point3i(a, b, c));
-  }
-
-  return colorMap;
-}
-
-/**
   * @brief Processes an image from an images sequence and tracks and matchs objects according to the previous image in the sequence. Takes a new image from the image sequence, substracts the background, binarises the image and crops according to the defined region of interest. Detects all the objects in the image and extracts the object features. Then matches detected objects with objects from the previous frame. This function emits a signal to display the images in the user interface.
 */
 void Tracking::imageProcessing() {
@@ -868,8 +848,6 @@ void Tracking::startProcess() {
       }
     }
 
-    //m_colorMap = color(9000);
-    m_memory = vector<vector<Point>>(9000, vector<Point>());
     // First frame
     video->getImage(m_im, m_visuFrame);
 
