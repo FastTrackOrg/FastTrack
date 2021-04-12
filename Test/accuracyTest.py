@@ -92,7 +92,7 @@ def errorsCounter(reference, tracking):
                 skip = []
                 operations = []
                 for j in ref.itertuples():
-                    tmp = track[ (j.xBody == track["xBody"].values) & (j.yBody == track["yBody"].values)]
+                    tmp = track[ (j.xBody == track["xBody"].values) & (j.yBody == track["yBody"].values) & (j.tBody == track["tBody"].values)]
                     objects += 1
                     if not tmp.empty and j.id != tmp["id"].values[0]:
                         operations.append((tmp["id"].values[0], j.id))
@@ -118,7 +118,7 @@ def errorsCounter(reference, tracking):
             skip = []
             operations = []
             for j in ref.itertuples():
-                tmp = track[ (j.xBody == track["xBody"].values) & (j.yBody == track["yBody"].values)]
+                tmp = track[ (j.xBody == track["xBody"].values) & (j.yBody == track["yBody"].values) & (j.tBody == track["tBody"].values)]
                 objects += 1
                 if not tmp.empty and j.id != tmp["id"].values[0]:
                     operations.append((tmp["id"].values[0], j.id))
@@ -164,9 +164,9 @@ def tracking(path, imagePath, normDist=None, normAngle=None, maxDist=None, maxTi
 
 
 def test_accuracy():
-  reference = pandas.read_csv("dataSet/images/Groundtruth/Tracking_Result/tracking.txt", engine="python", sep="\t", usecols=['xBody', 'yBody', 'imageNumber', 'id'])
+  reference = pandas.read_csv("dataSet/images/Groundtruth/Tracking_Result/tracking.txt", engine="python", sep="\t", usecols=['xBody', 'yBody','tBody', 'imageNumber', 'id'])
   tracking("dataSet/", "images/frame_000000.pgm", normDist=20, normAngle=118, maxDist=195, maxTime=40, normArea=0, normPerim=0)
-  trackingData = pandas.read_csv("dataSet/images/Tracking_Result/tracking.txt", engine="python", sep="\t", usecols=['xBody', 'yBody', 'imageNumber', 'id'])              
+  trackingData = pandas.read_csv("dataSet/images/Tracking_Result/tracking.txt", engine="python", sep="\t", usecols=['xBody', 'yBody', 'tBody', 'imageNumber', 'id'])              
   res = errorsCounter(reference, trackingData)
   shutil.rmtree("dataSet/images/Tracking_Result/")
   assert res[1] == 12, "If better accuracy than previously reported! Please update the benchmark comment and the test with: " + str(np.around(res[0]*100, 2)) + '%\t' + str(res[1]) + " errors"

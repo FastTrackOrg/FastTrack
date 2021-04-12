@@ -153,16 +153,17 @@ vector<double> Tracking::objectInformation(const UMat &image) const {
   double j = moment.mu11;
   double k = moment.mu02;
 
-  double orientation = 0.5 * atan((2 * j) / (i - k)) + (i < k) * (M_PI * 0.5);
-  orientation += 2 * M_PI * (orientation < 0);
-  orientation = 2 * M_PI - orientation;
+  double orientation = 0;
+  if (i + j - k != 0) {
+    orientation = (0.5 * atan((2 * j) / (i - k)) + (i < k) * (M_PI * 0.5));
+    orientation += 2 * M_PI * (orientation < 0);
+    orientation = (2 * M_PI - orientation);
+  }
 
   double majAxis = 2 * pow((((i + k) + pow((i - k) * (i - k) + 4 * j * j, 0.5)) * 0.5) / moment.m00, 0.5);
   double minAxis = 2 * pow((((i + k) - pow((i - k) * (i - k) + 4 * j * j, 0.5)) * 0.5) / moment.m00, 0.5);
 
-  vector<double> param{x, y, orientation, majAxis, minAxis};
-
-  return param;
+  return {x, y, orientation, majAxis, minAxis};
 }
 
 /**
@@ -524,8 +525,7 @@ vector<vector<Point3d>> Tracking::objectPosition(const UMat &frame, int minSize,
     }
   }
 
-  vector<vector<Point3d>> out = {positionHead, positionTail, positionFull, globalParam, ellipseHead, ellipseTail, ellipseBody};
-  return out;
+  return {positionHead, positionTail, positionFull, globalParam, ellipseHead, ellipseTail, ellipseBody};
 }
 
 /**
