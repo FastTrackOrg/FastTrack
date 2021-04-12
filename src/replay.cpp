@@ -335,6 +335,11 @@ void Replay::sliderConnection(const int index) {
 
 Replay::~Replay() {
   delete ui;
+  delete trackingData;
+  delete annotation;
+  if (isStandalone) {
+    delete video;
+  }
 }
 
 /**
