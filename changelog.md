@@ -1,5 +1,11 @@
 # FastTrack changelog
 
+## 5.3.1
+
+###Fixed
+- Memory leaks in Replay.
+- Crop in interactive.
+
 ## 5.3.0
 
 ### Changed
