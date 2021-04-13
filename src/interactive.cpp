@@ -364,6 +364,7 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   connect(ui->threshBox, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), ui->threshSlider, &QSlider::setValue);
   connect(ui->threshBox, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [this]() {
     ui->isBin->setChecked(true);
+    ui->interactiveTab->setCurrentIndex(0);
     display(ui->slider->value());
   });
 
@@ -754,6 +755,7 @@ void Interactive::computeBackground() {
         ui->backColor->setCurrentIndex(1);
       }
 
+      ui->interactiveTab->setCurrentIndex(0);
       display(background);
       ui->previewButton->setDisabled(false);
       ui->trackButton->setDisabled(false);
