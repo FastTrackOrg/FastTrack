@@ -220,6 +220,9 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   else if (color == "ft") {
     ftColor->trigger();
   }
+  else {
+    ftColor->trigger();
+  }
 
   // Layout options
   ui->menuBar->removeAction(ui->menuLayout->menuAction());
@@ -309,7 +312,7 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   });
 
   // Loads previous layout
-  layout = settingsFile.value("window/layout", 1).toInt();
+  layout = settingsFile.value("window/layout").toInt();
 
   switch (layout) {
     case 1:
@@ -598,11 +601,6 @@ void Interactive::display(int index, int scale) {
     return;
   }
 
-  // Crops the image
-  if (roi.width != 0 || roi.height != 0) {
-    frame = frame(roi);
-  }
-
   // Computes the image with the background subtracted
   if (ui->isSub->isChecked() && isBackground) {
     (ui->backColor->currentText() == "Light background") ? (subtract(background, frame, frame)) : (subtract(frame, background, frame));
@@ -658,6 +656,11 @@ void Interactive::display(int index, int scale) {
   // Draws the scale
   if (scale != 0) {
     line(frame, Point(20, 20), Point(20 + scale, 20), Scalar(255, 0, 0), 2);
+  }
+
+  // Crops the image
+  if (roi.width != 0 || roi.height != 0) {
+    frame = frame(roi);
   }
 
   Mat image = frame.getMat(ACCESS_READ);
@@ -1184,8 +1187,8 @@ void Interactive::loadParameters(QString path) {
     ui->registrationBack->setCurrentIndex(parameterList.value("regBack").toInt());
     ui->x1->setValue(parameterList.value("xTop").toInt());
     ui->y1->setValue(parameterList.value("yTop").toInt());
-    ui->x2->setValue(parameterList.value("xBottom").toInt());
-    ui->y2->setValue(parameterList.value("yBottom").toInt());
+    (parameterList.value("xBottom").toInt() == 0) ? ui->x2->setValue(originalImageSize.width()) : ui->x2->setValue(parameterList.value("xBottom").toInt());
+    (parameterList.value("yBottom").toInt() == 0) ? ui->y2->setValue(originalImageSize.height()) : ui->y2->setValue(parameterList.value("yBottom").toInt());
     ui->reg->setCurrentIndex(parameterList.value("reg").toInt());
     ui->backColor->setCurrentIndex(parameterList.value("lightBack").toInt());
     ui->morphOperation->setCurrentIndex(parameterList.value("morph").toInt());
