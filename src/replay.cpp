@@ -41,6 +41,7 @@ using namespace std;
 Replay::Replay(QWidget* parent, bool standalone, Timeline* slider, VideoReader* videoReader) : QMainWindow(parent),
                                                                                                ui(new Ui::Replay) {
   ui->setupUi(this);
+  isStandalone = standalone;
   ui->replayDisplay->setAttribute(Qt::WA_Hover);
 
   // Generates a color map.
@@ -55,18 +56,21 @@ Replay::Replay(QWidget* parent, bool standalone, Timeline* slider, VideoReader* 
 
   currentIndex = 0;
 
-  QIcon img = QIcon(":/assets/buttons/open.png");
-  QAction* openAction = new QAction(img, tr("&Open"), this);
-  openAction->setShortcuts(QKeySequence::Open);
-  openAction->setStatusTip(tr("Open a tracked movie"));
-  connect(openAction, &QAction::triggered, this, &Replay::openReplayFolder);
-  ui->toolBar->addAction(openAction);
+  QIcon img;
+  if (isStandalone) {
+    img = QIcon(":/assets/buttons/openImage.png");
+    QAction* openAction = new QAction(img, tr("&Open"), this);
+    openAction->setShortcuts(QKeySequence::Open);
+    openAction->setStatusTip(tr("Open a tracked movie"));
+    connect(openAction, &QAction::triggered, this, &Replay::openReplay);
+    ui->toolBar->addAction(openAction);
+  }
 
   img = QIcon(":/assets/buttons/refresh.png");
   QAction* refreshAction = new QAction(img, tr("&Refresh"), this);
-  refreshAction->setStatusTip(tr("Refresh a tracked movie"));
+  refreshAction->setStatusTip(tr("Reload newest tracking analysis"));
   connect(refreshAction, &QAction::triggered, [this]() {
-    loadReplayFolder(memoryDir);
+    loadReplay(memoryDir);
   });
   ui->toolBar->addAction(refreshAction);
 
@@ -309,7 +313,6 @@ Replay::Replay(QWidget* parent, bool standalone, Timeline* slider, VideoReader* 
 
   // In not standalone mode, the user need to manually connect the slider to the loadFrame
   // signal to avoid double connections and increase performance.
-  isStandalone = standalone;
   if (!standalone) {
     delete ui->controls;
     ui->replaySlider = slider;
@@ -343,26 +346,21 @@ Replay::~Replay() {
 }
 
 /**
-  * @brief Opens a dialogue to select a folder.
+* @brief Opens a dialogue to select a folder.
 */
-void Replay::openReplayFolder() {
-  QString dir = QFileDialog::getOpenFileName(this, tr("Open Directory"), memoryDir);
+void Replay::openReplay() {
+  QString dir = QFileDialog::getOpenFileName(this, tr("Open video file or image from an image sequence"), memoryDir);
   QApplication::setOverrideCursor(Qt::WaitCursor);
-  loadReplayFolder(dir);
+  loadReplay(dir);
   QApplication::restoreOverrideCursor();
 }
 
 /**
-  * @brief Loads a folder containing an image sequence and the tracking data if it exists. Triggerred when ui->pathButton is pressed.
-  * @arg[in] dir Path to the folder where the image sequence is stored.
+* @brief Clears replay data.
 */
-void Replay::loadReplayFolder(QString dir) {
-  // This function will detect from an inputed path to a directory the image sequence and the tracking data.
-  // The last tracking data from the folder Tracking_Result is automatically loaded if found.
-  // If the user explicitly select another Tracking_Result folder, these data are loaded.
-  // Delete existing data
-
-  if (!dir.length()) return;
+void Replay::clear() {
+  annotation->clear();
+  trackingData->clear();
 
   ui->replaySlider->setValue(0);
   commandStack->clear();
@@ -374,7 +372,21 @@ void Replay::loadReplayFolder(QString dir) {
   object = true;
   currentZoom = 1;
   memoryDir.clear();
-  memoryDir = dir;
+  isReplayable = false;
+}
+
+/**
+* @brief Loads a video/images sequence and the last analysis performed.
+* @arg[in] dir Path to a video or image of an images sequence.
+*/
+void Replay::loadReplay(const QString& dir) {
+  // This function will detect from an inputed path to a directory the image sequence and the tracking data.
+  // The last tracking data from the folder Tracking_Result is automatically loaded if found.
+  // If the user explicitly select another Tracking_Result folder, these data are loaded.
+  // Delete existing data
+
+  clear();
+  if (!dir.length()) return;
 
   try {
     // Gets the paths to all the frames in the folder and puts it in a vector.
@@ -397,24 +409,7 @@ void Replay::loadReplayFolder(QString dir) {
       isReplayable = true;
     }
 
-    QFileInfo savingInfo(dir);
-    QString savingFilename = savingInfo.baseName();
-    QString savingPath = savingInfo.absolutePath();
-    QString trackingDir = savingPath;
-    if (video->isSequence()) {
-      trackingDir.append(QString("/Tracking_Result") + QDir::separator());
-    }
-    else {
-      trackingDir.append(QString("/Tracking_Result_") + savingFilename + QDir::separator());
-    }
-    trackingData->setPath(trackingDir);
-    ids = trackingData->getId(0, video->getImageCount());
-    for (auto const& a : ids) {
-      object2Replay->addItem(QString::number(a));
-    }
-
-    // Load annotation file
-    annotation->setPath(trackingDir);
+    loadTrackingDir(dir);
 
     ui->replaySlider->setValue(1);  // To force the change
     ui->replaySlider->setValue(0);
@@ -428,7 +423,43 @@ void Replay::loadReplayFolder(QString dir) {
 }
 
 /**
-  * @brief Displays the image and the tracking data in the ui->displayReplay. Triggered when the ui->replaySlider value is changed.
+* @brief Loads a tracking analysis folder from a video file.
+* @arg[in] dir Path to a video or image of an images sequence.
+*/
+void Replay::loadTrackingDir(const QString& dir) {
+  if (!dir.length()) return;
+
+  QString trackingDir;
+  QFileInfo savingInfo(dir);
+  // If the dir is the Tracking_Result directory
+  if (savingInfo.isDir()) {
+    trackingDir = dir + QDir::separator();
+  }
+  // If the dir is the video file
+  else if (savingInfo.isFile()) {
+    QString savingFilename = savingInfo.baseName();
+    QString savingPath = savingInfo.absolutePath();
+    trackingDir = savingPath;
+    if (video->isSequence()) {
+      trackingDir.append(QString("/Tracking_Result") + QDir::separator());
+    }
+    else {
+      trackingDir.append(QString("/Tracking_Result_") + savingFilename + QDir::separator());
+    }
+  }
+
+  trackingData->setPath(trackingDir);
+  ids = trackingData->getId(0, video->getImageCount());
+  for (auto const& a : ids) {
+    object2Replay->addItem(QString::number(a));
+  }
+
+  // Load annotation file
+  annotation->setPath(trackingDir);
+}
+
+/**
+* @brief Displays the image and the tracking data in the ui->displayReplay. Triggered when the ui->replaySlider value is changed.
 */
 void Replay::loadFrame(int frameIndex) {
   if (!isReplayable) {

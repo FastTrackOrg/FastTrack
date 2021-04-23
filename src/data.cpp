@@ -24,24 +24,37 @@ This file is part of Fast Track.
  *
  * @author Benjamin Gallois
  *
- * @version $Revision: 4.0 $
+ * @version $Revision: 5.0 $
  *
- * Contact: gallois.benjamin08@gmail.com
+ * Contact: benjamin.gallois@fasttrack.sh
  *
  */
+
+/**
+  * @brief Clear data.
+*/
+void Data::clear() {
+  if (!isEmpty) {
+    save();
+  }
+  data.clear();
+  dataCopy.clear();
+  maxId = 0;
+  maxFrameIndex = 0;
+  actions = 0;
+  dir.clear();
+  isEmpty = true;
+}
 
 /**
   * @brief Set the path to a tracking data file.
   * @param[in] dataPath Path to the tracking data file.
 */
 bool Data::setPath(const QString &dataPath) {
-  data.clear();
-  dataCopy.clear();
+  clear();
+  dir = dataPath;
 
   QVector<QString> replayTracking;
-  dir = dataPath;
-  maxId = 0;
-  maxFrameIndex = 0;
 
   QFile trackingFile(dir + QDir::separator() + "tracking.txt");
   if (trackingFile.exists() && trackingFile.open(QIODevice::ReadOnly)) {
@@ -94,7 +107,15 @@ bool Data::setPath(const QString &dataPath) {
   * @param[in] dataPath Path to the tracking data file.
 */
 Data::Data(const QString &dataPath) {
+  isEmpty = true;
   setPath(dataPath);
+}
+
+/**
+  * @brief Construct the data object from a tracking result file.
+*/
+Data::Data() {
+  isEmpty = true;
 }
 
 /**
@@ -230,7 +251,7 @@ void Data::swapData(int firstObject, int secondObject, int from) {
       data.insert(i.key(), objects);
     }
   }
-  save();
+  save(false);
   dataCopy = data;
 }
 
@@ -255,7 +276,7 @@ void Data::deleteData(int objectId, int from, int to) {
       data.insert(i.key(), objects);
     }
   }
-  save();
+  save(false);
 }
 
 /**
@@ -281,12 +302,22 @@ void Data::insertData(int objectId, int from, int to) {
       }
     }
   }
-  save();
+  save(false);
 }
 /**
   * @brief Save the data in the tracking result file.
+  * @param[in] force Force the saving.
+  * @param[in] eachActions Save every eachActions actions.
 */
-void Data::save() {
+void Data::save(bool force, int eachActions) {
+  if (!force && actions < 10) {
+    ++actions;
+    return;
+  }
+  // Check if the class is running with an ui
+  if (!QApplication::topLevelWidgets().isEmpty()) {
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+  }
   QFile file(dir + QDir::separator() + "tracking.txt");
   if (file.open(QFile::WriteOnly | QFile::Text)) {
     QTextStream out(&file);
@@ -305,9 +336,17 @@ void Data::save() {
     msgBox.setText("Error writting the tracking.txt file. Changes not saved.");
     msgBox.exec();
   }
+  actions = 0;
+  if (!QApplication::topLevelWidgets().isEmpty()) {
+    QApplication::restoreOverrideCursor();
+  }
 }
 
-Data::~Data(){};
+Data::~Data() {
+  if (!isEmpty && actions != 0) {
+    save();
+  }
+};
 
 SwapData::SwapData(int firstObject, int secondObject, int from, Data *data)
     : m_firstObject(firstObject), m_secondObject(secondObject), m_from(from), m_data(data) { setText("swap data"); }

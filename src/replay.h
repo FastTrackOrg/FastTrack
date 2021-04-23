@@ -112,8 +112,9 @@ class Replay : public QMainWindow {
 
  public slots:
 
-  void openReplayFolder();
-  void loadReplayFolder(QString dir);
+  void openReplay();
+  void loadReplay(const QString &dir);
+  void loadTrackingDir(const QString &dir);
   void loadFrame(int frameIndex);
   void zoomIn();
   void zoomOut();
@@ -124,6 +125,7 @@ class Replay : public QMainWindow {
   void previousOcclusionEvent();
   void saveTrackedMovie();
   void sliderConnection(const int index);
+  void clear();
 };
 
 #endif  // REPLAY_H

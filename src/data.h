@@ -1,6 +1,7 @@
 #ifndef DATA_H
 #define DATA_H
 
+#include <QApplication>
 #include <QDebug>
 #include <QDir>
 #include <QFile>
@@ -23,9 +24,10 @@ class Data {
   QString dir; /*!< Path to the tracking result file. */
   QMap<int, QVector<object>> dataCopy;
   QMap<int, QVector<object>> data; /*!< Tracking data stored in a QMap, the keys are the image index and the value a vector of data stored in a structure with a field containing the object id and a field containing the data stored in a QMap where the keys are the data name and the velue the data value. */
+  int actions;
 
  public:
-  Data() = default;
+  Data();
   explicit Data(const QString &dataPath);
   Data(const Data &T) = delete;
   Data &operator=(const Data &T) = delete;
@@ -41,7 +43,8 @@ class Data {
   void swapData(int firstObject, int secondObject, int from);
   void deleteData(int objectId, int from, int to);
   void insertData(int objectId, int from, int to);
-  void save();
+  void save(bool force = true, int eachActions = 10);
+  void clear();
   int maxId;
   int maxFrameIndex;
   bool isEmpty;

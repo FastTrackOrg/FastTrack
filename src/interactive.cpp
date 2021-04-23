@@ -553,7 +553,7 @@ void Interactive::openFolder() {
       reset();
 
       // Load replay
-      replay->loadReplayFolder(dir);
+      replay->loadReplay(dir);
       if (!replay->trackingData->isEmpty) {
         replayAction->setChecked(true);
       }
@@ -841,6 +841,7 @@ void Interactive::previewTracking() {
     ui->previewButton->setDisabled(true);
     ui->trackButton->setDisabled(true);
     replayAction->setChecked(false);
+    replay->clear();  // Avoid mixing 2 subsequent analysy
 
     QThread *thread = new QThread;
     Tracking *tracking = new Tracking(memoryDir.toStdString(), background, ui->startImage->value(), ui->startImage->value() + ui->stopImage->value());
@@ -855,14 +856,14 @@ void Interactive::previewTracking() {
       ui->slider->setDisabled(false);
       ui->previewButton->setDisabled(false);
       ui->trackButton->setDisabled(false);
-      replay->loadReplayFolder(dir);
+      replay->loadReplay(dir);
       replayAction->setChecked(true);
     });
     connect(tracking, &Tracking::forceFinished, this, [this](QString errorMessage) {
       ui->slider->setDisabled(false);
       ui->previewButton->setDisabled(false);
       ui->trackButton->setDisabled(false);
-      replay->loadReplayFolder(dir);
+      replay->loadReplay(dir);
       replayAction->setChecked(true);
       message(errorMessage);
     });
@@ -889,6 +890,7 @@ void Interactive::track() {
     ui->previewButton->setDisabled(true);
     ui->trackButton->setDisabled(true);
     replayAction->setChecked(false);
+    replay->clear();  // Avoid mixing 2 subsequent analysy
 
     QThread *thread = new QThread;
     Tracking *tracking = new Tracking(memoryDir.toStdString(), background);
@@ -907,7 +909,7 @@ void Interactive::track() {
       ui->slider->setDisabled(false);
       ui->previewButton->setDisabled(false);
       ui->trackButton->setDisabled(false);
-      replay->loadReplayFolder(dir);
+      replay->loadReplay(dir);
       replayAction->setChecked(true);
       logMap->insert("status", errorMessage);
       emit(log(*logMap));
@@ -918,7 +920,7 @@ void Interactive::track() {
       ui->slider->setDisabled(false);
       ui->previewButton->setDisabled(false);
       ui->trackButton->setDisabled(false);
-      replay->loadReplayFolder(dir);
+      replay->loadReplay(dir);
       replayAction->setChecked(true);
       logMap->insert("status", "Done");
       emit(log(*logMap));
