@@ -43,8 +43,10 @@ class AutoLevel : public QObject {
   double computeStdPerimeter(const Data &data);
 
  public:
+  AutoLevel() = default;
   AutoLevel(const string &path, const UMat &background, const QMap<QString, QString> &parameters);
-  ~AutoLevel();
+  AutoLevel(const AutoLevel &T) = delete;
+  AutoLevel &operator=(const AutoLevel &T) = delete;
   static double stdev(const QVector<double> &vect);
 
  public slots:

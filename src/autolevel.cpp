@@ -46,9 +46,6 @@ AutoLevel::AutoLevel(const string &path, const UMat &background, const QMap<QStr
   m_endImage = 200;
 }
 
-AutoLevel::~AutoLevel() {
-}
-
 /**
   * @brief Levels the tracking parameters.
   * @return Map containing the levelled parameters.
@@ -94,6 +91,9 @@ QMap<QString, double> AutoLevel::level() {
       stdDist = computeStdDistance(data);
       stdArea = computeStdArea(data);
       stdPerimeter = computeStdPerimeter(data);
+      // This construction only work because tracking data are not changed
+      // therefore no call to Data.save() are triggered at destruction
+      // at out of scope on a non-existing tracking.txt already deleted.
       QDir(directory).removeRecursively();
       counter++;
       if (counter > 100) {
