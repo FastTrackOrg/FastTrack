@@ -347,7 +347,9 @@ Replay::~Replay() {
 */
 void Replay::openReplayFolder() {
   QString dir = QFileDialog::getOpenFileName(this, tr("Open Directory"), memoryDir);
+  QApplication::setOverrideCursor(Qt::WaitCursor);
   loadReplayFolder(dir);
+  QApplication::restoreOverrideCursor();
 }
 
 /**
