@@ -516,6 +516,7 @@ void Interactive::openFolder() {
 
   dir = QFileDialog::getOpenFileName(this, tr("Open File"), memoryDir);
 
+  QApplication::setOverrideCursor(Qt::WaitCursor);
   if (dir.length()) {
     // Finds the image format
     // Setups the class member
@@ -585,6 +586,7 @@ void Interactive::openFolder() {
       emit(message("No image found."));
     }
   }
+  QApplication::restoreOverrideCursor();
 }
 
 /**
@@ -734,6 +736,7 @@ void Interactive::computeBackground() {
 
     // Computes the background without blocking the ui
     QFuture<void> future = QtConcurrent::run([=]() {
+      QApplication::setOverrideCursor(Qt::WaitCursor);
       try {
         this->setEnabled(false);
         background = tracking->backgroundExtraction(*video, nBack, method, registrationMethod);
@@ -759,6 +762,7 @@ void Interactive::computeBackground() {
       display(background);
       ui->previewButton->setDisabled(false);
       ui->trackButton->setDisabled(false);
+      QApplication::restoreOverrideCursor();
     });
   }
 }
