@@ -36,6 +36,7 @@ Timeline::Timeline(QWidget *parent)
   ui->setupUi(this);
 
   // Class members
+  isAutoplay = false;
   m_imageNumber = 100;
   m_imageMin = 0;
   m_width = ui->timelineView->width();

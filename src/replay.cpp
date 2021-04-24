@@ -411,8 +411,11 @@ void Replay::loadReplay(const QString& dir) {
 
     loadTrackingDir(dir);
 
+    // Block the signal to not overwrite the first annonation at ui setup
+    ui->annotation->blockSignals(true);
     ui->replaySlider->setValue(1);  // To force the change
     ui->replaySlider->setValue(0);
+    ui->annotation->blockSignals(false);
   }
   catch (...) {
     isReplayable = false;
