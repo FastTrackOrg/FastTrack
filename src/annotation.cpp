@@ -31,17 +31,25 @@ This file is part of Fast Track.
  */
 
 /**
+  * @brief Clear the object.
+*/
+void Annotation::clear() {
+  if (!annotationFile->fileName().isEmpty()) {
+    writeToFile();
+    annotationFile->setFileName("");
+  }
+  findIndexes.clear();
+  findIndex = -1;
+  annotations->clear();
+}
+
+/**
   * @brief Set the path for the annotation.
   * @param[in] filePath Path to the tracking folder.
 */
 bool Annotation::setPath(const QString &filePath) {
-  if (!annotationFile->fileName().isEmpty()) {
-    writeToFile();
-  }
-  findIndexes.clear();
-  findIndex = -1;
+  clear();
   annotationFile->setFileName(filePath + "annotation.txt");
-  annotations->clear();
   if (!annotationFile->open(QIODevice::ReadOnly)) {
     return false;
   }

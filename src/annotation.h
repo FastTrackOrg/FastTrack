@@ -23,6 +23,7 @@ class Annotation : public QWidget {
   int findIndex;
 
  public slots:
+  void clear();
   void write(int index, const QString &text);
   void read(int index);
   void find(const QString &expression);
