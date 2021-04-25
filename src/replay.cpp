@@ -66,9 +66,17 @@ Replay::Replay(QWidget* parent, bool standalone, Timeline* slider, VideoReader* 
     ui->toolBar->addAction(openAction);
   }
 
+  img = QIcon(":/assets/buttons/open.png");
+  QAction* openTrackingDirAction = new QAction(img, tr("&Open Tracking_Result directory"), this);
+  openTrackingDirAction->setStatusTip(tr("Open an analysis folder"));
+  connect(openTrackingDirAction, &QAction::triggered, this, &Replay::openTrackingDir);
+  connect(this, &Replay::opened, openTrackingDirAction, &QAction::setEnabled);
+  openTrackingDirAction->setEnabled(false);
+  ui->toolBar->addAction(openTrackingDirAction);
+
   img = QIcon(":/assets/buttons/refresh.png");
   QAction* refreshAction = new QAction(img, tr("&Refresh"), this);
-  refreshAction->setStatusTip(tr("Reload newest tracking analysis"));
+  refreshAction->setStatusTip(tr("Reload the latest tracking analysis"));
   connect(refreshAction, &QAction::triggered, [this]() {
     loadReplay(memoryDir);
   });
@@ -356,6 +364,16 @@ void Replay::openReplay() {
 }
 
 /**
+* @brief Opens a dialogue to select a Tracking_Result dir, necessitate a video already opened and matching tracking results.
+*/
+void Replay::openTrackingDir() {
+  QString dir = QFileDialog::getExistingDirectory(this, tr("Open Tracking_Result_* Directory"), memoryDir, QFileDialog::ShowDirsOnly);
+  QApplication::setOverrideCursor(Qt::WaitCursor);
+  loadTrackingDir(dir);
+  QApplication::restoreOverrideCursor();
+}
+
+/**
 * @brief Clears replay data.
 */
 void Replay::clear() {
@@ -371,8 +389,8 @@ void Replay::clear() {
   ui->annotation->clear();
   object = true;
   currentZoom = 1;
-  memoryDir.clear();
   isReplayable = false;
+  emit(opened(isReplayable));
 }
 
 /**
@@ -386,7 +404,10 @@ void Replay::loadReplay(const QString& dir) {
   // Delete existing data
 
   clear();
-  if (!dir.length()) return;
+  if (!dir.length()) {
+    memoryDir.clear();
+    return;
+  }
 
   try {
     // Gets the paths to all the frames in the folder and puts it in a vector.
@@ -409,6 +430,7 @@ void Replay::loadReplay(const QString& dir) {
       isReplayable = true;
     }
 
+    memoryDir = dir;
     loadTrackingDir(dir);
 
     // Block the signal to not overwrite the first annonation at ui setup
@@ -416,9 +438,11 @@ void Replay::loadReplay(const QString& dir) {
     ui->replaySlider->setValue(1);  // To force the change
     ui->replaySlider->setValue(0);
     ui->annotation->blockSignals(false);
+    emit(opened(isReplayable));
   }
   catch (...) {
     isReplayable = false;
+    memoryDir.clear();
     QMessageBox msgBox;
     msgBox.setText("No file found.");
     msgBox.exec();
@@ -426,9 +450,9 @@ void Replay::loadReplay(const QString& dir) {
 }
 
 /**
-* @brief Loads a tracking analysis folder from a video file.
-* @arg[in] dir Path to a video or image of an images sequence.
-*/
+  * @brief Loads a tracking analysis folder from a video file.
+  * @arg[in] dir Path to a video or image of an images sequence.
+  */
 void Replay::loadTrackingDir(const QString& dir) {
   if (!dir.length()) return;
 

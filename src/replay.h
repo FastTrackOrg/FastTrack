@@ -113,6 +113,7 @@ class Replay : public QMainWindow {
  public slots:
 
   void openReplay();
+  void openTrackingDir();
   void loadReplay(const QString &dir);
   void loadTrackingDir(const QString &dir);
   void loadFrame(int frameIndex);
@@ -126,6 +127,9 @@ class Replay : public QMainWindow {
   void saveTrackedMovie();
   void sliderConnection(const int index);
   void clear();
+
+ signals:
+  void opened(bool);
 };
 
 #endif  // REPLAY_H
