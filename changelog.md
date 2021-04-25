@@ -1,8 +1,20 @@
 # FastTrack changelog
 
+## 5.3.2
+
+### Changed
+- Performance improvement in tracking data correction.
+
+### Fixed
+- Fix annotation
+
+### Added
+- Add waiting cursor at loading.
+- Add loading of previous analysis.
+
 ## 5.3.1
 
-###Fixed
+### Fixed
 - Memory leaks in Replay.
 - Crop in interactive.
 
