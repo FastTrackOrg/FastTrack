@@ -54,6 +54,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
     stylesheet.close();
   }
 
+#ifndef NO_WEB
   QNetworkAccessManager *manager = new QNetworkAccessManager(this);
   connect(manager, &QNetworkAccessManager::finished, [this](QNetworkReply *reply) {
     if (reply->error() != QNetworkReply::NoError) {
@@ -128,6 +129,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
       break;
     }
   }
+#endif
 
   interactive = new Interactive(this);
   ui->tabWidget->addTab(interactive, tr("Interactive tracking"));
@@ -143,6 +145,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
   connect(interactive, &Interactive::log, trackingManager, &TrackingManager::addLogEntry);
   connect(batch, &Batch::log, trackingManager, &TrackingManager::addLogEntry);
 
+#ifndef NO_WEB
   manual = new QWebEngineView(this);
   ui->tabWidget->addTab(manual, tr("User Manual"));
   connect(ui->tabWidget, &QTabWidget::currentChanged, [this](int index) {
@@ -150,6 +153,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
       manual->setUrl(QUrl("https://www.fasttrack.sh/UserManual/docs/intro.html"));
     }
   });
+#endif
 
 }  // Constructor
 

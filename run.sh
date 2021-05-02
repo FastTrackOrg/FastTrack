@@ -11,6 +11,17 @@ if [ "$1" = "full" ]; then
   make clean
 fi
 
+if [ "$1" = "no_web" ]; then
+  set -e
+  qmake CONFIG+="released NO_WEB" src/FastTrack.pro
+  make clean
+  make
+  cd build
+  ./FastTrack
+  cd ..
+  make clean
+fi
+
 if [ "$1" = "partial" ]; then
   set -e
   qmake CONFIG+=released src/FastTrack.pro

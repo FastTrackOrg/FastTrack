@@ -7,6 +7,10 @@
 QT       += core gui network webenginewidgets
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets webenginewidgets
+NO_WEB {
+        QT -= webenginewidgets
+        DEFINES += NO_WEB
+}
 
 TARGET = FastTrack
 TEMPLATE = app

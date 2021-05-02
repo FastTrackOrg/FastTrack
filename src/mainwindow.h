@@ -18,17 +18,20 @@ This file is part of Fast Track.
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#ifndef NO_WEB
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+#include <QNetworkRequest>
+#include <QWebEngineView>
+#endif
+
 #include <QByteArray>
 #include <QCloseEvent>
 #include <QFile>
 #include <QMainWindow>
 #include <QMessageBox>
-#include <QNetworkAccessManager>
-#include <QNetworkReply>
-#include <QNetworkRequest>
 #include <QSysInfo>
 #include <QUrl>
-#include <QWebEngineView>
 #include "batch.h"
 #include "interactive.h"
 #include "replay.h"
@@ -55,7 +58,9 @@ class MainWindow : public QMainWindow {
   Batch *batch;
   Replay *replay;
   TrackingManager *trackingManager;
+#ifndef NO_WEB
   QWebEngineView *manual;
+#endif
 };
 
 #endif  // MAINWINDOW_H
