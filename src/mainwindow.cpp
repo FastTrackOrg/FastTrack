@@ -80,7 +80,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
     if (lastVersion != APP_VERSION) {
       QMessageBox msgBox;
       msgBox.setTextFormat(Qt::RichText);
-      msgBox.setText("FastTrack version " + lastVersion + " is available! <br> Please update. <br> <a href='http://www.fasttrack.sh/UserManual/docs/installation/#update'>Need help to update?</a> <br>" + message + "<br>" + warning);
+      msgBox.setText("FastTrack version " + lastVersion + " is available! <br> Please update. <br> <a href='http://www.fasttrack.sh/docs/installation/#update'>Need help to update?</a> <br>" + message + "<br>" + warning);
       msgBox.exec();
     }
     else if (!warning.isEmpty()) {
@@ -150,7 +150,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
   ui->tabWidget->addTab(manual, tr("User Manual"));
   connect(ui->tabWidget, &QTabWidget::currentChanged, [this](int index) {
     if (index == 4) {
-      manual->setUrl(QUrl("https://www.fasttrack.sh/UserManual/docs/intro.html"));
+      manual->setUrl(QUrl("https://www.fasttrack.sh/docs/intro"));
     }
   });
 #endif

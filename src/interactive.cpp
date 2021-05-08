@@ -333,7 +333,7 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
 
   // Help menu
   connect(ui->actionDoc, &QAction::triggered, []() {
-    QDesktopServices::openUrl(QUrl("http://www.fasttrack.sh/UserManual/docs/intro.html", QUrl::TolerantMode));
+    QDesktopServices::openUrl(QUrl("http://www.fasttrack.sh/UserManual/docs/intro", QUrl::TolerantMode));
   });
   connect(ui->actionTuto, &QAction::triggered, []() {
     QDesktopServices::openUrl(QUrl("https://www.youtube.com/watch?v=RzzmcZs04E4&list=PLGjsUpRojSmO4RHrd-TbpbNpJrfjNYlIm", QUrl::TolerantMode));

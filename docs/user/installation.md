@@ -19,12 +19,12 @@ Stable versions of FastTrack are released for Linux, Mac (as dmg), and Windows (
 
 1.  For Windows:
 
-    -   Download the FastTrack [installer](/download/FastTrackInstaller.exe).
+    -   Download the FastTrack [installer](https://fasttrack.sh/download/FastTrackInstaller.exe).
     -   Execute the installer and follow the provided instructions.
 
 2. For Linux (all distributions) as AppImage:
 
-    * Download the AppImage [file](/download/FastTrack.AppImage).
+    * Download the AppImage [file](https://fasttrack.sh/download/FastTrack.AppImage).
     * Allow FastTrack.AppImage to be executed:
 
       -   Right click on the AppImage file.
@@ -37,7 +37,7 @@ Stable versions of FastTrack are released for Linux, Mac (as dmg), and Windows (
 3.  For Mac:
 
     -   Minimal version required: 10.15.
-    -   Download the FastTrack dmg [file](/download/FastTrack.dmg).
+    -   Download the FastTrack dmg [file](https://fasttrack.sh/download/FastTrack.dmg).
     -   Double click on the dmg file.
     -   Drag the application from the dmg window into the Applications folder.
 

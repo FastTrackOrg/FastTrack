@@ -14,5 +14,5 @@ Keyboard shortcuts are available to move the cursor frame by frame:
 * Space: start/stop autoplay.
 
 <video width="100%" muted autoplay controls loop>
-  <source src="/UserManual/docs/assets/timeline.webm" type="video/webm">
+  <source src="assets/timeline.webm" type="video/webm"></source>
 </video> 
