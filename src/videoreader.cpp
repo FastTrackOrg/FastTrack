@@ -59,11 +59,11 @@ bool VideoReader::open(const String &path, int apiPreference) {
   if (imageExtensions.count(filesystem::path(path).extension().string()) > 0) {
     m_isSequence = true;
     string name = filesystem::path(path).filename().string();
-    regex e("\\D\\d+\\.");
+    regex e("0\\d+\\.");
     smatch match;
     if (std::regex_search(name, match, e)) {
-      string pattern = string("%0") + to_string(match.length(0) - 2) + "d";
-      name.replace(match.position(0) + 1, match.length(0) - 2, pattern);
+      string pattern = string("%0") + to_string(match.length(0) - 1) + "d";
+      name.replace(match.position(0), match.length(0) - 1, pattern);
       normPath = (filesystem::path(path).parent_path() / name).string();
       m_index = 0;
     }
