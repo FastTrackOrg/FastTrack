@@ -1,5 +1,14 @@
 # FastTrack changelog
 
+## 5.3.3
+
+### Fixed
+- Fix video sequence opening
+- Fix documentation tab
+
+### Added
+- Add FastTrack light version
+
 ## 5.3.2
 
 ### Changed

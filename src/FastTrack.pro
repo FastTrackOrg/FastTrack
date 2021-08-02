@@ -14,7 +14,7 @@ NO_WEB {
 
 TARGET = FastTrack
 TEMPLATE = app
-VERSION = 5.3.2
+VERSION = 5.3.3
 DEFINES += APP_VERSION=\\\"$$VERSION\\\"
 
 
