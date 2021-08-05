@@ -96,24 +96,20 @@ jobs:
       needs: [job_1, job_2]
       runs-on: ubuntu-latest
       steps:
-        - name: Delete previous release
-          uses: dev-drprasad/delete-tag-and-release@v0.1.2
+        - name: Delete old assets
+          uses: mknejp/delete-release-assets@v1
           with:
-            delete_release: true
-            tag_name: continuous_cli
+            token: ${{ github.token }}
+            tag: continuous_cli 
+            fail-if-no-assets: false
+            assets: '*'
+        - name: Get Release
+          id: get_release
+          uses: cardinalby/git-get-release-action@v1.1
           env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        - name: create release
-          id: create_release
-          uses: actions/create-release@v1
-          env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            GITHUB_TOKEN: ${{ github.token }}
           with:
-            tag_name: continuous_cli
-            release_name: Continuous release cli
-            draft: false
-            prerelease: true
-
+            tag: continuous_cli
         - name: Download linux
           uses: actions/download-artifact@v1
           with:
@@ -124,7 +120,7 @@ jobs:
           env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           with:
-            upload_url: ${{ steps.create_release.outputs.upload_url }} 
+            upload_url: ${{ steps.get_release.outputs.upload_url }}
             asset_path: FastTrackLinux/fasttrack-cli-x86_64.AppImage
             asset_name: fasttrack-cli-x86_64.AppImage
             asset_content_type: application/zip
@@ -138,7 +134,7 @@ jobs:
           env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           with:
-            upload_url: ${{ steps.create_release.outputs.upload_url }} 
+            upload_url: ${{ steps.get_release.outputs.upload_url }}
             asset_path: FastTrackMac/fasttrack-cli.dmg
             asset_name: FastTrackCli.dmg
             asset_content_type: application/zip
