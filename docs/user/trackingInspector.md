@@ -6,25 +6,25 @@ sidebar_label: Tracking Inspector
 
 ![alt text](assets/tracking_inspector.svg)
 
-* 1: Open Folder
-* 2: Reload
-* 3: Export video
-* 4: Undo
-* 5: Redo
-* 6: First object selection box
-* 7: Swap
-* 8: Second object selection box
-* 9: Delete one
-* 10: Delete
-* 11: Delete selection box
-* 12: Previous occlusion
-* 13: Next occlusion
+* 1: Open
+* 2: Open Tracking_Result directory
+* 3: Reload
+* 4: Export video
+* 5: Undo
+* 6: Redo
+* 8: First object selection box
+* 9: Swap
+* 9: Second object selection box
+* 10: Delete one
+* 11: Delete
+* 12: Delete selection box
+* 13: Previous/Next occlusion (experimental)
 * 14: Annotation search
 * 15: Annotation previous match
 * 16: Annotation next match
 * 17: Annotation entry
 * 18: Objects information table
-* 19: Play cursor
+* 19: Timeline
 * 20: Image number
 * 21: Play
 * 22: FPS selection box
@@ -34,9 +34,9 @@ sidebar_label: Tracking Inspector
 
 **The Tracking Inspector** is a tool to display the result of a tracking analysis and to correct the tracking manually if necessary. For example, the user can delete an object to remove an artifact or change the object ID to correct a tracking error. To make the user's life easier, an ergonomic interface with build-in keyboard shortcuts are provided. FastTrack alleviates the tedious work of review and correction, and the user can achieve 100% tracking accuracy rapidly and efficiently.
 
-## Load an image sequence
-To load a tracking analysis previously tracked in FastTrack, click on the **Open Folder** button (1) and select the **Tracking_Result** folder of the analysis to review. If the image sequence was tracked several times, the last tracking analysis is stored in the **Tracking_Result** folder and the previous tracking analysis in the **Tracking_Result_Date** folders.
-Click on the **Reload** button (2) to reload the tracking data if necessary.
+## Load a tracking analysis
+To load a tracking analysis previously tracked in FastTrack, first click on the **Open** button (1) and select a movie or an image of an image sequence. If the movie was tracked several times, the last tracking analysis is stored in the **Tracking_Result** folder and the previous tracking analysis in the **Tracking_Result_Date** folders and can be loaded using the **Open Tracking_result directory** button (2) (can only be activated if a movie is loaded).
+Click on the **Reload)** button (3) to reload the tracking data if necessary.
 The software can only load a tracking analysis if the folder architecture is preserved, .ie the folder with the image sequence has to have a sub-folder named **Tracking_Result** containing at least the *tracking.txt* file.
 
 ## Display options
