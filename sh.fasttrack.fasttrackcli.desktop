@@ -1,8 +1,11 @@
 [Desktop Entry]
+Version=1.0
 Type=Application
+
 Name=fasttrack-cli
 Comment=Fast tracking of multiple objects
+Categories=Science;ImageProcessing;
+
+Icon=fasttrack
 Exec=fasttrack-cli
-Icon=icon
-Categories=Science;Qt;
-X-AppImage-Version=
+Terminal=true

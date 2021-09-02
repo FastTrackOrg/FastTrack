@@ -41,14 +41,14 @@ jobs:
               mkdir -p appdir/usr/bin/
               mv fasttrack-cli appdir/usr/bin/
               mkdir -p appdir/usr/share/applications/
-              cp ../FastTrackCli.desktop appdir/usr/share/applications/
+              cp ../sh.fasttrack.fasttrackcli.desktop appdir/usr/share/applications/
               mkdir -p appdir/usr/share/icons/hicolor/256x256/
-              cp ../src/assets/icon.png appdir/usr/share/icons/hicolor/256x256/
-              ./deploy.AppImage ./appdir/usr/share/applications/FastTrackCli.desktop -exclude-libs="libnss3.so,libnssutil3.so" -no-translations -bundle-non-qt-libs
+              cp ../src/assets/icon.png appdir/usr/share/icons/hicolor/256x256/fasttrack.png
+              ./deploy.AppImage ./appdir/usr/share/applications/sh.fasttrack.fasttrackcli.desktop -exclude-libs="libnss3.so,libnssutil3.so" -no-translations -bundle-non-qt-libs
               mkdir -p appdir/usr/optional/ ; wget -c https://github.com/darealshinji/AppImageKit-checkrt/releases/download/continuous/exec-x86_64.so -O ./appdir/usr/optional/exec.so
               mkdir -p appdir/usr/optional/libstdc++/ ; cp /usr/lib/x86_64-linux-gnu/libstdc++.so.6 ./appdir/usr/optional/libstdc++/ ; cp /usr/lib/gcc/x86_64-linux-gnu/9/libstdc++.so ./appdir/usr/optional/libstdc++/
               ( cd appdir ; rm AppRun ; wget -c https://github.com/darealshinji/AppImageKit-checkrt/releases/download/continuous/AppRun-patched-x86_64 -O AppRun ; chmod a+x AppRun)
-              ./deploy.AppImage ./appdir/usr/share/applications/FastTrackCli.desktop -appimage
+              ./deploy.AppImage ./appdir/usr/share/applications/sh.fasttrack.fasttrackcli.desktop -appimage
         - name: Linux artefact
           uses: actions/upload-artifact@v1
           with:

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>sh.fasttrack.fasttrack</id>
+  
+  <name>FastTrack</name>
+  <summary>Fast tracking of multiple objects</summary>
+  
+  <metadata_license>MIT</metadata_license>
+  <project_license>GPL-3.0-or-later</project_license>
+  
+  <recommends>
+    <control>pointing</control>
+    <control>keyboard</control>
+    <control>touch</control>
+  </recommends>
+  
+  <description>
+    <p>
+      FastTrack is a free (as freedom) desktop tracking software, easy to install, easy to use, and performant. The software can be downloaded for Linux, macOS, and Windows, and a public API is available to embed the core of the software in any C++/Qt project.
+    </p>
+  </description>
+  
+  <launchable type="desktop-id">sh.fasttrack.fasttrack.desktop</launchable>
+  <screenshots>
+    <screenshot type="default">
+      <image>https://raw.githubusercontent.com/FastTrackOrg/FastTrack/master/docs/user/assets/readme.png</image>
+    </screenshot>
+  </screenshots>
+</component>
