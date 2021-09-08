@@ -37,6 +37,18 @@ unix:!macx {
   INCLUDEPATH += /usr/local/include/opencv4/
   LIBS += -L/usr/lib/ -fopenmp
   LIBS += -L/usr/local/lib -L/usr/lib -L/usr/local/lib64 -L/usr/lib64 -lopencv_core -lopencv_imgproc -lopencv_highgui -lopencv_imgcodecs -lopencv_videoio -lopencv_video -lopencv_calib3d -lopencv_photo -lopencv_features2d
+
+  # custom destination INSTALL_ROOT=$PWD/package_root make install
+  target.path = /usr/bin/
+  desktop.path = /usr/share/applications/
+  desktop.files = sh.fasttrack.fasttrack.desktop
+  metainfo.path = /usr/share/metainfo/
+  metainfo.files = sh.fasttrack.fasttrack.metainfo.xml
+  icon.path = /usr/share/icons/
+  icon.files = src/assets/fasttrack.png
+  license.path = /usr/share/licenses/FastTrack/
+  license.files = LICENSE
+  INSTALLS += target desktop metainfo icon license
 }
 
 win32 {

@@ -33,13 +33,11 @@ unix:!macx {
   LIBS += -L/usr/lib/ -fopenmp
   LIBS += -L/usr/local/lib -L/usr/lib -L/usr/local/lib64 -L/usr/lib64 -lopencv_core -lopencv_imgproc -lopencv_highgui -lopencv_imgcodecs -lopencv_videoio -lopencv_video -lopencv_calib3d -lopencv_photo -lopencv_features2d
   RCC_DIR=build
-}
 
-win32 {
-  QMAKE_CXXFLAGS += /std:c++latest
-  LIBS += -LC:\opencv\build\x64\vc15\lib -lopencv_world430
-  INCLUDEPATH += C:\opencv\build\include
-  DEPENDPATH += C:\opencv\build\include
+  target.path = /usr/bin/
+  license.path = /usr/share/licenses/FastTrack/
+  license.files = LICENSE
+  INSTALLS += target license
 }
 
 unix:macx {
