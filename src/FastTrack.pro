@@ -1,9 +1,3 @@
-#-------------------------------------------------
-#
-# Project created by QtCreator 2018-01-26T21:49:39
-#
-#-------------------------------------------------
-
 QT       += core gui network webenginewidgets
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets webenginewidgets
@@ -12,13 +6,14 @@ NO_WEB {
         DEFINES += NO_WEB
 }
 
-TARGET = FastTrack
 TEMPLATE = app
 VERSION = 5.3.3
 DEFINES += APP_VERSION=\\\"$$VERSION\\\"
 
 
 unix:!macx {
+  TARGET = fasttrack
+  
   DESTDIR=build
   OBJECTS_DIR=build
   MOC_DIR=build
@@ -46,12 +41,13 @@ unix:!macx {
   metainfo.files = sh.fasttrack.fasttrack.metainfo.xml
   icon.path = /usr/share/icons/
   icon.files = src/assets/fasttrack.png
-  license.path = /usr/share/licenses/FastTrack/
+  license.path = /usr/share/licenses/fasttrack/
   license.files = LICENSE
   INSTALLS += target desktop metainfo icon license
 }
 
 win32 {
+  TARGET = FastTrack
   QMAKE_CXXFLAGS += /std:c++latest
   LIBS += -LC:\opencv\build\x64\vc15\lib -lopencv_world450
   INCLUDEPATH += C:\opencv\build\include
@@ -59,6 +55,7 @@ win32 {
 }
 
 unix:macx {
+  TARGET = FastTrack
   CONFIG += c++17
   QMAKE_CXXFLAGS += -std=c++1z -stdlib=libc++ -mmacosx-version-min=10.15  -O3 -g
   QMAKE_CXXFLAGS_RELEASE -= -O1

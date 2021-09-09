@@ -2,8 +2,8 @@
 Version=1.0
 Type=Application
 
-Name=fasttrack-cli
-Comment=Fast tracking of multiple objects
+Name=FastTrack-cli
+Comment=Multiple objects tracking software, easy to use, and performant.
 Categories=Science;ImageProcessing;
 
 Icon=fasttrack

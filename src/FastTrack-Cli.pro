@@ -1,9 +1,3 @@
--------------------------------------------------
-#
-# Project created by QtCreator 2018-01-26T21:49:39
-#
-#-------------------------------------------------
-
 QT       += core gui network webenginewidgets
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
@@ -35,7 +29,7 @@ unix:!macx {
   RCC_DIR=build
 
   target.path = /usr/bin/
-  license.path = /usr/share/licenses/FastTrack/
+  license.path = /usr/share/licenses/fasttrack/
   license.files = LICENSE
   INSTALLS += target license
 }

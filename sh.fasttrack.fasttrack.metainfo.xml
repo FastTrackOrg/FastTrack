@@ -3,7 +3,7 @@
   <id>sh.fasttrack.fasttrack</id>
   
   <name>FastTrack</name>
-  <summary>Fast tracking of multiple objects</summary>
+  <summary>Multiple objects tracking software, easy to use, and performant.</summary>
   
   <metadata_license>MIT</metadata_license>
   <project_license>GPL-3.0-or-later</project_license>

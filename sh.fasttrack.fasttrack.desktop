@@ -3,9 +3,9 @@ Version=1.0
 Type=Application
 
 Name=FastTrack
-Comment=Fast tracking of multiple objects
+Comment=Multiple objects tracking software, easy to use, and performant.
 Categories=Science;ImageProcessing;
 
 Icon=fasttrack
-Exec=FastTrack
+Exec=fasttrack
 Terminal=false

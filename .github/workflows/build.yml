@@ -39,7 +39,7 @@ jobs:
           wget -O deploy.AppImage https://github.com/probonopd/linuxdeployqt/releases/download/7/linuxdeployqt-7-x86_64.AppImage
           chmod +x deploy.AppImage
           mkdir -p appdir/usr/bin/
-          mv FastTrack appdir/usr/bin/
+          mv fasttrack appdir/usr/bin/
           mkdir -p appdir/usr/share/applications/
           cp ../sh.fasttrack.fasttrack.desktop appdir/usr/share/applications/
           mkdir -p appdir/usr/share/icons/hicolor/256x256/

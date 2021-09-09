@@ -6,7 +6,7 @@ if [ "$1" = "full" ]; then
   make clean
   make
   cd build
-  ./FastTrack
+  ./fasttrack
   cd ..
   make clean
 fi
@@ -17,7 +17,7 @@ if [ "$1" = "no_web" ]; then
   make clean
   make
   cd build
-  ./FastTrack
+  ./fasttrack
   cd ..
   make clean
 fi
@@ -27,7 +27,7 @@ if [ "$1" = "partial" ]; then
   qmake CONFIG+=released src/FastTrack.pro
   make
   cd build
-  ./FastTrack
+  ./fasttrack
   cd ..
 fi
 
@@ -36,7 +36,7 @@ if [ "$1" = "debug" ]; then
   qmake CONFIG+=debug src/FastTrack.pro
   make
   cd build
-  ./FastTrack
+  ./fasttrack
   cd ..
 fi
 
@@ -46,7 +46,7 @@ if [ "$1" = "profile" ]; then
   qmake QMAKE_CXXFLAGS+=-pg QMAKE_LFLAGS+=-pg CONFIG+=debug src/FastTrack.pro
   make
   cd build
-  ./FastTrack
+  ./fasttrack
   cd ..
   gprof build/FastTrack build/gmon.out > profiling.txt
 fi
