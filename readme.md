@@ -16,7 +16,7 @@ Two main features are implemented in the software:
 
 ## Installation
 
-Stable builds of the software are available for Linux, Mac, and Windows on the [download page](http://www.fasttrack.sh/UserManual/docs/installation/). Nightly builds are available on the [releases page](https://github.com/bgallois/FastTrack/releases).
+Stable builds of the software are available for Linux, Mac, and Windows on the [download page](https://www.fasttrack.sh/docs/installation/). Nightly builds are available on the [releases page](https://github.com/bgallois/FastTrack/releases).
 
 ## Documentation
 
