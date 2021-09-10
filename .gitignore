@@ -2,3 +2,4 @@
 Makefile
 *.pro.user*
 *.user
+.qmake.stash

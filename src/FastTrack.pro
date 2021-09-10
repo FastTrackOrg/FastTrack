@@ -122,5 +122,5 @@ FORMS += \
         timeline.ui \ 
 
 RESOURCES += resources.qrc \
-        assets/breeze.qrc
+        assets/theme.qrc
 
