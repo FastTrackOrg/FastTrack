@@ -60,6 +60,7 @@ class MainWindow : public QMainWindow {
   TrackingManager *trackingManager;
 #ifndef NO_WEB
   QWebEngineView *manual;
+  QWebEngineView *dataset;
 #endif
 };
 

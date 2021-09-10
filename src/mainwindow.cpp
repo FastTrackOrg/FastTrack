@@ -153,6 +153,13 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
       manual->setUrl(QUrl("https://www.fasttrack.sh/docs/intro"));
     }
   });
+  dataset = new QWebEngineView(this);
+  ui->tabWidget->addTab(dataset, tr("TD²"));
+  connect(ui->tabWidget, &QTabWidget::currentChanged, [this](int index) {
+    if (index == 5) {
+      dataset->setUrl(QUrl("http://data.ljp.upmc.fr/datasets/TD2/"));
+    }
+  });
 #endif
 
 }  // Constructor
