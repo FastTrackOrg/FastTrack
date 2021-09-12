@@ -7,7 +7,7 @@ NO_WEB {
 }
 
 TEMPLATE = app
-VERSION = 5.3.3
+VERSION = 5.3.4
 DEFINES += APP_VERSION=\\\"$$VERSION\\\"
 
 

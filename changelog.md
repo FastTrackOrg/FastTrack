@@ -1,5 +1,13 @@
 # FastTrack changelog
 
+## 5.3.4
+### Added
+- TD2 dataset page
+
+### Fix
+- Fix theme
+- Linux standardized desktop metainfo and binary
+
 ## 5.3.3
 
 ### Fixed
