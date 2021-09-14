@@ -13,7 +13,7 @@ During the installation on Windows and Mac systems, security alerts are displaye
 ---
 
 ## Download
-Stable versions of FastTrack are released for Linux, Mac (as dmg), and Windows (installer). The nightly version is available on the [GitHub repository](https://github.com/FastTrackOrg/FastTrack/releases)
+Stable versions of FastTrack are released for Linux, Mac (as dmg), and Windows (installer). The nightly version is available on the [Github Actions artifacts](https://github.com/FastTrackOrg/FastTrack/actions).
 
 ## Installation
 
