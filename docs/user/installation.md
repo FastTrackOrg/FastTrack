@@ -31,7 +31,7 @@ Stable versions of FastTrack are released for Linux, Mac (as dmg), and Windows (
 3. For Linux natively:
     * Fedora: `sudo dnf install fasttrack fasttrack-cli`
     * Arch Linux: `yay -S fasttrack fasttrack-cli`
-    * From source : `qmake src/FastTrack.pro ; make ; sudo make install ; qmake src/FastTrack-Cli.pro ; make ; sudo make install
+    * From source : `qmake src/FastTrack.pro ; make ; sudo make install ; qmake src/FastTrack-Cli.pro ; make ; sudo make install`
 4.  For Mac:
     - Minimal version required: 10.15.
     - Download the FastTrack dmg [file](https://fasttrack.sh/download/FastTrack.dmg).
