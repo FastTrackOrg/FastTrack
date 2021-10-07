@@ -12,3 +12,4 @@ sidebar_label: Reference
 
 * [Golovkova, Iaroslava, et al. "Depletion attraction impairs the plasticity of emulsions flowing in a constriction." Soft Matter 16.13 (2020): 3294-3302.](http://www.dx.doi.org/10.1039/c9sm02343g)
 * [Candelier, Raphaël, et al. "A semi-automatic dispenser for solid and liquid food in aquatic facilities." Zebrafish 16.4 (2019): 401-407.](https://doi.org/10.1089/zeb.2019.1733)
+* [Goc, Guillaume Le, et al. "Thermal modulation of Zebrafish exploratory statistics reveals constraints on individual behavioral variability." BMC biology 19 (2021): 1-17.](https://hal.sorbonne-universite.fr/hal-03352907/document)

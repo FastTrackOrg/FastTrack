@@ -11,7 +11,7 @@ After a tracking analysis (or an analysis preview), FastTrack saves several file
 * *background.pgm*: the background image
 * *cfg.toml*: the parameters used for the tracking
 
-The tracking result file is simply a text file with 20 columns separated by a '\t' character. This file can easily be loaded to subsequent analysis see [this example](http://www.fasttrack.sh/UserManual/blog/2019/06/21/Data-analysis-python/).
+The tracking result file is simply a text file with 20 columns separated by a '\t' character. This file can easily be loaded to subsequent analysis see [this Python](https://www.fasttrack.sh/blog/2021/08/09/FastAnalysis-tuto) and [this Julia](https://www.fasttrack.sh/blog/2020/11/25/Data-analysis-julia).
 
 * **xHead, yHead, tHead**: the position (x, y) and the absolute angle of the object's head.
 * **xTail, yTail, tTail**: the position (x, y) and the absolute angle of the object's tail.
