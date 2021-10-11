@@ -106,8 +106,8 @@ class Batch : public QWidget {
   * @brief Emitted when a tracking analysis is finished.
   */
   void next();
-
   void log(QMap<QString, QString> log);
+  void status(QString messsage);
 };
 
 #endif  // BATCH_H

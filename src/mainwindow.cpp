@@ -161,9 +161,15 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 
   interactive = new Interactive(this);
   ui->tabWidget->addTab(interactive, tr("Interactive tracking"));
+  connect(interactive, &Interactive::status, [this](QString message) {
+    trayIcon->showMessage("FastTrack", message, QSystemTrayIcon::Information, 3000);
+  });
 
   batch = new Batch(this);
   ui->tabWidget->addTab(batch, tr("Batch tracking"));
+  connect(batch, &Batch::status, [this](QString message) {
+    trayIcon->showMessage("FastTrack", message, QSystemTrayIcon::Information, 3000);
+  });
 
   replay = new Replay(this);
   ui->tabWidget->addTab(replay, tr("Tracking inspector"));

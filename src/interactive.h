@@ -132,5 +132,6 @@ class Interactive : public QMainWindow {
  signals:
   void message(QString message);
   void log(QMap<QString, QString> log);
+  void status(QString messsage);
 };
 #endif  // INTERACTIVE_H

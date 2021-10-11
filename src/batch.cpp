@@ -468,6 +468,7 @@ void Batch::startTracking() {
     ui->startButton->setDisabled(false);
     ui->removePath->setDisabled(false);
     ui->clearPath->setDisabled(false);
+    emit(status("Tracking finished"));
   }
 }
 

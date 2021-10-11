@@ -913,7 +913,8 @@ void Interactive::track() {
       replayAction->setChecked(true);
       logMap->insert("status", errorMessage);
       emit(log(*logMap));
-      message(errorMessage);
+      emit(status("Tracking failed"));
+      emit(message(errorMessage));
     });
     connect(tracking, &Tracking::finished, thread, &QThread::quit);
     connect(tracking, &Tracking::finished, this, [this, logMap]() {
@@ -924,6 +925,7 @@ void Interactive::track() {
       replayAction->setChecked(true);
       logMap->insert("status", "Done");
       emit(log(*logMap));
+      emit(status("Tracking succeeded"));
     });
     connect(tracking, &Tracking::forceFinished, thread, &QThread::quit);
     connect(tracking, &Tracking::forceFinished, tracking, &Tracking::deleteLater);
