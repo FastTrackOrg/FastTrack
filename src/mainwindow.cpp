@@ -46,6 +46,30 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
   setWindowState(Qt::WindowMaximized);
   setWindowTitle(qApp->applicationName() + " " + APP_VERSION);
 
+  // Tray icon
+  trayIcon = new QSystemTrayIcon(QIcon(":/assets/icon.svg"), this);
+  QMenu *trayMenu = new QMenu;
+  QAction *restore = new QAction(tr("Restore"));
+  connect(restore, &QAction::triggered, this, &MainWindow::showNormal);
+  trayMenu->addAction(restore);
+  QAction *close = new QAction(tr("Close"));
+  connect(close, &QAction::triggered, this, &MainWindow::close);
+  trayMenu->addAction(close);
+  connect(trayIcon, &QSystemTrayIcon::activated, [this](QSystemTrayIcon::ActivationReason reason) {
+    switch (reason) {
+      case QSystemTrayIcon::Trigger: {
+        this->setVisible(true);
+        break;
+      }
+      case QSystemTrayIcon::DoubleClick: {
+        break;
+      }
+      default:;
+    }
+  });
+  trayIcon->setContextMenu(trayMenu);
+  trayIcon->show();
+
   // Setup style
   QFile stylesheet("");
 
@@ -82,7 +106,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
       msgBox.setWindowTitle("Information");
       msgBox.setTextFormat(Qt::RichText);
       msgBox.setText("FastTrack version " + lastVersion + " is available! <br> Please update. <br> <a href='http://www.fasttrack.sh/docs/installation/#update'>Need help to update?</a> <br>" + message + "<br>" + warning);
-      //QTimer::singleShot(2000, &msgBox, [&msgBox]() { qInfo() << "TEST"; msgBox.close(); });
       QTimer::singleShot(5000, &msgBox, &QMessageBox::close);
       msgBox.exec();
       this->statusBar()->addWidget(new QLabel("FastTrack version " + lastVersion + " is available!"));
@@ -173,10 +196,22 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
   * @brief Close event reimplemented to ask confirmation before closing.
 */
 void MainWindow::closeEvent(QCloseEvent *event) {
-  QMessageBox::StandardButton reply;
-  reply = QMessageBox::question(this, "Quit?", "Are you sure you want to quit?", QMessageBox::Yes | QMessageBox::No);
+  QMessageBox msgBox(this);
+  msgBox.setTextFormat(Qt::RichText);
+  msgBox.setWindowTitle("Confirmation");
+  msgBox.setText("<b>Are you sure you want to quit?</b>");
+  msgBox.setIcon(QMessageBox::Question);
+  msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+  msgBox.addButton(tr("Minimize"), QMessageBox::AcceptRole);
+  int reply = msgBox.exec();
   if (reply == QMessageBox::Yes) {
     event->accept();
+  }
+  else if (reply == QMessageBox::AcceptRole) {
+    trayIcon->show();
+    this->hide();
+    trayIcon->showMessage(tr("Hey!"), tr("I'm there"), QIcon(":/assets/icon.svg"), 1500);
+    event->ignore();
   }
   else {
     event->ignore();

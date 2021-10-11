@@ -1,6 +1,7 @@
 <!DOCTYPE RCC><RCC version="1.0">
     <qresource prefix='/'>
         <file>assets/icon.png</file>
+        <file>assets/icon.svg</file>
         <file>assets/Font.ttf</file>
         <file>assets/buttons/play.png</file>
         <file>assets/buttons/pause.png</file>

@@ -25,12 +25,17 @@ This file is part of Fast Track.
 #include <QWebEngineView>
 #endif
 
+#include <QAbstractButton>
+#include <QAction>
 #include <QByteArray>
 #include <QCloseEvent>
 #include <QFile>
+#include <QIcon>
 #include <QMainWindow>
+#include <QMenu>
 #include <QMessageBox>
 #include <QSysInfo>
+#include <QSystemTrayIcon>
 #include <QUrl>
 #include "batch.h"
 #include "interactive.h"
@@ -58,6 +63,7 @@ class MainWindow : public QMainWindow {
   Batch *batch;
   Replay *replay;
   TrackingManager *trackingManager;
+  QSystemTrayIcon *trayIcon;
 #ifndef NO_WEB
   QWebEngineView *manual;
   QWebEngineView *dataset;
