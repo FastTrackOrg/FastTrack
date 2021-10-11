@@ -79,12 +79,17 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 
     if (lastVersion != APP_VERSION) {
       QMessageBox msgBox;
+      msgBox.setWindowTitle("Information");
       msgBox.setTextFormat(Qt::RichText);
       msgBox.setText("FastTrack version " + lastVersion + " is available! <br> Please update. <br> <a href='http://www.fasttrack.sh/docs/installation/#update'>Need help to update?</a> <br>" + message + "<br>" + warning);
+      //QTimer::singleShot(2000, &msgBox, [&msgBox]() { qInfo() << "TEST"; msgBox.close(); });
+      QTimer::singleShot(5000, &msgBox, &QMessageBox::close);
       msgBox.exec();
+      this->statusBar()->addWidget(new QLabel("FastTrack version " + lastVersion + " is available!"));
     }
     else if (!warning.isEmpty()) {
       QMessageBox msgBox;
+      msgBox.setWindowTitle("Information");
       msgBox.setText(warning);
       msgBox.exec();
     }
