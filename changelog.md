@@ -1,21 +1,30 @@
 # FastTrack changelog
 
-## 5.3.4
+## 5.3.5
+
 ### Added
-- TD2 dataset page
+- Added system tray
+
+### Fixed
+- Fixed outdated urls
+
+## 5.3.4
+
+### Added
+- Added TD2 dataset page
 
 ### Fix
-- Fix theme
-- Linux standardized desktop metainfo and binary
+- Fixed theme
+- Fixed Linux standardized desktop metainfo and binary
 
 ## 5.3.3
 
 ### Fixed
-- Fix video sequence opening
-- Fix documentation tab
+- Fixed video sequence opening
+- Fixed documentation tab
 
 ### Added
-- Add FastTrack light version
+- Added FastTrack light version
 
 ## 5.3.2
 
@@ -23,22 +32,22 @@
 - Performance improvement in tracking data correction.
 
 ### Fixed
-- Fix annotation
+- Fixed annotation
 
 ### Added
-- Add waiting cursor at loading.
-- Add loading of previous analysis.
+- Added waiting cursor at loading.
+- Added loading of previous analysis.
 
 ## 5.3.1
 
 ### Fixed
-- Memory leaks in Replay.
-- Crop in interactive.
+- Fixed memory leaks in Replay.
+- Croped in interactive.
 
 ## 5.3.0
 
 ### Changed
-- Refactoring ui with major performance improvement on the display.
+- Refactored ui with major performance improvement on the display.
 - Default style changed.
 - Ui settings file architecture.
 
@@ -49,15 +58,15 @@
 
 ### Fixed
 - ROI loading from cfg file.
-- Crashing when accessing image.
-- Clearer error when input background image not matching video size.
+- Fixed crashing when accessing image.
+- Cleared error when input background image not matching video size.
 
 ## 5.2.3
 
 ### Fixed
 - Fixed Replay panel objects' selection not working inside the Interactive panel.
 - Fixed configuration loading in the Interactive panel.
-- Update Qt for Windows and Mac to the latest LTS.
+- Updated Qt for Windows and Mac to the latest LTS.
 
 ### Added
 - Added errors message and log.
