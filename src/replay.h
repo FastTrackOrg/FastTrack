@@ -93,17 +93,17 @@ class Replay : public QMainWindow {
 
   QString memoryDir; /*!< Saves the path of the last opened folder.*/
 
-  vector<Point3i> colorMap;     /*!< RGB color map to display each object in one color. */
-  QVector<int> occlusionEvents; /*!< Index of each occlusion event in the replayed images sequence. */
-  int replayNumberObject;       /*!< Number of objects tracked in the replayed images sequence. */
-  int maxIndex;                 /*!< Number of images. */
-  bool isReplayable;            /*!< True if user input is an images sequences that can be played. */
-  int replayFps;                /*!< Frame rate value at which a new image is displayed in autoplay mode in the replay. */
-  int autoPlayerIndex;          /*!< Index of the image displayed in autoplay mode in the replay. */
-  bool object;                  /*!< Alternatively true or false to associate either object A or object B at each click of the user in the ui->replayDisplay. */
-  QSize resizedFrame;           /*!< Width and height of displayed QPixmap to accomodate window size changment. */
-  QSize originalImageSize;      /*!< Width and height of the original image in the images sequence. */
-  int currentIndex;             /*!< Current image index. */
+  vector<Point3i> colorMap;   /*!< RGB color map to display each object in one color. */
+  QList<int> occlusionEvents; /*!< Index of each occlusion event in the replayed images sequence. */
+  int replayNumberObject;     /*!< Number of objects tracked in the replayed images sequence. */
+  int maxIndex;               /*!< Number of images. */
+  bool isReplayable;          /*!< True if user input is an images sequences that can be played. */
+  int replayFps;              /*!< Frame rate value at which a new image is displayed in autoplay mode in the replay. */
+  int autoPlayerIndex;        /*!< Index of the image displayed in autoplay mode in the replay. */
+  bool object;                /*!< Alternatively true or false to associate either object A or object B at each click of the user in the ui->replayDisplay. */
+  QSize resizedFrame;         /*!< Width and height of displayed QPixmap to accomodate window size changment. */
+  QSize originalImageSize;    /*!< Width and height of the original image in the images sequence. */
+  int currentIndex;           /*!< Current image index. */
   double currentZoom;
   QPointF panReferenceClick;
   QPointF zoomReferencePosition;

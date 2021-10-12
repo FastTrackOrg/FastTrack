@@ -122,7 +122,7 @@ QMap<QString, double> AutoLevel::level() {
   * @param[in] data Distribution.
   * @return Std.
 */
-double AutoLevel::stdev(const QVector<double> &vect) {
+double AutoLevel::stdev(const QList<double> &vect) {
   double mean = std::accumulate(vect.begin(), vect.end(), 0.0);
   mean /= double(vect.size());
   double std = std::accumulate(vect.begin(), vect.end(), 0.0, [&mean](double a, double b) { return a + (b - mean) * (b - mean); });

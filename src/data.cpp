@@ -54,7 +54,7 @@ bool Data::setPath(const QString &dataPath) {
   clear();
   dir = dataPath;
 
-  QVector<QString> replayTracking;
+  QList<QString> replayTracking;
 
   QFile trackingFile(dir + QDir::separator() + "tracking.txt");
   if (trackingFile.exists() && trackingFile.open(QIODevice::ReadOnly)) {
@@ -69,7 +69,7 @@ bool Data::setPath(const QString &dataPath) {
     replayTracking.removeFirst();
 
     for (auto &a : replayTracking) {
-      QVector<object> tmpVector;
+      QList<object> tmpVector;
       QMap<int, QMap<QString, double>> objectMap;  // Map object id to data
       QMap<QString, double> objectData;            // Map data keys to data value
 
@@ -123,7 +123,7 @@ Data::Data() {
   * @param[in] imageIndex The index of the image where to extracts the data.
   * @return The tracking data in a QVector that contains a structure with the Id of the object and data for this object. The data are stored in a QMap<dataName, value>. 
 */
-QVector<object> Data::getData(int imageIndex) const {
+QList<object> Data::getData(int imageIndex) const {
   return data.value(imageIndex);
 }
 
@@ -134,7 +134,7 @@ QVector<object> Data::getData(int imageIndex) const {
   * @return The tracking data for for the selected object at the selected image. The data are stored in a QMap<dataName, value>. 
 */
 QMap<QString, double> Data::getData(int imageIndex, int id) const {
-  QVector<object> objects = data.value(imageIndex);
+  QList<object> objects = data.value(imageIndex);
   for (auto &a : objects) {
     if (a.id == id) {
       return a.data;
@@ -151,13 +151,13 @@ QMap<QString, double> Data::getData(int imageIndex, int id) const {
   * @param[in] id The id of the object.
   * @return The tracking data for for the selected object in a map with the key and a vector with the value for all the images.
 */
-QMap<QString, QVector<double>> Data::getDataId(int id) const {
-  QMap<QString, QVector<double>> idData;
+QMap<QString, QList<double>> Data::getDataId(int id) const {
+  QMap<QString, QList<double>> idData;
   for (int i = 0; i < maxFrameIndex + 1; i++) {
     QMap<QString, double> tmp = getData(i, id);
     QMap<QString, double>::const_iterator j = tmp.constBegin();
     while (j != tmp.constEnd()) {
-      QVector<double> tmpVal;
+      QList<double> tmpVal;
       if (idData.contains(j.key())) {
         tmpVal = idData.value(j.key());
       }
@@ -175,7 +175,7 @@ QMap<QString, QVector<double>> Data::getDataId(int id) const {
   * @return List of indexes.
 */
 QList<int> Data::getId(int imageIndex) const {
-  QVector<object> objects = data.value(imageIndex);
+  QList<object> objects = data.value(imageIndex);
   QList<int> ids;
   for (auto &a : objects) {
     ids.append(a.id);
@@ -192,7 +192,7 @@ QList<int> Data::getId(int imageIndex) const {
 QList<int> Data::getId(int imageIndexFirst, int imageIndexLast) const {
   QList<int> ids;
   for (int i = imageIndexFirst; i < imageIndexLast; i++) {
-    QVector<object> objects = data.value(i);
+    QList<object> objects = data.value(i);
     for (auto &a : objects) {
       ids.append(a.id);
     }
@@ -210,7 +210,7 @@ QList<int> Data::getId(int imageIndexFirst, int imageIndexLast) const {
 int Data::getObjectInformation(int objectId) const {
   int firstAppearance;
   for (int i = 0; i < maxFrameIndex + 1; i++) {
-    QVector<object> objects = data.value(i);
+    QList<object> objects = data.value(i);
     for (auto &a : objects) {
       if (a.id == objectId) {
         firstAppearance = i;
@@ -228,11 +228,11 @@ int Data::getObjectInformation(int objectId) const {
   * @arg[in] from Start index from which the data will be swapped.
 */
 void Data::swapData(int firstObject, int secondObject, int from) {
-  QMapIterator<int, QVector<object>> i(data);
+  QMapIterator<int, QList<object>> i(data);
   while (i.hasNext()) {
     i.next();
     if (i.key() >= from) {
-      QVector<object> objects = i.value();
+      QList<object> objects = i.value();
 
       for (int j = 0; j < objects.size(); j++) {
         int id = objects[j].id;
@@ -262,11 +262,11 @@ void Data::swapData(int firstObject, int secondObject, int from) {
   * @arg[in] to End index from which the data will be swapped.
 */
 void Data::deleteData(int objectId, int from, int to) {
-  QMapIterator<int, QVector<object>> i(data);
+  QMapIterator<int, QList<object>> i(data);
   while (i.hasNext()) {
     i.next();
     if (i.key() >= from && i.key() <= to) {
-      QVector<object> objects = i.value();
+      QList<object> objects = i.value();
 
       for (int j = 0; j < objects.size(); j++) {
         if (objects[j].id == objectId) {
@@ -286,16 +286,16 @@ void Data::deleteData(int objectId, int from, int to) {
   * @arg[in] to End index from which the data will be swapped.
 */
 void Data::insertData(int objectId, int from, int to) {
-  QMapIterator<int, QVector<object>> i(dataCopy);
+  QMapIterator<int, QList<object>> i(dataCopy);
   while (i.hasNext()) {
     i.next();
     if (i.key() >= from && i.key() <= to) {
-      QVector<object> objects = i.value();
+      QList<object> objects = i.value();
 
       for (int j = 0; j < objects.size(); j++) {
         if (objects[j].id == objectId) {
           object objectToInsert = dataCopy.value(i.key())[j];
-          QVector<object> objectsToReplace = data.value(i.key());
+          QList<object> objectsToReplace = data.value(i.key());
           objectsToReplace.append(objectToInsert);
           data.insert(i.key(), objectsToReplace);
         }
@@ -322,7 +322,7 @@ void Data::save(bool force, int eachActions) {
   if (file.open(QFile::WriteOnly | QFile::Text)) {
     QTextStream out(&file);
     out << "xHead" << '\t' << "yHead" << '\t' << "tHead" << '\t' << "xTail" << '\t' << "yTail" << '\t' << "tTail" << '\t' << "xBody" << '\t' << "yBody" << '\t' << "tBody" << '\t' << "curvature" << '\t' << "areaBody" << '\t' << "perimeterBody" << '\t' << "headMajorAxisLength" << '\t' << "headMinorAxisLength" << '\t' << "headExcentricity" << '\t' << "tailMajorAxisLength" << '\t' << "tailMinorAxisLength" << '\t' << "tailExcentricity" << '\t' << "bodyMajorAxisLength" << '\t' << "bodyMinorAxisLength" << '\t' << "bodyExcentricity" << '\t' << "imageNumber" << '\t' << "id" << Qt::endl;
-    QMapIterator<int, QVector<object>> i(data);
+    QMapIterator<int, QList<object>> i(data);
     while (i.hasNext()) {
       i.next();
       for (auto &a : i.value()) {

@@ -630,7 +630,7 @@ bool Replay::eventFilter(QObject* target, QEvent* event) {
         QList<int> idList = trackingData->getId(frameIndex);
 
         if (!idList.isEmpty()) {
-          QVector<double> distance;
+          QList<double> distance;
           for (auto const& a : idList) {
             QMap<QString, double> coordinate = trackingData->getData(frameIndex, a);
             distance.append(pow(coordinate.value("xBody") - xTop, 2) + pow(coordinate.value("yBody") - yTop, 2));

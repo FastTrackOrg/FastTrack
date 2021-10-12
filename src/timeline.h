@@ -55,7 +55,7 @@ class Timeline : public QWidget {
   QGraphicsLineItem *cursorLeft;
   QGraphicsSimpleTextItem *indexNumber;
 
-  QVector<int> markers;
+  QList<int> markers;
 
   void setLayout(const int width, const int imageNumber);
   void resizeEvent(QResizeEvent *event);

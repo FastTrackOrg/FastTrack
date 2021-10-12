@@ -22,8 +22,8 @@ struct object
 class Data {
  private:
   QString dir; /*!< Path to the tracking result file. */
-  QMap<int, QVector<object>> dataCopy;
-  QMap<int, QVector<object>> data; /*!< Tracking data stored in a QMap, the keys are the image index and the value a vector of data stored in a structure with a field containing the object id and a field containing the data stored in a QMap where the keys are the data name and the velue the data value. */
+  QMap<int, QList<object>> dataCopy;
+  QMap<int, QList<object>> data; /*!< Tracking data stored in a QMap, the keys are the image index and the value a vector of data stored in a structure with a field containing the object id and a field containing the data stored in a QMap where the keys are the data name and the velue the data value. */
   int actions;
 
  public:
@@ -34,9 +34,9 @@ class Data {
   ~Data();
 
   bool setPath(const QString &dataPath);
-  QVector<object> getData(int imageIndex) const;
+  QList<object> getData(int imageIndex) const;
   QMap<QString, double> getData(int imageIndex, int id) const;
-  QMap<QString, QVector<double>> getDataId(int id) const;
+  QMap<QString, QList<double>> getDataId(int id) const;
   QList<int> getId(int imageIndex) const;
   QList<int> getId(int imageIndexFirst, int imageIndexLast) const;
   int getObjectInformation(int objectId) const;
