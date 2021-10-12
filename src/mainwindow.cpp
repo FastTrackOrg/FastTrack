@@ -43,8 +43,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
                                           ui(new Ui::MainWindow) {
   QDir::setCurrent(QCoreApplication::applicationDirPath());
   ui->setupUi(this);
-  setWindowState(Qt::WindowMaximized);
   setWindowTitle(qApp->applicationName() + " " + APP_VERSION);
+  setWindowState(Qt::WindowMaximized);
+  showMaximized();
 
   // Tray icon
   trayIcon = new QSystemTrayIcon(QIcon(":/assets/icon.svg"), this);
