@@ -483,9 +483,9 @@ void Batch::startTracking() {
 void Batch::updateParameters() {
   if (isEditable) {
     // Updates SpinBox parameters
-    QVector<int> spinBoxIndexes = {1, 2, 4, 5, 6, 7, 11, 12, 13, 16, 17};
-    QVector<int> doubleSpinBoxIndexes = {14, 15, 20, 21};
-    QVector<int> comboBoxIndexes = {3, 8, 9, 10, 18, 19};
+    QList<int> spinBoxIndexes = {1, 2, 4, 5, 6, 7, 11, 12, 13, 16, 17};
+    QList<int> doubleSpinBoxIndexes = {14, 15, 20, 21};
+    QList<int> comboBoxIndexes = {3, 8, 9, 10, 18, 19};
 
     for (auto &a : spinBoxIndexes) {
       parameterList.insert(ui->tableParameters->item(a, 0)->text(), QString::number(qobject_cast<QSpinBox *>(ui->tableParameters->cellWidget(a, 1))->value()));

@@ -47,7 +47,7 @@ class AutoLevel : public QObject {
   AutoLevel(const string &path, const UMat &background, const QMap<QString, QString> &parameters);
   AutoLevel(const AutoLevel &T) = delete;
   AutoLevel &operator=(const AutoLevel &T) = delete;
-  static double stdev(const QVector<double> &vect);
+  static double stdev(const QList<double> &vect);
 
  public slots:
   QMap<QString, double> level();

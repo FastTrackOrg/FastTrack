@@ -71,7 +71,7 @@ class Batch : public QWidget {
     QString backgroundPath;
     QMap<QString, QString> trackingParameters;
   };
-  QVector<process> processList;
+  QList<process> processList;
 
   void loadSettings();
   void saveSettings();
