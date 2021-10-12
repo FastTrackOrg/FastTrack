@@ -65,7 +65,7 @@ bool Data::setPath(const QString &dataPath) {
     }
 
     // Gets the header to construct the QMap data
-    QStringList header = replayTracking[0].split('\t', QString::SkipEmptyParts);
+    QStringList header = replayTracking[0].split('\t', Qt::SkipEmptyParts);
     replayTracking.removeFirst();
 
     for (auto &a : replayTracking) {
@@ -73,7 +73,7 @@ bool Data::setPath(const QString &dataPath) {
       QMap<int, QMap<QString, double>> objectMap;  // Map object id to data
       QMap<QString, double> objectData;            // Map data keys to data value
 
-      QStringList dat = a.split('\t', QString::SkipEmptyParts);
+      QStringList dat = a.split('\t', Qt::SkipEmptyParts);
       if (dat.size() != 23) break;  // Checks for corrupted data
       int frameIndex = dat[21].toInt();
       if (frameIndex > maxFrameIndex) maxFrameIndex = frameIndex;
@@ -321,12 +321,12 @@ void Data::save(bool force, int eachActions) {
   QFile file(dir + QDir::separator() + "tracking.txt");
   if (file.open(QFile::WriteOnly | QFile::Text)) {
     QTextStream out(&file);
-    out << "xHead" << '\t' << "yHead" << '\t' << "tHead" << '\t' << "xTail" << '\t' << "yTail" << '\t' << "tTail" << '\t' << "xBody" << '\t' << "yBody" << '\t' << "tBody" << '\t' << "curvature" << '\t' << "areaBody" << '\t' << "perimeterBody" << '\t' << "headMajorAxisLength" << '\t' << "headMinorAxisLength" << '\t' << "headExcentricity" << '\t' << "tailMajorAxisLength" << '\t' << "tailMinorAxisLength" << '\t' << "tailExcentricity" << '\t' << "bodyMajorAxisLength" << '\t' << "bodyMinorAxisLength" << '\t' << "bodyExcentricity" << '\t' << "imageNumber" << '\t' << "id" << endl;
+    out << "xHead" << '\t' << "yHead" << '\t' << "tHead" << '\t' << "xTail" << '\t' << "yTail" << '\t' << "tTail" << '\t' << "xBody" << '\t' << "yBody" << '\t' << "tBody" << '\t' << "curvature" << '\t' << "areaBody" << '\t' << "perimeterBody" << '\t' << "headMajorAxisLength" << '\t' << "headMinorAxisLength" << '\t' << "headExcentricity" << '\t' << "tailMajorAxisLength" << '\t' << "tailMinorAxisLength" << '\t' << "tailExcentricity" << '\t' << "bodyMajorAxisLength" << '\t' << "bodyMinorAxisLength" << '\t' << "bodyExcentricity" << '\t' << "imageNumber" << '\t' << "id" << Qt::endl;
     QMapIterator<int, QVector<object>> i(data);
     while (i.hasNext()) {
       i.next();
       for (auto &a : i.value()) {
-        out << a.data.value("xHead") << '\t' << a.data.value("yHead") << '\t' << a.data.value("tHead") << '\t' << a.data.value("xTail") << '\t' << a.data.value("yTail") << '\t' << a.data.value("tTail") << '\t' << a.data.value("xBody") << '\t' << a.data.value("yBody") << '\t' << a.data.value("tBody") << '\t' << a.data.value("curvature") << '\t' << a.data.value("areaBody") << '\t' << a.data.value("perimeterBody") << '\t' << a.data.value("headMajorAxisLength") << '\t' << a.data.value("headMinorAxisLength") << '\t' << a.data.value("headExcentricity") << '\t' << a.data.value("tailMajorAxisLength") << '\t' << a.data.value("tailMinorAxisLength") << '\t' << a.data.value("tailExcentricity") << '\t' << a.data.value("bodyMajorAxisLength") << '\t' << a.data.value("bodyMinorAxisLength") << '\t' << a.data.value("bodyExcentricity") << '\t' << a.data.value("imageNumber") << '\t' << a.id << endl;
+        out << a.data.value("xHead") << '\t' << a.data.value("yHead") << '\t' << a.data.value("tHead") << '\t' << a.data.value("xTail") << '\t' << a.data.value("yTail") << '\t' << a.data.value("tTail") << '\t' << a.data.value("xBody") << '\t' << a.data.value("yBody") << '\t' << a.data.value("tBody") << '\t' << a.data.value("curvature") << '\t' << a.data.value("areaBody") << '\t' << a.data.value("perimeterBody") << '\t' << a.data.value("headMajorAxisLength") << '\t' << a.data.value("headMinorAxisLength") << '\t' << a.data.value("headExcentricity") << '\t' << a.data.value("tailMajorAxisLength") << '\t' << a.data.value("tailMinorAxisLength") << '\t' << a.data.value("tailExcentricity") << '\t' << a.data.value("bodyMajorAxisLength") << '\t' << a.data.value("bodyMinorAxisLength") << '\t' << a.data.value("bodyExcentricity") << '\t' << a.data.value("imageNumber") << '\t' << a.id << Qt::endl;
       }
     }
     file.close();

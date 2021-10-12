@@ -1021,7 +1021,7 @@ bool Interactive::eventFilter(QObject *target, QEvent *event) {
     }
     if (event->type() == QEvent::Wheel) {
       QWheelEvent *wheelEvent = static_cast<QWheelEvent *>(event);
-      zoomReferencePosition = wheelEvent->pos();
+      zoomReferencePosition = wheelEvent->position();
     }
 
     // Zoom/unzoom the display by wheel
@@ -1177,7 +1177,7 @@ void Interactive::loadParameters(QString path) {
     QMap<QString, QString> parameterList;
     while (in.readLineInto(&line)) {
       if (line.contains("=")) {
-        parameters = line.split("=", QString::SkipEmptyParts);
+        parameters = line.split("=", Qt::SkipEmptyParts);
         parameterList.insert(parameters[0].trimmed(), parameters[1].trimmed());
       }
     }

@@ -552,7 +552,7 @@ bool Batch::loadParameterFile(QString path) {
     parameterList.clear();
     while (in.readLineInto(&line)) {
       if (line.contains("=")) {
-        parameters = line.split("=", QString::SkipEmptyParts);
+        parameters = line.split("=", Qt::SkipEmptyParts);
         parameterList.insert(parameters[0].trimmed(), parameters[1].trimmed());
       }
     }

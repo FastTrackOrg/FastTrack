@@ -36,7 +36,7 @@ void loadConfig(QString path, QMap<QString, QString> &parameters) {
     QStringList params;
     while (in.readLineInto(&line)) {
       if (line.contains("=")) {
-        params = line.split("=", QString::SkipEmptyParts);
+        params = line.split("=", Qt::SkipEmptyParts);
         parameters.insert(params[0].trimmed(), params[1].trimmed());
       }
     }
