@@ -4,6 +4,7 @@ on:
   push:
     branches:
     - master
+    - qt6
   pull_request:
     branches:
     - master

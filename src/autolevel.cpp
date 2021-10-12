@@ -136,15 +136,17 @@ double AutoLevel::stdev(const QVector<double> &vect) {
   * @return Standard deviation.
 */
 double AutoLevel::computeStdAngle(const Data &data) {
-  QVector<double> angle;
+  QList<double> angle;
   QList<int> ids = data.getId(0, data.maxFrameIndex);
   for (const int &a : ids) {
-    QMap<QString, QVector<double>> i = data.getDataId(a);
-    QVector<double> angleDiff(i.value("t" + m_spotSuffix).size());
-    std::adjacent_difference(i.value("t" + m_spotSuffix).begin(), i.value("t" + m_spotSuffix).end(), angleDiff.begin(), [](double a, double b) { return Tracking::angleDifference(b, a); });
-    QVector<double> tDiff(i.value("imageNumber").size());
-    std::adjacent_difference(i.value("imageNumber").begin(), i.value("imageNumber").end(), tDiff.begin());
-    std::transform(angleDiff.begin(), angleDiff.end(), tDiff.begin(), angleDiff.begin(), std::divides<double>{});  // Divide the time distance by the time to account for time gaps
+    QMap<QString, QList<double>> i = data.getDataId(a);
+    QList<double> angleDiff(i.value("t" + m_spotSuffix).size());
+    QList<double> ang = i.value("t" + m_spotSuffix);
+    std::adjacent_difference(ang.begin(), ang.end(), angleDiff.begin(), [](double a, double b) { return Tracking::angleDifference(b, a); });
+    QList<double> tDiff(i.value("imageNumber").size());
+    QList<double> image = i.value("imageNumber");
+    std::adjacent_difference(image.begin(), image.end(), tDiff.begin());
+    std::transform(angleDiff.begin(), angleDiff.end(), tDiff.begin(), angleDiff.begin(), std::divides<double>{});  // Divide the distance by the time to account for time gaps
     angleDiff.removeFirst();
     angle.append(angleDiff);
   }
@@ -157,17 +159,20 @@ double AutoLevel::computeStdAngle(const Data &data) {
   * @return Standard deviation.
 */
 double AutoLevel::computeStdDistance(const Data &data) {
-  QVector<double> distance;
+  QList<double> distance;
   QList<int> ids = data.getId(0, data.maxFrameIndex);
   for (const int &a : ids) {
-    QMap<QString, QVector<double>> i = data.getDataId(a);
-    QVector<double> xDiff(i.value("x" + m_spotSuffix).size());
-    std::adjacent_difference(i.value("x" + m_spotSuffix).begin(), i.value("x" + m_spotSuffix).end(), xDiff.begin());
-    QVector<double> yDiff(i.value("y" + m_spotSuffix).size());
-    std::adjacent_difference(i.value("y" + m_spotSuffix).begin(), i.value("y" + m_spotSuffix).end(), yDiff.begin());
-    QVector<double> tDiff(i.value("imageNumber").size());
-    std::adjacent_difference(i.value("imageNumber").begin(), i.value("imageNumber").end(), tDiff.begin());
-    QVector<double> dist(xDiff.size());
+    QMap<QString, QList<double>> i = data.getDataId(a);
+    QList<double> xDiff(i.value("x" + m_spotSuffix).size());
+    QList<double> x = i.value("x" + m_spotSuffix);
+    std::adjacent_difference(x.begin(), x.end(), xDiff.begin());
+    QList<double> yDiff(i.value("y" + m_spotSuffix).size());
+    QList<double> y = i.value("y" + m_spotSuffix);
+    std::adjacent_difference(y.begin(), y.end(), yDiff.begin());
+    QList<double> tDiff(i.value("imageNumber").size());
+    QList<double> image = i.value("imageNumber");
+    std::adjacent_difference(image.begin(), image.end(), tDiff.begin());
+    QList<double> dist(xDiff.size());
     std::transform(xDiff.begin(), xDiff.end(), yDiff.begin(), dist.begin(), [](double a, double b) { return std::pow(std::pow(a, 2) + std::pow(b, 2), 0.5); });
     std::transform(dist.begin(), dist.end(), tDiff.begin(), dist.begin(), std::divides<double>{});  // Divide the time distance by the time to account for time gaps
     dist.removeFirst();
@@ -182,12 +187,13 @@ double AutoLevel::computeStdDistance(const Data &data) {
   * @return Standard deviation.
 */
 double AutoLevel::computeStdArea(const Data &data) {
-  QVector<double> area;
+  QList<double> area;
   QList<int> ids = data.getId(0, data.maxFrameIndex);
   for (const int &a : ids) {
-    QMap<QString, QVector<double>> i = data.getDataId(a);
-    QVector<double> areaDiff(i.value("areaBody").size());
-    std::adjacent_difference(i.value("areaBody").begin(), i.value("areaBody").end(), areaDiff.begin());
+    QMap<QString, QList<double>> i = data.getDataId(a);
+    QList<double> areaDiff(i.value("areaBody").size());
+    QList<double> ar = i.value("areaBody");
+    std::adjacent_difference(ar.begin(), ar.end(), areaDiff.begin());
     areaDiff.removeFirst();
     area.append(areaDiff);
   }
@@ -200,12 +206,13 @@ double AutoLevel::computeStdArea(const Data &data) {
   * @return Standard deviation.
 */
 double AutoLevel::computeStdPerimeter(const Data &data) {
-  QVector<double> perimeter;
+  QList<double> perimeter;
   QList<int> ids = data.getId(0, data.maxFrameIndex);
   for (const int &a : ids) {
-    QMap<QString, QVector<double>> i = data.getDataId(a);
-    QVector<double> perimDiff(i.value("perimeterBody").size());
-    std::adjacent_difference(i.value("perimeterBody").begin(), i.value("perimeterBody").end(), perimDiff.begin());
+    QMap<QString, QList<double>> i = data.getDataId(a);
+    QList<double> perimDiff(i.value("perimeterBody").size());
+    QList<double> perim = i.value("perimeterBody");
+    std::adjacent_difference(perim.begin(), perim.end(), perimDiff.begin());
     perimDiff.removeFirst();
     perimeter.append(perimDiff);
   }

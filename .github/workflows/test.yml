@@ -4,6 +4,7 @@ on:
   push:
     branches:
     - master
+    - qt6
   pull_request:
     branches:
     - master
@@ -14,16 +15,19 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: install qt5
-      run: |
-        sudo apt-get update
-        sudo apt-get install build-essential cmake
-        sudo apt-get install qt5-default qt5-qmake qtwebengine5-dev libgtest-dev
-    - name: install opencv
-      run: sudo apt-get install libopencv-dev
     - uses: actions/setup-python@v2
       with:
         python-version: '3.8'
+    - name: install qt6
+      run: |
+        sudo apt-get update
+        sudo apt-get install build-essential cmake libgl1-mesa-dev
+        sudo apt-get install libgtest-dev
+        pip install aqtinstall
+        python3 -m aqt install-qt -m qtwebengine qtwebchannel qtpositioning -O ${{ github.workspace }}/Qt/ linux desktop 6.2.0
+        echo ${{ github.workspace }}/Qt/6.2.0/gcc_64/bin/ >> $GITHUB_PATH
+    - name: install opencv
+      run: sudo apt-get install libopencv-dev
     - name: install python dependencies
       run: |
         python -m pip install --upgrade pip setuptools wheel

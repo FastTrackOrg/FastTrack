@@ -7,7 +7,7 @@ NO_WEB {
 }
 
 TEMPLATE = app
-VERSION = 5.3.5
+VERSION = 6.0.0
 DEFINES += APP_VERSION=\\\"$$VERSION\\\"
 
 
@@ -48,7 +48,7 @@ unix:!macx {
 
 win32 {
   TARGET = FastTrack
-  QMAKE_CXXFLAGS += /std:c++latest
+  CONFIG += c++2a
   LIBS += -LC:\opencv\build\x64\vc15\lib -lopencv_world450
   INCLUDEPATH += C:\opencv\build\include
   DEPENDPATH += C:\opencv\build\include

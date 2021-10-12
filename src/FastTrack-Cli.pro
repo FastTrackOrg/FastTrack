@@ -4,7 +4,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = fasttrack-cli
 TEMPLATE = app
-VERSION = 5.3.5
+VERSION = 6.0.0
 DEFINES += APP_VERSION=\\\"$$VERSION\\\"
 
 unix:!macx {

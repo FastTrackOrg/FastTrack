@@ -2,45 +2,42 @@ name: Continous Builds Cli
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
 
 jobs:
-
   job_1:
-      runs-on: ubuntu-18.04
+      runs-on: ubuntu-20.04
       steps:
         - uses: actions/checkout@v2
-        - name: install qt5
-          run: |
-             sudo add-apt-repository ppa:beineri/opt-qt-5.15.2-bionic
-             sudo apt-get update
-             sudo apt-get install libgl1-mesa-dev qt515base qt515webengine ffmpeg
-             sudo add-apt-repository ppa:ubuntu-toolchain-r/test
-             sudo apt-get update
-             sudo apt-get install libavcodec-dev libavformat-dev libswscale-dev
-             sudo apt-get install libgstreamer-plugins-base1.0-dev libgstreamer1.0-dev
-             sudo apt-get install gcc-9 g++-9
-             sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 90 --slave /usr/bin/g++ g++ /usr/bin/g++-9 --slave /usr/bin/gcov gcov /usr/bin/gcov-9
+        - uses: actions/setup-python@v2
+          with:
+            python-version: '3.8'
         - name: install opencv
-          run: sudo ./dependencies.sh opencv
+          run: |
+              sudo apt-get update
+              sudo apt-get dist-upgrade
+              sudo apt-get install libgl1-mesa-dev libssl-dev
+              sudo apt-get install libavcodec-dev libavformat-dev libswscale-dev libnss3
+              sudo apt-get install libgstreamer-plugins-base1.0-dev libgstreamer1.0-dev
+              sudo apt-get install libopencv-dev
+        - name: install qt6
+          run: |
+            pip install aqtinstall
+            python3 -m aqt install-qt -m qtwebengine qtwebchannel qtpositioning -O ${{ github.workspace }}/Qt/ linux desktop 6.2.0
+            echo ${{ github.workspace }}/Qt/6.2.0/gcc_64/bin/ >> $GITHUB_PATH
         - name: build
           run: |
-              export QTDIR=/opt/qt515
-              export PATH=/opt/qt515/bin:$PATH
-              export LD_LIBRARY_PATH=$QT_DIR/lib/x86_64-linux-gnu:$QT_DIR/lib:$LD_LIBRARY_PATH
               ./run.sh cli
               make clean
         - name: appimage
           run: |
               cd build_cli
-              export QTDIR=/opt/qt515
-              export PATH=/opt/qt515/bin:$PATH
-              export LD_LIBRARY_PATH=$QT_DIR/lib/x86_64-linux-gnu:$QT_DIR/lib:$LD_LIBRARY_PATH
               wget -O deploy.AppImage https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage
               chmod +x deploy.AppImage
               cp ../sh.fasttrack.fasttrackcli.desktop .
               cp ../src/assets/fasttrack.png .
-              ./deploy.AppImage sh.fasttrack.fasttrackcli.desktop -appimage -no-translations -bundle-non-qt-libs
+              export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${{ github.workspace }}/Qt/6.2.0/gcc_64/lib/
+              ./deploy.AppImage fasttrack-cli -appimage -no-translations -bundle-non-qt-libs -unsupported-allow-new-glibc
               mv FastTrack*.AppImage FastTrack-cli-x86_64.AppImage
         - name: Linux artefact
           uses: actions/upload-artifact@v1
@@ -51,15 +48,14 @@ jobs:
       runs-on: macos-latest
       steps:
         - uses: actions/checkout@v2
-        - uses: jurplel/install-qt-action@v2
+        - uses: actions/setup-python@v2
           with:
-            host: 'mac'
-            target: 'desktop'
-            dir: '${{ github.workspace }}/Qt/'
-            install-deps: 'true'
-            modules: 'qtwebengine'
-            cached: 'false'
-            extra: '--external 7z'
+            python-version: '3.8'
+        - name: install qt6
+          run: |
+            pip install aqtinstall
+            python3 -m aqt install-qt -m qtwebengine qtwebchannel qtpositioning -O ${{ github.workspace }}/Qt/ mac desktop 6.2.0
+            echo ${{ github.workspace }}/Qt/6.2.0/macos/bin/ >> $GITHUB_PATH
         - name: install opencv
           run: |
               rm -rf /usr/local/bin/2to3

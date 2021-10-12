@@ -83,7 +83,7 @@ Timeline::Timeline(QWidget *parent)
   connect(dShortcut, &QShortcut::activated, [this]() { setValue(m_currentIndexLeft + 1); });
 
   QShortcut *spaceShortcut = new QShortcut(Qt::Key_Space, this);
-  connect(spaceShortcut, &QShortcut::activated, [this]() { ui->playButton->animateClick(0); });
+  connect(spaceShortcut, &QShortcut::activated, [this]() { ui->playButton->animateClick(); });
 
   //Ui
   QIcon img = QIcon(":/assets/buttons/play.png");

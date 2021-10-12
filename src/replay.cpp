@@ -622,8 +622,8 @@ bool Replay::eventFilter(QObject* target, QEvent* event) {
       // Left click to select an object
       if (mouseEvent->buttons() == Qt::LeftButton && isReplayable) {
         // Finds user click coordinate
-        double xTop = ((double(mouseEvent->pos().x()) - 0.5 * (ui->replayDisplay->width() - resizedFrame.width())) * double(originalImageSize.width())) / double(resizedFrame.width());
-        double yTop = ((double(mouseEvent->pos().y()) - 0.5 * (ui->replayDisplay->height() - resizedFrame.height())) * double(originalImageSize.height())) / double(resizedFrame.height());
+        double xTop = ((double(mouseEvent->position().x()) - 0.5 * (ui->replayDisplay->width() - resizedFrame.width())) * double(originalImageSize.width())) / double(resizedFrame.width());
+        double yTop = ((double(mouseEvent->position().y()) - 0.5 * (ui->replayDisplay->height() - resizedFrame.height())) * double(originalImageSize.height())) / double(resizedFrame.height());
 
         // Finds the id of the closest object
         int frameIndex = ui->replaySlider->value();
@@ -660,8 +660,8 @@ bool Replay::eventFilter(QObject* target, QEvent* event) {
     // Hover screen
     if (event->type() == QEvent::HoverMove) {
       QHoverEvent* hoverEvent = static_cast<QHoverEvent*>(event);
-      int xPix = static_cast<int>(((double(hoverEvent->pos().x()) - 0.5 * (ui->replayDisplay->width() - resizedFrame.width())) * double(originalImageSize.width())) / double(resizedFrame.width()));
-      int yPix = static_cast<int>(((double(hoverEvent->pos().y()) - 0.5 * (ui->replayDisplay->height() - resizedFrame.height())) * double(originalImageSize.height())) / double(resizedFrame.height()));
+      int xPix = static_cast<int>(((double(hoverEvent->position().x()) - 0.5 * (ui->replayDisplay->width() - resizedFrame.width())) * double(originalImageSize.width())) / double(resizedFrame.width()));
+      int yPix = static_cast<int>(((double(hoverEvent->position().y()) - 0.5 * (ui->replayDisplay->height() - resizedFrame.height())) * double(originalImageSize.height())) / double(resizedFrame.height()));
       if (xPix > 0 && yPix > 0 && xPix < originalImageSize.width() && yPix < originalImageSize.height()) {
         this->statusBar()->showMessage("x: " + QString::number(xPix) + "\ty: " + QString::number(yPix));
       }
@@ -681,7 +681,7 @@ bool Replay::eventFilter(QObject* target, QEvent* event) {
     }
     if (event->type() == QEvent::Wheel) {
       QWheelEvent* wheelEvent = static_cast<QWheelEvent*>(event);
-      zoomReferencePosition = wheelEvent->pos();
+      zoomReferencePosition = wheelEvent->position();
     }
 
     // Zoom/unzoom the display by wheel
