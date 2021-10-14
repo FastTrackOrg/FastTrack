@@ -68,9 +68,20 @@ jobs:
           cd src/
           qmake FastTrack.pro -spec win32-msvc "CONFIG+=qtquickcompiler"
           nmake release
-          bitsadmin.exe /transfer debjob /download /priority normal http://www.fasttrack.sh/download/FastTrack/FastTrack/template.zip C:\FastTrack.zip
+          nmake clean
           cd release
-          7z a C:\FastTrack.zip FastTrack.exe
+          windeployqt FastTrack.exe --release --compiler-runtime
+          copy ..\assets\icon.ico .
+          copy C:\Windows\System32\concrt140.dll . 
+          copy C:\Windows\System32\msvcp140.dll .
+          copy C:\Windows\System32\msvcp140_1.dll .
+          copy C:\opencv\build\x64\vc15\bin\opencv_videoio_ffmpeg450_64.dll .
+          copy C:\opencv\build\x64\vc15\bin\opencv_world450.dll .
+          copy C:\Windows\System32\vcruntime140.dll .
+          copy C:\Windows\System32\vcruntime140_1.dll .  
+          copy C:\Windows\System32\libcrypto-1_1-x64.dll .
+          copy C:\Windows\System32\libssl-1_1-x64.dll .
+          7z a C:\FastTrack.zip *
       - name: Windows artefact
         uses: actions/upload-artifact@v1
         with:
