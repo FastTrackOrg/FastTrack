@@ -44,8 +44,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
   QDir::setCurrent(QCoreApplication::applicationDirPath());
   ui->setupUi(this);
   setWindowTitle(qApp->applicationName() + " " + APP_VERSION);
-  setWindowState(Qt::WindowMaximized);
-  showMaximized();
+  setWindowState(Qt::WindowActive);
+  QTimer::singleShot(1500, this, &QMainWindow::showMaximized);  // Workaround to wait for a showEvent() that defines the screen geometry
 
   // Tray icon
   trayIcon = new QSystemTrayIcon(QIcon(":/assets/icon.svg"), this);
