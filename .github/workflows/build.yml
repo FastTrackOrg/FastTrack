@@ -32,12 +32,12 @@ jobs:
       - name: appimage
         run: |
           cd build
-          wget -O deploy.AppImage https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage
+          wget -O deploy.AppImage https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
           chmod +x deploy.AppImage
           cp ../sh.fasttrack.fasttrack.desktop .
           cp ../src/assets/fasttrack.png .
           export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${{ github.workspace }}/Qt/6.2.0/gcc_64/lib/
-          ./deploy.AppImage fasttrack -appimage -no-translations -bundle-non-qt-libs -unsupported-allow-new-glibc
+          ./deploy.AppImage -d sh.fasttrack.fasttrack.desktop --appdir AppDir -i fasttrack.png -e fasttrack --output appimage
           mv FastTrack*.AppImage FastTrack-x86_64.AppImage
       - name: Linux artefact
         uses: actions/upload-artifact@v1

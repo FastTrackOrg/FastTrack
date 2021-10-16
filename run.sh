@@ -56,6 +56,7 @@ if [ "$1" = "ci" ]; then
   qmake CONFIG+=released src/FastTrack.pro
   make clean
   make
+  make clean
   cd build
 fi
 
@@ -64,5 +65,6 @@ if [ "$1" = "cli" ]; then
   qmake CONFIG+=released src/FastTrack-Cli.pro
   make clean
   make
+  make clean
   cd build_cli
 fi
