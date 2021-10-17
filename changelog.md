@@ -1,5 +1,14 @@
 # FastTrack changelog
 
+## 6.0.0
+
+### Changed
+- Updated to Qt6
+- Added Expert mode to simplify the ui
+
+### Fixed
+- Fixed window state at startup
+
 ## 5.3.5
 
 ### Added
