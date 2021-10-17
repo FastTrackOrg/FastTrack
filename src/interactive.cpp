@@ -45,8 +45,6 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
 
   // Loads settings
   QSettings settingsFile("FastTrack", "FastTrackOrg");
-  resize(settingsFile.value("window/size").toSize());
-  move(settingsFile.value("window/pos").toPoint());
   videoStatus = false;
 
   // MetaType
@@ -92,6 +90,7 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
 
   // Menu bar
   connect(ui->actionOpen, &QAction::triggered, this, &Interactive::openFolder);
+  connect(ui->actionQuit, &QAction::triggered, qApp, &QApplication::quit);
   ui->menuView->addAction(ui->imageOptions->toggleViewAction());
   ui->menuView->addAction(ui->trackingOptions->toggleViewAction());
   ui->menuView->addAction(ui->controlOptions->toggleViewAction());
@@ -330,6 +329,19 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
     default:
       ui->actionLayout1->activate(QAction::Trigger);
   }
+
+  QAction *actionMode = new QAction(tr("Expert Mode"), this);
+  actionMode->setCheckable(true);
+  isExpert = settingsFile.value("window/mode", false).toBool();
+  actionMode->setChecked(isExpert);
+  connect(actionMode, &QAction::toggled, [this](bool isChecked) {
+    emit(modeChanged(isChecked));
+    isExpert = isChecked;
+  });
+  QTimer::singleShot(500, actionMode, [this]() {
+    emit(modeChanged(isExpert));
+  });  // Need to wait for the connection initialization
+  ui->menuSettings->addAction(actionMode);
 
   // Help menu
   connect(ui->actionDoc, &QAction::triggered, []() {
@@ -1123,11 +1135,10 @@ Interactive::~Interactive() {
 */
 void Interactive::saveSettings() {
   QSettings settingsFile("FastTrack", "FastTrackOrg");
-  settingsFile.setValue("window/size", this->size());
-  settingsFile.setValue("window/fullScreen", this->isFullScreen());
   settingsFile.setValue("window/style", style);
   settingsFile.setValue("window/color", color);
   settingsFile.setValue("window/layout", layout);
+  settingsFile.setValue("window/mode", isExpert);
 }
 
 /**

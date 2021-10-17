@@ -3,6 +3,12 @@ id: trackingInspector
 title: Tracking Inspector
 sidebar_label: Tracking Inspector
 ---
+**NOTE**
+
+The Tracking Inspector panel is accessible in Expert Mode (settings -> Expert Mode). Or in the Interactive panel (View -> Tracking replay).
+
+---
+
 
 ![alt text](assets/tracking_inspector.svg)
 

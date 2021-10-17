@@ -55,6 +55,7 @@ class MainWindow : public QMainWindow {
  public:
   explicit MainWindow(QWidget *parent = 0);
   ~MainWindow();
+  void setMode(bool isExpert);
 
  private:
   Ui::MainWindow *ui; /*!< ui file from Qt designer. */

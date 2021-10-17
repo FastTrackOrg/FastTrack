@@ -165,6 +165,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
   connect(interactive, &Interactive::status, [this](QString message) {
     trayIcon->showMessage("FastTrack", message, QSystemTrayIcon::Information, 3000);
   });
+  connect(interactive, &Interactive::modeChanged, this, &MainWindow::setMode);
 
   batch = new Batch(this);
   ui->tabWidget->addTab(batch, tr("Batch tracking"));
@@ -195,6 +196,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
       dataset->setUrl(QUrl("http://data.ljp.upmc.fr/datasets/TD2/"));
     }
   });
+
 #endif
 
 }  // Constructor
@@ -223,6 +225,14 @@ void MainWindow::closeEvent(QCloseEvent *event) {
   else {
     event->ignore();
   }
+}
+
+/**
+  * @brief Changes the software mode.
+  * @param[in] isExpert True if the software is in expert mode with advanced functions.
+*/
+void MainWindow::setMode(bool isExpert) {
+  ui->tabWidget->tabBar()->setVisible(isExpert);
 }
 
 /**

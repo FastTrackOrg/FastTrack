@@ -47,6 +47,7 @@ This file is part of Fast Track.
 #include <QStyleFactory>
 #include <QTableWidget>
 #include <QTableWidgetItem>
+#include <QTimer>
 #include <QUrl>
 #include <QWidget>
 #include <QtConcurrent/QtConcurrentRun>
@@ -128,10 +129,12 @@ class Interactive : public QMainWindow {
   QString style;
   QString color;
   int layout;
+  bool isExpert; /*!< Is FastTrack is in expert mode with advanced capabilities. */
 
  signals:
   void message(QString message);
   void log(QMap<QString, QString> log);
   void status(QString messsage);
+  void modeChanged(bool isSimple);
 };
 #endif  // INTERACTIVE_H

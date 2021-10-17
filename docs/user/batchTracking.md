@@ -3,6 +3,13 @@ id: batchTracking
 title: Batch Tracking
 sidebar_label: Batch Tracking
 ---
+---
+
+**NOTE**
+
+The Batch Tracking panel is only accessible in Expert Mode (settings -> Expert Mode).
+
+---
 
 ![alt text](assets/batchTracking.svg)
 

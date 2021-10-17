@@ -18,11 +18,16 @@ This file is part of Fast Track.
 #include <QApplication>
 #include <QFont>
 #include <QFontDatabase>
+#include <QPixmap>
+#include <QSplashScreen>
 #include <QString>
 #include "mainwindow.h"
 
 int main(int argc, char *argv[]) {
   QApplication a(argc, argv);
+  QPixmap pixmap(":/assets/icon.png");
+  QSplashScreen splash(pixmap);
+  splash.show();
   MainWindow w;
   a.setApplicationName("FastTrack");
   a.setApplicationVersion(APP_VERSION);
@@ -32,5 +37,6 @@ int main(int argc, char *argv[]) {
   QFontDatabase::addApplicationFont(":/assets/Font.ttf");
   w.setStyleSheet("QWidget {font-family: 'Lato', sans-serif;}");
   w.show();
+  splash.finish(&w);
   a.exec();
 }
