@@ -71,7 +71,7 @@ jobs:
               cd build_cli/
               macdeployqt fasttrack-cli.app -always-overwrite
               wget https://raw.githubusercontent.com/arl/macdeployqtfix/master/macdeployqtfix.py
-              python2.7 macdeployqtfix.py fasttrack_cli.app/Contents/MacOS/fasttrack-cli ../../Qt/5.15.0/
+              python2.7 macdeployqtfix.py fasttrack_cli.app/Contents/MacOS/fasttrack-cli ../../Qt/6.2.0/
               hdiutil create -volname fasttrack-cli -srcfolder fasttrack-cli.app -ov -format UDZO fasttrack-cli.dmg
 
 
