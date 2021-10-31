@@ -1,5 +1,6 @@
 *build*
-Makefile
+*Makefile*
 *.pro.user*
 *.user
 .qmake.stash
+*target_wrapper*

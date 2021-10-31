@@ -1,4 +1,4 @@
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets webenginewidgets core gui network
+greaterThan(QT_MAJOR_VERSION, 5): QT += widgets webenginewidgets core gui network
 
 TARGET = fasttrack-cli
 TEMPLATE = app

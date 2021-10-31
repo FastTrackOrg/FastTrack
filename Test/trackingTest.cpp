@@ -1,9 +1,11 @@
 #include <QMap>
+#include <filesystem>
 #include <string>
 #include "../src/autolevel.cpp"
 #include "../src/tracking.cpp"
 #include "gtest/gtest.h"
 
+namespace fs = std::filesystem;
 using namespace std;
 using namespace cv;
 
@@ -754,6 +756,7 @@ TEST_F(DataTest, getData_2) {
 }
 
 TEST_F(DataTest, swapData) {
+  fs::copy("../dataSet/images/Groundtruth/Tracking_Result/", "../dataSet/images/Groundtruth/Tracking_Result_Copy/", fs::copy_options::overwrite_existing | fs::copy_options::recursive);
   Data data("../dataSet/images/Groundtruth/Tracking_Result_Copy/");
   QMap<QString, double> a_prev = data.getData(2, 12);
   QMap<QString, double> b_prev = data.getData(2, 11);
@@ -817,6 +820,7 @@ TEST_F(DataTest, crossCheck) {
       EXPECT_EQ(a.data, data.getData(2, 7));
     }
   }
+  fs::remove_all("../dataSet/images/Groundtruth/Tracking_Result_Copy/");
 }
 }  // namespace
 
