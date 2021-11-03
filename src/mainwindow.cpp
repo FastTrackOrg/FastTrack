@@ -121,43 +121,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 
   manager->get(QNetworkRequest(QUrl("https://www.fasttrack.sh/download/FastTrack/platforms.txt")));
 
-  QSettings settingsFile("FastTrack", "FastTrackOrg");
-  int isChosed = settingsFile.value("main/consent", -1).toInt();
-  switch (isChosed) {
-    case -1: {
-      QMessageBox *consent = new QMessageBox(this);
-      consent->setWindowTitle("Consent");
-      consent->setText("To help to monitor the development of the software, FastTrack would like to collect some information (IP address, operating system)");
-      consent->setStandardButtons(QMessageBox::Yes);
-      consent->addButton(QMessageBox::No);
-      QTimer::singleShot(5000, consent, &QMessageBox::close);
-      if (consent->exec() == QMessageBox::Yes) {
-        QWebEngineView *view = new QWebEngineView(this);
-        view->setUrl(QUrl("https://www.fasttrack.sh/soft.html"));
-        connect(view->page(), &QWebEnginePage::loadFinished, [this, view]() {
-          delete view;
-        });
-        settingsFile.setValue("main/consent", 0);
-      }
-      else {
-        settingsFile.setValue("main/consent", 1);
-      }
-      break;
-    }
-    case 0: {
-      QWebEngineView *view = new QWebEngineView(this);
-      view->setUrl(QUrl("https://www.fasttrack.sh/soft.html"));
-      connect(view->page(), &QWebEnginePage::loadFinished, [this, view]() {
-        delete view;
-      });
-      view = new QWebEngineView(this);
-      view->setUrl(QUrl("https://www.fasttrack.sh/soft.html"));
-      connect(view->page(), &QWebEnginePage::loadFinished, [this, view]() {
-        delete view;
-      });
-      break;
-    }
-  }
 #endif
 
   interactive = new Interactive(this);
