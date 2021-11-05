@@ -1,6 +1,6 @@
 # FastTrack
 
- ![Test](https://github.com/bgallois/FastTrack/workflows/Tests/badge.svg) ![Clang Format](https://github.com/bgallois/FastTrack/workflows/Clang%20Format/badge.svg) ![Continous Build](https://github.com/bgallois/FastTrack/workflows/Continous%20Builds/badge.svg) [![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/fasttracksh) [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0) [![Website](https://img.shields.io/website?down_color=red&down_message=offline&style=plastic&up_color=green&up_message=online&url=http%3A%2F%2Fwww.fasttrack.sh)](http://www.fasttrack.sh)
+ ![Test](https://github.com/bgallois/FastTrack/workflows/Tests/badge.svg) ![Clang Format](https://github.com/bgallois/FastTrack/workflows/Clang%20Format/badge.svg) ![Continous Build](https://github.com/bgallois/FastTrack/workflows/Continous%20Builds/badge.svg) [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0) [![Website](https://img.shields.io/website?down_color=red&down_message=offline&style=plastic&up_color=green&up_message=online&url=http%3A%2F%2Fwww.fasttrack.sh)](http://www.fasttrack.sh)
 
 ## About
 
