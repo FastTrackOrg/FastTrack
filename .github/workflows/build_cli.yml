@@ -16,7 +16,9 @@ jobs:
           run: |
               sudo apt-get update
               sudo apt-get dist-upgrade
-              sudo apt-get install libgl1-mesa-dev libssl-dev
+              sudo apt-get install mesa-common-dev libgl1-mesa-dev libssl-dev
+              sudo apt-get install libxcb-*
+              sudo apt-get install libxkb-*
               sudo apt-get install libavcodec-dev libavformat-dev libswscale-dev libnss3
               sudo apt-get install libgstreamer-plugins-base1.0-dev libgstreamer1.0-dev
               sudo apt-get install libopencv-dev
@@ -32,12 +34,12 @@ jobs:
         - name: appimage
           run: |
               cd build_cli
-              wget -O deploy.AppImage https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
+              wget -O deploy.AppImage https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage
               chmod +x deploy.AppImage
               cp ../sh.fasttrack.fasttrackcli.desktop .
               cp ../src/assets/fasttrack.png .
               export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${{ github.workspace }}/Qt/6.2.0/gcc_64/lib/
-              ./deploy.AppImage -d sh.fasttrack.fasttrackcli.desktop --appdir AppDir -i fasttrack.png -e fasttrack-cli --output appimage
+              ./deploy.AppImage fasttrack-cli -appimage -no-translations -bundle-non-qt-libs -unsupported-allow-new-glibc -qmake=${{ github.workspace }}/Qt/6.2.0/gcc_64/bin/qmake6 -extra-plugins=platforms/
               mv FastTrack*.AppImage FastTrack-cli-x86_64.AppImage
         - name: Linux artefact
           uses: actions/upload-artifact@v1
