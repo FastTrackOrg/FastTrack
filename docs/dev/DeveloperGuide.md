@@ -6,24 +6,30 @@
 
 ## Introduction
 
-FastTrack is developed to be embedded in existing C++/Qt projects. It can also be adapted to every project by re-implementing the existing software.
-**Note:** more recent information are available at [1](https://blog.gallois.cc/Qt/opencv-qt-mac/) and [2](https://blog.gallois.cc/Qt/opencv-qt-win/) for Windows systems.
+FastTrack is developed to be used as a standalone application. I can also be embedded in existing C++/Qt projects or adapted to a specific project by re-implementing the existing software.
 
 ## Installation of the development environment
 
+Each library can be compilated from source code, see https://wiki.qt.io/How_to_setup_Qt_and_openCV_on_Windows_with_MSVC2017, https://wiki.qt.io/Building_Qt_6_from_Git, etc...
+
+Library prebuild can be found for Windows, macOS, and Windows to speed up the installation process.
+
 ### Windows
+
+#### MSVC
+
+The MSVC compiler can be installed as a part of [Visual Studio Community 2019](https://visualstudio.microsoft.com/vs/community/). During the installation process do not forget to select **Visual Studio Build Tools 2019** to install the build tools.
+
 
 #### Qt installation
 
-1. Go to https://download/qt.io/archive/qt and choose the last version of Qt (this example is made with the 5.12 version). Download the Window installer.
+1. Go to https://download/qt.io/archive/qt and choose the last version of Qt>=6. Download the Window installer.
 
-   ![Qt download page](Qt_Rep.png)
-
-2. Follow the installation steps and select **C:\Qt\Qt5.12.0** for the installation folder. In the Select Components page, select MinGW 7.3.0 64 bit and Qt creator 4.8.
+2. Follow the installation steps. On the Select Components page, select MSVC2019 64-bit.
 
    ![Qt installer dialogue](Qt_Dial.png)
 
-3. Add MinGW to the path:
+3. Add Qt to the path:
 
    - Open the **Settings** dialogue.
 
@@ -33,150 +39,44 @@ FastTrack is developed to be embedded in existing C++/Qt projects. It can also b
 
      ![Windows Environment Variables dialogue](Var_Dial.png)
 
-   - Double click on **Path** and add the MinGW path: **C:\Qt\Qt5.12.0\Tools\mingw730_64\bin**.
+   - Double click on **Path** and add the Qt path: **C:\Qt\Qt6.1.2\Tools\msvc2019_64\bin** and the MSVC path **“C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.24.28314\bin\Hostx64\x64”**
 
      ![Windows Edit environment variable dialogue](Path_Dial.png)
 
 #### OpenCV installation
 
-- Download the last version of OpenCV at https://sourceforge.net/projects/opencvlibrary/files/ (in this example 4.0.1). Select the Windows file **opencv-4.0.1-vc14_vc15.exe**.
+- Download the latest version of OpenCV at https://sourceforge.net/projects/opencvlibrary/files/ (in this example 4.0.1). Select the Windows file **opencv-4.0.1-vc14_vc15.exe**.
 
-- Extract OpenCV in the **C:\ ** folder.
+- Extract OpenCV in the **C:** folder.
 
   ![OpenCV self-extracting archive dialogue](Opencv_Dial.png)
+- Add OpenCV to the path **C:\opencv_build\install\x86\vc15\bin**
+- FastTrack can be compiled using 'qmake FastTrack.pro -spec win32-msvc "CONFIG+=qtquickcompiler"'' and then 'nmake'. Check that the version of the dll in the FastTrack.pro match the version of OpenCV.
 
-- Download and install CMake https://cmake.org/download/.
+### MacOs
 
-- Open CMake an set **Where is the source code** to **C:/opencv/source ** and **Where to build the binaries** to **C:/opencv/source/build **.
+- Install OpenCV 4 using `brew install opencv4`/
+- Install QT6 using `brew install qt`.
+- Compile FastTrack using `qmake6 FastTrack.pro` then `make`.
 
-  ![CMake dialogue](1_Cmake.png)
+### Linux
 
-- Click on the Configure button and select **MinGW Makefiles** and tick **Specify native compiler**.
-
-  ![CMake dialogue](1.5_Cmake.png)
-
-- Set the C and C++ path compiler to **C:/Qt/Qt5.12.0/Tools/mingw730_64/bin/gcc.exe** and **C:/Qt/Qt5.12.0/Tools/mingw730_64/bin/g++.exe**.
-
-  ![CMake dialogue](3_Cmake.png)
-
-- Untick  **WITH_OPENCL** and tick **WITH_OPENMP** and click on the Configure button. Then click the Generate button.
-
-  ![CMake dialogue](4_Cmake.png)
-
-- Open the **Command Prompt** application.
-
-  ![Windows Command Prompt application](Command_Dial.png)
-
-- Type (replace 8 by your the number of processors on your computer) the command
-
-  ```
-  cd C:\opencv\sources\build & mingw32-make -j 8 & mingw32-make install
-  ```
-
-  to compile and install OpenCV.
-
-- Add  **C:\opencv\sources\build\install\x64\mingw\bin** to the Path.
-
-  ![](Path2_Dial.png)
+- Install Qt6 and OpenCV4 using the package manager of our Linux distribution.
+- Compile FastTrack using `qmake6 FastTrack.pro` then `make`.
 
 
-#### Configure FastTrack
+## Tests
 
-Replace **FastTrack.pro** by:
-
-```bash
-QT       += core gui
-
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
-
-TARGET = FastTrack
-TEMPLATE = app
-
-QMAKE_LFLAGS_RELEASE += -O3
-
-# The following define makes your compiler emit warnings if you use
-# any feature of Qt which has been marked as deprecated (the exact warnings
-# depend on your compiler). Please consult the documentation of the
-# deprecated API in order to know how to port your code away from it.
-DEFINES += QT_DEPRECATED_WARNINGS
-
-# You can also make your code fail to compile if you use deprecated APIs.
-# In order to do so, uncomment the following line.
-# You can also select to disable deprecated APIs only up to a certain version of Qt.
-#DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
-
-
-SOURCES += \
-        main.cpp \
-        mainwindow.cpp \
-        tracking.cpp \
-        setupwindow.cpp \
-        Hungarian.cpp
-
-QMAKE_CXXFLAGS += -std=c++11 -O3 -fopenmp
-
-INCLUDEPATH += C:/opencv/build/include
-
-
-LIBS += C:/opencv/sources/build/install/x64/mingw/bin/libopencv_core401.dll
-LIBS += C:/opencv/sources/build/install/x64/mingw/bin/libopencv_highgui401.dll
-LIBS += C:/opencv/sources/build/install/x64/mingw/bin/libopencv_imgcodecs401.dll
-LIBS += C:/opencv/sources/build/install/x64/mingw/bin/libopencv_imgproc401.dll
-LIBS += C:/opencv/sources/build/install/x64/mingw/bin/libopencv_videoio401.dll
-
-
-HEADERS += \
-        mainwindow.h\
-        tracking.h \
-        setupwindow.h \
-        Hungarian.h
-
-FORMS += mainwindow.ui \
-        setupwindow.ui 
-
-RESOURCES += resources.qrc
-
-```
-
-### Linux / MacOs
-
-- Download OpenCV.
-
-  ```
-  git clone https://github.com/opencv/opencv
-  ```
-
-- Compile OpenCV (can need additional dependencies like **build-essential** and **libgl1-mesa-dev**).
-
-  ```bash
-  cd opencv
-  mkdir build
-  cd build
-  cmake -D WITH_TBB=ON -D WITH_OPENMP=ON -D WITH_IPP=ON -D CMAKE_BUILD_TYPE=RELEASE -D BUILD_EXAMPLES=OFF -D WITH_NVCUVID=ON -D WITH_CUDA=ON -D BUILD_DOCS=OFF -D BUILD_PERF_TESTS=OFF -D BUILD_TESTS=OFF -D WITH_CSTRIPES=ON -D WITH_OPENCL=OFF CMAKE_INSTALL_PREFIX=/usr/local/ ..
-  make -j8
-  sudo make install
-  ```
-
-- Compile FastTrack 
-
-  ```bash
-  cd FastTrack
-  ./run full                // Compiles from scratch
-  ./run partial             // Compiles changes
-  ./run debug               // Compiles for debugging
-  ./run profile            // Creates profiling.txt
-  ```
-
-
+FastTrack uses [GoogleTest](https://google.github.io/googletest/) and [Pytest](https://docs.pytest.org/en/6.2.x/) to perform the unit and functional testing. The installation process can be found on these libraries' documentation.
 
 
 ## Adapt FastTrack for our project
 
-To adapt FastTrack for our project, you must re-implement the **startProcess()** and **imageAnalysis()** method from the Tracking class with our own image analysis workflow.
+To adapt FastTrack for our project, you must re-implement the **startProcess()** and **imageAnalysis()** virtual methods from the Tracking class with our image analysis workflow.
 
 ### startProcess() method
 
-The **startProcess()** method initializes the tracking process by taking the first image of the sequence, detects its format and all the objects in the image. 
+The **startProcess()** method initializes the tracking process by taking the first image of the sequence, detecting its format and all the objects in the image. 
 
 By default the image analysis workflow is the following:
 
@@ -205,7 +105,7 @@ By default the image analysis workflow is the following:
 - Objects association.
 - Parameters saving.
 
-The **imageAnalysis()** method will emit a signal with images to display and triggered via a timer the analysis of the next image of the image sequence.
+The **imageAnalysis()** method will emit a signal with the image to display and trigger the analysis of the next image of the image sequence.
 
 
 
@@ -213,7 +113,7 @@ The **imageAnalysis()** method will emit a signal with images to display and tri
 
 ### Video tracking
 
-To embedded Fast Track in an existing project, you must first create a thread where the Tracking class will live.
+To embed Fast Track in an existing project, you must first create a thread where the Tracking class will live.
 
 ```C++ 
 thread = new QThread; // Creates a new QThread
@@ -222,7 +122,7 @@ tracking -> moveToThread(thread); // Moves the Tracking instance in the new QThr
 
 connect(thread, &QThread::started, tracking, &Tracking::startProcess); // Starts the tracking analysis when the thread start
 
-// Do here all useful connect like updating parameters, display images etc...
+// Do here all useful connect like updating parameters, display images, etc...
 
 connect(tracking, &Tracking::finished, thread, &QThread::quit); // Shut down the thread when the tracking analysis is finished 
 connect(tracking, &Tracking::finished, tracking, &Tracking::deleteLater); // Deletes the Tracking instance when the tracking analysis is finished
@@ -265,16 +165,3 @@ The documentation can be generated in HTML and PDF format with Doxygen. Install 
 ./generateDocumentation.sh
 ```
 
-
-
-## Test
-
-FastTrack have a test script that allows to test the code after changes. To use the test script, install gcode.
-
-```
-./test
-```
-
-
-
-Revised 2020/03/19

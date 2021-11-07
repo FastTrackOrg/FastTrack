@@ -1,6 +1,14 @@
 #!/bin/bash
 
 doxygen docs/dev/Doxyfile
+cp docs/dev/*png Documentation/html/
+cd Documentation/latex/
+make
+cd ../..
+mkdir -p manual/dev/html
+mv Documentation/html manual/dev/html
+mv Documentation/latex/refman.pdf manual/dev/
+rm -r Documentation
 
 cd docs/user
 sed -n "3p" intro.md > User_Manual.md
@@ -39,10 +47,12 @@ echo -e "\n" >> User_Manual.md
 sed -n "3p" dataOutput.md >> User_Manual.md
 tail -n +7 dataOutput.md >> User_Manual.md
 sed -i "s/title:/#/g" User_Manual.md
-mkdir ../../user_manual/
+mkdir -p ../../manual/user/html
 pandoc User_Manual.md -f markdown --mathjax --toc -t html5 -c css/style.css -s -o user_manual.html
-cp -r css ../../user_manual
-cp -r assets ../../user_manual
-mv user_manual.html ../../user_manual
-pandoc ../../user_manual/user_manual.html -o ../../user_manual/user_manual.pdf
+cp -r css ../../manual/user/html
+cp -r assets ../../manual/user/html
+mv user_manual.html ../../manual/user/html
+pandoc ../../manual/user/html/user_manual.html -o ../../manual/user/user_manual.pdf
 rm User_Manual.md
+cd ../..
+tar -czvf manual.tar.gz manual/
