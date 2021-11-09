@@ -25,8 +25,8 @@ jobs:
       - name: install qt6
         run: |
           pip install aqtinstall
-          python3 -m aqt install-qt -m qtwebengine qtwebchannel qtpositioning -O ${{ github.workspace }}/Qt/ linux desktop 6.2.0
-          echo ${{ github.workspace }}/Qt/6.2.0/gcc_64/bin/ >> $GITHUB_PATH
+          python3 -m aqt install-qt -m qtwebengine qtwebchannel qtpositioning -O ${{ github.workspace }}/Qt/ linux desktop 6.2.1
+          echo ${{ github.workspace }}/Qt/6.2.1/gcc_64/bin/ >> $GITHUB_PATH
       - name: build
         run: |
           ./run.sh ci
@@ -38,8 +38,8 @@ jobs:
           chmod +x deploy.AppImage
           cp ../sh.fasttrack.fasttrack.desktop .
           cp ../src/assets/fasttrack.png .
-          export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${{ github.workspace }}/Qt/6.2.0/gcc_64/lib/
-          ./deploy.AppImage fasttrack -appimage -no-translations -bundle-non-qt-libs -unsupported-allow-new-glibc -qmake=${{ github.workspace }}/Qt/6.2.0/gcc_64/bin/qmake6 -extra-plugins=platforms/
+          export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${{ github.workspace }}/Qt/6.2.1/gcc_64/lib/
+          ./deploy.AppImage fasttrack -appimage -no-translations -bundle-non-qt-libs -unsupported-allow-new-glibc -qmake=${{ github.workspace }}/Qt/6.2.1/gcc_64/bin/qmake6 -extra-plugins=platforms/
           mv FastTrack*.AppImage FastTrack-x86_64.AppImage
       - name: Linux artefact
         uses: actions/upload-artifact@v1
@@ -57,13 +57,13 @@ jobs:
       - name: install qt6
         run: |
           pip install aqtinstall
-          python3 -m aqt install-qt -m qtwebengine qtwebchannel qtpositioning -O ${{ github.workspace }}/Qt/ windows desktop 6.2.0 win64_msvc2019_64
-          echo "${{ github.workspace }}/Qt/6.2.0/msvc2019_64/bin/" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          python3 -m aqt install-qt -m qtwebengine qtwebchannel qtpositioning -O ${{ github.workspace }}/Qt/ windows desktop 6.2.1 win64_msvc2019_64
+          echo "${{ github.workspace }}/Qt/6.2.1/msvc2019_64/bin/" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
       - name: install opencv
         shell: cmd
         run: |
-          bitsadmin.exe /transfer debjob /download /priority normal https://downloads.sourceforge.net/project/opencvlibrary/4.5.0/opencv-4.5.0-vc14_vc15.exe C:\opencv-4.5.0-vc14_vc15.exe
-          C:\opencv-4.5.0-vc14_vc15.exe -o"C:\" -y
+          bitsadmin.exe /transfer debjob /download /priority normal https://downloads.sourceforge.net/project/opencvlibrary/4.5.4/opencv-4.5.4-vc14_vc15.exe C:\opencv-4.5.4-vc14_vc15.exe
+          C:\opencv-4.5.4-vc14_vc15.exe -o"C:\" -y
       - name: build
         shell: cmd
         run: |
@@ -77,10 +77,11 @@ jobs:
           copy C:\Windows\System32\concrt140.dll . 
           copy C:\Windows\System32\msvcp140.dll .
           copy C:\Windows\System32\msvcp140_1.dll .
-          copy C:\opencv\build\x64\vc15\bin\opencv_videoio_ffmpeg450_64.dll .
-          copy C:\opencv\build\x64\vc15\bin\opencv_world450.dll .
+          copy C:\opencv\build\x64\vc15\bin\opencv_videoio_ffmpeg454_64.dll .
+          copy C:\opencv\build\x64\vc15\bin\opencv_world454.dll .
           copy C:\Windows\System32\vcruntime140.dll .
           copy C:\Windows\System32\vcruntime140_1.dll .  
+          copy C:\Windows\System32\vccorlib140.dll .
           copy C:\Windows\System32\libcrypto-1_1-x64.dll .
           copy C:\Windows\System32\libssl-1_1-x64.dll .
           7z a C:\FastTrack.zip *
@@ -99,8 +100,8 @@ jobs:
       - name: install qt6
         run: |
           pip install aqtinstall
-          python3 -m aqt install-qt -m qtwebengine qtwebchannel qtpositioning -O ${{ github.workspace }}/Qt/ mac desktop 6.2.0
-          echo ${{ github.workspace }}/Qt/6.2.0/macos/bin/ >> $GITHUB_PATH
+          python3 -m aqt install-qt -m qtwebengine qtwebchannel qtpositioning -O ${{ github.workspace }}/Qt/ mac desktop 6.2.1
+          echo ${{ github.workspace }}/Qt/6.2.1/macos/bin/ >> $GITHUB_PATH
       - name: install opencv
         run: |
           rm -rf /usr/local/bin/2to3
@@ -117,7 +118,7 @@ jobs:
           cd build/
           macdeployqt FastTrack.app -always-overwrite
           wget https://raw.githubusercontent.com/arl/macdeployqtfix/master/macdeployqtfix.py
-          python2.7 macdeployqtfix.py FastTrack.app/Contents/MacOS/FastTrack ../../Qt/6.2.0/
+          python2.7 macdeployqtfix.py FastTrack.app/Contents/MacOS/FastTrack ../../Qt/6.2.1/
           hdiutil create -volname FastTrack -srcfolder FastTrack.app -ov -format UDZO FastTrack.dmg
 
       - name: Mac artefact

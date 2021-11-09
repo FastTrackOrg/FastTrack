@@ -25,8 +25,8 @@ jobs:
         - name: install qt6
           run: |
             pip install aqtinstall
-            python3 -m aqt install-qt -m qtwebengine qtwebchannel qtpositioning -O ${{ github.workspace }}/Qt/ linux desktop 6.2.0
-            echo ${{ github.workspace }}/Qt/6.2.0/gcc_64/bin/ >> $GITHUB_PATH
+            python3 -m aqt install-qt -m qtwebengine qtwebchannel qtpositioning -O ${{ github.workspace }}/Qt/ linux desktop 6.2.1
+            echo ${{ github.workspace }}/Qt/6.2.1/gcc_64/bin/ >> $GITHUB_PATH
         - name: build
           run: |
               ./run.sh cli
@@ -38,8 +38,8 @@ jobs:
               chmod +x deploy.AppImage
               cp ../sh.fasttrack.fasttrackcli.desktop .
               cp ../src/assets/fasttrack.png .
-              export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${{ github.workspace }}/Qt/6.2.0/gcc_64/lib/
-              ./deploy.AppImage fasttrack-cli -appimage -no-translations -bundle-non-qt-libs -unsupported-allow-new-glibc -qmake=${{ github.workspace }}/Qt/6.2.0/gcc_64/bin/qmake6 -extra-plugins=platforms/
+              export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${{ github.workspace }}/Qt/6.2.1/gcc_64/lib/
+              ./deploy.AppImage fasttrack-cli -appimage -no-translations -bundle-non-qt-libs -unsupported-allow-new-glibc -qmake=${{ github.workspace }}/Qt/6.2.1/gcc_64/bin/qmake6 -extra-plugins=platforms/
               mv FastTrack*.AppImage FastTrack-cli-x86_64.AppImage
         - name: Linux artefact
           uses: actions/upload-artifact@v1
@@ -56,8 +56,8 @@ jobs:
         - name: install qt6
           run: |
             pip install aqtinstall
-            python3 -m aqt install-qt -m qtwebengine qtwebchannel qtpositioning -O ${{ github.workspace }}/Qt/ mac desktop 6.2.0
-            echo ${{ github.workspace }}/Qt/6.2.0/macos/bin/ >> $GITHUB_PATH
+            python3 -m aqt install-qt -m qtwebengine qtwebchannel qtpositioning -O ${{ github.workspace }}/Qt/ mac desktop 6.2.1
+            echo ${{ github.workspace }}/Qt/6.2.1/macos/bin/ >> $GITHUB_PATH
         - name: install opencv
           run: |
               rm -rf /usr/local/bin/2to3
@@ -73,7 +73,7 @@ jobs:
               cd build_cli/
               macdeployqt fasttrack-cli.app -always-overwrite
               wget https://raw.githubusercontent.com/arl/macdeployqtfix/master/macdeployqtfix.py
-              python2.7 macdeployqtfix.py fasttrack_cli.app/Contents/MacOS/fasttrack-cli ../../Qt/6.2.0/
+              python2.7 macdeployqtfix.py fasttrack_cli.app/Contents/MacOS/fasttrack-cli ../../Qt/6.2.1/
               hdiutil create -volname fasttrack-cli -srcfolder fasttrack-cli.app -ov -format UDZO fasttrack-cli.dmg
 
 

@@ -47,7 +47,7 @@ unix:!macx {
 win32 {
   TARGET = FastTrack
   CONFIG += c++2a
-  LIBS += -LC:\opencv\build\x64\vc15\lib -lopencv_world450
+  LIBS += -LC:\opencv\build\x64\vc15\lib -lopencv_world454
   INCLUDEPATH += C:\opencv\build\include
   DEPENDPATH += C:\opencv\build\include
 }
