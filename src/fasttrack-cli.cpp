@@ -59,7 +59,7 @@ Use FastTrack version \
 "),
         stdout);
   fputs(("\
-All argument are mandatory except --backPath --cfg. Loading a configuration file with --cfg overwrite any selected parameters.\n\
+All arguments are mandatory except --backPath and --cfg. Loading a configuration file with --cfg overwrite any selected parameters.\n\
 "),
         stdout);
   fputs(("\
