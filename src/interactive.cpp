@@ -36,8 +36,8 @@ This file is part of Fast Track.
  */
 
 /**
-  * @brief Constructs the interactive object derived from a QMainWindow object.
-*/
+ * @brief Constructs the interactive object derived from a QMainWindow object.
+ */
 Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
                                             ui(new Ui::Interactive) {
   ui->setupUi(this);
@@ -50,7 +50,7 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   // MetaType
   qRegisterMetaType<QMap<QString, double>>("QMap<QString, double>");
 
-  //DockWidget
+  // DockWidget
   connect(ui->imageOptions, &QDockWidget::dockLocationChanged, [this](Qt::DockWidgetArea area) {
     switch (area) {
       case Qt::LeftDockWidgetArea:
@@ -350,6 +350,9 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   connect(ui->actionTuto, &QAction::triggered, []() {
     QDesktopServices::openUrl(QUrl("https://www.youtube.com/watch?v=RzzmcZs04E4&list=PLGjsUpRojSmO4RHrd-TbpbNpJrfjNYlIm", QUrl::TolerantMode));
   });
+  connect(ui->actionAsk, &QAction::triggered, []() {
+    QDesktopServices::openUrl(QUrl("https://github.com/FastTrackOrg/FastTrack/discussions", QUrl::TolerantMode));
+  });
   connect(ui->actionIssue, &QAction::triggered, []() {
     QDesktopServices::openUrl(QUrl("https://github.com/FastTrackOrg/FastTrack/issues", QUrl::TolerantMode));
   });
@@ -507,8 +510,8 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
 }
 
 /**
-  * @brief Asks the path to a folder where an image sequence is stored. Setups the ui and resets the class attributs for a new analysis. Triggered when the open button from the menu bar is clicked.
-*/
+ * @brief Asks the path to a folder where an image sequence is stored. Setups the ui and resets the class attributs for a new analysis. Triggered when the open button from the menu bar is clicked.
+ */
 void Interactive::openFolder() {
   // Resets the class members
   replayAction->setChecked(false);
@@ -602,10 +605,10 @@ void Interactive::openFolder() {
 }
 
 /**
-  * @brief Displays the image at index in the image sequence in the ui.
-  * @param[in] index Index of the image to display in the image sequence.
-  * @param[in] scale Optional scale to display.
-*/
+ * @brief Displays the image at index in the image sequence in the ui.
+ * @param[in] index Index of the image to display in the image sequence.
+ * @param[in] scale Optional scale to display.
+ */
 void Interactive::display(int index, int scale) {
   if (!videoStatus) {
     return;
@@ -683,8 +686,8 @@ void Interactive::display(int index, int scale) {
 }
 
 /**
-  * @brief Zooms in the display.
-*/
+ * @brief Zooms in the display.
+ */
 void Interactive::zoomIn() {
   if (!isEnabled()) {
     return;
@@ -698,8 +701,8 @@ void Interactive::zoomIn() {
 }
 
 /**
-  * @brief Zooms out the display.
-*/
+ * @brief Zooms out the display.
+ */
 void Interactive::zoomOut() {
   if (!isEnabled()) {
     return;
@@ -714,8 +717,8 @@ void Interactive::zoomOut() {
 }
 
 /**
-  * @brief This is an overloaded function to display a QImage in the display.
-*/
+ * @brief This is an overloaded function to display a QImage in the display.
+ */
 void Interactive::display(const QImage &image) {
   resizedPix = (QPixmap::fromImage(image).scaled(ui->display->size(), Qt::KeepAspectRatio));
   ui->display->setPixmap(resizedPix);
@@ -724,8 +727,8 @@ void Interactive::display(const QImage &image) {
 }
 
 /**
-  * @brief This is an overloaded function to display a UMat in the display.
-*/
+ * @brief This is an overloaded function to display a UMat in the display.
+ */
 void Interactive::display(const UMat &image) {
   Mat frame = image.getMat(ACCESS_READ);
   cvtColor(frame, frame, COLOR_GRAY2RGB);
@@ -736,8 +739,8 @@ void Interactive::display(const UMat &image) {
 }
 
 /**
-  * @brief Computes and displays the background image in the display. Triggered when the backgroundComputeButton is clicked.
-*/
+ * @brief Computes and displays the background image in the display. Triggered when the backgroundComputeButton is clicked.
+ */
 void Interactive::computeBackground() {
   if (videoStatus) {
     int nBack = ui->nBack->value();
@@ -780,8 +783,8 @@ void Interactive::computeBackground() {
 }
 
 /**
-  * @brief Opens a dialogue to select a background image. Triggered when ui->backgroundSelectButton is pressed.
-*/
+ * @brief Opens a dialogue to select a background image. Triggered when ui->backgroundSelectButton is pressed.
+ */
 void Interactive::selectBackground() {
   QString dir = QFileDialog::getOpenFileName(this, tr("Open Background Image"), memoryDir);
 
@@ -815,8 +818,8 @@ void Interactive::selectBackground() {
 }
 
 /**
-  * @brief Gets all the tracking parameters from the ui and updates the parameter map that will be passed to the tracking object.
-*/
+ * @brief Gets all the tracking parameters from the ui and updates the parameter map that will be passed to the tracking object.
+ */
 void Interactive::getParameters() {
   parameters.insert("maxArea", QString::number(ui->maxSize->value()));
   parameters.insert("minArea", QString::number(ui->minSize->value()));
@@ -844,8 +847,8 @@ void Interactive::getParameters() {
 }
 
 /**
-  * @brief Does a tracing analysis on a sub-part of the image sequence defined by the user. Triggered when previewButton is clicked.
-*/
+ * @brief Does a tracing analysis on a sub-part of the image sequence defined by the user. Triggered when previewButton is clicked.
+ */
 void Interactive::previewTracking() {
   if (videoStatus) {
     ui->progressBar->setRange(ui->startImage->value(), ui->stopImage->value() + ui->startImage->value() - 1);
@@ -893,8 +896,8 @@ void Interactive::previewTracking() {
 }
 
 /**
-  * @brief Does a tracking analysis. Triggered when the trackButton is clicked.
-*/
+ * @brief Does a tracking analysis. Triggered when the trackButton is clicked.
+ */
 void Interactive::track() {
   if (videoStatus) {
     ui->progressBar->setRange(0, video->getImageCount() - 1);
@@ -953,10 +956,10 @@ void Interactive::track() {
 }
 
 /**
-  * @brief Manages all the mouse inputs in the display.
-  * @param[in] target Widget to apply the filter.
-  * @param[in] event Describes the mouse event.
-*/
+ * @brief Manages all the mouse inputs in the display.
+ * @param[in] target Widget to apply the filter.
+ * @param[in] event Describes the mouse event.
+ */
 bool Interactive::eventFilter(QObject *target, QEvent *event) {
   // Mouse event for the display
   if (target == ui->display) {
@@ -1062,7 +1065,7 @@ bool Interactive::eventFilter(QObject *target, QEvent *event) {
 }
 
 /**
-   * @brief Crops the image from a rectangle drawed by the user with the mouse on the display. Triggered when the QPushButton ui->crop is clicked.
+ * @brief Crops the image from a rectangle drawed by the user with the mouse on the display. Triggered when the QPushButton ui->crop is clicked.
  */
 void Interactive::crop() {
   int xTop = ui->x1->value();
@@ -1070,7 +1073,7 @@ void Interactive::crop() {
   int xBottom = ui->x2->value();
   int yBottom = ui->y2->value();
 
-  //Checks for wrong values
+  // Checks for wrong values
   int width = xBottom - xTop;
   int height = yBottom - yTop;
   if (xTop < roi.tl().x) xTop = roi.tl().x;
@@ -1097,7 +1100,7 @@ void Interactive::crop() {
 }
 
 /**
-   * @brief Resets the region of interest. Triggered by the reset button.
+ * @brief Resets the region of interest. Triggered by the reset button.
  */
 void Interactive::reset() {
   cropedImageSize.setWidth(originalImageSize.width());
@@ -1121,8 +1124,8 @@ void Interactive::reset() {
 }
 
 /**
-  * @brief Destructors.
-*/
+ * @brief Destructors.
+ */
 Interactive::~Interactive() {
   saveSettings();
   delete tracking;
@@ -1131,8 +1134,8 @@ Interactive::~Interactive() {
 }
 
 /**
-  * @brief Saves the settings.
-*/
+ * @brief Saves the settings.
+ */
 void Interactive::saveSettings() {
   QSettings settingsFile("FastTrack", "FastTrackOrg");
   settingsFile.setValue("window/style", style);
@@ -1142,8 +1145,8 @@ void Interactive::saveSettings() {
 }
 
 /**
-  * @brief Level the parameters.
-*/
+ * @brief Level the parameters.
+ */
 void Interactive::level() {
   if (videoStatus) {
     QThread *thread = new QThread;
@@ -1177,8 +1180,8 @@ void Interactive::level() {
 }
 
 /**
-  * @brief Reads a parameter file, updates parameters.
-*/
+ * @brief Reads a parameter file, updates parameters.
+ */
 void Interactive::loadParameters(QString path) {
   QFile parameterFile(path);
   if (parameterFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
