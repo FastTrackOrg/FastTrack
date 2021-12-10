@@ -1,5 +1,16 @@
 # FastTrack changelog
 
+## 6.0.1
+
+### Changed
+- Remove analytic
+- Update Qt and OpenCV for Windows
+
+### Fixed
+- Fixed icon display in tray
+- Fixed AppImage
+
+
 ## 6.0.0
 
 ### Changed
