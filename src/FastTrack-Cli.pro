@@ -1,4 +1,8 @@
 greaterThan(QT_MAJOR_VERSION, 5): QT += widgets webenginewidgets core gui network
+NO_WEB {
+        QT -= webenginewidgets
+        DEFINES += NO_WEB
+}
 
 TARGET = fasttrack-cli
 TEMPLATE = app
