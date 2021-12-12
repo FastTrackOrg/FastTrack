@@ -1,5 +1,8 @@
 #!/bin/bash
 
+set -o nounset
+set -o errexit
+
 doxygen docs/dev/Doxyfile
 cp docs/dev/*png Documentation/html/
 cd Documentation/latex/
