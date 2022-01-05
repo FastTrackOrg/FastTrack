@@ -11,11 +11,12 @@ After a tracking analysis (or an analysis preview), FastTrack saves several file
 * *background.pgm*: the background image
 * *cfg.toml*: the parameters used for the tracking
 
-The tracking result file is simply a text file with 20 columns separated by a '\t' character. This file can easily be loaded to subsequent analysis see [this Python](https://www.fasttrack.sh/blog/2021/08/09/FastAnalysis-tuto) and [this Julia](https://www.fasttrack.sh/blog/2020/11/25/Data-analysis-julia).
+The tracking result file is simply a text file with 23 columns separated by a '\t' character. This file can easily be loaded to subsequent analysis see [this Python](https://www.fasttrack.sh/blog/2021/08/09/FastAnalysis-tuto) and [this Julia](https://www.fasttrack.sh/blog/2020/11/25/Data-analysis-julia).
 
 * **xHead, yHead, tHead**: the position (x, y) and the absolute angle of the object's head.
 * **xTail, yTail, tTail**: the position (x, y) and the absolute angle of the object's tail.
 * **xBody, yBody, tBody**: the position (x, y) and the absolute angle of the object.
+* **curvature, areaBody, perimeterBody**: curvature of the object, area and perimeter of the object (in pixels).
 * **headMajorAxisLength, headMinorAxisLength, headExcentricity**: parameters of the head's ellipse (headMinorAxisLength and headExcentricity are semi-axis length).
 * **bodyMajorAxisLength, bodyMinorAxisLength, bodyExcentricity**: parameters of the body's ellipse (bodyMinorAxisLength and bodyExcentricity are semi-axis length).
 * **tailMajorAxisLength, tailMinorAxisLength, tailExcentricity**: parameters of the tail's ellipse (bodyMinorAxisLength and bodyExcentricity are semi-axis length).

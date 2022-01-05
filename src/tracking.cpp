@@ -39,11 +39,11 @@ using namespace std;
  */
 
 /**
-  * @brief Computes the center of the curvature, defined as the intersection of the minor axis of the head ellipse with the minor axis of the tail ellipse of the object.
-  * @param[in] tail The parameters of the tail ellipse: coordinate and direction of the major axis.
-  * @param[in] head The parameters of the head ellipse: coordinate and direction of the major axis.
-  * @return Coordinate of the curvature center.
-*/
+ * @brief Computes the center of the curvature, defined as the intersection of the minor axis of the head ellipse with the minor axis of the tail ellipse of the object.
+ * @param[in] tail The parameters of the tail ellipse: coordinate and direction of the major axis.
+ * @param[in] head The parameters of the head ellipse: coordinate and direction of the major axis.
+ * @return Coordinate of the curvature center.
+ */
 Point2d Tracking::curvatureCenter(const Point3d &tail, const Point3d &head) const {
   Point2d center;
 
@@ -82,11 +82,11 @@ Point2d Tracking::curvatureCenter(const Point3d &tail, const Point3d &head) cons
 }
 
 /**
-  * @brief Computes the radius of curvature of the object defined as the inverse of the mean distance between each pixel of the object, and the center of the curvature. The center of curvature is defined as the intersection of the two minor axes of the head and tail ellipse.
-  * @param[in] center Center of the curvature.
-	* @param[in] image Binary image CV_8U.
-  * @return Radius of curvature.
-*/
+ * @brief Computes the radius of curvature of the object defined as the inverse of the mean distance between each pixel of the object, and the center of the curvature. The center of curvature is defined as the intersection of the two minor axes of the head and tail ellipse.
+ * @param[in] center Center of the curvature.
+ * @param[in] image Binary image CV_8U.
+ * @return Radius of curvature.
+ */
 double Tracking::curvature(Point2d center, const Mat &image) const {
   double d = 0;
   double count = 0;
@@ -102,20 +102,20 @@ double Tracking::curvature(Point2d center, const Mat &image) const {
 }
 
 /**
-  * @brief Computes the usual mathematical modulo 2*PI of an angle.
-  * @param[in] angle Input angle.
-  * @return Output angle.
-*/
+ * @brief Computes the usual mathematical modulo 2*PI of an angle.
+ * @param[in] angle Input angle.
+ * @return Output angle.
+ */
 double Tracking::modul(double angle) {
   return angle - 2 * M_PI * floor(angle / (2 * M_PI));
 }
 
 /**
-  * @brief Computes the float division and handle the division by 0 by returning 0.
-  * @param[in] a Dividend.
-  * @param[in] a Divisor.
-  * @return Division result, 0 if b = 0.
-*/
+ * @brief Computes the float division and handle the division by 0 by returning 0.
+ * @param[in] a Dividend.
+ * @param[in] a Divisor.
+ * @return Division result, 0 if b = 0.
+ */
 double Tracking::divide(double a, double b) const {
   if (b != 0) {
     return a / b;
@@ -126,11 +126,11 @@ double Tracking::divide(double a, double b) const {
 }
 
 /**
-  * @brief Computes the least difference between two angles, alpha - beta. The difference is oriented in the trigonometric convention.
-  * @param[in] alpha Input angle.
-  * @param[in] beta Input angle.
-  * @return Least difference.
-*/
+ * @brief Computes the least difference between two angles, alpha - beta. The difference is oriented in the trigonometric convention.
+ * @param[in] alpha Input angle.
+ * @param[in] beta Input angle.
+ * @return Least difference.
+ */
 double Tracking::angleDifference(double alpha, double beta) {
   alpha = modul(alpha);
   beta = modul(beta);
@@ -138,11 +138,11 @@ double Tracking::angleDifference(double alpha, double beta) {
 }
 
 /**
-  * @brief Computes the equivalent ellipse of an object by computing the moments of the image. If the image is a circle, return nan as the orientation.
-  * @param[in] image Binary image CV_8U.
-  * @return The equivalent ellipse parameters: the object center of mass coordinate and its orientation.
-  * @note: This function computes the object orientation, not its direction.
-*/
+ * @brief Computes the equivalent ellipse of an object by computing the moments of the image. If the image is a circle, return nan as the orientation.
+ * @param[in] image Binary image CV_8U.
+ * @return The equivalent ellipse parameters: the object center of mass coordinate and its orientation.
+ * @note: This function computes the object orientation, not its direction.
+ */
 vector<double> Tracking::objectInformation(const UMat &image) const {
   Moments moment = moments(image);
 
@@ -167,18 +167,18 @@ vector<double> Tracking::objectInformation(const UMat &image) const {
 }
 
 /**
-  * @brief Computes the direction of the object from the object parameter (coordinate of the center of mass and orientation). To use this function, the object major axis has to be the horizontal axis of the image. Therefore, it is necessary to rotate the image before calling objectDirection.
-  * @param[in] image Binary image CV_8U.
-  * @param[in, out] information The parameters of the object (x coordinate, y coordinate, orientation).
-  * @return True if the direction angle is the orientation angle. False if the direction angle is the orientation angle plus pi.
-*/
+ * @brief Computes the direction of the object from the object parameter (coordinate of the center of mass and orientation). To use this function, the object major axis has to be the horizontal axis of the image. Therefore, it is necessary to rotate the image before calling objectDirection.
+ * @param[in] image Binary image CV_8U.
+ * @param[in, out] information The parameters of the object (x coordinate, y coordinate, orientation).
+ * @return True if the direction angle is the orientation angle. False if the direction angle is the orientation angle plus pi.
+ */
 bool Tracking::objectDirection(const UMat &image, vector<double> &information) const {
   // Computes the distribution of the image on the horizontal axis.
 
   vector<double> projection;
   reduce(image, projection, 0, REDUCE_SUM);
 
-  vector<double> distribution;  //tmp
+  vector<double> distribution;  // tmp
   distribution.reserve(projection.size());
   double ccMax = *max_element(projection.begin(), projection.end()) / 100;
   for (size_t it = 0; it < projection.size(); ++it) {
@@ -288,11 +288,11 @@ UMat Tracking::backgroundExtraction(VideoReader &video, int n, const int method,
 }
 
 /**
-  * @brief Register two images. To speed-up, the registration is made in a pyramidal way: the images are downsampled then registered to have a an approximate transformation then upslampled to have the precise transformation.
-  * @param[in] imageReference The reference image for the registration.
-  * @param[in, out] frame The image to register.
-  * @param[in] method The method of registration: 0 = simple (phase correlation), 1 = ECC, 2 = Features based.
-*/
+ * @brief Register two images. To speed-up, the registration is made in a pyramidal way: the images are downsampled then registered to have a an approximate transformation then upslampled to have the precise transformation.
+ * @param[in] imageReference The reference image for the registration.
+ * @param[in, out] frame The image to register.
+ * @param[in] method The method of registration: 0 = simple (phase correlation), 1 = ECC, 2 = Features based.
+ */
 void Tracking::registration(UMat imageReference, UMat &frame, const int method) const {
   switch (method) {
     // Simple registration by phase correlation
@@ -375,11 +375,11 @@ void Tracking::registration(UMat imageReference, UMat &frame, const int method) 
 }
 
 /**
-  * @brief Binarizes the image by thresholding.
-  * @param[in, out] frame The image to binarize.
-  * @param[in] backgroundColor If equals to 'w' the thresholded image will be inverted, if equal to 'b' it will not be inverted.
-  * @param[in] value The value at which to threshold the image.
-*/
+ * @brief Binarizes the image by thresholding.
+ * @param[in, out] frame The image to binarize.
+ * @param[in] backgroundColor If equals to 'w' the thresholded image will be inverted, if equal to 'b' it will not be inverted.
+ * @param[in] value The value at which to threshold the image.
+ */
 void Tracking::binarisation(UMat &frame, char backgroundColor, int value) const {
   frame.convertTo(frame, CV_8U);
 
@@ -393,12 +393,12 @@ void Tracking::binarisation(UMat &frame, char backgroundColor, int value) const 
 }
 
 /**
-  * @brief Computes the positions of the objects and extracts the object's features.
-  * @param[in] frame Binary image CV_8U.
-  * @param[in] minSize The minimal size of an object.
-  * @param[in] maxSize: The maximal size of an object.
-  * @return All the parameters of all the objects formated as follows: one vector, inside of this vector, four vectors for parameters of the head, tail, body and features with number of object size. {  { Point(xHead, yHead, thetaHead), ...}, Point({xTail, yTail, thetaHead), ...}, {Point(xBody, yBody, thetaBody), ...}, {Point(curvature, 0, 0), ...}}
-*/
+ * @brief Computes the positions of the objects and extracts the object's features.
+ * @param[in] frame Binary image CV_8U.
+ * @param[in] minSize The minimal size of an object.
+ * @param[in] maxSize: The maximal size of an object.
+ * @return All the parameters of all the objects formated as follows: one vector, inside of this vector, four vectors for parameters of the head, tail, body and features with number of object size. {  { Point(xHead, yHead, thetaHead), ...}, Point({xTail, yTail, thetaHead), ...}, {Point(xBody, yBody, thetaBody), ...}, {Point(curvature, 0, 0), ...}}
+ */
 vector<vector<Point3d>> Tracking::objectPosition(const UMat &frame, int minSize, int maxSize) const {
   vector<vector<Point>> contours;
   vector<Point3d> positionHead;
@@ -529,14 +529,14 @@ vector<vector<Point3d>> Tracking::objectPosition(const UMat &frame, int minSize,
 }
 
 /**
-  * @brief Computes a cost function and use a global optimization association to associate targets between images. Method adapted from: "An effective and robust method for Tracking multiple fish in video image based on fish head detection" YQ Chen et al. Uses the Hungarian method implemented by Cong Ma, 2016 "https://github.com/mcximing/hungarian-algorithm-cpp" adapted from the Matlab implementation by Markus Buehren "https://fr.mathworks.com/matlabcentral/fileexchange/6543-functions-for-the-rectangular-assignment-problem".
-  * @param[in] prevPos The vector of objects parameters at the previous image.
-  * @param[in] pos The vector of objects parameters at the current image that we want to sort in order to conserve objects identity.
-  * @param[in] LENGTH The typical displacement of an object in pixels.
-  * @param[in] ANGLE The typical reorientation angle in radians.
-  * @param[in] LO The maximal assignment distance in pixels.
-  * @return The assignment vector containing the new index position to sort the pos vector. 
-*/
+ * @brief Computes a cost function and use a global optimization association to associate targets between images. Method adapted from: "An effective and robust method for Tracking multiple fish in video image based on fish head detection" YQ Chen et al. Uses the Hungarian method implemented by Cong Ma, 2016 "https://github.com/mcximing/hungarian-algorithm-cpp" adapted from the Matlab implementation by Markus Buehren "https://fr.mathworks.com/matlabcentral/fileexchange/6543-functions-for-the-rectangular-assignment-problem".
+ * @param[in] prevPos The vector of objects parameters at the previous image.
+ * @param[in] pos The vector of objects parameters at the current image that we want to sort in order to conserve objects identity.
+ * @param[in] LENGTH The typical displacement of an object in pixels.
+ * @param[in] ANGLE The typical reorientation angle in radians.
+ * @param[in] LO The maximal assignment distance in pixels.
+ * @return The assignment vector containing the new index position to sort the pos vector.
+ */
 vector<int> Tracking::costFunc(const vector<vector<Point3d>> &prevPos, const vector<vector<Point3d>> &pos, double LENGTH, double ANGLE, double LO, double AREA, double PERIMETER) const {
   int n = static_cast<int>(prevPos[0].size());
   int m = static_cast<int>(pos[0].size());
@@ -589,10 +589,10 @@ vector<int> Tracking::costFunc(const vector<vector<Point3d>> &prevPos, const vec
 }
 
 /**
-  * @brief Finds the objects that are occluded during the tracking.
-  * @param[in] assignment The vector with the new indexes that will be used to sort the input vector.
-  * @return The vector with the indexes of occluded objects.
-*/
+ * @brief Finds the objects that are occluded during the tracking.
+ * @param[in] assignment The vector with the new indexes that will be used to sort the input vector.
+ * @return The vector with the indexes of occluded objects.
+ */
 vector<int> Tracking::findOcclusion(vector<int> assignment) const {
   vector<int> occlusion;
   vector<int>::iterator index = find(assignment.begin(), assignment.end(), -1);
@@ -604,14 +604,14 @@ vector<int> Tracking::findOcclusion(vector<int> assignment) const {
 }
 
 /**
-  * @brief Sorts a vector accordingly to a new set of indexes. The sorted vector at index i is the input at index assignment[i].
-  * @param[in] past The vector at the previous image.
-  * @param[in] input The vector at current image of size m <= n to be sorted.
-  * @param[in] assignment The vector with the new indexes that will be used to sort the input vector.
-  * @param[in] lostCounter The vector with the number of times each objects are lost consecutively.
-  * @param[in] id The vector with the id of the objects.
-  * @return The sorted vector.
-*/
+ * @brief Sorts a vector accordingly to a new set of indexes. The sorted vector at index i is the input at index assignment[i].
+ * @param[in] past The vector at the previous image.
+ * @param[in] input The vector at current image of size m <= n to be sorted.
+ * @param[in] assignment The vector with the new indexes that will be used to sort the input vector.
+ * @param[in] lostCounter The vector with the number of times each objects are lost consecutively.
+ * @param[in] id The vector with the id of the objects.
+ * @return The sorted vector.
+ */
 vector<Point3d> Tracking::reassignment(const vector<Point3d> &past, const vector<Point3d> &input, const vector<int> &assignment) const {
   vector<Point3d> tmp = past;
 
@@ -641,14 +641,14 @@ vector<Point3d> Tracking::reassignment(const vector<Point3d> &past, const vector
 }
 
 /**
-  * @brief Cleans the data if an object is lost more than a certain time.
-  * @param[in] occluded The vector with the index of object missing in the current image.
-  * @param[in] input The vector at current image of size m <= n to be sorted.
-  * @param[in] lostCounter The vector with the number of times each objects are lost consecutively.
-  * @param[in] id The vector with the id of the objects.
-  * @param[in] param_maximalTime 
-  * @return The sorted vector.
-*/
+ * @brief Cleans the data if an object is lost more than a certain time.
+ * @param[in] occluded The vector with the index of object missing in the current image.
+ * @param[in] input The vector at current image of size m <= n to be sorted.
+ * @param[in] lostCounter The vector with the number of times each objects are lost consecutively.
+ * @param[in] id The vector with the id of the objects.
+ * @param[in] param_maximalTime
+ * @return The sorted vector.
+ */
 void Tracking::cleaning(const vector<int> &occluded, vector<int> &lostCounter, vector<int> &id, vector<vector<Point3d>> &input, double param_maximalTime) const {
   vector<int> counter(lostCounter.size(), 0);
 
@@ -672,11 +672,11 @@ void Tracking::cleaning(const vector<int> &occluded, vector<int> &lostCounter, v
 }
 
 /**
-  * @brief Predicts the next position of an object from the previous position.
-  * @param past The previous position parameters.
-  * @param present: The current position parameters.
-  * @return The predicted positions.
-*/
+ * @brief Predicts the next position of an object from the previous position.
+ * @param past The previous position parameters.
+ * @param present: The current position parameters.
+ * @return The predicted positions.
+ */
 vector<Point3d> Tracking::prevision(vector<Point3d> past, vector<Point3d> present) const {
   double l = 0;
   for (unsigned int i = 0; i < past.size(); i++) {
@@ -696,8 +696,8 @@ vector<Point3d> Tracking::prevision(vector<Point3d> past, vector<Point3d> presen
 }
 
 /**
-  * @brief Processes an image from an images sequence and tracks and matchs objects according to the previous image in the sequence. Takes a new image from the image sequence, substracts the background, binarises the image and crops according to the defined region of interest. Detects all the objects in the image and extracts the object features. Then matches detected objects with objects from the previous frame. This function emits a signal to display the images in the user interface.
-*/
+ * @brief Processes an image from an images sequence and tracks and matchs objects according to the previous image in the sequence. Takes a new image from the image sequence, substracts the background, binarises the image and crops according to the defined region of interest. Detects all the objects in the image and extracts the object features. Then matches detected objects with objects from the previous frame. This function emits a signal to display the images in the user interface.
+ */
 void Tracking::imageProcessing() {
   while (m_im < m_stopImage) {
     try {
@@ -744,20 +744,26 @@ void Tracking::imageProcessing() {
         m_lost.push_back(0);
       }
 
-      // Draws lines and arrows on the image in the display panel
+      // Save date in the database
+      if (m_im % 50 == 0) {  // Performe the transaction every 50 frames to increase INSERT performance
+        m_outputDb.commit();
+        m_outputDb.transaction();
+      }
+      QSqlQuery query(m_outputDb);
       for (size_t l = 0; l < m_out[0].size(); l++) {
         // Tracking data are available
         if (find(occluded.begin(), occluded.end(), int(l)) == occluded.end()) {
+          query.prepare(
+              "INSERT INTO tracking (xHead, yHead, tHead, xTail, yTail, tTail, xBody, yBody, tBody, curvature, areaBody, perimeterBody, headMajorAxisLength, headMinorAxisLength, headExcentricity, tailMajorAxisLength, tailMinorAxisLength, tailExcentricity, bodyMajorAxisLength, bodyMinorAxisLength, bodyExcentricity, imageNumber, id) "
+              "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
           for (auto const &a : m_out) {
-            m_savefile << a[l].x;
-            m_savefile << '\t';
-            m_savefile << a[l].y;
-            m_savefile << '\t';
-            m_savefile << a[l].z;
-            m_savefile << '\t';
+            query.addBindValue(a[l].x);
+            query.addBindValue(a[l].y);
+            query.addBindValue(a[l].z);
           }
-          m_savefile << m_im << '\t';
-          m_savefile << m_id[l] << '\n';
+          query.addBindValue(m_im);
+          query.addBindValue(m_id[l]);
+          query.exec();
         }
       }
 
@@ -767,53 +773,53 @@ void Tracking::imageProcessing() {
       emit(progress(m_im));
     }
     catch (...) {
-      m_savefile.flush();
-      m_outputFile.close();
+      m_outputDb.commit();
       m_logFile.close();
+      exportTrackingResult(m_savingPath, m_outputDb);
       emit(forceFinished("Fatal error during the processing of the image " + QString::number(m_im)));
       break;
     }
   }
   if (m_error.isEmpty()) {
-    m_savefile.flush();
-    m_outputFile.close();
+    m_outputDb.commit();
+    exportTrackingResult(m_savingPath, m_outputDb);
     emit(finished());
     emit(statistic(timer->elapsed()));
     delete timer;
   }
   else {
-    m_savefile.flush();
-    m_outputFile.close();
+    m_outputDb.commit();
+    exportTrackingResult(m_savingPath, m_outputDb);
     emit(forceFinished("Images " + m_error + " where skipped because unreadable"));
     emit(statistic(timer->elapsed()));
   }
 }
 
 /**
-  * @brief Constructs the tracking object from a path to an image sequence and an optional path to a background image.
-  * @param[in] path The path to a folder where images are stocked.
-  * @param[in] backgroundPath The path to a background image.
-  * @param[in] startImage Index of the beginning image.
-  * @param[in] stopImage Index of the ending image.
-*/
+ * @brief Constructs the tracking object from a path to an image sequence and an optional path to a background image.
+ * @param[in] path The path to a folder where images are stocked.
+ * @param[in] backgroundPath The path to a background image.
+ * @param[in] startImage Index of the beginning image.
+ * @param[in] stopImage Index of the ending image.
+ */
 Tracking::Tracking(string path, string backgroundPath, int startImage, int stopImage) : m_path(path), m_backgroundPath(backgroundPath), m_startImage(startImage), m_stopImage(stopImage) {
   video = new VideoReader(m_path);
 }
 
 /**
-  * @brief Constructs the tracking object from a list of path, a background image and a range of image.
-  * @param[in] imagePath List of path to the images.
-  * @param[in] background A background image.
-  * @param[in] startImage Index of the beginning image.
-  * @param[in] stopImage Index of the ending image.
-*/
+ * @brief Constructs the tracking object from a list of path, a background image and a range of image.
+ * @param[in] imagePath List of path to the images.
+ * @param[in] background A background image.
+ * @param[in] startImage Index of the beginning image.
+ * @param[in] stopImage Index of the ending image.
+ */
 Tracking::Tracking(string path, UMat background, int startImage, int stopImage) : m_path(path), m_background(background), m_startImage(startImage), m_stopImage(stopImage) {
   video = new VideoReader(m_path);
 }
 
 /**
-  * @brief Initializes a tracking analysis and triggers its execution. Constructs from the path to a folder where the image sequence is stored, detects the image format and processes the first image to detect objects. First, it computes the background by averaging images from the sequence, then it subtracts  the background from the first image and then binarizes the resulting image. It detects the objects by contour analysis and extracts features by computing the object moments. It triggers the analysis of the second image of the sequence.
-*/
+ * @brief Initializes a tracking analysis and triggers its execution. Constructs from the path to a folder where the image sequence is stored, detects the image format and processes the first image to detect objects. First, it computes the background by averaging images from the sequence, then it subtracts  the background from the first image and then binarizes the resulting image. It detects the objects by contour analysis and extracts features by computing the object moments. It triggers the analysis of the second image of the sequence.
+ */
 void Tracking::startProcess() {
   try {
     if (!video->isOpened()) {
@@ -882,19 +888,19 @@ void Tracking::startProcess() {
     //  If a folder already exist, renames it with the date and time.
     QFileInfo savingInfo(QString::fromStdString(m_path));
     QString savingFilename = savingInfo.baseName();
-    QString savingPath = savingInfo.absolutePath();
+    m_savingPath = savingInfo.absolutePath();
     if (video->isSequence()) {
-      savingPath.append(QString("/Tracking_Result"));
+      m_savingPath.append(QString("/Tracking_Result"));
     }
     else {
-      savingPath.append(QString("/Tracking_Result_") + savingFilename);
+      m_savingPath.append(QString("/Tracking_Result_") + savingFilename);
     }
     QDir r;
-    r.rename(savingPath, savingPath + "_Archive-" + QDate::currentDate().toString("dd-MMM-yyyy-") + QTime::currentTime().toString("hh-mm-ss"));
-    QDir().mkdir(savingPath);
-    savingPath.append(QDir::separator());
+    r.rename(m_savingPath, m_savingPath + "_Archive-" + QDate::currentDate().toString("dd-MMM-yyyy-") + QTime::currentTime().toString("hh-mm-ss"));
+    QDir().mkdir(m_savingPath);
+    m_savingPath.append(QDir::separator());
 
-    QFile parameterFile(savingPath + "cfg.toml");
+    QFile parameterFile(m_savingPath + "cfg.toml");
     if (!parameterFile.open(QFile::WriteOnly | QFile::Text)) {
       QMessageBox errorBox;
       errorBox.setText("You don't have the right to write in the selected folder!");
@@ -909,17 +915,22 @@ void Tracking::startProcess() {
       }
     }
 
-    imwrite(savingPath.toStdString() + "background.pgm", m_background);
+    imwrite(m_savingPath.toStdString() + "background.pgm", m_background);
 
-    m_outputFile.setFileName(savingPath + "tracking.txt");
-    if (!m_outputFile.open(QFile::WriteOnly | QFile::Text)) {
+    m_outputDb = QSqlDatabase::addDatabase("QSQLITE");
+    m_outputDb.setDatabaseName(m_savingPath + "tracking.db");
+    if (!m_outputDb.open()) {
       QMessageBox msgBox;
       msgBox.setText("Permission denied to write in the folder");
       msgBox.exec();
     }
-    m_savefile.setDevice(&m_outputFile);
+    QSqlQuery query(m_outputDb);
+    query.prepare("PRAGMA synchronous=OFF");
+    query.exec();
+    query.prepare("CREATE TABLE tracking ( xHead REAL, yHead REAL, tHead REAL, xTail REAL, yTail REAL, tTail REAL, xBody REAL, yBody REAL, tBody REAL, curvature REAL, areaBody REAL, perimeterBody REAL, headMajorAxisLength REAL, headMinorAxisLength REAL, headExcentricity REAL, tailMajorAxisLength REAL, tailMinorAxisLength REAL, tailExcentricity REAL, bodyMajorAxisLength REAL, bodyMinorAxisLength REAL, bodyExcentricity REAL, imageNumber INTEGER, id INTEGER)");
+    query.exec();
 
-    m_logFile.setFileName(savingPath + "log");
+    m_logFile.setFileName(m_savingPath + "log");
     if (!m_logFile.open(QFile::WriteOnly | QFile::Text)) {
       QMessageBox msgBox;
       msgBox.setText("Permission denied to write in the folder");
@@ -933,23 +944,19 @@ void Tracking::startProcess() {
     }
 
     // Saving
-
-    // File header
-    m_savefile << "xHead" << '\t' << "yHead" << '\t' << "tHead" << '\t' << "xTail" << '\t' << "yTail" << '\t' << "tTail" << '\t' << "xBody" << '\t' << "yBody" << '\t' << "tBody" << '\t' << "curvature" << '\t' << "areaBody" << '\t' << "perimeterBody" << '\t' << "headMajorAxisLength" << '\t' << "headMinorAxisLength" << '\t' << "headExcentricity" << '\t' << "tailMajorAxisLength" << '\t' << "tailMinorAxisLength" << '\t' << "tailExcentricity" << '\t' << "bodyMajorAxisLength" << '\t' << "bodyMinorAxisLength" << '\t' << "bodyExcentricity" << '\t' << "imageNumber" << '\t' << "id" << Qt::endl;
-
-    // Draws lines and arrows on the image in the display panel
+    m_outputDb.transaction();
     for (size_t l = 0; l < m_out[0].size(); l++) {
-      // Draws lines and arrows on the image in the display panel
+      query.prepare(
+          "INSERT INTO tracking (xHead, yHead, tHead, xTail, yTail, tTail, xBody, yBody, tBody, curvature, areaBody, perimeterBody, headMajorAxisLength, headMinorAxisLength, headExcentricity, tailMajorAxisLength, tailMinorAxisLength, tailExcentricity, bodyMajorAxisLength, bodyMinorAxisLength, bodyExcentricity, imageNumber, id) "
+          "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
       for (auto const &a : m_out) {
-        m_savefile << a[l].x;
-        m_savefile << '\t';
-        m_savefile << a[l].y;
-        m_savefile << '\t';
-        m_savefile << a[l].z;
-        m_savefile << '\t';
+        query.addBindValue(a[l].x);
+        query.addBindValue(a[l].y);
+        query.addBindValue(a[l].z);
       }
-      m_savefile << m_im << '\t';
-      m_savefile << m_id[l] << '\n';
+      query.addBindValue(m_im);
+      query.addBindValue(m_id[l]);
+      query.exec();
     }
     m_outPrev = m_out;
     m_im++;
@@ -963,9 +970,9 @@ void Tracking::startProcess() {
 }
 
 /**
-  * @brief Updates the private members from the external parameters. This function links the tracking logic with the graphical user interface.
-  * @param[in] parameterList The list of all the parameters used in the tracking.
-*/
+ * @brief Updates the private members from the external parameters. This function links the tracking logic with the graphical user interface.
+ * @param[in] parameterList The list of all the parameters used in the tracking.
+ */
 void Tracking::updatingParameters(const QMap<QString, QString> &parameterList) {
   parameters = parameterList;
   param_maxArea = parameterList.value("maxArea").toInt();
@@ -995,8 +1002,43 @@ void Tracking::updatingParameters(const QMap<QString, QString> &parameterList) {
 }
 
 /**
-  * @brief Destructs the tracking object.
-*/
+ * @brief Destructs the tracking object.
+ */
 Tracking::~Tracking() {
+  m_outputDb.close();
   delete video;
+}
+
+/**
+ * @brief Exports the tracking data from the database to a text file.
+ * @param[in] path The path to a folder where to write the text file.
+ * @param[in] db The database where tracking results are stored already opened.
+ */
+void Tracking::exportTrackingResult(QString path, QSqlDatabase db) {
+  QFile outputFile(path + "/tracking.txt");
+  if (!outputFile.open(QFile::WriteOnly | QFile::Text)) {
+    QMessageBox msgBox;
+    msgBox.setText("Permission denied to write in the folder");
+    msgBox.exec();
+  }
+
+  QTextStream savefile;
+  savefile.setDevice(&outputFile);
+  savefile << "xHead" << '\t' << "yHead" << '\t' << "tHead" << '\t' << "xTail" << '\t' << "yTail" << '\t' << "tTail" << '\t' << "xBody" << '\t' << "yBody" << '\t' << "tBody" << '\t' << "curvature" << '\t' << "areaBody" << '\t' << "perimeterBody" << '\t' << "headMajorAxisLength" << '\t' << "headMinorAxisLength" << '\t' << "headExcentricity" << '\t' << "tailMajorAxisLength" << '\t' << "tailMinorAxisLength" << '\t' << "tailExcentricity" << '\t' << "bodyMajorAxisLength" << '\t' << "bodyMinorAxisLength" << '\t' << "bodyExcentricity" << '\t' << "imageNumber" << '\t' << "id"
+           << "\n";
+  QSqlQuery query(db);
+  query.prepare("SELECT * FROM tracking");
+  query.exec();
+  while (query.next()) {
+    int size = 23;
+    for (int i = 0; i < size; ++i) {
+      savefile << query.value(i).toDouble();
+      if (i != (size - 1)) {
+        savefile << '\t';
+      }
+    }
+    savefile << '\n';
+  }
+  savefile.flush();
+  outputFile.close();
 }

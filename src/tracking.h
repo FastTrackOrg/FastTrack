@@ -32,6 +32,9 @@ This file is part of Fast Track.
 #include <QMap>
 #include <QMessageBox>
 #include <QObject>
+#include <QSqlDatabase>
+#include <QSqlError>
+#include <QSqlQuery>
 #include <QString>
 #include <QTextStream>
 #include <QThread>
@@ -66,6 +69,7 @@ class Tracking : public QObject {
   string m_backgroundPath; /*!< Path to an image background. */
   UMat m_background;       /*!< Background image CV_8U. */
   int m_displayTime;       /*!< Binary image CV_8U. */
+  QString m_savingPath;    /*!< Folder where to save files. */
 
   VideoReader *video;
   int m_im;                   /*!< Index of the next image to process in the m_files list. */
@@ -73,8 +77,7 @@ class Tracking : public QObject {
   int m_startImage;           /*!< Index of the next image to process in the m_files list. */
   int m_stopImage;            /*!< Index of the next image to process in the m_files list. */
   Rect m_ROI;                 /*!< Rectangular region of interest. */
-  QTextStream m_savefile;     /*!< Stream to output tracking data. */
-  QFile m_outputFile;         /*!< Path to the file where to save tracking data. */
+  QSqlDatabase m_outputDb;    /*!< Path to the database where to save tracking data. */
   QFile m_logFile;            /*!< Path to the file where to save logs. */
   vector<cv::String> m_files; /*!< Vector containing the path for each image in the images sequence. */
   vector<int> m_id;           /*!< Vector containing the objets Id. */
@@ -129,6 +132,7 @@ class Tracking : public QObject {
   void cleaning(const vector<int> &occluded, vector<int> &lostCounter, vector<int> &id, vector<vector<Point3d>> &input, double param_maximalTime) const;
   vector<Point3d> prevision(vector<Point3d> past, vector<Point3d> present) const;
   vector<int> findOcclusion(vector<int> assignment) const;
+  static void exportTrackingResult(QString path, QSqlDatabase db);
 
   UMat m_binaryFrame;                /*!< Binary image CV_8U */
   UMat m_visuFrame;                  /*!< Image 8 bit CV_8U */
@@ -142,40 +146,40 @@ class Tracking : public QObject {
 
  signals:
   /**
-  * @brief Emitted when an image is processed.
-  * @param int Index of the processed image.
-  */
+   * @brief Emitted when an image is processed.
+   * @param int Index of the processed image.
+   */
   void progress(int) const;
 
   /**
-  * @brief Emitted when an image to compute the background is processed.
-  * @param int The number of processed image.
-  */
+   * @brief Emitted when an image to compute the background is processed.
+   * @param int The number of processed image.
+   */
   void backgroundProgress(int) const;
 
   /**
-  * @brief Emitted when the first image has been processed to trigger the starting of the analysis.
-  */
+   * @brief Emitted when the first image has been processed to trigger the starting of the analysis.
+   */
   void finishedProcessFrame() const;
 
   /**
-  * @brief Emitted when all images have been processed.
-  */
+   * @brief Emitted when all images have been processed.
+   */
   void finished() const;
 
   /**
-  * @brief Emitted when a crash occurs during the analysis.
-  */
+   * @brief Emitted when a crash occurs during the analysis.
+   */
   void forceFinished(QString message) const;
 
   /**
-  * @brief Emitted when an error occurs.
-  */
+   * @brief Emitted when an error occurs.
+   */
   void error(int code) const;
 
   /**
-  * @brief Emitted at the end of the analysis.
-  */
+   * @brief Emitted at the end of the analysis.
+   */
   void statistic(long long int time) const;
 };
 

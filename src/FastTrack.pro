@@ -1,4 +1,4 @@
-greaterThan(QT_MAJOR_VERSION, 5): QT += widgets webenginewidgets core gui network svg
+greaterThan(QT_MAJOR_VERSION, 5): QT += widgets webenginewidgets core gui network svg sql
 NO_WEB {
         QT -= webenginewidgets
         DEFINES += NO_WEB

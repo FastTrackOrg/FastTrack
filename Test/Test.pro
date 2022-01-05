@@ -1,4 +1,4 @@
-greaterThan(QT_MAJOR_VERSION, 5): QT += widgets core gui
+greaterThan(QT_MAJOR_VERSION, 5): QT += widgets core gui sql
 
 TARGET = Test
 TEMPLATE = app
