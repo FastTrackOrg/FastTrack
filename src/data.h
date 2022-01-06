@@ -8,22 +8,21 @@
 #include <QMap>
 #include <QMapIterator>
 #include <QMessageBox>
+#include <QSqlDatabase>
+#include <QSqlDriver>
+#include <QSqlError>
+#include <QSqlQuery>
+#include <QSqlRecord>
 #include <QString>
 #include <QTextStream>
+#include <QThread>
 #include <QUndoCommand>
 #include <QWidget>
-
-struct object
-{
-  int id;
-  QMap<QString, double> data;
-};
+#include "tracking.h"
 
 class Data {
  private:
   QString dir; /*!< Path to the tracking result file. */
-  QMap<int, QList<object>> dataCopy;
-  QMap<int, QList<object>> data; /*!< Tracking data stored in a QMap, the keys are the image index and the value a vector of data stored in a structure with a field containing the object id and a field containing the data stored in a QMap where the keys are the data name and the velue the data value. */
   int actions;
 
  public:
@@ -34,7 +33,6 @@ class Data {
   ~Data();
 
   bool setPath(const QString &dataPath);
-  QList<object> getData(int imageIndex) const;
   QMap<QString, double> getData(int imageIndex, int id) const;
   QMap<QString, QList<double>> getDataId(int id) const;
   QList<int> getId(int imageIndex) const;
@@ -43,7 +41,7 @@ class Data {
   void swapData(int firstObject, int secondObject, int from);
   void deleteData(int objectId, int from, int to);
   void insertData(int objectId, int from, int to);
-  void save(bool force = true, int eachActions = 10);
+  void save(bool force = true, int eachActions = 30);
   void clear();
   int maxId;
   int maxFrameIndex;

@@ -31,14 +31,16 @@ This file is part of Fast Track.
  */
 
 /**
-  * @brief Clear data.
-*/
+ * @brief Clear data.
+ */
 void Data::clear() {
+  QSqlDatabase data = QSqlDatabase::database("data", false);
   if (!isEmpty) {
     save();
+    QSqlQuery query(data);
+    query.exec("DROP TABLE deleted");
   }
-  data.clear();
-  dataCopy.clear();
+  data.close();
   maxId = 0;
   maxFrameIndex = 0;
   actions = 0;
@@ -47,99 +49,66 @@ void Data::clear() {
 }
 
 /**
-  * @brief Set the path to a tracking data file.
-  * @param[in] dataPath Path to the tracking data file.
-*/
+ * @brief Set the path to a tracking data file.
+ * @param[in] dataPath Path to the tracking data file.
+ */
 bool Data::setPath(const QString &dataPath) {
   clear();
   dir = dataPath;
 
-  QList<QString> replayTracking;
-
-  QFile trackingFile(dir + QDir::separator() + "tracking.txt");
-  if (trackingFile.exists() && trackingFile.open(QIODevice::ReadOnly)) {
-    QTextStream input(&trackingFile);
-    QString line;
-    while (input.readLineInto(&line)) {
-      replayTracking.append(line);
+  QSqlDatabase data = QSqlDatabase::database("data", false);
+  data.setDatabaseName(dataPath + "/tracking.db");
+  QSqlQuery query(data);
+  if (data.open()) {
+    query.exec("CREATE TABLE deleted ( xHead REAL, yHead REAL, tHead REAL, xTail REAL, yTail REAL, tTail REAL, xBody REAL, yBody REAL, tBody REAL, curvature REAL, areaBody REAL, perimeterBody REAL, headMajorAxisLength REAL, headMinorAxisLength REAL, headExcentricity REAL, tailMajorAxisLength REAL, tailMinorAxisLength REAL, tailExcentricity REAL, bodyMajorAxisLength REAL, bodyMinorAxisLength REAL, bodyExcentricity REAL, imageNumber INTEGER, id INTEGER)");
+    query.exec("SELECT MAX(imageNumber), MAX(id) FROM tracking");
+    if (query.first()) {
+      maxFrameIndex = query.value(0).toInt();
+      maxId = query.value(1).toInt();
+      isEmpty = false;
+      return true;
     }
-
-    // Gets the header to construct the QMap data
-    QStringList header = replayTracking[0].split('\t', Qt::SkipEmptyParts);
-    replayTracking.removeFirst();
-
-    for (auto &a : replayTracking) {
-      QList<object> tmpVector;
-      QMap<int, QMap<QString, double>> objectMap;  // Map object id to data
-      QMap<QString, double> objectData;            // Map data keys to data value
-
-      QStringList dat = a.split('\t', Qt::SkipEmptyParts);
-      if (dat.size() != 23) break;  // Checks for corrupted data
-      int frameIndex = dat[21].toInt();
-      if (frameIndex > maxFrameIndex) maxFrameIndex = frameIndex;
-      int id = dat[22].toInt();
-      if (id > maxId) maxId = id;
-      dat.removeAt(22);
-
-      for (int j = 0; j < dat.size(); j++) {
-        objectData.insert(header[j], dat[j].toDouble());
-      }
-
-      tmpVector = data.value(frameIndex);
-      object tmpObject;
-      tmpObject.id = id;
-      tmpObject.data = objectData;
-      tmpVector.append(tmpObject);
-      data.insert(frameIndex, tmpVector);
-    }
-    dataCopy = data;
-    isEmpty = false;
-    return true;
   }
-  else {
-    isEmpty = true;
-    return false;
-  }
+  isEmpty = true;
+  return false;
 }
 
 /**
-  * @brief Construct the data object from a tracking result file.
-  * @param[in] dataPath Path to the tracking data file.
-*/
-Data::Data(const QString &dataPath) {
-  isEmpty = true;
+ * @brief Construct the data object from a tracking result file.
+ * @param[in] dataPath Path to the tracking data file.
+ */
+Data::Data(const QString &dataPath) : Data() {
   setPath(dataPath);
 }
 
 /**
-  * @brief Construct the data object from a tracking result file.
-*/
+ * @brief Construct the data object from a tracking result file.
+ */
 Data::Data() {
   isEmpty = true;
+  QSqlDatabase data = QSqlDatabase::addDatabase("QSQLITE", "data");
 }
 
 /**
-  * @brief Get the tracking data at the selected image number for all the objects.
-  * @param[in] imageIndex The index of the image where to extracts the data.
-  * @return The tracking data in a QVector that contains a structure with the Id of the object and data for this object. The data are stored in a QMap<dataName, value>. 
-*/
-QList<object> Data::getData(int imageIndex) const {
-  return data.value(imageIndex);
-}
-
-/**
-  * @brief Get the tracking data at the selected image number for one selected object.
-  * @param[in] imageIndex The index of the image where to extracts the data.
-  * @param[in] id The id of the object.
-  * @return The tracking data for for the selected object at the selected image. The data are stored in a QMap<dataName, value>. 
-*/
+ * @brief Get the tracking data at the selected image number for one selected object.
+ * @param[in] imageIndex The index of the image where to extracts the data.
+ * @param[in] id The id of the object.
+ * @return The tracking data for for the selected object at the selected image. The data are stored in a QMap<dataName, value>.
+ */
 QMap<QString, double> Data::getData(int imageIndex, int id) const {
-  QList<object> objects = data.value(imageIndex);
-  for (auto &a : objects) {
-    if (a.id == id) {
-      return a.data;
-      break;
+  QSqlDatabase data = QSqlDatabase::database("data", false);
+  QSqlQuery query(data);
+  query.prepare("SELECT * FROM tracking WHERE imageNumber = ? AND id = ?");
+  query.addBindValue(imageIndex);
+  query.addBindValue(id);
+  query.exec();
+  QSqlRecord rec = query.record();
+  if (query.first()) {
+    QMap<QString, double> tmp;
+    for (int i = 0; i < rec.count(); i++) {
+      tmp.insert(rec.fieldName(i), query.value(i).toDouble());
     }
+    return tmp;
   }
   QMap<QString, double> tmp;
   tmp.insert("NAN", -1);
@@ -147,55 +116,63 @@ QMap<QString, double> Data::getData(int imageIndex, int id) const {
 }
 
 /**
-  * @brief Get the tracking data for the selected id.
-  * @param[in] id The id of the object.
-  * @return The tracking data for for the selected object in a map with the key and a vector with the value for all the images.
-*/
+ * @brief Get the tracking data for the selected id.
+ * @param[in] id The id of the object.
+ * @return The tracking data for for the selected object in a map with the key and a vector with the value for all the images.
+ */
 QMap<QString, QList<double>> Data::getDataId(int id) const {
+  QSqlDatabase data = QSqlDatabase::database("data", false);
+  QSqlQuery query(data);
+  query.prepare("SELECT xHead, yHead, tHead, xTail, yTail, tTail, xBody, yBody, tBody, curvature, areaBody, perimeterBody, headMajorAxisLength, headMinorAxisLength, headExcentricity, tailMajorAxisLength, tailMinorAxisLength, tailExcentricity, bodyMajorAxisLength, bodyMinorAxisLength, bodyExcentricity, imageNumber, id FROM tracking WHERE id = ?");
+  query.addBindValue(id);
+  query.exec();
+  QSqlRecord rec = query.record();
   QMap<QString, QList<double>> idData;
-  for (int i = 0; i < maxFrameIndex + 1; i++) {
-    QMap<QString, double> tmp = getData(i, id);
-    QMap<QString, double>::const_iterator j = tmp.constBegin();
-    while (j != tmp.constEnd()) {
-      QList<double> tmpVal;
-      if (idData.contains(j.key())) {
-        tmpVal = idData.value(j.key());
-      }
-      tmpVal.append(j.value());
-      idData.insert(j.key(), tmpVal);
-      ++j;
+  for (int i = 0; i < rec.count(); i++) {
+    idData.insert(rec.fieldName(i), {});
+  }
+  while (query.next()) {
+    for (int i = 0; i < rec.count(); i++) {
+      idData[rec.fieldName(i)].append(query.value(i).toDouble());
     }
   }
   return idData;
 }
 
 /**
-  * @brief Get the ids of all the objects in the frame.
-  * @arg[in] imageIndex Index of the frame.
-  * @return List of indexes.
-*/
+ * @brief Get the ids of all the objects in the frame.
+ * @arg[in] imageIndex Index of the frame.
+ * @return List of indexes.
+ */
 QList<int> Data::getId(int imageIndex) const {
-  QList<object> objects = data.value(imageIndex);
+  QSqlDatabase data = QSqlDatabase::database("data", false);
+  QSqlQuery query(data);
+  query.prepare("SELECT id FROM tracking where imageNumber = ?");
+  query.addBindValue(imageIndex);
+  query.exec();
   QList<int> ids;
-  for (auto &a : objects) {
-    ids.append(a.id);
+  while (query.next()) {
+    ids.append(query.value(0).toInt());
   }
   return ids;
 }
 
 /**
-  * @brief Get the ids of all the objects in several frames.
-  * @arg[in] imageIndexFirst Index of the first frame.
-  * @arg[in] imageIndexLast Index of the last frame.
-  * @return List of indexes.
-*/
+ * @brief Get the ids of all the objects in several frames.
+ * @arg[in] imageIndexFirst Index of the first frame.
+ * @arg[in] imageIndexLast Index of the last frame.
+ * @return List of indexes.
+ */
 QList<int> Data::getId(int imageIndexFirst, int imageIndexLast) const {
+  QSqlDatabase data = QSqlDatabase::database("data", false);
+  QSqlQuery query(data);
+  query.prepare("SELECT id FROM tracking where imageNumber >= ? AND imageNumber <= ?");
+  query.addBindValue(imageIndexFirst);
+  query.addBindValue(imageIndexLast);
+  query.exec();
   QList<int> ids;
-  for (int i = imageIndexFirst; i < imageIndexLast; i++) {
-    QList<object> objects = data.value(i);
-    for (auto &a : objects) {
-      ids.append(a.id);
-    }
+  while (query.next()) {
+    ids.append(query.value(0).toInt());
   }
   std::sort(ids.begin(), ids.end());
   ids.erase(std::unique(ids.begin(), ids.end()), ids.end());
@@ -203,114 +180,91 @@ QList<int> Data::getId(int imageIndexFirst, int imageIndexLast) const {
 }
 
 /**
-  * @brief Get the object's information.
-  * @arg[in] objectId Id of the object.
-  * @return First appearance image index.
-*/
+ * @brief Get the object's information.
+ * @arg[in] objectId Id of the object.
+ * @return First appearance image index.
+ */
 int Data::getObjectInformation(int objectId) const {
-  int firstAppearance;
-  for (int i = 0; i < maxFrameIndex + 1; i++) {
-    QList<object> objects = data.value(i);
-    for (auto &a : objects) {
-      if (a.id == objectId) {
-        firstAppearance = i;
-        return firstAppearance;
-      }
-    }
+  int firstAppearance = 0;
+  QSqlDatabase data = QSqlDatabase::database("data", false);
+  QSqlQuery query(data);
+  query.prepare("SELECT MIN(imageNumber) FROM tracking where id = ?");
+  query.addBindValue(objectId);
+  query.exec();
+  if (query.first()) {
+    firstAppearance = query.value(0).toInt();
   }
-  return 0;
+  return firstAppearance;
 }
 
 /**
-  * @brief In the tracking data, swaps two objects from a selected index to the end.
-  * @arg[in] firstObject The first object id.
-  * @arg[in] secondObject The second object id.
-  * @arg[in] from Start index from which the data will be swapped.
-*/
+ * @brief In the tracking data, swaps two objects from a selected index to the end.
+ * @arg[in] firstObject The first object id.
+ * @arg[in] secondObject The second object id.
+ * @arg[in] from Start index from which the data will be swapped.
+ */
 void Data::swapData(int firstObject, int secondObject, int from) {
-  QMapIterator<int, QList<object>> i(data);
-  while (i.hasNext()) {
-    i.next();
-    if (i.key() >= from) {
-      QList<object> objects = i.value();
-
-      for (int j = 0; j < objects.size(); j++) {
-        int id = objects[j].id;
-        int changed = -1;
-
-        if (id == firstObject && j != changed) {
-          objects[j].id = secondObject;
-          changed = j;
-        }
-        else if (id == secondObject && j != changed) {
-          objects[j].id = firstObject;
-          changed = j;
-        }
-      }
-
-      data.insert(i.key(), objects);
-    }
-  }
+  QSqlDatabase data = QSqlDatabase::database("data", false);
+  QSqlQuery query(data);
+  query.prepare("UPDATE tracking SET id = (CASE WHEN id = :first THEN :second ELSE :first END) WHERE id IN (:first, :second) AND imageNumber >= :from");
+  query.bindValue(":first", firstObject);
+  query.bindValue(":second", secondObject);
+  query.bindValue(":from", from);
+  query.exec();
   save(false);
-  dataCopy = data;
 }
 
 /**
-  * @brief Delete the tracking data of one object from a selected index to the end.
-  * @arg[in] objectId The object id.
-  * @arg[in] from Start index from which the data will be swapped.
-  * @arg[in] to End index from which the data will be swapped.
-*/
+ * @brief Delete the tracking data of one object from a selected index to the end.
+ * @arg[in] objectId The object id.
+ * @arg[in] from Start index from which the data will be deleted.
+ * @arg[in] to End index from which the data will be deleted.
+ */
 void Data::deleteData(int objectId, int from, int to) {
-  QMapIterator<int, QList<object>> i(data);
-  while (i.hasNext()) {
-    i.next();
-    if (i.key() >= from && i.key() <= to) {
-      QList<object> objects = i.value();
-
-      for (int j = 0; j < objects.size(); j++) {
-        if (objects[j].id == objectId) {
-          objects.remove(j);
-        }
-      }
-      data.insert(i.key(), objects);
-    }
-  }
+  QSqlDatabase data = QSqlDatabase::database("data", false);
+  QSqlQuery query(data);
+  query.prepare("INSERT INTO deleted SELECT xHead, yHead, tHead, xTail, yTail, tTail, xBody, yBody, tBody, curvature, areaBody, perimeterBody, headMajorAxisLength, headMinorAxisLength, headExcentricity, tailMajorAxisLength, tailMinorAxisLength, tailExcentricity, bodyMajorAxisLength, bodyMinorAxisLength, bodyExcentricity, imageNumber, id FROM tracking WHERE id = ? AND imageNumber >= ? AND imageNumber <= ?");
+  query.addBindValue(objectId);
+  query.addBindValue(from);
+  query.addBindValue(to);
+  query.exec();
+  query.prepare("DELETE FROM tracking WHERE id = ? AND imageNumber >= ? AND imageNumber <= ?");
+  query.addBindValue(objectId);
+  query.addBindValue(from);
+  query.addBindValue(to);
+  query.exec();
   save(false);
 }
 
 /**
-  * @brief Insert the tracking data for one object from a selected index to the end.
-  * @arg[in] objectId The object id.
-  * @arg[in] from Start index from which the data will be swapped.
-  * @arg[in] to End index from which the data will be swapped.
-*/
+ * @brief Insert the tracking data for one object from a selected index to the end.
+ * @arg[in] objectId The object id.
+ * @arg[in] from Start index from which the data will be swapped.
+ * @arg[in] to End index from which the data will be swapped.
+ */
 void Data::insertData(int objectId, int from, int to) {
-  QMapIterator<int, QList<object>> i(dataCopy);
-  while (i.hasNext()) {
-    i.next();
-    if (i.key() >= from && i.key() <= to) {
-      QList<object> objects = i.value();
-
-      for (int j = 0; j < objects.size(); j++) {
-        if (objects[j].id == objectId) {
-          object objectToInsert = dataCopy.value(i.key())[j];
-          QList<object> objectsToReplace = data.value(i.key());
-          objectsToReplace.append(objectToInsert);
-          data.insert(i.key(), objectsToReplace);
-        }
-      }
-    }
-  }
+  QSqlDatabase data = QSqlDatabase::database("data", false);
+  QSqlQuery query(data);
+  query.prepare("INSERT INTO tracking SELECT xHead, yHead, tHead, xTail, yTail, tTail, xBody, yBody, tBody, curvature, areaBody, perimeterBody, headMajorAxisLength, headMinorAxisLength, headExcentricity, tailMajorAxisLength, tailMinorAxisLength, tailExcentricity, bodyMajorAxisLength, bodyMinorAxisLength, bodyExcentricity, imageNumber, id FROM deleted WHERE id = ? AND imageNumber >= ? AND imageNumber <= ?");
+  query.addBindValue(objectId);
+  query.addBindValue(from);
+  query.addBindValue(to);
+  query.exec();
+  query.prepare("DELETE FROM deleted WHERE id = ? AND imageNumber >= ? AND imageNumber <= ?");
+  query.addBindValue(objectId);
+  query.addBindValue(from);
+  query.addBindValue(to);
+  query.exec();
   save(false);
 }
+
 /**
-  * @brief Save the data in the tracking result file.
-  * @param[in] force Force the saving.
-  * @param[in] eachActions Save every eachActions actions.
-*/
+ * @brief Save the data in the tracking result file.
+ * @param[in] force Force the saving.
+ * @param[in] eachActions Save every eachActions actions.
+ */
 void Data::save(bool force, int eachActions) {
-  if (!force && actions < 10) {
+  if (!force && actions < eachActions) {
     ++actions;
     return;
   }
@@ -318,24 +272,9 @@ void Data::save(bool force, int eachActions) {
   if (!QApplication::topLevelWidgets().isEmpty()) {
     QApplication::setOverrideCursor(Qt::WaitCursor);
   }
-  QFile file(dir + QDir::separator() + "tracking.txt");
-  if (file.open(QFile::WriteOnly | QFile::Text)) {
-    QTextStream out(&file);
-    out << "xHead" << '\t' << "yHead" << '\t' << "tHead" << '\t' << "xTail" << '\t' << "yTail" << '\t' << "tTail" << '\t' << "xBody" << '\t' << "yBody" << '\t' << "tBody" << '\t' << "curvature" << '\t' << "areaBody" << '\t' << "perimeterBody" << '\t' << "headMajorAxisLength" << '\t' << "headMinorAxisLength" << '\t' << "headExcentricity" << '\t' << "tailMajorAxisLength" << '\t' << "tailMinorAxisLength" << '\t' << "tailExcentricity" << '\t' << "bodyMajorAxisLength" << '\t' << "bodyMinorAxisLength" << '\t' << "bodyExcentricity" << '\t' << "imageNumber" << '\t' << "id" << Qt::endl;
-    QMapIterator<int, QList<object>> i(data);
-    while (i.hasNext()) {
-      i.next();
-      for (auto &a : i.value()) {
-        out << a.data.value("xHead") << '\t' << a.data.value("yHead") << '\t' << a.data.value("tHead") << '\t' << a.data.value("xTail") << '\t' << a.data.value("yTail") << '\t' << a.data.value("tTail") << '\t' << a.data.value("xBody") << '\t' << a.data.value("yBody") << '\t' << a.data.value("tBody") << '\t' << a.data.value("curvature") << '\t' << a.data.value("areaBody") << '\t' << a.data.value("perimeterBody") << '\t' << a.data.value("headMajorAxisLength") << '\t' << a.data.value("headMinorAxisLength") << '\t' << a.data.value("headExcentricity") << '\t' << a.data.value("tailMajorAxisLength") << '\t' << a.data.value("tailMinorAxisLength") << '\t' << a.data.value("tailExcentricity") << '\t' << a.data.value("bodyMajorAxisLength") << '\t' << a.data.value("bodyMinorAxisLength") << '\t' << a.data.value("bodyExcentricity") << '\t' << a.data.value("imageNumber") << '\t' << a.id << Qt::endl;
-      }
-    }
-    file.close();
-  }
-  else {
-    QMessageBox msgBox;
-    msgBox.setText("Error writting the tracking.txt file. Changes not saved.");
-    msgBox.exec();
-  }
+  QString file = dir + QDir::separator();
+  QSqlDatabase data = QSqlDatabase::database("data", false);
+  Tracking::exportTrackingResult(file, data);
   actions = 0;
   if (!QApplication::topLevelWidgets().isEmpty()) {
     QApplication::restoreOverrideCursor();
@@ -343,9 +282,8 @@ void Data::save(bool force, int eachActions) {
 }
 
 Data::~Data() {
-  if (!isEmpty && actions != 0) {
-    save();
-  }
+  clear();
+  QSqlDatabase::removeDatabase("data");
 };
 
 SwapData::SwapData(int firstObject, int secondObject, int from, Data *data)

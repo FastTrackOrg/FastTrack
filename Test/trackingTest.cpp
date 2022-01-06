@@ -37,7 +37,7 @@ class DataTest : public ::testing::Test {
   }
 };
 
-//Curvature method test
+// Curvature method test
 TEST_F(TrackingTest, CurvatureCenter) {
   Tracking tracking("", "");
   Point2d test = tracking.curvatureCenter(Point3d(1, 1, M_PI * 0.25), Point3d(2, 2, M_PI));
@@ -62,7 +62,7 @@ TEST_F(TrackingTest, CurvatureCenter) {
   EXPECT_NEAR(test.y, 2, 0.005);
 }
 
-//Registration test
+// Registration test
 TEST_F(TrackingTest, RegistrationMethod0Lena) {
   Tracking tracking("", "");
 
@@ -132,21 +132,21 @@ TEST_F(TrackingTest, RegistrationMethod2Lena) {
   copyMakeBorder(imageReference, padded, 50, 50, 50, 50, BORDER_CONSTANT);
 
   /*H = (Mat_<float>(2, 3) << 1.0, 0.0, -2, 0.0, 1.0, -2);
-	warpAffine(padded, registered, H, padded.size());
+        warpAffine(padded, registered, H, padded.size());
   tracking.registration(padded, registered, 2);
   subtract(registered, padded, registered);
   imwrite("/home/benjamin/reg.pgm", registered);
   compare(registered, padded, diff, cv::CMP_NE);
   EXPECT_EQ(countNonZero(diff), 0);
-  
+
   H = (Mat_<float>(2, 3) << 1.0, 0.0, 50, 0.0, 1.0, 10);
-	warpAffine(padded, registered, H, padded.size());
+        warpAffine(padded, registered, H, padded.size());
   tracking.registration(padded, registered, 2);
   compare(registered, padded, diff, cv::CMP_NE);
   EXPECT_EQ(countNonZero(diff), 0);
 
   H = (Mat_<float>(2, 3) << 1.0, 0.0, 0, 0.0, 1.0, 0);
-	warpAffine(padded, registered, H, padded.size());
+        warpAffine(padded, registered, H, padded.size());
   tracking.registration(padded, registered, 2);
   compare(registered, padded, diff, cv::CMP_NE);
   EXPECT_EQ(countNonZero(diff), 0);*/
@@ -221,13 +221,13 @@ TEST_F(TrackingTest, RegistrationMethod2Dual) {
   copyMakeBorder(imageReference, padded, 50, 50, 50, 50, BORDER_CONSTANT);
 
   H = (Mat_<float>(2, 3) << 1.0, 0.0, -20, 0.0, 1.0, -20);
-	warpAffine(padded, registered, H, padded.size());
+        warpAffine(padded, registered, H, padded.size());
   tracking.registration(padded, registered, 2);
   compare(registered, padded, diff, cv::CMP_NE);
   EXPECT_EQ(countNonZero(diff), 0);
-  
+
   H = (Mat_<float>(2, 3) << 1.0, 0.0, 50, 0.0, 1.0, 10);
-	warpAffine(padded, registered, H, padded.size());
+        warpAffine(padded, registered, H, padded.size());
   tracking.registration(padded, registered, 2);
   compare(registered, padded, diff, cv::CMP_NE);
   EXPECT_EQ(countNonZero(diff), 0);
@@ -736,25 +736,6 @@ TEST_F(DataTest, getDataId) {
   EXPECT_EQ(test.value("xHead").last(), 360.181);
 }
 
-TEST_F(DataTest, getData_2) {
-  Data data("../dataSet/images/Groundtruth/Tracking_Result/");
-  QList<object> test = data.getData(2);
-  double testValue;
-  for (auto &a : test) {
-    if (a.id == 12) {
-      testValue = a.data.value("xHead");
-    }
-  }
-  EXPECT_EQ(testValue, 506.779);
-  test = data.getData(198);
-  for (auto &a : test) {
-    if (a.id == 3) {
-      testValue = a.data.value("yHead");
-    }
-  }
-  EXPECT_EQ(testValue, 25.838);
-}
-
 TEST_F(DataTest, swapData) {
   fs::copy("../dataSet/images/Groundtruth/Tracking_Result/", "../dataSet/images/Groundtruth/Tracking_Result_Copy/", fs::copy_options::overwrite_existing | fs::copy_options::recursive);
   Data data("../dataSet/images/Groundtruth/Tracking_Result_Copy/");
@@ -769,8 +750,8 @@ TEST_F(DataTest, swapData) {
   QMap<QString, double> b_next_test = data.getData(180, 11);
   EXPECT_EQ(a_prev, a_prev_test);
   EXPECT_EQ(b_prev, b_prev_test);
-  EXPECT_EQ(b_next, a_next_test);
-  EXPECT_EQ(a_next, b_next_test);
+  EXPECT_EQ(b_next.remove("id"), a_next_test.remove("id"));
+  EXPECT_EQ(a_next.remove("id"), b_next_test.remove("id"));
 }
 
 TEST_F(DataTest, deleteInsertData) {
@@ -803,23 +784,6 @@ TEST_F(DataTest, info) {
   Data data("../dataSet/images/Groundtruth/Tracking_Result_Copy/");
   data.deleteData(12, 0, 20);
   EXPECT_EQ(data.getObjectInformation(12), 21);
-}
-
-TEST_F(DataTest, crossCheck) {
-  Data data("../dataSet/images/Groundtruth/Tracking_Result/");
-  QList<object> test;
-  test = data.getData(2);
-  for (auto &a : test) {
-    if (a.id == 12) {
-      EXPECT_EQ(a.data, data.getData(2, 12));
-    }
-    if (a.id == 1) {
-      EXPECT_EQ(a.data, data.getData(2, 1));
-    }
-    if (a.id == 7) {
-      EXPECT_EQ(a.data, data.getData(2, 7));
-    }
-  }
   fs::remove_all("../dataSet/images/Groundtruth/Tracking_Result_Copy/");
 }
 }  // namespace

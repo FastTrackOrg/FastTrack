@@ -775,28 +775,25 @@ void Tracking::imageProcessing() {
     }
     catch (...) {
       outputDb.commit();
-      outputDb.close();
-      QSqlDatabase::removeDatabase("tracking");
-      m_logFile.close();
       exportTrackingResult(m_savingPath, outputDb);
+      outputDb.close();
+      m_logFile.close();
       emit(forceFinished("Fatal error during the processing of the image " + QString::number(m_im)));
       break;
     }
   }
   if (m_error.isEmpty()) {
     outputDb.commit();
-    outputDb.close();
-    QSqlDatabase::removeDatabase("tracking");
     exportTrackingResult(m_savingPath, outputDb);
+    outputDb.close();
     emit(finished());
     emit(statistic(timer->elapsed()));
     delete timer;
   }
   else {
     outputDb.commit();
-    outputDb.close();
-    QSqlDatabase::removeDatabase("tracking");
     exportTrackingResult(m_savingPath, outputDb);
+    outputDb.close();
     emit(forceFinished("Images " + m_error + " where skipped because unreadable"));
     emit(statistic(timer->elapsed()));
   }
@@ -1013,6 +1010,7 @@ void Tracking::updatingParameters(const QMap<QString, QString> &parameterList) {
  */
 Tracking::~Tracking() {
   delete video;
+  QSqlDatabase::removeDatabase("tracking");
 }
 
 /**
@@ -1023,9 +1021,9 @@ Tracking::~Tracking() {
 void Tracking::exportTrackingResult(QString path, QSqlDatabase db) {
   QFile outputFile(path + "/tracking.txt");
   if (!outputFile.open(QFile::WriteOnly | QFile::Text)) {
-    QMessageBox msgBox;
-    msgBox.setText("Permission denied to write in the folder");
-    msgBox.exec();
+    // QMessageBox msgBox;
+    // msgBox.setText("Permission denied to write in the folder");
+    // msgBox.exec();
   }
 
   QTextStream savefile;

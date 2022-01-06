@@ -35,10 +35,10 @@ This file is part of Fast Track.
  */
 
 /**
-  * @brief Constructs the AutoLevel object.
-  * @param[in] path Path to the movie to track.
-  * @param[in] background Background image.
-*/
+ * @brief Constructs the AutoLevel object.
+ * @param[in] path Path to the movie to track.
+ * @param[in] background Background image.
+ */
 AutoLevel::AutoLevel(const string &path, const UMat &background, const QMap<QString, QString> &parameters) {
   m_path = path;
   m_background = background;
@@ -47,9 +47,9 @@ AutoLevel::AutoLevel(const string &path, const UMat &background, const QMap<QStr
 }
 
 /**
-  * @brief Levels the tracking parameters.
-  * @return Map containing the levelled parameters.
-*/
+ * @brief Levels the tracking parameters.
+ * @return Map containing the levelled parameters.
+ */
 QMap<QString, double> AutoLevel::level() {
   try {
     VideoReader video(m_path);
@@ -86,7 +86,7 @@ QMap<QString, double> AutoLevel::level() {
       Tracking tracking = Tracking(m_path, m_background, 0, m_endImage);
       tracking.updatingParameters(m_parameters);
       tracking.startProcess();
-      Data data = Data(directory);
+      Data data(directory);
       stdAngle = 180 * computeStdAngle(data) / M_PI;
       stdDist = computeStdDistance(data);
       stdArea = computeStdArea(data);
@@ -118,10 +118,10 @@ QMap<QString, double> AutoLevel::level() {
 }
 
 /**
-  * @brief Compute the std from a vector.
-  * @param[in] data Distribution.
-  * @return Std.
-*/
+ * @brief Compute the std from a vector.
+ * @param[in] data Distribution.
+ * @return Std.
+ */
 double AutoLevel::stdev(const QList<double> &vect) {
   double mean = std::accumulate(vect.begin(), vect.end(), 0.0);
   mean /= double(vect.size());
@@ -131,10 +131,10 @@ double AutoLevel::stdev(const QList<double> &vect) {
 }
 
 /**
-  * @brief Compute the standard deviation of the angle distribution.
-  * @param[in] data Tracking data.
-  * @return Standard deviation.
-*/
+ * @brief Compute the standard deviation of the angle distribution.
+ * @param[in] data Tracking data.
+ * @return Standard deviation.
+ */
 double AutoLevel::computeStdAngle(const Data &data) {
   QList<double> angle;
   QList<int> ids = data.getId(0, data.maxFrameIndex);
@@ -154,10 +154,10 @@ double AutoLevel::computeStdAngle(const Data &data) {
 }
 
 /**
-  * @brief Compute the standard deviation of the distance distribution.
-  * @param[in] data Tracking data.
-  * @return Standard deviation.
-*/
+ * @brief Compute the standard deviation of the distance distribution.
+ * @param[in] data Tracking data.
+ * @return Standard deviation.
+ */
 double AutoLevel::computeStdDistance(const Data &data) {
   QList<double> distance;
   QList<int> ids = data.getId(0, data.maxFrameIndex);
@@ -182,10 +182,10 @@ double AutoLevel::computeStdDistance(const Data &data) {
 }
 
 /**
-  * @brief Compute the standard deviation of the area distribution.
-  * @param[in] data Tracking data.
-  * @return Standard deviation.
-*/
+ * @brief Compute the standard deviation of the area distribution.
+ * @param[in] data Tracking data.
+ * @return Standard deviation.
+ */
 double AutoLevel::computeStdArea(const Data &data) {
   QList<double> area;
   QList<int> ids = data.getId(0, data.maxFrameIndex);
@@ -201,10 +201,10 @@ double AutoLevel::computeStdArea(const Data &data) {
 }
 
 /**
-  * @brief Compute the standard deviation of the angle distribution.
-  * @param[in] data Tracking data.
-  * @return Standard deviation.
-*/
+ * @brief Compute the standard deviation of the angle distribution.
+ * @param[in] data Tracking data.
+ * @return Standard deviation.
+ */
 double AutoLevel::computeStdPerimeter(const Data &data) {
   QList<double> perimeter;
   QList<int> ids = data.getId(0, data.maxFrameIndex);

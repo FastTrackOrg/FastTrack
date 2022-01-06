@@ -36,7 +36,7 @@ using namespace std;
  *
  * Contact: gallois.benjamin08@gmail.com
  *
-*/
+ */
 
 Replay::Replay(QWidget* parent, bool standalone, Timeline* slider, VideoReader* videoReader) : QMainWindow(parent),
                                                                                                ui(new Ui::Replay) {
@@ -354,8 +354,8 @@ Replay::~Replay() {
 }
 
 /**
-* @brief Opens a dialogue to select a folder.
-*/
+ * @brief Opens a dialogue to select a folder.
+ */
 void Replay::openReplay() {
   QString dir = QFileDialog::getOpenFileName(this, tr("Open video file or image from an image sequence"), memoryDir);
   QApplication::setOverrideCursor(Qt::WaitCursor);
@@ -364,8 +364,8 @@ void Replay::openReplay() {
 }
 
 /**
-* @brief Opens a dialogue to select a Tracking_Result dir, necessitate a video already opened and matching tracking results.
-*/
+ * @brief Opens a dialogue to select a Tracking_Result dir, necessitate a video already opened and matching tracking results.
+ */
 void Replay::openTrackingDir() {
   QString dir = QFileDialog::getExistingDirectory(this, tr("Open Tracking_Result_* Directory"), memoryDir, QFileDialog::ShowDirsOnly);
   QApplication::setOverrideCursor(Qt::WaitCursor);
@@ -374,8 +374,8 @@ void Replay::openTrackingDir() {
 }
 
 /**
-* @brief Clears replay data.
-*/
+ * @brief Clears replay data.
+ */
 void Replay::clear() {
   annotation->clear();
   trackingData->clear();
@@ -394,9 +394,9 @@ void Replay::clear() {
 }
 
 /**
-* @brief Loads a video/images sequence and the last analysis performed.
-* @arg[in] dir Path to a video or image of an images sequence.
-*/
+ * @brief Loads a video/images sequence and the last analysis performed.
+ * @arg[in] dir Path to a video or image of an images sequence.
+ */
 void Replay::loadReplay(const QString& dir) {
   // This function will detect from an inputed path to a directory the image sequence and the tracking data.
   // The last tracking data from the folder Tracking_Result is automatically loaded if found.
@@ -450,9 +450,9 @@ void Replay::loadReplay(const QString& dir) {
 }
 
 /**
-  * @brief Loads a tracking analysis folder from a video file.
-  * @arg[in] dir Path to a video or image of an images sequence.
-  */
+ * @brief Loads a tracking analysis folder from a video file.
+ * @arg[in] dir Path to a video or image of an images sequence.
+ */
 void Replay::loadTrackingDir(const QString& dir) {
   if (!dir.length()) return;
 
@@ -486,8 +486,8 @@ void Replay::loadTrackingDir(const QString& dir) {
 }
 
 /**
-* @brief Displays the image and the tracking data in the ui->displayReplay. Triggered when the ui->replaySlider value is changed.
-*/
+ * @brief Displays the image and the tracking data in the ui->displayReplay. Triggered when the ui->replaySlider value is changed.
+ */
 void Replay::loadFrame(int frameIndex) {
   if (!isReplayable) {
     return;
@@ -583,8 +583,8 @@ void Replay::loadFrame(int frameIndex) {
 }
 
 /**
-  * @brief Zooms in the display.
-*/
+ * @brief Zooms in the display.
+ */
 void Replay::zoomIn() {
   currentZoom = abs(currentZoom);
   if (currentZoom < 3.75) {
@@ -595,8 +595,8 @@ void Replay::zoomIn() {
 }
 
 /**
-  * @brief Zooms out the display.
-*/
+ * @brief Zooms out the display.
+ */
 void Replay::zoomOut() {
   currentZoom = abs(currentZoom);
   if (currentZoom > 0.25) {
@@ -608,10 +608,10 @@ void Replay::zoomOut() {
 }
 
 /**
-  * @brief Manages all the mouse input in the display.
-  * @param[in] target Target widget to apply the filter.
-  * @param[in] event Describes the mouse event.
-*/
+ * @brief Manages all the mouse input in the display.
+ * @param[in] target Target widget to apply the filter.
+ * @param[in] event Describes the mouse event.
+ */
 bool Replay::eventFilter(QObject* target, QEvent* event) {
   // Event filter for the display
   if (target == ui->replayDisplay) {
@@ -710,11 +710,11 @@ bool Replay::eventFilter(QObject* target, QEvent* event) {
 }
 
 /**
-  * @brief Update the information of an object inside a table widget.
-  * @param[in] objectId The id of the object to display the data.
-  * @param[in] imageIndex The index of the image where to extracts the data.
-  * @param[in] table Pointer to a QTableWidget where to display the data.
-*/
+ * @brief Update the information of an object inside a table widget.
+ * @param[in] objectId The id of the object to display the data.
+ * @param[in] imageIndex The index of the image where to extracts the data.
+ * @param[in] table Pointer to a QTableWidget where to display the data.
+ */
 void Replay::updateInformation(int objectId, int imageIndex, QTableWidget* table) {
   QMap<QString, double> infoData = trackingData->getData(imageIndex, objectId);
   table->item(0, 0)->setText(QString::number(objectId));
@@ -725,8 +725,8 @@ void Replay::updateInformation(int objectId, int imageIndex, QTableWidget* table
 }
 
 /**
-  * @brief Gets the index of the two selected objects, the start index, swaps the data from the start index to the end, and saves the new tracking data. Triggered when ui->swapButton is pressed or a right-click event is registered inside the replayDisplay.
-*/
+ * @brief Gets the index of the two selected objects, the start index, swaps the data from the start index to the end, and saves the new tracking data. Triggered when ui->swapButton is pressed or a right-click event is registered inside the replayDisplay.
+ */
 void Replay::correctTracking() {
   if (isReplayable) {
     // Swaps the data
@@ -740,8 +740,8 @@ void Replay::correctTracking() {
 }
 
 /**
-  * @brief Finds and displays the next occlusion event on the ui->replayDisplay. Triggered when ui->nextReplay is pressed.
-*/
+ * @brief Finds and displays the next occlusion event on the ui->replayDisplay. Triggered when ui->nextReplay is pressed.
+ */
 void Replay::nextOcclusionEvent() {
   if (!occlusionEvents.isEmpty()) {
     int current = ui->replaySlider->value();
@@ -751,8 +751,8 @@ void Replay::nextOcclusionEvent() {
 }
 
 /**
-  * @brief Finds and displays the previous occlusion event on the ui->replayDisplay. Triggered when ui->previousReplay is pressed.
-*/
+ * @brief Finds and displays the previous occlusion event on the ui->replayDisplay. Triggered when ui->previousReplay is pressed.
+ */
 void Replay::previousOcclusionEvent() {
   if (!occlusionEvents.isEmpty()) {
     int current = ui->replaySlider->value();
@@ -762,8 +762,8 @@ void Replay::previousOcclusionEvent() {
 }
 
 /**
-  * @brief Saves the tracked movie in .avi. Triggered when ui->previousReplay is pressed.
-*/
+ * @brief Saves the tracked movie in .avi. Triggered when ui->previousReplay is pressed.
+ */
 void Replay::saveTrackedMovie() {
   // If tracking data are available, gets the display settings and saves the movie in the
   // selected folder
