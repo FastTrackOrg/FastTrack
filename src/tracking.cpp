@@ -699,6 +699,7 @@ vector<Point3d> Tracking::prevision(vector<Point3d> past, vector<Point3d> presen
  * @brief Processes an image from an images sequence and tracks and matchs objects according to the previous image in the sequence. Takes a new image from the image sequence, substracts the background, binarises the image and crops according to the defined region of interest. Detects all the objects in the image and extracts the object features. Then matches detected objects with objects from the previous frame. This function emits a signal to display the images in the user interface.
  */
 void Tracking::imageProcessing() {
+  QSqlDatabase outputDb = QSqlDatabase::database("tracking");
   while (m_im < m_stopImage) {
     try {
       // Reads the next image in the image sequence and applies the image processing workflow
@@ -746,10 +747,10 @@ void Tracking::imageProcessing() {
 
       // Save date in the database
       if (m_im % 50 == 0) {  // Performe the transaction every 50 frames to increase INSERT performance
-        m_outputDb.commit();
-        m_outputDb.transaction();
+        outputDb.commit();
+        outputDb.transaction();
       }
-      QSqlQuery query(m_outputDb);
+      QSqlQuery query(outputDb);
       for (size_t l = 0; l < m_out[0].size(); l++) {
         // Tracking data are available
         if (find(occluded.begin(), occluded.end(), int(l)) == occluded.end()) {
@@ -773,23 +774,29 @@ void Tracking::imageProcessing() {
       emit(progress(m_im));
     }
     catch (...) {
-      m_outputDb.commit();
+      outputDb.commit();
+      outputDb.close();
+      QSqlDatabase::removeDatabase("tracking");
       m_logFile.close();
-      exportTrackingResult(m_savingPath, m_outputDb);
+      exportTrackingResult(m_savingPath, outputDb);
       emit(forceFinished("Fatal error during the processing of the image " + QString::number(m_im)));
       break;
     }
   }
   if (m_error.isEmpty()) {
-    m_outputDb.commit();
-    exportTrackingResult(m_savingPath, m_outputDb);
+    outputDb.commit();
+    outputDb.close();
+    QSqlDatabase::removeDatabase("tracking");
+    exportTrackingResult(m_savingPath, outputDb);
     emit(finished());
     emit(statistic(timer->elapsed()));
     delete timer;
   }
   else {
-    m_outputDb.commit();
-    exportTrackingResult(m_savingPath, m_outputDb);
+    outputDb.commit();
+    outputDb.close();
+    QSqlDatabase::removeDatabase("tracking");
+    exportTrackingResult(m_savingPath, outputDb);
     emit(forceFinished("Images " + m_error + " where skipped because unreadable"));
     emit(statistic(timer->elapsed()));
   }
@@ -917,14 +924,14 @@ void Tracking::startProcess() {
 
     imwrite(m_savingPath.toStdString() + "background.pgm", m_background);
 
-    m_outputDb = QSqlDatabase::addDatabase("QSQLITE");
-    m_outputDb.setDatabaseName(m_savingPath + "tracking.db");
-    if (!m_outputDb.open()) {
+    QSqlDatabase outputDb = QSqlDatabase::addDatabase("QSQLITE", "tracking");
+    outputDb.setDatabaseName(m_savingPath + "tracking.db");
+    if (!outputDb.open()) {
       QMessageBox msgBox;
       msgBox.setText("Permission denied to write in the folder");
       msgBox.exec();
     }
-    QSqlQuery query(m_outputDb);
+    QSqlQuery query(outputDb);
     query.prepare("PRAGMA synchronous=OFF");
     query.exec();
     query.prepare("CREATE TABLE tracking ( xHead REAL, yHead REAL, tHead REAL, xTail REAL, yTail REAL, tTail REAL, xBody REAL, yBody REAL, tBody REAL, curvature REAL, areaBody REAL, perimeterBody REAL, headMajorAxisLength REAL, headMinorAxisLength REAL, headExcentricity REAL, tailMajorAxisLength REAL, tailMinorAxisLength REAL, tailExcentricity REAL, bodyMajorAxisLength REAL, bodyMinorAxisLength REAL, bodyExcentricity REAL, imageNumber INTEGER, id INTEGER)");
@@ -944,7 +951,7 @@ void Tracking::startProcess() {
     }
 
     // Saving
-    m_outputDb.transaction();
+    outputDb.transaction();
     for (size_t l = 0; l < m_out[0].size(); l++) {
       query.prepare(
           "INSERT INTO tracking (xHead, yHead, tHead, xTail, yTail, tTail, xBody, yBody, tBody, curvature, areaBody, perimeterBody, headMajorAxisLength, headMinorAxisLength, headExcentricity, tailMajorAxisLength, tailMinorAxisLength, tailExcentricity, bodyMajorAxisLength, bodyMinorAxisLength, bodyExcentricity, imageNumber, id) "
@@ -1005,7 +1012,6 @@ void Tracking::updatingParameters(const QMap<QString, QString> &parameterList) {
  * @brief Destructs the tracking object.
  */
 Tracking::~Tracking() {
-  m_outputDb.close();
   delete video;
 }
 

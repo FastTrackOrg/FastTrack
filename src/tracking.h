@@ -77,7 +77,6 @@ class Tracking : public QObject {
   int m_startImage;           /*!< Index of the next image to process in the m_files list. */
   int m_stopImage;            /*!< Index of the next image to process in the m_files list. */
   Rect m_ROI;                 /*!< Rectangular region of interest. */
-  QSqlDatabase m_outputDb;    /*!< Path to the database where to save tracking data. */
   QFile m_logFile;            /*!< Path to the file where to save logs. */
   vector<cv::String> m_files; /*!< Vector containing the path for each image in the images sequence. */
   vector<int> m_id;           /*!< Vector containing the objets Id. */
