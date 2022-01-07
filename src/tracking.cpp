@@ -912,17 +912,24 @@ void Tracking::startProcess() {
       throw std::runtime_error("Can't write tracking.db to the disk!");
     }
 
+    query.exec("CREATE TABLE parameter ( parameter TEXT, value REAL)");
     QFile parameterFile(m_savingPath + "cfg.toml");
     if (!parameterFile.open(QFile::WriteOnly | QFile::Text)) {
       throw std::runtime_error("Can't write cfg.toml to the disk!");
     }
     else {
+      outputDb.transaction();
       QTextStream out(&parameterFile);
       out << "title = \"FastTrack cfg\"\"\n\n[parameters]\n";
       QList<QString> keyList = parameters.keys();
       for (auto a : keyList) {
         out << a << " = " << parameters.value(a) << Qt::endl;
+        query.prepare("INSERT INTO parameter (parameter, value) VALUES (?, ?)");
+        query.addBindValue(a);
+        query.addBindValue(parameters.value(a));
+        query.exec();
       }
+      outputDb.commit();
     }
 
     imwrite(m_savingPath.toStdString() + "background.pgm", m_background);
