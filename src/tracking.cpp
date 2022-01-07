@@ -782,20 +782,21 @@ void Tracking::imageProcessing() {
       break;
     }
   }
-  if (m_error.isEmpty()) {
-    outputDb.commit();
-    exportTrackingResult(m_savingPath, outputDb);
-    outputDb.close();
+  // Finished successfully
+  outputDb.commit();
+  bool isSaved = exportTrackingResult(m_savingPath, outputDb);
+  outputDb.close();
+  emit(statistic(timer->elapsed()));
+  delete timer;
+
+  if (isSaved && m_error.isEmpty()) {
     emit(finished());
-    emit(statistic(timer->elapsed()));
-    delete timer;
+  }
+  else if (isSaved && !m_error.isEmpty()) {
+    emit(forceFinished("Images " + m_error + " where skipped because unreadable."));
   }
   else {
-    outputDb.commit();
-    exportTrackingResult(m_savingPath, outputDb);
-    outputDb.close();
-    emit(forceFinished("Images " + m_error + " where skipped because unreadable"));
-    emit(statistic(timer->elapsed()));
+    emit(forceFinished("Can't write tracking.txt to the disk!"));
   }
 }
 
@@ -904,11 +905,16 @@ void Tracking::startProcess() {
     QDir().mkdir(m_savingPath);
     m_savingPath.append(QDir::separator());
 
+    QSqlDatabase outputDb = QSqlDatabase::addDatabase("QSQLITE", "tracking");
+    outputDb.setDatabaseName(m_savingPath + "tracking.db");
+    QSqlQuery query(outputDb);
+    if (!outputDb.open()) {
+      throw std::runtime_error("Can't write tracking.db to the disk!");
+    }
+
     QFile parameterFile(m_savingPath + "cfg.toml");
     if (!parameterFile.open(QFile::WriteOnly | QFile::Text)) {
-      QMessageBox errorBox;
-      errorBox.setText("You don't have the right to write in the selected folder!");
-      errorBox.exec();
+      throw std::runtime_error("Can't write cfg.toml to the disk!");
     }
     else {
       QTextStream out(&parameterFile);
@@ -921,24 +927,12 @@ void Tracking::startProcess() {
 
     imwrite(m_savingPath.toStdString() + "background.pgm", m_background);
 
-    QSqlDatabase outputDb = QSqlDatabase::addDatabase("QSQLITE", "tracking");
-    outputDb.setDatabaseName(m_savingPath + "tracking.db");
-    if (!outputDb.open()) {
-      QMessageBox msgBox;
-      msgBox.setText("Permission denied to write in the folder");
-      msgBox.exec();
-    }
-    QSqlQuery query(outputDb);
-    query.prepare("PRAGMA synchronous=OFF");
-    query.exec();
-    query.prepare("CREATE TABLE tracking ( xHead REAL, yHead REAL, tHead REAL, xTail REAL, yTail REAL, tTail REAL, xBody REAL, yBody REAL, tBody REAL, curvature REAL, areaBody REAL, perimeterBody REAL, headMajorAxisLength REAL, headMinorAxisLength REAL, headExcentricity REAL, tailMajorAxisLength REAL, tailMinorAxisLength REAL, tailExcentricity REAL, bodyMajorAxisLength REAL, bodyMinorAxisLength REAL, bodyExcentricity REAL, imageNumber INTEGER, id INTEGER)");
-    query.exec();
+    query.exec("PRAGMA synchronous=OFF");
+    query.exec("CREATE TABLE tracking ( xHead REAL, yHead REAL, tHead REAL, xTail REAL, yTail REAL, tTail REAL, xBody REAL, yBody REAL, tBody REAL, curvature REAL, areaBody REAL, perimeterBody REAL, headMajorAxisLength REAL, headMinorAxisLength REAL, headExcentricity REAL, tailMajorAxisLength REAL, tailMinorAxisLength REAL, tailExcentricity REAL, bodyMajorAxisLength REAL, bodyMinorAxisLength REAL, bodyExcentricity REAL, imageNumber INTEGER, id INTEGER)");
 
     m_logFile.setFileName(m_savingPath + "log");
     if (!m_logFile.open(QFile::WriteOnly | QFile::Text)) {
-      QMessageBox msgBox;
-      msgBox.setText("Permission denied to write in the folder");
-      msgBox.exec();
+      throw std::runtime_error("Can't write log to the disk!");
     }
     else {
       connect(this, &Tracking::forceFinished, [this](QString message) {
@@ -967,6 +961,9 @@ void Tracking::startProcess() {
     connect(this, &Tracking::finishedProcessFrame, this, &Tracking::imageProcessing);
 
     emit(finishedProcessFrame());
+  }
+  catch (const std::runtime_error &e) {
+    emit(forceFinished(QString::fromStdString(e.what())));
   }
   catch (...) {
     emit(forceFinished("Fatal error, tracking initialization failed"));
@@ -1018,12 +1015,10 @@ Tracking::~Tracking() {
  * @param[in] path The path to a folder where to write the text file.
  * @param[in] db The database where tracking results are stored already opened.
  */
-void Tracking::exportTrackingResult(QString path, QSqlDatabase db) {
+bool Tracking::exportTrackingResult(QString path, QSqlDatabase db) {
   QFile outputFile(path + "/tracking.txt");
   if (!outputFile.open(QFile::WriteOnly | QFile::Text)) {
-    // QMessageBox msgBox;
-    // msgBox.setText("Permission denied to write in the folder");
-    // msgBox.exec();
+    return false;
   }
 
   QTextStream savefile;
@@ -1031,7 +1026,7 @@ void Tracking::exportTrackingResult(QString path, QSqlDatabase db) {
   savefile << "xHead" << '\t' << "yHead" << '\t' << "tHead" << '\t' << "xTail" << '\t' << "yTail" << '\t' << "tTail" << '\t' << "xBody" << '\t' << "yBody" << '\t' << "tBody" << '\t' << "curvature" << '\t' << "areaBody" << '\t' << "perimeterBody" << '\t' << "headMajorAxisLength" << '\t' << "headMinorAxisLength" << '\t' << "headExcentricity" << '\t' << "tailMajorAxisLength" << '\t' << "tailMinorAxisLength" << '\t' << "tailExcentricity" << '\t' << "bodyMajorAxisLength" << '\t' << "bodyMinorAxisLength" << '\t' << "bodyExcentricity" << '\t' << "imageNumber" << '\t' << "id"
            << "\n";
   QSqlQuery query(db);
-  query.prepare("SELECT * FROM tracking");
+  query.prepare("SELECT xHead, yHead, tHead, xTail, yTail, tTail, xBody, yBody, tBody, curvature, areaBody, perimeterBody, headMajorAxisLength, headMinorAxisLength, headExcentricity, tailMajorAxisLength, tailMinorAxisLength, tailExcentricity, bodyMajorAxisLength, bodyMinorAxisLength, bodyExcentricity, imageNumber, id FROM tracking");
   query.exec();
   while (query.next()) {
     int size = 23;
@@ -1045,4 +1040,5 @@ void Tracking::exportTrackingResult(QString path, QSqlDatabase db) {
   }
   savefile.flush();
   outputFile.close();
+  return true;
 }

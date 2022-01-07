@@ -30,10 +30,8 @@ This file is part of Fast Track.
 #include <QFileInfo>
 #include <QList>
 #include <QMap>
-#include <QMessageBox>
 #include <QObject>
 #include <QSqlDatabase>
-#include <QSqlError>
 #include <QSqlQuery>
 #include <QString>
 #include <QTextStream>
@@ -49,6 +47,7 @@ This file is part of Fast Track.
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/video/tracking.hpp>
+#include <stdexcept>
 #include <string>
 #include <tuple>
 #include <utility>
@@ -131,7 +130,7 @@ class Tracking : public QObject {
   void cleaning(const vector<int> &occluded, vector<int> &lostCounter, vector<int> &id, vector<vector<Point3d>> &input, double param_maximalTime) const;
   vector<Point3d> prevision(vector<Point3d> past, vector<Point3d> present) const;
   vector<int> findOcclusion(vector<int> assignment) const;
-  static void exportTrackingResult(QString path, QSqlDatabase db);
+  static bool exportTrackingResult(QString path, QSqlDatabase db);
 
   UMat m_binaryFrame;                /*!< Binary image CV_8U */
   UMat m_visuFrame;                  /*!< Image 8 bit CV_8U */
@@ -170,11 +169,6 @@ class Tracking : public QObject {
    * @brief Emitted when a crash occurs during the analysis.
    */
   void forceFinished(QString message) const;
-
-  /**
-   * @brief Emitted when an error occurs.
-   */
-  void error(int code) const;
 
   /**
    * @brief Emitted at the end of the analysis.
