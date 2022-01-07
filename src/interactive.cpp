@@ -524,6 +524,7 @@ void Interactive::openFolder() {
 
   // Resets the ui
   ui->display->clear();
+  video->release();
   replay->clear();
   ui->backgroundProgressBar->setValue(0);
   ui->isBin->setCheckable(false);
