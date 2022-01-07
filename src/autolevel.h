@@ -17,6 +17,7 @@ This file is part of Fast Track.
 #ifndef AUTOLEVEL_H
 #define AUTOLEVEL_H
 
+#include <QHash>
 #include <QMap>
 #include <algorithm>
 #include <functional>

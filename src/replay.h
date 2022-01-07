@@ -30,6 +30,7 @@ This file is part of Fast Track.
 #include <QFile>
 #include <QFileDialog>
 #include <QFileInfo>
+#include <QHash>
 #include <QImage>
 #include <QLCDNumber>
 #include <QLabel>

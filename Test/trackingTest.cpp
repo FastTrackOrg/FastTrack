@@ -1,3 +1,4 @@
+#include <QHash>
 #include <QMap>
 #include <filesystem>
 #include <string>
@@ -721,15 +722,31 @@ TEST_F(AutoLevelTest, AutoLevelStd) {
 
 TEST_F(DataTest, getData) {
   Data data("../dataSet/images/Groundtruth/Tracking_Result/");
-  QMap<QString, double> test = data.getData(2, 12);
+  QHash<QString, double> test = data.getData(2, 12);
   EXPECT_EQ(test.value("xHead"), 506.779);
   test = data.getData(198, 3);
   EXPECT_EQ(test.value("yHead"), 25.838);
 }
 
+TEST_F(DataTest, getData2) {
+  Data data("../dataSet/images/Groundtruth/Tracking_Result/");
+  QList<QHash<QString, double>> test = data.getData(2);
+  for (const auto &a : test) {
+    if (a.value("id") == 12) {
+      EXPECT_EQ(a.value("xHead"), 506.779);
+    }
+  }
+  test = data.getData(198);
+  for (const auto &a : test) {
+    if (a.value("id") == 3) {
+      EXPECT_EQ(a.value("yHead"), 25.838);
+    }
+  }
+}
+
 TEST_F(DataTest, getDataId) {
   Data data("../dataSet/images/Groundtruth/Tracking_Result/");
-  QMap<QString, QList<double>> test = data.getDataId(12);
+  QHash<QString, QList<double>> test = data.getDataId(12);
   EXPECT_EQ(test.value("xHead")[2], 506.779);
   EXPECT_EQ(test.value("xHead")[3], 512.988);
   EXPECT_EQ(test.value("xHead")[4], 512.512);
@@ -739,15 +756,15 @@ TEST_F(DataTest, getDataId) {
 TEST_F(DataTest, swapData) {
   fs::copy("../dataSet/images/Groundtruth/Tracking_Result/", "../dataSet/images/Groundtruth/Tracking_Result_Copy/", fs::copy_options::overwrite_existing | fs::copy_options::recursive);
   Data data("../dataSet/images/Groundtruth/Tracking_Result_Copy/");
-  QMap<QString, double> a_prev = data.getData(2, 12);
-  QMap<QString, double> b_prev = data.getData(2, 11);
-  QMap<QString, double> a_next = data.getData(180, 12);
-  QMap<QString, double> b_next = data.getData(180, 11);
+  QHash<QString, double> a_prev = data.getData(2, 12);
+  QHash<QString, double> b_prev = data.getData(2, 11);
+  QHash<QString, double> a_next = data.getData(180, 12);
+  QHash<QString, double> b_next = data.getData(180, 11);
   data.swapData(12, 11, 5);
-  QMap<QString, double> a_prev_test = data.getData(2, 12);
-  QMap<QString, double> b_prev_test = data.getData(2, 11);
-  QMap<QString, double> a_next_test = data.getData(180, 12);
-  QMap<QString, double> b_next_test = data.getData(180, 11);
+  QHash<QString, double> a_prev_test = data.getData(2, 12);
+  QHash<QString, double> b_prev_test = data.getData(2, 11);
+  QHash<QString, double> a_next_test = data.getData(180, 12);
+  QHash<QString, double> b_next_test = data.getData(180, 11);
   EXPECT_EQ(a_prev, a_prev_test);
   EXPECT_EQ(b_prev, b_prev_test);
   EXPECT_EQ(b_next.remove("id"), a_next_test.remove("id"));
@@ -756,14 +773,14 @@ TEST_F(DataTest, swapData) {
 
 TEST_F(DataTest, deleteInsertData) {
   Data data("../dataSet/images/Groundtruth/Tracking_Result_Copy/");
-  QMap<QString, double> a_prev = data.getData(2, 12);
-  QMap<QString, double> a_mid = data.getData(60, 12);
-  QMap<QString, double> a_next = data.getData(100, 12);
+  QHash<QString, double> a_prev = data.getData(2, 12);
+  QHash<QString, double> a_mid = data.getData(60, 12);
+  QHash<QString, double> a_next = data.getData(100, 12);
   data.deleteData(12, 40, 80);
-  QMap<QString, double> a_prev_test = data.getData(2, 12);
-  QMap<QString, double> a_mid_test = data.getData(60, 12);
-  QMap<QString, double> a_next_test = data.getData(100, 12);
-  QMap<QString, double> err;
+  QHash<QString, double> a_prev_test = data.getData(2, 12);
+  QHash<QString, double> a_mid_test = data.getData(60, 12);
+  QHash<QString, double> a_next_test = data.getData(100, 12);
+  QHash<QString, double> err;
   err.insert("NAN", -1);
   EXPECT_EQ(a_prev, a_prev_test);
   EXPECT_NE(a_mid, err);

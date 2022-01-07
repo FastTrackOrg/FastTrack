@@ -93,9 +93,9 @@ Data::Data() {
  * @brief Get the tracking data at the selected image number for one selected object.
  * @param[in] imageIndex The index of the image where to extracts the data.
  * @param[in] id The id of the object.
- * @return The tracking data for for the selected object at the selected image. The data are stored in a QMap<dataName, value>.
+ * @return The tracking data for the selected object at the selected image. The data are stored in a QHash<dataName, value>.
  */
-QMap<QString, double> Data::getData(int imageIndex, int id) const {
+QHash<QString, double> Data::getData(int imageIndex, int id) const {
   QSqlDatabase data = QSqlDatabase::database("data", false);
   QSqlQuery query(data);
   query.prepare("SELECT * FROM tracking WHERE imageNumber = ? AND id = ?");
@@ -104,15 +104,37 @@ QMap<QString, double> Data::getData(int imageIndex, int id) const {
   query.exec();
   QSqlRecord rec = query.record();
   if (query.first()) {
-    QMap<QString, double> tmp;
+    QHash<QString, double> tmp;
     for (int i = 0; i < rec.count(); i++) {
       tmp.insert(rec.fieldName(i), query.value(i).toDouble());
     }
     return tmp;
   }
-  QMap<QString, double> tmp;
+  QHash<QString, double> tmp;
   tmp.insert("NAN", -1);
   return tmp;
+}
+/**
+ * @brief Get the tracking data at the selected image number/
+ * @param[in] imageIndex The index of the image where to extracts the data.
+ * @return The tracking data at the selected image. The data are stored in a QList<QHash<dataName, value>>.
+ */
+QList<QHash<QString, double>> Data::getData(int imageIndex) const {
+  QList<QHash<QString, double>> dataImage;
+  QSqlDatabase data = QSqlDatabase::database("data", false);
+  QSqlQuery query(data);
+  query.prepare("SELECT * FROM tracking WHERE imageNumber = ?");
+  query.addBindValue(imageIndex);
+  query.exec();
+  QSqlRecord rec = query.record();
+  while (query.next()) {
+    QHash<QString, double> tmp;
+    for (int i = 0; i < rec.count(); i++) {
+      tmp.insert(rec.fieldName(i), query.value(i).toDouble());
+    }
+    dataImage.append(tmp);
+  }
+  return dataImage;
 }
 
 /**
@@ -120,14 +142,14 @@ QMap<QString, double> Data::getData(int imageIndex, int id) const {
  * @param[in] id The id of the object.
  * @return The tracking data for for the selected object in a map with the key and a vector with the value for all the images.
  */
-QMap<QString, QList<double>> Data::getDataId(int id) const {
+QHash<QString, QList<double>> Data::getDataId(int id) const {
   QSqlDatabase data = QSqlDatabase::database("data", false);
   QSqlQuery query(data);
   query.prepare("SELECT xHead, yHead, tHead, xTail, yTail, tTail, xBody, yBody, tBody, curvature, areaBody, perimeterBody, headMajorAxisLength, headMinorAxisLength, headExcentricity, tailMajorAxisLength, tailMinorAxisLength, tailExcentricity, bodyMajorAxisLength, bodyMinorAxisLength, bodyExcentricity, imageNumber, id FROM tracking WHERE id = ?");
   query.addBindValue(id);
   query.exec();
   QSqlRecord rec = query.record();
-  QMap<QString, QList<double>> idData;
+  QHash<QString, QList<double>> idData;
   for (int i = 0; i < rec.count(); i++) {
     idData.insert(rec.fieldName(i), {});
   }
@@ -147,7 +169,7 @@ QMap<QString, QList<double>> Data::getDataId(int id) const {
 QList<int> Data::getId(int imageIndex) const {
   QSqlDatabase data = QSqlDatabase::database("data", false);
   QSqlQuery query(data);
-  query.prepare("SELECT id FROM tracking where imageNumber = ?");
+  query.prepare("SELECT id FROM tracking where imageNumber = ? ORDER BY id");
   query.addBindValue(imageIndex);
   query.exec();
   QList<int> ids;

@@ -139,7 +139,7 @@ double AutoLevel::computeStdAngle(const Data &data) {
   QList<double> angle;
   QList<int> ids = data.getId(0, data.maxFrameIndex);
   for (const int &a : ids) {
-    QMap<QString, QList<double>> i = data.getDataId(a);
+    QHash<QString, QList<double>> i = data.getDataId(a);
     QList<double> angleDiff(i.value("t" + m_spotSuffix).size());
     QList<double> ang = i.value("t" + m_spotSuffix);
     std::adjacent_difference(ang.begin(), ang.end(), angleDiff.begin(), [](double a, double b) { return Tracking::angleDifference(b, a); });
@@ -162,7 +162,7 @@ double AutoLevel::computeStdDistance(const Data &data) {
   QList<double> distance;
   QList<int> ids = data.getId(0, data.maxFrameIndex);
   for (const int &a : ids) {
-    QMap<QString, QList<double>> i = data.getDataId(a);
+    QHash<QString, QList<double>> i = data.getDataId(a);
     QList<double> xDiff(i.value("x" + m_spotSuffix).size());
     QList<double> x = i.value("x" + m_spotSuffix);
     std::adjacent_difference(x.begin(), x.end(), xDiff.begin());
@@ -190,7 +190,7 @@ double AutoLevel::computeStdArea(const Data &data) {
   QList<double> area;
   QList<int> ids = data.getId(0, data.maxFrameIndex);
   for (const int &a : ids) {
-    QMap<QString, QList<double>> i = data.getDataId(a);
+    QHash<QString, QList<double>> i = data.getDataId(a);
     QList<double> areaDiff(i.value("areaBody").size());
     QList<double> ar = i.value("areaBody");
     std::adjacent_difference(ar.begin(), ar.end(), areaDiff.begin());
@@ -209,7 +209,7 @@ double AutoLevel::computeStdPerimeter(const Data &data) {
   QList<double> perimeter;
   QList<int> ids = data.getId(0, data.maxFrameIndex);
   for (const int &a : ids) {
-    QMap<QString, QList<double>> i = data.getDataId(a);
+    QHash<QString, QList<double>> i = data.getDataId(a);
     QList<double> perimDiff(i.value("perimeterBody").size());
     QList<double> perim = i.value("perimeterBody");
     std::adjacent_difference(perim.begin(), perim.end(), perimDiff.begin());

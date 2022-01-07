@@ -5,6 +5,7 @@
 #include <QDebug>
 #include <QDir>
 #include <QFile>
+#include <QHash>
 #include <QMap>
 #include <QMapIterator>
 #include <QMessageBox>
@@ -33,8 +34,9 @@ class Data {
   ~Data();
 
   bool setPath(const QString &dataPath);
-  QMap<QString, double> getData(int imageIndex, int id) const;
-  QMap<QString, QList<double>> getDataId(int id) const;
+  QHash<QString, double> getData(int imageIndex, int id) const;
+  QList<QHash<QString, double>> getData(int imageIndex) const;
+  QHash<QString, QList<double>> getDataId(int id) const;
   QList<int> getId(int imageIndex) const;
   QList<int> getId(int imageIndexFirst, int imageIndexLast) const;
   int getObjectInformation(int objectId) const;

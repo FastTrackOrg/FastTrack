@@ -505,11 +505,9 @@ void Replay::loadFrame(int frameIndex) {
   if (!trackingData->isEmpty) {
     // Takes the tracking data corresponding to the replayed frame and parse data to display
     int scale = ui->replaySize->value();
-    QList<int> idList = trackingData->getId(frameIndex);
-    std::sort(idList.begin(), idList.end());
-    for (auto const& a : idList) {
-      QMap<QString, double> coordinate = trackingData->getData(frameIndex, a);
-      int id = a;
+    QList<QHash<QString, double>> dataImage = trackingData->getData(frameIndex);
+    for (const QHash<QString, double>& coordinate : dataImage) {
+      int id = coordinate.value("id");
 
       object1Replay->addItem(QString::number(id));
 
@@ -563,7 +561,7 @@ void Replay::loadFrame(int frameIndex) {
         vector<Point> memory;
         for (int j = frameIndex - ui->replayTraceLength->value(); j < frameIndex; j++) {
           if (j > 0) {
-            QMap<QString, double> coordinate = trackingData->getData(j, a);
+            QHash<QString, double> coordinate = trackingData->getData(j, id);
             if (coordinate.contains("xBody")) {
               memory.push_back(Point(static_cast<int>(coordinate.value("xBody")), static_cast<int>(coordinate.value("yBody"))));
             }
@@ -632,7 +630,7 @@ bool Replay::eventFilter(QObject* target, QEvent* event) {
         if (!idList.isEmpty()) {
           QList<double> distance;
           for (auto const& a : idList) {
-            QMap<QString, double> coordinate = trackingData->getData(frameIndex, a);
+            QHash<QString, double> coordinate = trackingData->getData(frameIndex, a);
             distance.append(pow(coordinate.value("xBody") - xTop, 2) + pow(coordinate.value("yBody") - yTop, 2));
           }
 
@@ -716,7 +714,7 @@ bool Replay::eventFilter(QObject* target, QEvent* event) {
  * @param[in] table Pointer to a QTableWidget where to display the data.
  */
 void Replay::updateInformation(int objectId, int imageIndex, QTableWidget* table) {
-  QMap<QString, double> infoData = trackingData->getData(imageIndex, objectId);
+  QHash<QString, double> infoData = trackingData->getData(imageIndex, objectId);
   table->item(0, 0)->setText(QString::number(objectId));
   table->item(1, 0)->setText(QString::number(trackingData->getObjectInformation(objectId)));
   table->item(2, 0)->setText(QString::number(infoData.value("areaBody")));
@@ -781,7 +779,7 @@ void Replay::saveTrackedMovie() {
       // Takes the tracking data corresponding to the replayed frame and parse data to display
       QList<int> idList = trackingData->getId(frameIndex);
       for (auto const& a : idList) {
-        QMap<QString, double> coordinate = trackingData->getData(frameIndex, a);
+        QHash<QString, double> coordinate = trackingData->getData(frameIndex, a);
         int id = a;
 
         object1Replay->addItem(QString::number(id));
@@ -837,7 +835,7 @@ void Replay::saveTrackedMovie() {
           vector<Point> memory;
           for (int j = frameIndex - ui->replayTraceLength->value(); j < frameIndex; j++) {
             if (j > 0) {
-              QMap<QString, double> coordinate = trackingData->getData(j, a);
+              QHash<QString, double> coordinate = trackingData->getData(j, a);
               if (coordinate.contains("xBody")) {
                 memory.push_back(Point(static_cast<int>(coordinate.value("xBody")), static_cast<int>(coordinate.value("yBody"))));
               }

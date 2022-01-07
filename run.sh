@@ -30,7 +30,7 @@ if [ "$1" = "profile" ]; then
   make
   make check
   src/build/fasttrack
-  gprof build/FastTrack build/gmon.out > profiling.txt
+  gprof src/build/fasttrack src/build/gmon.out > profiling.txt
 fi
 
 if [ "$1" = "ci" ]; then
