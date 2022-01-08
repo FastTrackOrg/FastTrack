@@ -130,7 +130,8 @@ class Tracking : public QObject {
   void cleaning(const vector<int> &occluded, vector<int> &lostCounter, vector<int> &id, vector<vector<Point3d>> &input, double param_maximalTime) const;
   vector<Point3d> prevision(vector<Point3d> past, vector<Point3d> present) const;
   vector<int> findOcclusion(vector<int> assignment) const;
-  static bool exportTrackingResult(QString path, QSqlDatabase db);
+  static bool exportTrackingResult(const QString path, QSqlDatabase db);
+  static bool importTrackingResult(const QString path, QSqlDatabase db);
 
   UMat m_binaryFrame;                /*!< Binary image CV_8U */
   UMat m_visuFrame;                  /*!< Image 8 bit CV_8U */

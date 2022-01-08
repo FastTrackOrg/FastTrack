@@ -57,9 +57,13 @@ bool Data::setPath(const QString &dataPath) {
   dir = dataPath;
 
   QSqlDatabase data = QSqlDatabase::database("data", false);
-  data.setDatabaseName(dataPath + "/tracking.db");
+  bool isDbExist = QFile::exists(dataPath + "/tracking.db");
+  data.setDatabaseName(dataPath + "/tracking.db");  // Open or create the db
   QSqlQuery query(data);
   if (data.open()) {
+    if (!isDbExist) {  // Import tracking.txt in db for retrocompatibility
+      Tracking::importTrackingResult(dataPath, data);
+    }
     query.exec("CREATE TABLE deleted ( xHead REAL, yHead REAL, tHead REAL, xTail REAL, yTail REAL, tTail REAL, xBody REAL, yBody REAL, tBody REAL, curvature REAL, areaBody REAL, perimeterBody REAL, headMajorAxisLength REAL, headMinorAxisLength REAL, headExcentricity REAL, tailMajorAxisLength REAL, tailMinorAxisLength REAL, tailExcentricity REAL, bodyMajorAxisLength REAL, bodyMinorAxisLength REAL, bodyExcentricity REAL, imageNumber INTEGER, id INTEGER)");
     query.exec("SELECT MAX(imageNumber), MAX(id) FROM tracking");
     if (query.first()) {

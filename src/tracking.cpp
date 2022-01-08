@@ -1022,7 +1022,7 @@ Tracking::~Tracking() {
  * @param[in] path The path to a folder where to write the text file.
  * @param[in] db The database where tracking results are stored already opened.
  */
-bool Tracking::exportTrackingResult(QString path, QSqlDatabase db) {
+bool Tracking::exportTrackingResult(const QString path, QSqlDatabase db) {
   QFile outputFile(path + "/tracking.txt");
   if (!outputFile.open(QFile::WriteOnly | QFile::Text)) {
     return false;
@@ -1047,5 +1047,39 @@ bool Tracking::exportTrackingResult(QString path, QSqlDatabase db) {
   }
   savefile.flush();
   outputFile.close();
+  return true;
+}
+
+/**
+ * @brief Imports the tracking data from a text file to the database.
+ * @param[in] path The path to a folder where to write the text file.
+ * @param[in] db The database where tracking results are stored already opened.
+ */
+bool Tracking::importTrackingResult(const QString path, QSqlDatabase db) {
+  QFile file(path + "/tracking.txt");
+  if (!file.open(QFile::ReadOnly | QFile::Text)) {
+    return false;
+  }
+
+  db.transaction();
+  QSqlQuery query(db);
+  query.exec("CREATE TABLE tracking ( xHead REAL, yHead REAL, tHead REAL, xTail REAL, yTail REAL, tTail REAL, xBody REAL, yBody REAL, tBody REAL, curvature REAL, areaBody REAL, perimeterBody REAL, headMajorAxisLength REAL, headMinorAxisLength REAL, headExcentricity REAL, tailMajorAxisLength REAL, tailMinorAxisLength REAL, tailExcentricity REAL, bodyMajorAxisLength REAL, bodyMinorAxisLength REAL, bodyExcentricity REAL, imageNumber INTEGER, id INTEGER)");
+
+  QTextStream in(&file);
+  QString line;
+  QStringList values;
+  in.readLineInto(&line);  // Ignore header
+  while (in.readLineInto(&line)) {
+    values = line.split("\t", Qt::SkipEmptyParts);
+    query.prepare(
+        "INSERT INTO tracking (xHead, yHead, tHead, xTail, yTail, tTail, xBody, yBody, tBody, curvature, areaBody, perimeterBody, headMajorAxisLength, headMinorAxisLength, headExcentricity, tailMajorAxisLength, tailMinorAxisLength, tailExcentricity, bodyMajorAxisLength, bodyMinorAxisLength, bodyExcentricity, imageNumber, id) "
+        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    for (const auto &a : values) {
+      query.addBindValue(a.toDouble());
+    }
+    query.exec();
+  }
+  db.commit();
+  file.close();
   return true;
 }
