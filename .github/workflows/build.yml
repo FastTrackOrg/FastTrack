@@ -110,6 +110,8 @@ jobs:
           brew install pkg-config
           brew install opencv
           brew install openssl
+          brew unlink unixodbc
+          brew install libiodbc
           export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig/
       - name: build
         run: |
