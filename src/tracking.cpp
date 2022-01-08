@@ -779,7 +779,7 @@ void Tracking::imageProcessing() {
       outputDb.close();
       m_logFile.close();
       emit(forceFinished("Fatal error during the processing of the image " + QString::number(m_im)));
-      break;
+      return;
     }
   }
   // Finished successfully

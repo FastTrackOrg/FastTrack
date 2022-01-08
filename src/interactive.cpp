@@ -486,7 +486,7 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
 
   // Instanciates a default tracking object that will be used to access its public functions in order to perform the interactive tracking
   isBackground = false;
-  tracking = new Tracking("", "");
+  tracking = new Tracking();
   connect(tracking, &Tracking::backgroundProgress, ui->backgroundProgressBar, &QProgressBar::setValue);
   connect(tracking, &Tracking::forceFinished, [this](QString errorMessage) {
     message(errorMessage);
