@@ -493,6 +493,7 @@ void Replay::loadFrame(int frameIndex) {
     return;
   }
 
+  QApplication::setOverrideCursor(Qt::WaitCursor);
   currentIndex = frameIndex;
   object1Replay->clear();
 
@@ -578,6 +579,7 @@ void Replay::loadFrame(int frameIndex) {
   ui->replayDisplay->setPixmap(resizedPix);
   resizedFrame.setWidth(resizedPix.width());
   resizedFrame.setHeight(resizedPix.height());
+  qApp->restoreOverrideCursor();
 }
 
 /**
