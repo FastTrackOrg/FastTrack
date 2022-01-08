@@ -6,6 +6,7 @@ sidebar_label: Tracking Result
 
 After a tracking analysis (or an analysis preview), FastTrack saves several files inside the **Tracking_Result** folder located inside the image sequence folder or inside the **Tracking_Result_VideoFileName** for a video file:
 
+* *tracking.db*: the tracking result as a Sqlite database
 * *tracking.txt*: the tracking result
 * *annotation.txt*: the annotation
 * *background.pgm*: the background image
@@ -36,19 +37,42 @@ Positions are in pixels, in the frame of reference of the original image, zero i
 
 ## Data analysis
 
-The tracking file can be opened for subsequent analysis:
+The tracking.txt file can be opened for subsequent analysis:
 ```python
 # Python
+import pandas
+
 data = pandas.read_csv("tracking.txt", sep='\t')
 ```
 
 ```julia
 # Julia
 using CSV
-CSV.read("tracking.txt", delim='\t')
+using DataFrames
+
+data = CSV.read("tracking.txt", delim='\t', DataFrame)
 ```
 
 ```R
 # R
 read.csv("tracking.txt", header=T sep="\t")
+```
+
+The tracking.db file can be opened for subsequent analysis:
+```python
+# Python
+import pandas
+import sqlite3
+
+con = sqlite3.connect("tracking.db")
+data = pandas.read_sql_query("SELECT * from tracking", con)
+
+```
+
+```julia
+# Julia
+using SQLite, DataFrames
+
+db = SQLite.DB("tracking.db")
+df = DataFrame(SQLite.Source(db, "SELECT * FROM tracking;"))
 ```
