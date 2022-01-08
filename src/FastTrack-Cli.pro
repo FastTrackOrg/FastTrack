@@ -4,6 +4,7 @@ TARGET = fasttrack-cli
 TEMPLATE = app
 VERSION = 6.0.1
 DEFINES += APP_VERSION=\\\"$$VERSION\\\"
+QTPLUGIN += QSQLITE
 
 unix:!macx {
   DESTDIR=build_cli

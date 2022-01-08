@@ -39,7 +39,7 @@ jobs:
           cp ../sh.fasttrack.fasttrack.desktop .
           cp ../src/assets/fasttrack.png .
           export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${{ github.workspace }}/Qt/6.2.1/gcc_64/lib/
-          ./deploy.AppImage fasttrack -appimage -no-translations -bundle-non-qt-libs -unsupported-allow-new-glibc -qmake=${{ github.workspace }}/Qt/6.2.1/gcc_64/bin/qmake6 -extra-plugins=platforms/
+          ./deploy.AppImage fasttrack -appimage -no-translations -bundle-non-qt-libs -unsupported-allow-new-glibc -qmake=${{ github.workspace }}/Qt/6.2.1/gcc_64/bin/qmake6 -extra-plugins=platforms/,sqldrivers/
           mv FastTrack*.AppImage FastTrack-x86_64.AppImage
       - name: Linux artefact
         uses: actions/upload-artifact@v1
