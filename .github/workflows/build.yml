@@ -33,19 +33,18 @@ jobs:
           make clean
       - name: appimage
         run: |
-          cd build
           wget -O deploy.AppImage https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage
           chmod +x deploy.AppImage
-          cp ../sh.fasttrack.fasttrack.desktop .
-          cp ../src/assets/fasttrack.png .
+          cp sh.fasttrack.fasttrack.desktop build/
+          cp src/assets/fasttrack.png build/
           export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${{ github.workspace }}/Qt/6.2.1/gcc_64/lib/
-          ./deploy.AppImage fasttrack -appimage -no-translations -bundle-non-qt-libs -unsupported-allow-new-glibc -qmake=${{ github.workspace }}/Qt/6.2.1/gcc_64/bin/qmake6 -extra-plugins=platforms/,sqldrivers/
+          ./deploy.AppImage build/fasttrack -appimage -no-translations -bundle-non-qt-libs -unsupported-allow-new-glibc -qmake=${{ github.workspace }}/Qt/6.2.1/gcc_64/bin/qmake6 -extra-plugins=platforms/,sqldrivers/ -exclude-libs=libgmodule-2.0.so
           mv FastTrack*.AppImage FastTrack-x86_64.AppImage
       - name: Linux artefact
         uses: actions/upload-artifact@v1
         with:
           name: FastTrackLinux
-          path: ./build/FastTrack-x86_64.AppImage
+          path: ./FastTrack-x86_64.AppImage
   job_2:
     runs-on: windows-latest
     steps:
