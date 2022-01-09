@@ -1,5 +1,16 @@
 # FastTrack changelog
 
+## 6.1.0
+
+### Changed
+- Changed the backend from text files to SQlite database
+- Refactored Data, Tracking and Replay class to optimize memory consumption
+
+### Fixed
+- Stop the tracking immediately if a fatal error is encountered
+- Fixed AppImage for non-ubuntu based linux distribution
+
+
 ## 6.0.1
 
 ### Changed

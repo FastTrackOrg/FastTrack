@@ -2,7 +2,7 @@ greaterThan(QT_MAJOR_VERSION, 5): QT += widgets core gui sql
 
 TARGET = fasttrack-cli
 TEMPLATE = app
-VERSION = 6.0.1
+VERSION = 6.1.0
 DEFINES += APP_VERSION=\\\"$$VERSION\\\"
 QTPLUGIN += QSQLITE
 
