@@ -85,12 +85,12 @@ jobs:
           copy C:\Windows\System32\vccorlib140.dll .
           copy C:\Windows\System32\libcrypto-1_1-x64.dll .
           copy C:\Windows\System32\libssl-1_1-x64.dll .
-          7z a C:\FastTrack.zip *
+          7z a FastTrack.zip *
       - name: Windows artefact
         uses: actions/upload-artifact@v1
         with:
           name: FastTrackWindows
-          path: C:/FastTrack.zip
+          path: src/release/FastTrack.zip
   job_3:
     runs-on: macos-latest
     steps:
