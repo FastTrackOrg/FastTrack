@@ -70,14 +70,14 @@ jobs:
               qmake src/FastTrack-Cli.pro
               make
               cd build_cli/
-              macdeployqt fasttrack-cli.app -always-overwrite
+              macdeployqt FastTrack-cli.app -always-overwrite
               wget https://raw.githubusercontent.com/arl/macdeployqtfix/master/macdeployqtfix.py
               python2.7 macdeployqtfix.py fasttrack_cli.app/Contents/MacOS/fasttrack-cli ../../Qt/6.2.1/
-              hdiutil create -volname fasttrack-cli -srcfolder fasttrack-cli.app -ov -format UDZO fasttrack-cli.dmg
+              hdiutil create -volname FastTrack-cli -srcfolder FastTrack-cli.app -ov -format UDZO FastTrack-cli.dmg
 
 
         - name: Mac artefact
           uses: actions/upload-artifact@v1
           with:
             name: FastTrackMac
-            path: ./build_cli/fasttrack-cli.dmg
+            path: ./build_cli/FastTrack-cli.dmg

@@ -1,12 +1,12 @@
 greaterThan(QT_MAJOR_VERSION, 5): QT += widgets core gui sql
 
-TARGET = fasttrack-cli
 TEMPLATE = app
 VERSION = 6.1.0
 DEFINES += APP_VERSION=\\\"$$VERSION\\\"
 QTPLUGIN += QSQLITE
 
 unix:!macx {
+  TARGET = fasttrack-cli
   DESTDIR=build_cli
   OBJECTS_DIR=build_cli
   MOC_DIR=build_cli
@@ -34,6 +34,7 @@ unix:!macx {
 }
 
 unix:macx {
+  TARGET = FastTrack-cli
   CONFIG += c++17
   QMAKE_CXXFLAGS += -std=c++1z -stdlib=libc++ -mmacosx-version-min=10.15  -O3 -g
   QMAKE_CXXFLAGS_RELEASE -= -O1
