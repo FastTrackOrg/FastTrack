@@ -1,5 +1,10 @@
 # FastTrack changelog
 
+## 6.1.1
+
+### Fixed
+- Fix database connection names crossover (critical)
+
 ## 6.1.0
 
 ### Changed
