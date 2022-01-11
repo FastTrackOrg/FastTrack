@@ -9,6 +9,7 @@
 #include <QMap>
 #include <QMapIterator>
 #include <QMessageBox>
+#include <QRandomGenerator>
 #include <QSqlDatabase>
 #include <QSqlDriver>
 #include <QSqlError>
@@ -33,6 +34,7 @@ class Data {
   Data &operator=(const Data &T) = delete;
   ~Data();
 
+  const QString connectionName;
   bool setPath(const QString &dataPath);
   QHash<QString, double> getData(int imageIndex, int id) const;
   QList<QHash<QString, double>> getData(int imageIndex) const;

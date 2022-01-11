@@ -31,6 +31,7 @@ This file is part of Fast Track.
 #include <QList>
 #include <QMap>
 #include <QObject>
+#include <QRandomGenerator>
 #include <QSqlDatabase>
 #include <QSqlQuery>
 #include <QString>
@@ -114,6 +115,7 @@ class Tracking : public QObject {
   Tracking &operator=(const Tracking &) = delete;
   ~Tracking();
 
+  const QString connectionName;
   Point2d curvatureCenter(const Point3d &tail, const Point3d &head) const;
   double curvature(Point2d center, const Mat &image) const;
   static double modul(double angle);

@@ -699,7 +699,7 @@ vector<Point3d> Tracking::prevision(vector<Point3d> past, vector<Point3d> presen
  * @brief Processes an image from an images sequence and tracks and matchs objects according to the previous image in the sequence. Takes a new image from the image sequence, substracts the background, binarises the image and crops according to the defined region of interest. Detects all the objects in the image and extracts the object features. Then matches detected objects with objects from the previous frame. This function emits a signal to display the images in the user interface.
  */
 void Tracking::imageProcessing() {
-  QSqlDatabase outputDb = QSqlDatabase::database("tracking");
+  QSqlDatabase outputDb = QSqlDatabase::database(connectionName);
   while (m_im < m_stopImage) {
     try {
       // Reads the next image in the image sequence and applies the image processing workflow
@@ -807,7 +807,7 @@ void Tracking::imageProcessing() {
  * @param[in] startImage Index of the beginning image.
  * @param[in] stopImage Index of the ending image.
  */
-Tracking::Tracking(string path, string backgroundPath, int startImage, int stopImage) : m_path(path), m_backgroundPath(backgroundPath), m_startImage(startImage), m_stopImage(stopImage) {
+Tracking::Tracking(string path, string backgroundPath, int startImage, int stopImage) : m_path(path), m_backgroundPath(backgroundPath), m_startImage(startImage), m_stopImage(stopImage), connectionName(QString("tracking_%1").arg(QRandomGenerator::global()->generate())) {
   video = new VideoReader(m_path);
 }
 
@@ -818,7 +818,7 @@ Tracking::Tracking(string path, string backgroundPath, int startImage, int stopI
  * @param[in] startImage Index of the beginning image.
  * @param[in] stopImage Index of the ending image.
  */
-Tracking::Tracking(string path, UMat background, int startImage, int stopImage) : m_path(path), m_background(background), m_startImage(startImage), m_stopImage(stopImage) {
+Tracking::Tracking(string path, UMat background, int startImage, int stopImage) : m_path(path), m_background(background), m_startImage(startImage), m_stopImage(stopImage), connectionName(QString("tracking_%1").arg(QRandomGenerator::global()->generate())) {
   video = new VideoReader(m_path);
 }
 
@@ -905,7 +905,7 @@ void Tracking::startProcess() {
     QDir().mkdir(m_savingPath);
     m_savingPath.append(QDir::separator());
 
-    QSqlDatabase outputDb = QSqlDatabase::addDatabase("QSQLITE", "tracking");
+    QSqlDatabase outputDb = QSqlDatabase::addDatabase("QSQLITE", connectionName);
     outputDb.setDatabaseName(m_savingPath + "tracking.db");
     QSqlQuery query(outputDb);
     if (!outputDb.open()) {
@@ -1014,7 +1014,7 @@ void Tracking::updatingParameters(const QMap<QString, QString> &parameterList) {
  */
 Tracking::~Tracking() {
   delete video;
-  QSqlDatabase::removeDatabase("tracking");
+  QSqlDatabase::removeDatabase(connectionName);
 }
 
 /**
