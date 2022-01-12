@@ -209,13 +209,15 @@ bool Tracking::objectDirection(const UMat &image, vector<double> &information) c
 
 /**
   * @brief Computes the background of an image sequence by averaging n images.
-  * @param[in] files List of paths to each image in the images sequence.
+  * @param[in] VideoReader A VideoReader object containing the movie.
   * @param[in] n The number of images to average to computes the background.
   * @param[in] Method 0: minimal projection, 1: maximal projection, 2: average projection.
+  * @param[in] registrationMethod Method of registration.
+  * @param[in] isError Is a least one error as occured during the process.
   * @return The background image.
   TO DO: currently opening all the frames, to speed-up the process and if step is large can skip frames by replacing nextImage by getImage.
 */
-UMat Tracking::backgroundExtraction(VideoReader &video, int n, const int method, const int registrationMethod) const {
+UMat Tracking::backgroundExtraction(VideoReader &video, int n, const int method, const int registrationMethod, bool &isError) {
   int imageCount = video.getImageCount();
   if (n > imageCount) {
     n = imageCount;
@@ -238,12 +240,12 @@ UMat Tracking::backgroundExtraction(VideoReader &video, int n, const int method,
   int step = imageCount / n;
   int count = 1;
   int i = 1;
-  int error = 0;
+  isError = false;
 
   while (i < imageCount) {
     if (i % step == 0) {
       if (!video.getNext(cameraFrameReg)) {
-        error++;
+        isError = true;
         i++;
         continue;
       }
@@ -268,7 +270,6 @@ UMat Tracking::backgroundExtraction(VideoReader &video, int n, const int method,
           cv::max(background, cameraFrameReg, background);
       }
       count++;
-      emit(backgroundProgress(count));
     }
     else {
       video.grab();
@@ -281,9 +282,6 @@ UMat Tracking::backgroundExtraction(VideoReader &video, int n, const int method,
   else {
     background.convertTo(background, CV_8U);
   }
-  if (error > 0) {
-    emit(forceFinished("Background computation error: " + QString::number(error) + " images can not be read. The background was computed ignoring them"));
-  }
   return background;
 }
 
@@ -293,7 +291,7 @@ UMat Tracking::backgroundExtraction(VideoReader &video, int n, const int method,
  * @param[in, out] frame The image to register.
  * @param[in] method The method of registration: 0 = simple (phase correlation), 1 = ECC, 2 = Features based.
  */
-void Tracking::registration(UMat imageReference, UMat &frame, const int method) const {
+void Tracking::registration(UMat imageReference, UMat &frame, const int method) {
   switch (method) {
     // Simple registration by phase correlation
     case 0: {
@@ -380,7 +378,7 @@ void Tracking::registration(UMat imageReference, UMat &frame, const int method) 
  * @param[in] backgroundColor If equals to 'w' the thresholded image will be inverted, if equal to 'b' it will not be inverted.
  * @param[in] value The value at which to threshold the image.
  */
-void Tracking::binarisation(UMat &frame, char backgroundColor, int value) const {
+void Tracking::binarisation(UMat &frame, char backgroundColor, int value) {
   frame.convertTo(frame, CV_8U);
 
   if (backgroundColor == 'b') {
@@ -839,7 +837,9 @@ void Tracking::startProcess() {
     // Loads the background image is provided and check if the image has the correct size
     if (m_background.empty() && m_backgroundPath.empty()) {
       try {
-        m_background = backgroundExtraction(*video, static_cast<int>(param_nBackground), param_methodBackground, param_methodRegistrationBackground);
+        bool isError;
+        m_background = backgroundExtraction(*video, static_cast<int>(param_nBackground), param_methodBackground, param_methodRegistrationBackground, isError);
+        if (isError) emit(forceFinished("Background computation error: several images can not be read. The background was computed ignoring them"));
       }
       catch (...) {
         emit(forceFinished("Fatal error during background computation"));

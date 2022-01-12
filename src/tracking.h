@@ -31,6 +31,7 @@ This file is part of Fast Track.
 #include <QList>
 #include <QMap>
 #include <QObject>
+#include <QProgressBar>
 #include <QRandomGenerator>
 #include <QSqlDatabase>
 #include <QSqlQuery>
@@ -118,20 +119,20 @@ class Tracking : public QObject {
   const QString connectionName;
   Point2d curvatureCenter(const Point3d &tail, const Point3d &head) const;
   double curvature(Point2d center, const Mat &image) const;
-  static double modul(double angle);
   double divide(double a, double b) const;
-  static double angleDifference(double alpha, double beta);
   bool objectDirection(const UMat &image, vector<double> &information) const;
   vector<double> objectInformation(const UMat &image) const;
   vector<Point3d> reassignment(const vector<Point3d> &past, const vector<Point3d> &input, const vector<int> &assignment) const;
-  UMat backgroundExtraction(VideoReader &video, int n, const int method, const int registrationMethod) const;
-  void registration(UMat imageReference, UMat &frame, int method) const;
-  void binarisation(UMat &frame, char backgroundColor, int value) const;
   vector<vector<Point3d>> objectPosition(const UMat &frame, int minSize, int maxSize) const;
   vector<int> costFunc(const vector<vector<Point3d>> &prevPos, const vector<vector<Point3d>> &pos, double LENGHT, double ANGLE, double LO, double AREA, double PERIMETER) const;
   void cleaning(const vector<int> &occluded, vector<int> &lostCounter, vector<int> &id, vector<vector<Point3d>> &input, double param_maximalTime) const;
   vector<Point3d> prevision(vector<Point3d> past, vector<Point3d> present) const;
   vector<int> findOcclusion(vector<int> assignment) const;
+  static double modul(double angle);
+  static double angleDifference(double alpha, double beta);
+  static UMat backgroundExtraction(VideoReader &video, int n, const int method, const int registrationMethod, bool &isError);
+  static void registration(UMat imageReference, UMat &frame, int method);
+  static void binarisation(UMat &frame, char backgroundColor, int value);
   static bool exportTrackingResult(const QString path, QSqlDatabase db);
   static bool importTrackingResult(const QString path, QSqlDatabase db);
 

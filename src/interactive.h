@@ -31,6 +31,7 @@ This file is part of Fast Track.
 #include <QFile>
 #include <QFileDialog>
 #include <QFuture>
+#include <QFutureWatcher>
 #include <QMainWindow>
 #include <QMap>
 #include <QMessageBox>

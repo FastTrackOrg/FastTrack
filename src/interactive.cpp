@@ -484,14 +484,7 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   // Sets information table
   ui->informationTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
-  // Instanciates a default tracking object that will be used to access its public functions in order to perform the interactive tracking
   isBackground = false;
-  tracking = new Tracking();
-  connect(tracking, &Tracking::backgroundProgress, ui->backgroundProgressBar, &QProgressBar::setValue);
-  connect(tracking, &Tracking::forceFinished, [this](QString errorMessage) {
-    message(errorMessage);
-    ui->backgroundProgressBar->setValue(ui->backgroundProgressBar->maximum());
-  });
 
   // Sets a color map
   colorMap.reserve(1000000);
@@ -629,7 +622,7 @@ void Interactive::display(int index, int scale) {
   // Computes the binary image an applies morphological operations
   else if (ui->isBin->isChecked() && isBackground) {
     (ui->backColor->currentText() == "Light background") ? (subtract(background, frame, frame)) : (subtract(frame, background, frame));
-    tracking->binarisation(frame, 'b', ui->threshBox->value());
+    Tracking::binarisation(frame, 'b', ui->threshBox->value());
     if (ui->morphOperation->currentIndex() != 8) {
       Mat element = getStructuringElement(ui->kernelType->currentIndex(), Size(2 * ui->kernelSize->value() + 1, 2 * ui->kernelSize->value() + 1), Point(ui->kernelSize->value(), ui->kernelSize->value()));
       morphologyEx(frame, frame, ui->morphOperation->currentIndex(), element);  // MorphTypes enum and QComboBox indexes have to match
@@ -745,42 +738,68 @@ void Interactive::display(const UMat &image) {
  */
 void Interactive::computeBackground() {
   if (videoStatus) {
+    // Before compute background process
     int nBack = ui->nBack->value();
     int method = ui->back->currentIndex();
     int registrationMethod = ui->registrationBack->currentIndex();
+    ui->backgroundProgressBar->setValue(0);
+    ui->backgroundProgressBar->setMaximum(0);
+    ui->backgroundComputeButton->setEnabled(false);
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+    this->setEnabled(false);
 
-    ui->backgroundProgressBar->setMaximum(nBack);
+    // After compute background process
+    QFutureWatcher<UMat> *watcher = new QFutureWatcher<UMat>();
+    connect(watcher, &QFutureWatcher<UMat>::finished, [this, watcher]() {
+      background = watcher->result();
+      if (!background.empty()) {
+        isBackground = true;
+        ui->isBin->setCheckable(true);
+        ui->isSub->setCheckable(true);
 
-    // Computes the background without blocking the ui
-    QFuture<void> future = QtConcurrent::run([=]() {
-      QApplication::setOverrideCursor(Qt::WaitCursor);
-      try {
-        this->setEnabled(false);
-        background = tracking->backgroundExtraction(*video, nBack, method, registrationMethod);
-      }
-      catch (const std::exception &ex) {
-        message("An error occurs. Please change the registration method");
-      }
-      isBackground = true;
-      ui->isBin->setCheckable(true);
-      ui->isSub->setCheckable(true);
-      this->setEnabled(true);
+        // Automatic background type selection based on the image mean
+        int meanValue = int(mean(background)[0]);
+        if (meanValue > 128) {
+          ui->backColor->setCurrentIndex(0);
+        }
+        else {
+          ui->backColor->setCurrentIndex(1);
+        }
 
-      // Automatic background type selection based on the image mean
-      int meanValue = int(mean(background)[0]);
-      if (meanValue > 128) {
-        ui->backColor->setCurrentIndex(0);
+        ui->interactiveTab->setCurrentIndex(0);
+        ui->previewButton->setDisabled(false);
+        ui->trackButton->setDisabled(false);
+        display(background);
       }
       else {
-        ui->backColor->setCurrentIndex(1);
+        isBackground = false;
+        ui->isBin->setCheckable(false);
+        ui->isSub->setCheckable(false);
+        ui->previewButton->setDisabled(true);
+        ui->trackButton->setDisabled(true);
       }
-
-      ui->interactiveTab->setCurrentIndex(0);
-      display(background);
-      ui->previewButton->setDisabled(false);
-      ui->trackButton->setDisabled(false);
+      ui->backgroundProgressBar->setMaximum(1);
+      ui->backgroundProgressBar->setValue(1);
+      ui->backgroundComputeButton->setDisabled(false);
+      this->setEnabled(true);
       QApplication::restoreOverrideCursor();
+      watcher->deleteLater();
     });
+
+    // Compute background process
+    QFuture<UMat> future = QtConcurrent::run([=]() {
+      UMat background;
+      try {
+        bool isError;
+        background = Tracking::backgroundExtraction(*video, nBack, method, registrationMethod, isError);
+        if (isError) emit(message("Background computation error: several images can not be read. The background was computed ignoring them."));
+      }
+      catch (const std::exception &ex) {
+        emit(message("An error occurs. Please change the registration method"));
+      }
+      return background;
+    });
+    watcher->setFuture(future);
   }
 }
 
