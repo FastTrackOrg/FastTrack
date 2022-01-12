@@ -44,6 +44,19 @@ AutoLevel::AutoLevel(const string &path, const UMat &background, const QMap<QStr
   m_background = background;
   m_parameters = parameters;
   m_endImage = 200;
+  // Save precedent analysis if exist
+  VideoReader video(m_path);
+  QFileInfo savingInfo(QString::fromStdString(m_path));
+  QString savingFilename = savingInfo.baseName();
+  m_savedPath = savingInfo.absolutePath();
+  if (video.isSequence()) {
+    m_savedPath.append(QString("/Tracking_Result"));
+  }
+  else {
+    m_savedPath.append(QString("/Tracking_Result_") + savingFilename);
+  }
+  QDir r;
+  r.rename(m_savedPath, m_savedPath + "tmp");
 }
 
 /**
@@ -53,15 +66,6 @@ AutoLevel::AutoLevel(const string &path, const UMat &background, const QMap<QStr
 QMap<QString, double> AutoLevel::level() {
   try {
     VideoReader video(m_path);
-    QFileInfo savingInfo(QString::fromStdString(m_path));
-    QString savingFilename = savingInfo.baseName();
-    QString directory = savingInfo.absolutePath();
-    if (video.isSequence()) {
-      directory.append(QString("/Tracking_Result") + QDir::separator());
-    }
-    else {
-      directory.append(QString("/Tracking_Result_") + savingFilename + QDir::separator());
-    }
     srand(static_cast<unsigned int>(time(NULL)));
     double stdAngle = static_cast<double>(rand() % 360 + 1);
     double stdDist = static_cast<double>(rand() % 500 + 1);
@@ -86,7 +90,7 @@ QMap<QString, double> AutoLevel::level() {
       Tracking tracking = Tracking(m_path, m_background, 0, m_endImage);
       tracking.updatingParameters(m_parameters);
       tracking.startProcess();
-      Data data(directory);
+      Data data(m_savedPath + QDir::separator());
       stdAngle = 180 * computeStdAngle(data) / M_PI;
       stdDist = computeStdDistance(data);
       stdArea = computeStdArea(data);
@@ -94,7 +98,7 @@ QMap<QString, double> AutoLevel::level() {
       // This construction only work because tracking data are not changed
       // therefore no call to Data.save() are triggered at destruction
       // at out of scope on a non-existing tracking.txt already deleted.
-      QDir(directory).removeRecursively();
+      QDir(m_savedPath).removeRecursively();
       counter++;
       if (counter > 100) {
         throw 0;
@@ -217,4 +221,9 @@ double AutoLevel::computeStdPerimeter(const Data &data) {
     perimeter.append(perimDiff);
   }
   return stdev(perimeter);
+}
+
+AutoLevel::~AutoLevel() {
+  QDir r;
+  r.rename(m_savedPath + "tmp", m_savedPath);
 }

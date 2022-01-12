@@ -1194,6 +1194,7 @@ void Interactive::level() {
       ui->maxL->setValue(levelParameters.value("normDist"));
       ui->normArea->setValue(levelParameters.value("normArea"));
       ui->normPerim->setValue(levelParameters.value("normPerim"));
+      QApplication::restoreOverrideCursor();
     });
     connect(autolevel, &AutoLevel::finished, thread, &QThread::quit);
     connect(autolevel, &AutoLevel::finished, autolevel, &AutoLevel::deleteLater);
@@ -1201,6 +1202,7 @@ void Interactive::level() {
     connect(autolevel, &AutoLevel::forceFinished, autolevel, &AutoLevel::deleteLater);
     connect(thread, &QThread::finished, thread, &QThread::deleteLater);
 
+    QApplication::setOverrideCursor(Qt::WaitCursor);
     thread->start();
     this->setEnabled(false);
   }

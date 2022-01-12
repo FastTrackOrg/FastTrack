@@ -37,6 +37,7 @@ class AutoLevel : public QObject {
   QString m_spotSuffix;                /*!< Spot to track. */
   UMat m_background;                   /*!< Path to video file/image sequence. */
   QMap<QString, QString> m_parameters; /*!< Optimal ending image index. */
+  QString m_savedPath;                 /*!< Old tracking analysis */
 
   double computeStdAngle(const Data &data);
   double computeStdDistance(const Data &data);
@@ -45,6 +46,7 @@ class AutoLevel : public QObject {
 
  public:
   AutoLevel() = default;
+  ~AutoLevel();
   AutoLevel(const string &path, const UMat &background, const QMap<QString, QString> &parameters);
   AutoLevel(const AutoLevel &T) = delete;
   AutoLevel &operator=(const AutoLevel &T) = delete;
