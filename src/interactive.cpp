@@ -614,70 +614,75 @@ void Interactive::display(int index, int scale) {
     return;
   }
 
-  // Computes the image with the background subtracted
-  if (ui->isSub->isChecked() && isBackground) {
-    (ui->backColor->currentText() == "Light background") ? (subtract(background, frame, frame)) : (subtract(frame, background, frame));
-    cvtColor(frame, frame, COLOR_GRAY2RGB);
-  }
-  // Computes the binary image an applies morphological operations
-  else if (ui->isBin->isChecked() && isBackground) {
-    (ui->backColor->currentText() == "Light background") ? (subtract(background, frame, frame)) : (subtract(frame, background, frame));
-    Tracking::binarisation(frame, 'b', ui->threshBox->value());
-    if (ui->morphOperation->currentIndex() != 8) {
-      Mat element = getStructuringElement(ui->kernelType->currentIndex(), Size(2 * ui->kernelSize->value() + 1, 2 * ui->kernelSize->value() + 1), Point(ui->kernelSize->value(), ui->kernelSize->value()));
-      morphologyEx(frame, frame, ui->morphOperation->currentIndex(), element);  // MorphTypes enum and QComboBox indexes have to match
+  try {
+    // Computes the image with the background subtracted
+    if (ui->isSub->isChecked() && isBackground) {
+      (ui->backColor->currentText() == "Light background") ? (subtract(background, frame, frame)) : (subtract(frame, background, frame));
+      cvtColor(frame, frame, COLOR_GRAY2RGB);
+    }
+    // Computes the binary image an applies morphological operations
+    else if (ui->isBin->isChecked() && isBackground) {
+      (ui->backColor->currentText() == "Light background") ? (subtract(background, frame, frame)) : (subtract(frame, background, frame));
+      Tracking::binarisation(frame, 'b', ui->threshBox->value());
+      if (ui->morphOperation->currentIndex() != 8) {
+        Mat element = getStructuringElement(ui->kernelType->currentIndex(), Size(2 * ui->kernelSize->value() + 1, 2 * ui->kernelSize->value() + 1), Point(ui->kernelSize->value(), ui->kernelSize->value()));
+        morphologyEx(frame, frame, ui->morphOperation->currentIndex(), element);  // MorphTypes enum and QComboBox indexes have to match
+      }
+
+      vector<vector<Point>> contours;
+      findContours(frame, contours, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
+
+      double min = ui->minSize->value();
+      double max = ui->maxSize->value();
+
+      // If too many contours are detected to be displayed without slowdowns, ask the user what to do
+      if (contours.size() > 10000) {
+        QMessageBox::StandardButton reply;
+        reply = QMessageBox::question(this, "Confirmation", "Too many objects detected to be displayed. \n Do you want to display them anyway (the program can be slow)? ", QMessageBox::No | QMessageBox::Yes);
+        if (reply == QMessageBox::No) {
+          return;
+        }
+      }
+
+      vector<vector<Point>> displayContours;
+      vector<vector<Point>> rejectedContours;
+      displayContours.reserve(contours.size());
+      rejectedContours.reserve(contours.size());
+      for (auto const &a : contours) {
+        double size = contourArea(a);
+        if (size > min && size < max) {
+          displayContours.push_back(a);
+        }
+        else {
+          rejectedContours.push_back(a);
+        }
+      }
+      cvtColor(frame, frame, COLOR_GRAY2RGB);
+      drawContours(frame, displayContours, -1, Scalar(0, 255, 0), FILLED, 8);
+      drawContours(frame, rejectedContours, -1, Scalar(255, 0, 0), FILLED, 8);
+      counterLabel->setText("Objects detected: " + QString::number(displayContours.size()));
+      counterLabel->adjustSize();
+    }
+    else {
+      cvtColor(frame, frame, COLOR_GRAY2RGB);
     }
 
-    vector<vector<Point>> contours;
-    findContours(frame, contours, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
-
-    double min = ui->minSize->value();
-    double max = ui->maxSize->value();
-
-    // If too many contours are detected to be displayed without slowdowns, ask the user what to do
-    if (contours.size() > 10000) {
-      QMessageBox::StandardButton reply;
-      reply = QMessageBox::question(this, "Confirmation", "Too many objects detected to be displayed. \n Do you want to display them anyway (the program can be slow)? ", QMessageBox::No | QMessageBox::Yes);
-      if (reply == QMessageBox::No) {
-        return;
-      }
+    // Draws the scale
+    if (scale != 0) {
+      line(frame, Point(20, 20), Point(20 + scale, 20), Scalar(255, 0, 0), 2);
     }
 
-    vector<vector<Point>> displayContours;
-    vector<vector<Point>> rejectedContours;
-    displayContours.reserve(contours.size());
-    rejectedContours.reserve(contours.size());
-    for (auto const &a : contours) {
-      double size = contourArea(a);
-      if (size > min && size < max) {
-        displayContours.push_back(a);
-      }
-      else {
-        rejectedContours.push_back(a);
-      }
+    // Crops the image
+    if ((roi.width != 0 || roi.height != 0) && (roi.width != originalImageSize.width() || roi.height != originalImageSize.height())) {
+      frame = frame(roi);
     }
-    cvtColor(frame, frame, COLOR_GRAY2RGB);
-    drawContours(frame, displayContours, -1, Scalar(0, 255, 0), FILLED, 8);
-    drawContours(frame, rejectedContours, -1, Scalar(255, 0, 0), FILLED, 8);
-    counterLabel->setText("Objects detected: " + QString::number(displayContours.size()));
-    counterLabel->adjustSize();
-  }
-  else {
-    cvtColor(frame, frame, COLOR_GRAY2RGB);
-  }
 
-  // Draws the scale
-  if (scale != 0) {
-    line(frame, Point(20, 20), Point(20 + scale, 20), Scalar(255, 0, 0), 2);
+    Mat image = frame.getMat(ACCESS_READ);
+    display(QImage(image.data, image.cols, image.rows, static_cast<int>(image.step), QImage::Format_RGB888));
   }
-
-  // Crops the image
-  if (roi.width != 0 || roi.height != 0) {
-    frame = frame(roi);
+  catch (...) {
+    emit(message(QString("An error occurs on image %1.").arg(index)));
   }
-
-  Mat image = frame.getMat(ACCESS_READ);
-  display(QImage(image.data, image.cols, image.rows, static_cast<int>(image.step), QImage::Format_RGB888));
 }
 
 /**
