@@ -790,12 +790,13 @@ void Interactive::computeBackground() {
     QFuture<UMat> future = QtConcurrent::run([=]() {
       UMat background;
       try {
-        bool isError;
-        background = Tracking::backgroundExtraction(*video, nBack, method, registrationMethod, isError);
-        if (isError) emit(message("Background computation error: several images can not be read. The background was computed ignoring them."));
+        background = Tracking::backgroundExtraction(*video, nBack, method, registrationMethod);
       }
       catch (const std::exception &ex) {
         emit(message("An error occurs. Please change the registration method"));
+      }
+      catch (const std::runtime_error &e) {
+        emit(message(e.what()));
       }
       return background;
     });

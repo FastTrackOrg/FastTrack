@@ -130,7 +130,7 @@ class Tracking : public QObject {
   vector<int> findOcclusion(vector<int> assignment) const;
   static double modul(double angle);
   static double angleDifference(double alpha, double beta);
-  static UMat backgroundExtraction(VideoReader &video, int n, const int method, const int registrationMethod, bool &isError);
+  static UMat backgroundExtraction(VideoReader &video, int n, const int method, const int registrationMethod);
   static void registration(UMat imageReference, UMat &frame, int method);
   static void binarisation(UMat &frame, char backgroundColor, int value);
   static bool exportTrackingResult(const QString path, QSqlDatabase db);

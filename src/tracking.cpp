@@ -217,7 +217,7 @@ bool Tracking::objectDirection(const UMat &image, vector<double> &information) c
   * @return The background image.
   TO DO: currently opening all the frames, to speed-up the process and if step is large can skip frames by replacing nextImage by getImage.
 */
-UMat Tracking::backgroundExtraction(VideoReader &video, int n, const int method, const int registrationMethod, bool &isError) {
+UMat Tracking::backgroundExtraction(VideoReader &video, int n, const int method, const int registrationMethod) {
   int imageCount = video.getImageCount();
   if (n > imageCount) {
     n = imageCount;
@@ -240,12 +240,11 @@ UMat Tracking::backgroundExtraction(VideoReader &video, int n, const int method,
   int step = imageCount / n;
   int count = 1;
   int i = 1;
-  isError = false;
 
   while (i < imageCount) {
     if (i % step == 0) {
       if (!video.getNext(cameraFrameReg)) {
-        isError = true;
+        throw std::runtime_error("Background computation error: image" + std::to_string(i) + " can not be read. The background was computed ignoring them.");
         i++;
         continue;
       }
@@ -826,9 +825,9 @@ Tracking::Tracking(string path, UMat background, int startImage, int stopImage) 
 void Tracking::startProcess() {
   try {
     if (!video->isOpened()) {
-      emit(forceFinished("Fatal error, the video can be opened"));
-      return;
+      throw std::runtime_error("Fatal error, the video can be opened");
     }
+
     timer = new QElapsedTimer();
     timer->start();
     m_im = m_startImage;
@@ -836,15 +835,7 @@ void Tracking::startProcess() {
 
     // Loads the background image is provided and check if the image has the correct size
     if (m_background.empty() && m_backgroundPath.empty()) {
-      try {
-        bool isError;
-        m_background = backgroundExtraction(*video, static_cast<int>(param_nBackground), param_methodBackground, param_methodRegistrationBackground, isError);
-        if (isError) emit(forceFinished("Background computation error: several images can not be read. The background was computed ignoring them"));
-      }
-      catch (...) {
-        emit(forceFinished("Fatal error during background computation"));
-        return;
-      }
+      m_background = backgroundExtraction(*video, static_cast<int>(param_nBackground), param_methodBackground, param_methodRegistrationBackground);
     }
     else if (m_background.empty()) {
       try {
@@ -854,8 +845,7 @@ void Tracking::startProcess() {
         subtract(test, m_background, test);
       }
       catch (...) {
-        emit(forceFinished("Select background image has the wrong size"));
-        return;
+        throw std::runtime_error("Select background image has the wrong size");
       }
     }
 
