@@ -1155,7 +1155,6 @@ void Interactive::reset() {
  */
 Interactive::~Interactive() {
   saveSettings();
-  delete tracking;
   delete video;
   delete ui;
 }
