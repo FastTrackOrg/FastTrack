@@ -2,7 +2,7 @@
 
 if [ "$1" = "release" ]; then
   set -e
-  qmake6 CONFIG+=released FastTrack.pro
+  qmake6 CONFIG+=release FastTrack.pro
   make
   make check
   src/build/fasttrack
@@ -10,7 +10,7 @@ fi
 
 if [ "$1" = "no_web" ]; then
   set -e
-  qmake6 CONFIG+="released NO_WEB" FastTrack.pro
+  qmake6 CONFIG+="release NO_WEB" FastTrack.pro
   make
   make check
   src/build/fasttrack
@@ -35,7 +35,7 @@ fi
 
 if [ "$1" = "ci" ]; then
   set -e
-  qmake6 CONFIG+=released src/FastTrack.pro
+  qmake6 CONFIG+=release src/FastTrack.pro
   make clean
   make
   make clean
@@ -44,7 +44,7 @@ fi
 
 if [ "$1" = "cli" ]; then
   set -e
-  qmake6 CONFIG+=released src/FastTrack-Cli.pro
+  qmake6 CONFIG+=release src/FastTrack-Cli.pro
   make clean
   make
   make clean

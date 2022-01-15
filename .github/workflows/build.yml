@@ -67,7 +67,7 @@ jobs:
         shell: cmd
         run: |
           cd src/
-          qmake FastTrack.pro -spec win32-msvc "CONFIG+=qtquickcompiler"
+          qmake FastTrack.pro -spec win32-msvc CONFIG+=release
           nmake release
           nmake clean
           cd release
@@ -116,7 +116,7 @@ jobs:
           export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig/
       - name: build
         run: |
-          qmake src/FastTrack.pro
+          qmake src/FastTrack.pro CONFIG+=release
           make
           cd build/
           macdeployqt FastTrack.app -always-overwrite

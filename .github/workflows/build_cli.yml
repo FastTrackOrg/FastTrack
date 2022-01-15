@@ -67,7 +67,7 @@ jobs:
               export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig/
         - name: build
           run: |
-              qmake src/FastTrack-Cli.pro
+              qmake CONFIG+=release src/FastTrack-Cli.pro
               make
               cd build_cli/
               macdeployqt FastTrack-cli.app -always-overwrite
