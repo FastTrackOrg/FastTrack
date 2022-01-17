@@ -25,7 +25,7 @@ using namespace std;
 
 /**
  * @class MainWindow
- * 
+ *
  * @brief The MainWindow class is derived from a QMainWindow widget. It displays the main window of the program.
  *
  * @author Benjamin Gallois
@@ -34,11 +34,11 @@ using namespace std;
  *
  * Contact: gallois.benjamin08@gmail.com
  *
-*/
+ */
 
 /**
- * @brief Constructs the MainWindow QObject and initializes the UI. 
-*/
+ * @brief Constructs the MainWindow QObject and initializes the UI.
+ */
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
                                           ui(new Ui::MainWindow) {
   QDir::setCurrent(QCoreApplication::applicationDirPath());
@@ -79,7 +79,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
     stylesheet.close();
   }
 
-#ifndef NO_WEB
   QNetworkAccessManager *manager = new QNetworkAccessManager(this);
   connect(manager, &QNetworkAccessManager::finished, [this](QNetworkReply *reply) {
     if (reply->error() != QNetworkReply::NoError) {
@@ -120,8 +119,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
   });
 
   manager->get(QNetworkRequest(QUrl("https://www.fasttrack.sh/download/FastTrack/platforms.txt")));
-
-#endif
 
   interactive = new Interactive(this);
   ui->tabWidget->addTab(interactive, tr("Interactive tracking"));
@@ -165,8 +162,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 }  // Constructor
 
 /**
-  * @brief Close event reimplemented to ask confirmation before closing.
-*/
+ * @brief Close event reimplemented to ask confirmation before closing.
+ */
 void MainWindow::closeEvent(QCloseEvent *event) {
   QMessageBox msgBox(this);
   msgBox.setTextFormat(Qt::RichText);
@@ -191,16 +188,16 @@ void MainWindow::closeEvent(QCloseEvent *event) {
 }
 
 /**
-  * @brief Changes the software mode.
-  * @param[in] isExpert True if the software is in expert mode with advanced functions.
-*/
+ * @brief Changes the software mode.
+ * @param[in] isExpert True if the software is in expert mode with advanced functions.
+ */
 void MainWindow::setMode(bool isExpert) {
   ui->tabWidget->tabBar()->setVisible(isExpert);
 }
 
 /**
-  * @brief Destructs the MainWindow object and saves the previous set of parameters.
-*/
+ * @brief Destructs the MainWindow object and saves the previous set of parameters.
+ */
 MainWindow::~MainWindow() {
   delete ui;
 }
