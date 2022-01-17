@@ -61,8 +61,8 @@ jobs:
       - name: install opencv
         shell: cmd
         run: |
-          bitsadmin.exe /transfer debjob /download /priority normal https://downloads.sourceforge.net/project/opencvlibrary/4.5.4/opencv-4.5.4-vc14_vc15.exe C:\opencv-4.5.4-vc14_vc15.exe
-          C:\opencv-4.5.4-vc14_vc15.exe -o"C:\" -y
+          bitsadmin.exe /transfer debjob /download /priority normal https://downloads.sourceforge.net/project/opencvlibrary/4.5.5/opencv-4.5.5-vc14_vc15.exe C:\opencv-4.5.5-vc14_vc15.exe
+          C:\opencv-4.5.5-vc14_vc15.exe -o"C:\" -y
       - name: build
         shell: cmd
         run: |
@@ -78,8 +78,8 @@ jobs:
           copy C:\Windows\System32\msvcp140_1.dll .
           copy C:\Windows\System32\msvcp140_2.dll .
           copy C:\Windows\System32\msvcp160.dll .
-          copy C:\opencv\build\x64\vc15\bin\opencv_videoio_ffmpeg454_64.dll .
-          copy C:\opencv\build\x64\vc15\bin\opencv_world454.dll .
+          copy C:\opencv\build\x64\vc15\bin\opencv_videoio_ffmpeg455_64.dll .
+          copy C:\opencv\build\x64\vc15\bin\opencv_world455.dll .
           copy C:\Windows\System32\vcruntime140.dll .
           copy C:\Windows\System32\vcruntime140_1.dll .  
           copy C:\Windows\System32\vccorlib140.dll .
