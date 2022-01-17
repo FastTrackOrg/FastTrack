@@ -25,7 +25,7 @@ jobs:
       - name: install qt6
         run: |
           pip install aqtinstall
-          python3 -m aqt install-qt -m qtwebengine qtwebchannel qtpositioning -O ${{ github.workspace }}/Qt/ linux desktop 6.2.1
+          python3 -m aqt install-qt -O ${{ github.workspace }}/Qt/ linux desktop 6.2.1
           echo ${{ github.workspace }}/Qt/6.2.1/gcc_64/bin/ >> $GITHUB_PATH
       - name: build
         run: |

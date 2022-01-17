@@ -35,7 +35,7 @@ fi
 
 if [ "$1" = "ci" ]; then
   set -e
-  qmake6 CONFIG+=release src/FastTrack.pro
+  qmake6 CONFIG+="release NO_WEB" src/FastTrack.pro
   make clean
   make
   make clean
