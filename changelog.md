@@ -1,9 +1,24 @@
 # FastTrack changelog
 
+## 6.1.2
+
+### Fixed
+- Fixed error handling for corrupted movies
+- Fixed crash when browsing corrupted movies
+- Fixed compilation flags leading to performance improvement
+- Fixed AppImage
+
+### Changed
+- Changed error triggering for corrupted movie. Background computation will stop and triggered a fatal error. 
+- Thread-safe background computation.
+- Update to Qt6.2.2 LTS and OpenCV 4.5.5
+
+
+
 ## 6.1.1
 
 ### Fixed
-- Fix database connection names crossover (critical)
+- Fixed database connection names crossover (critical)
 
 ## 6.1.0
 
@@ -12,7 +27,7 @@
 - Refactored Data, Tracking and Replay class to optimize memory consumption
 
 ### Fixed
-- Stop the tracking immediately if a fatal error is encountered
+- Stoped the tracking immediately if a fatal error is encountered
 - Fixed AppImage for non-ubuntu based linux distribution
 
 
