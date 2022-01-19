@@ -3,79 +3,75 @@
 ## 6.1.2
 
 ### Fixed
-- Fixed error handling for corrupted movies
-- Fixed crash when browsing corrupted movies
-- Fixed compilation flags leading to performance improvement
-- Fixed AppImage
+- Fixed error handling for corrupted movies.
+- Fixed crash when browsing corrupted movies.
+- Fixed compilation flags leading to performance improvement.
+- Fixed AppImage.
 
 ### Changed
-- Changed error triggering for corrupted movie. Background computation will stop and triggered a fatal error. 
+- Changed error triggering for corrupted movies. Background computation will stop and trigger a fatal error. 
 - Thread-safe background computation.
-- Update to Qt6.2.2 LTS and OpenCV 4.5.5
-
-
+- Update to Qt6.2.2 LTS and OpenCV 4.5.5.
 
 ## 6.1.1
 
 ### Fixed
-- Fixed database connection names crossover (critical)
+- Fixed database connection names crossover (critical).
 
 ## 6.1.0
 
 ### Changed
-- Changed the backend from text files to SQlite database
-- Refactored Data, Tracking and Replay class to optimize memory consumption
+- Changed the backend from text files to SQLite database.
+- Refactored Data, Tracking, and Replay class to optimize memory consumption.
 
 ### Fixed
-- Stoped the tracking immediately if a fatal error is encountered
-- Fixed AppImage for non-ubuntu based linux distribution
-
+- Stoped the tracking immediately if a fatal error is encountered.
+- Fixed AppImage for non-ubuntu-based Linux distribution.
 
 ## 6.0.1
 
 ### Changed
-- Remove analytic
-- Update Qt and OpenCV for Windows
+- Remove analytic.
+- Update Qt and OpenCV for Windows.
 
 ### Fixed
-- Fixed icon display in tray
-- Fixed AppImage
-
+- Fixed icon display in the tray.
+- Fixed AppImage.
 
 ## 6.0.0
 
 ### Changed
-- Updated to Qt6
-- Added Expert mode to simplify the ui
+- Updated to Qt6.
+- Added Expert mode to simplify the UI.
 
 ### Fixed
-- Fixed window state at startup
+- Fixed window state at startup.
 
 ## 5.3.5
 
 ### Added
-- Added system tray
+- Added system tray.
 
 ### Fixed
-- Fixed outdated urls
+- Fixed outdated URLs.
 
 ## 5.3.4
 
 ### Added
-- Added TD2 dataset page
+- Added TD2 dataset page.
 
 ### Fix
-- Fixed theme
-- Fixed Linux standardized desktop metainfo and binary
+- Fixed theme.
+- Fixed Linux standardized desktop meta info and binary.
 
 ## 5.3.3
 
 ### Fixed
-- Fixed video sequence opening
-- Fixed documentation tab
+- Fixed video sequence opening.
+- Fixed documentation tab.
 
 ### Added
-- Added FastTrack light version
+- Added FastTrack light version.
 
 ## 5.3.2
 
@@ -83,22 +79,22 @@
 - Performance improvement in tracking data correction.
 
 ### Fixed
-- Fixed annotation
+- Fixed annotation.
 
 ### Added
-- Added waiting cursor at loading.
+- Added waiting for cursor at loading.
 - Added loading of previous analysis.
 
 ## 5.3.1
 
 ### Fixed
 - Fixed memory leaks in Replay.
-- Croped in interactive.
+- Cropped in interactive.
 
 ## 5.3.0
 
 ### Changed
-- Refactored ui with major performance improvement on the display.
+- Refactored UI with major performance improvement on the display.
 - Default style changed.
 - Ui settings file architecture.
 
@@ -109,7 +105,7 @@
 
 ### Fixed
 - ROI loading from cfg file.
-- Fixed crashing when accessing image.
+- Fixed crashing when accessing images.
 - Cleared error when input background image not matching video size.
 
 ## 5.2.3
@@ -172,7 +168,7 @@
 ## 5.1.5
 
 ### Fixed
-- Fixed small ui related crashes.
+- Fixed small UI-related crashes.
 - Fixed ci libstdc AppImage.
 - Fixed zoom.
 
@@ -185,7 +181,7 @@
 ## 5.1.4
 
 ### Fixed
-- Added ffmpeg dependency for Windows release
+- Added FFmpeg dependency for Windows release
 
 ## 5.1.3
 
@@ -228,7 +224,7 @@
 ## 5.0.0
 
 ### Fixed
-- Fixed error of conversion in the inputed angle normalization tracking parameter (breaking retrocompatibility).
+- Fixed error of conversion in the input angle normalization tracking parameter (breaking retro compatibility).
 
 ### Removed
 - Removed deprecated weight tracking parameter (breaking retro-compatibility).
@@ -245,29 +241,29 @@
 ## 4.9.1
 
 ### Changed
-- Changed ui design in the Interactive panel.
+- Changed UI design in the Interactive panel.
 - Performance optimization
-- Added fasttrack-cli (not included in fasttrack-gui release)
+- Added fasttrack-cli (not included in fasttrack-GUI release)
 
 ### Added
 - Added online message display at start-up if necessary
 
 ### Fixed
-- Ui error that crash the program when opening new tracking analysis in the Replay panel.
+- Ui error that crashes the program when opening new tracking analysis in the Replay panel.
 
 ## 4.9.0
 
 ### Added
-- Several error message if input/output can be done.
-- Added tracking annotation, each image of a tracking analysis can be annoted.
+- Several error messages if input/output can be done.
+- Added tracking annotation, each image of a tracking analysis can be annotated.
 - Added object information in the Tracking Inspector.
 - Added the Tracking Manager to log each tracking analysis performed with FastTrack.
 - Added video compatibility.
 - Added 16 bits compatibility.
 
 ### Fixed
-- Fixed some ui inconsistencies.
-- Fixed the list of object displayed in the Tracking Inspector.
+- Fixed some UI inconsistencies.
+- Fixed the list of objects displayed in the Tracking Inspector.
 - Fixed registration method no changing in the batch tracking.
 
 ### Removed
@@ -278,7 +274,7 @@
 ### Fixed
 - Fixed saving error in the Replay panel.
 - Fixed global background not working in the Batch panel.
-- Minor ui fixes.
+- Minor UI fixes.
 
 ### Added
 - Better keyboard shortcut in the Replay Panel.
@@ -289,29 +285,29 @@
 ## 4.8.2
 
 ### Changed
-- Changed Replay panel ui design.
-- Changed Interactive panel ui design.
+- Changed Replay panel UI design.
+- Changed Interactive panel UI design.
 
 ## 4.8.1
 
 ### Changed
 - Old tracking data can be opened in the Replay panel.
-- Changed ui design.
+- Changed UI design.
 
 ## 4.8.0
 
 ### Fixed
 - Id numbering issue.
-- Crop not working properly if the rectangle get out of the image.
+- Crop does not work properly if the rectangle gets out of the image.
 - Fixed crash if tracking data are corrupted in the Replay panel.
 
 ### Changed
-- Changed the id display in the Replay Panel, allowing the user to select any Id int the bottom combo box.
-- New tracking analysis not overwrite the previous but renames the previous one as Tracking_Result_DateOfTheNewAnalysis.
-- An error is triggered if the inputed image background is not openable.
+- Changed the id display in the Replay Panel, allowing the user to select any Id in the bottom combo box.
+- New tracking analysis does not overwrite the previous but renames the previous one as Tracking_Result_DateOfTheNewAnalysis.
+- An error is triggered if the input image background is not openable.
 
 ### Added
-- New registration method: ECC and feature based.
+- New registration method: ECC and feature-based.
 - Undo/redo capabilities in the Replay panel.
 
 ## 4.7.0
@@ -325,7 +321,7 @@
 - Added layout options in the Interactive panel.
 
 ### Changed
--  Batch panel ui.
+-  Batch panel UI.
 
 ## 4.6.1
 
@@ -355,8 +351,8 @@
 ## 4.5.0
 
 ### Added
-- Auto load background image and settings file in the Tracking Inspector.
-- Zoom in the Tracking Inspector and in the Interactive Tracking panels.
+- Autoload background image and settings file in the Tracking Inspector.
+- Zoom in the Tracking Inspector and the Interactive Tracking panels.
 - Delete object in the Tracking Inspector.
 - Added image counter in the Interactive Tracking.
 
@@ -372,8 +368,9 @@
 
 ### Fixed
 - Tracking crash if images are blank.
-- Fixed multiple ui errors.
+- Fixed multiple UI errors.
 - Maximal distance and id assignment in Tracking.
 
 ### Changed
 - Maximal distance in Tracking.
+
