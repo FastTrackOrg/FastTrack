@@ -1,6 +1,6 @@
 # FastTrack
 
- ![Test](https://github.com/bgallois/FastTrack/workflows/Tests/badge.svg) ![Clang Format](https://github.com/bgallois/FastTrack/workflows/Clang%20Format/badge.svg) ![Continous Build](https://github.com/bgallois/FastTrack/workflows/Continous%20Builds/badge.svg) [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0) [![Website](https://img.shields.io/website?down_color=red&down_message=offline&style=plastic&up_color=green&up_message=online&url=http%3A%2F%2Fwww.fasttrack.sh)](http://www.fasttrack.sh)
+ ![Test](https://github.com/bgallois/FastTrack/workflows/Tests/badge.svg) ![Clang Format](https://github.com/bgallois/FastTrack/workflows/Clang%20Format/badge.svg) ![Continous Build](https://github.com/bgallois/FastTrack/workflows/Continous%20Builds/badge.svg) [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0) [![Website](https://img.shields.io/website?style=plastic&url=https%3A%2F%2Fwww.fasttrack.sh%2F)](http://www.fasttrack.sh)
 
 ## About
 
@@ -20,10 +20,11 @@ Stable builds of the software are available for Linux, Mac, and Windows on the [
 
 ## Documentation
 
-User documentation can be found [here](http://www.fasttrack.sh/UserManual/docs/intro.html) with video tutorials, examples, and an extended description of the software.
-Developer documentation can be found [here](http://www.fasttrack.sh/API/index.html). It contains information to set up a development environment and the API of FastTrack.
+User documentation can be found [here](https://www.fasttrack.sh/docs/intro) with video tutorials, examples, and an extended description of the software.
+Developer documentation can be found [here](https://www.fasttrack.sh/API/index.html). It contains information to set up a development environment and the API of FastTrack.
 
 ## Examples
+
 ![alt text](docs/user/assets/example.gif)
 
 ## Contributing
@@ -32,7 +33,7 @@ If you want to contribute to FastTrack, please follow the [guidelines](contribut
 
 ## Get help
 
-If you need help, please contact benjamin.gallois@fasttrack.sh or open an issue on GitHub.
+If you need help, please contact benjamin.gallois@fasttrack.sh or open an issue or a discussion on GitHub.
 
 ## Citation
 

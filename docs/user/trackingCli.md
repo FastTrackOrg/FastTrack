@@ -5,6 +5,7 @@ sidebar_label: Tracking CLI
 ---
 
 ## Installing fasttrack-cli
+
 A command-line interface is available for macOS, Linux, and by using WSL for Windows. It can be downloaded on [the release page](https://github.com/FastTrackOrg/FastTrack/releases/latest), or on the [downloads page](https://fasttrack.sh/download/).
 
 The full list of parameters can be found by calling ```./fasttrack-cli --help```. 

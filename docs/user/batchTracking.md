@@ -32,15 +32,15 @@ The Batch Tracking panel is an advanced tool to track a large number of movies a
 
 ## Basic usage
 
-The user can open several image sequences by clicking on the **Open folder** (1) button and select one or several folders. FastTrack can automatically load a background and/or a parameters file if a **Tracking_Result** folder is provided with the image sequence; check the **Autoload** (10) tick to activate this behavior.
+The user can open several image sequences by clicking on the **Open folder** (1) button and selecting one or several folders. FastTrack can automatically load a background and/or a parameters file if a **Tracking_Result** folder is provided with the image sequence; check the **Autoload** (10) tick to activate this behavior.
 After opening, image sequences are added to the **Processing stack** (4). If a background image and/or a set of parameters are automatically loaded, the path will be displayed in the second and third columns. If not, the user can select them with the (5) and (6) buttons after importation.
 **By default**, if no background image and parameter file are selected, FastTrack will use the parameters provided in the Parameters table (9) **before** the image sequence importation.
-The user can delete an image sequence by selecting the corresponding line in the **Processing stack** (4) and click on the **Remove** (14) button. The user can clear all the **Processing stack** (14) by clicking the **Clear** (13) button.
+The user can delete an image sequence by selecting the corresponding line in the **Processing stack** (4) and clicking on the **Remove** (14) button. The user can clear all the **Processing stack** (14) by clicking the **Clear** (13) button.
 To process the stack, click the **Start Tracking** (12) button.
 
 ## More advanced options
 
-### Add a suffix
+### Adding a suffix
 
 The user can append a suffix to the imported folders *folder_path/ + suffix/*
 For example, it can be usefull with a folder tree like this one:

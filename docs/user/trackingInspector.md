@@ -3,9 +3,11 @@ id: trackingInspector
 title: Tracking Inspector
 sidebar_label: Tracking Inspector
 ---
+---
+
 **NOTE**
 
-The Tracking Inspector panel is accessible in Expert Mode (settings -> Expert Mode). Or in the Interactive panel (View -> Tracking replay).
+The Tracking Inspector panel is accessible in Expert Mode (settings -> Expert Mode), or in the Interactive panel (View -> Tracking replay).
 
 ---
 
@@ -38,14 +40,18 @@ The Tracking Inspector panel is accessible in Expert Mode (settings -> Expert Mo
 * 24: Overlay
 
 
-**The Tracking Inspector** is a tool to display the result of a tracking analysis and to correct the tracking manually if necessary. For example, the user can delete an object to remove an artifact or change the object ID to correct a tracking error. To make the user's life easier, an ergonomic interface with build-in keyboard shortcuts are provided. FastTrack alleviates the tedious work of review and correction, and the user can achieve 100% tracking accuracy rapidly and efficiently.
+**The Tracking Inspector** is a tool to display the result of a tracking analysis and to correct the tracking manually if necessary. For example, the user can delete an object to remove an artifact or change the object ID to correct a tracking error. To make the user's life easier, FastTrack provides an ergonomic interface with built-in keyboard shortcuts. FastTrack alleviates the tedious work of review and correction, and the user can achieve 100% tracking accuracy rapidly and efficiently.
 
-## Load a tracking analysis
-To load a tracking analysis previously tracked in FastTrack, first click on the **Open** button (1) and select a movie or an image of an image sequence. If the movie was tracked several times, the last tracking analysis is stored in the **Tracking_Result** folder and the previous tracking analysis in the **Tracking_Result_Date** folders and can be loaded using the **Open Tracking_result directory** button (2) (can only be activated if a movie is loaded).
-Click on the **Reload)** button (3) to reload the tracking data if necessary.
-The software can only load a tracking analysis if the folder architecture is preserved, .ie the folder with the image sequence has to have a sub-folder named **Tracking_Result** containing at least the *tracking.txt* file.
+## Loading a tracking analysis
+
+To load a tracking analysis previously tracked in FastTrack, first, click on the **Open** button (1) and select a movie or an image of an image sequence. It will load the latest tracking analysis available.  
+If the movie was tracked several times, the last tracking analysis is stored in the **Tracking_Result** folder and the previous tracking analysis in the **Tracking_Result_Date** folders.  
+Old tracking analysis can be loaded using the **Open Tracking_result directory** button (2) (only activated if a movie is already loaded).
+Click on the **Reload)** button (3) to reload the tracking data if necessary.  
+The software can only load a tracking analysis if the folder architecture is preserved, .ie the folder with the image sequence or the movie has to have a sub-folder named **Tracking_Result** containing at least the *tracking.txt* file.
 
 ## Display options
+
 Several tracking overlay options are available on the tracking overlay panel (24):
 
 * Ellipse: display the head, tail, and or body ellipses on the tracked objects.
@@ -57,15 +63,19 @@ Several tracking overlay options are available on the tracking overlay panel (24
 
 Several useful information on the selected object can be found in the information table (18). The user can go to the image where the object has appeared for the first time by clicking directly on the table's corresponding cell.
 
-## Inspect the tracking
-The tracking can be inspected by moving the display cursor (19), see the image number (20), and automatically play the movie (21) at a selected frame rate (22).
+## Inspecting the tracking
+
+The tracking can be inspected by moving the display cursor (19), seeing the image number (20), and automatically playing the movie (21) at a selected frame rate (22).  
 Automatically detected occlusions (overlapped objects) can be reviewed by clicking on the **Previous** (12) and **Next** (13) occlusion buttons (this function is experimental and can miss some occlusions).
 
-## Annotate the tracking
+## Annotating the tracking
+
 The user can annotate any image of the tracking. Write the annotation in the annotate text entry (17). The user can search across annotations with the find bar (14) and the buttons (15)(16). All the annotations are saved in the *annotation.txt* file in the **Tracking_Result** folder.
 
-## Correct the tracking
-### Swap the data of two objects
+## Correcting the tracking
+
+### Swapping the data of two objects
+
 The user can correct an error by swapping two object's ID from the current image to the end of the sequence as follow:
 
 * Left-click on the first object, the object ID and color are displayed on the first selection box (6).
@@ -73,6 +83,7 @@ The user can correct an error by swapping two object's ID from the current image
 * Right-click or click on the **Swap Button** (7) to exchange the ID of the two selected objects from the current image to the last image of the sequence.
 
 ### Delete the data of an object
+
 To delete one object of several frames:
 
 * Double left click on the object, the object ID and color are displayed on the second selection box (8).
@@ -85,7 +96,8 @@ To delete one object on the current frame:
 * Click on the **Delete One** button (9) to delete the object on the current frame.
 
 ### Keyboard shortcuts summary
-A set of keyboard shortcuts are available to speed-up the tracking correction.
+
+A set of keyboard shortcuts are available to speed up the tracking correction.
 
 - Q/A: go to the previous image.
 - D: go to the next image.
@@ -94,9 +106,11 @@ A set of keyboard shortcuts are available to speed-up the tracking correction.
 - G: delete an object from the current image to the current plus the selected number.
 
 ## Saving
-All the changes made in the inspector are automatically saved in the original *tracking.txt* file. 
 
-## Export a movie
+All the changes made in the inspector are automatically saved in the original *tracking.txt* file and SQLite database. 
+
+## Exporting a movie
+
 To export a movie of a tracking analysis, select the desired display overlay and click on the **Save** button (3). Select a folder and a name to save the file. Only .avi format is supported.
 
 Note: Movie with many objects by frame can be challenging to load and review in the tracking Inspector.

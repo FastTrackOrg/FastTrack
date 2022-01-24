@@ -5,12 +5,12 @@ sidebar_label: Report a bug
 ---
 
 FastTrack is open-source software and it needs your help!
-If you encounter a bug or abnormal behaviors please report it by email at benjamin.gallois@fasttrack.sh following this blueprint or open an issue on [github](https://github.com/FastTrackOrg/FastTrack/issues):
+If you encounter a bug or abnormal behaviors please report it by email at benjamin.gallois@fasttrack.sh following this blueprint or open an issue on [GitHub](https://github.com/FastTrackOrg/FastTrack/issues) or a discussion on [GitHub](https://github.com/FastTrackOrg/FastTrack/discussions):
 
 	Recipients: benjamin.gallois@fasttrack.sh  
 	Subject: [report] One word description  
 
-	Dear FastTrack maintener,
+	Dear FastTrack maintainer,
 
 	System: Windows | Mac | Linux  
 	Distribution: Win10 | Snow Leopard | Ubuntu 18.04  
@@ -22,4 +22,4 @@ If you encounter a bug or abnormal behaviors please report it by email at benjam
 
 	You can attach an archive with the Tracking_Result folder if necessary.
 
-	Kind regards,
+	Kind regards.
