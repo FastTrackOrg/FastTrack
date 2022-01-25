@@ -59,7 +59,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
   connect(trayIcon, &QSystemTrayIcon::activated, [this](QSystemTrayIcon::ActivationReason reason) {
     switch (reason) {
       case QSystemTrayIcon::Trigger: {
-        this->setVisible(true);
+        this->setVisible(this->isHidden());
         break;
       }
       case QSystemTrayIcon::DoubleClick: {
@@ -173,7 +173,8 @@ void MainWindow::closeEvent(QCloseEvent *event) {
   msgBox.setText("<b>Are you sure you want to quit?</b>");
   msgBox.setIcon(QMessageBox::Question);
   msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-  msgBox.addButton(tr("Minimize"), QMessageBox::AcceptRole);
+  QPushButton *minimizeButton = msgBox.addButton(tr("Minimize"), QMessageBox::AcceptRole);
+  msgBox.setDefaultButton(minimizeButton);
   int reply = msgBox.exec();
   if (reply == QMessageBox::Yes) {
     event->accept();
