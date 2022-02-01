@@ -41,10 +41,11 @@ jobs:
               ./deploy.AppImage build_cli/fasttrack-cli -appimage -no-translations -bundle-non-qt-libs -unsupported-allow-new-glibc -qmake=${{ github.workspace }}/Qt/6.2.2/gcc_64/bin/qmake6 -extra-plugins=platforms/,sqldrivers/ -exclude-libs=libgmodule-2.0.so
               mv FastTrack*.AppImage FastTrack-cli-x86_64.AppImage
         - name: Linux artefact
-          uses: actions/upload-artifact@v1
+          uses: actions/upload-artifact@v2
           with:
-            name: FastTrackLinux
+            name: FastTrack-cli-x86_64.AppImage
             path: ./FastTrack-cli-x86_64.AppImage
+
   job_2:
       runs-on: macos-latest
       steps:
@@ -75,10 +76,11 @@ jobs:
               python2.7 macdeployqtfix.py fasttrack_cli.app/Contents/MacOS/fasttrack-cli ../../Qt/6.2.2/
               hdiutil create -volname FastTrack-cli -srcfolder FastTrack-cli.app -ov -format UDZO FastTrack-cli.dmg
         - name: Mac artefact
-          uses: actions/upload-artifact@v1
+          uses: actions/upload-artifact@v2
           with:
-            name: FastTrackMac
+            name: FastTrack-cli.dmg
             path: ./build_cli/FastTrack-cli.dmg
+
   job_3:
     runs-on: windows-latest
     steps:
@@ -116,5 +118,5 @@ jobs:
       - name: Windows artefact
         uses: actions/upload-artifact@v2
         with:
-          name: FastTrackCliWindows
+          name: FastTrack-Cli.zip
           path: src/release/

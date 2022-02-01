@@ -41,10 +41,11 @@ jobs:
           ./deploy.AppImage build/fasttrack -appimage -no-translations -bundle-non-qt-libs -unsupported-allow-new-glibc -qmake=${{ github.workspace }}/Qt/6.2.2/gcc_64/bin/qmake6 -extra-plugins=platforms/,sqldrivers/ -exclude-libs=libgmodule-2.0.so
           mv FastTrack*.AppImage FastTrack-x86_64.AppImage
       - name: Linux artefact
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v2
         with:
-          name: FastTrackLinux
+          name: FastTrack-x86_64.AppImage
           path: ./FastTrack-x86_64.AppImage
+
   job_2:
     runs-on: windows-latest
     steps:
@@ -85,12 +86,12 @@ jobs:
           copy C:\Windows\System32\vccorlib140.dll .
           copy C:\Windows\System32\libcrypto-1_1-x64.dll .
           copy C:\Windows\System32\libssl-1_1-x64.dll .
-          7z a FastTrack.zip *
       - name: Windows artefact
         uses: actions/upload-artifact@v1
         with:
-          name: FastTrackWindows
-          path: src/release/FastTrack.zip
+          name: FastTrack.zip
+          path: src/release/
+
   job_3:
     runs-on: macos-latest
     steps:
@@ -127,5 +128,5 @@ jobs:
       - name: Mac artefact
         uses: actions/upload-artifact@v1
         with:
-          name: FastTrackMac
+          name: FastTrack.dmg
           path: ./build/FastTrack.dmg
