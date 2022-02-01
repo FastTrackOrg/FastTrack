@@ -112,11 +112,11 @@ jobs:
           cd release
           windeployqt FastTrack-Cli.exe --release
           cp ..\assets\icon.ico .
-          cp ${{ github.workspace }}/Qt/Tools/mingw900_64/bin/*.dll . 
+          cp ${{ github.workspace }}/Qt/Tools/mingw900_64/bin/libgomp-1.dll . 
           cp ${{ github.workspace }}/OpenCV_MinGW_64/bin/opencv_videoio_ffmpeg455_64.dll .
           cp ${{ github.workspace }}/OpenCV_MinGW_64/bin/libopencv_world455.dll .
       - name: Windows artefact
         uses: actions/upload-artifact@v2
         with:
-          name: FastTrack-Cli.zip
+          name: FastTrack-Cli
           path: src/release/

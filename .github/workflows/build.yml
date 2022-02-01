@@ -50,46 +50,39 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: ilammy/msvc-dev-cmd@v1
       - uses: actions/setup-python@v2
         with:
           python-version: '3.8'
       - name: install qt6
         run: |
           pip install aqtinstall
-          python3 -m aqt install-qt -m qtwebengine qtwebchannel qtpositioning -O ${{ github.workspace }}/Qt/ windows desktop 6.2.2 win64_msvc2019_64
-          echo "${{ github.workspace }}/Qt/6.2.2/msvc2019_64/bin/" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          python3 -m aqt install-qt -O ${{ github.workspace }}/Qt/ windows desktop 6.2.2 win64_mingw
+          python3 -m aqt install-tool -O ${{ github.workspace }}/Qt/ windows desktop tools_mingw90
+          echo "${{ github.workspace }}/Qt/6.2.2/mingw_64/bin/" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          echo "${{ github.workspace }}/Qt/Tools/mingw900_64/bin/" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
       - name: install opencv
         shell: cmd
         run: |
-          bitsadmin.exe /transfer debjob /download /priority normal https://downloads.sourceforge.net/project/opencvlibrary/4.5.5/opencv-4.5.5-vc14_vc15.exe C:\opencv-4.5.5-vc14_vc15.exe
-          C:\opencv-4.5.5-vc14_vc15.exe -o"C:\" -y
+          choco install wget unzip
+          wget https://github.com/FastTrackOrg/Windows_MinGW_64_OpenCV/releases/download/4.5.5/OpenCV_MinGW_64.zip
+          unzip OpenCV_MinGW_64.zip -d ${{ github.workspace }}
       - name: build
         shell: cmd
         run: |
           cd src/
-          qmake FastTrack.pro -spec win32-msvc CONFIG+=release
-          nmake release
-          nmake clean
+          qmake FastTrack.pro -spec win32-g++ CONFIG+="release NO_WEB"
+          mingw32-make
+          mingw32-make clean
           cd release
-          windeployqt FastTrack.exe --release --compiler-runtime
-          copy ..\assets\icon.ico .
-          copy C:\Windows\System32\concrt140.dll . 
-          copy C:\Windows\System32\msvcp140.dll .
-          copy C:\Windows\System32\msvcp140_1.dll .
-          copy C:\Windows\System32\msvcp140_2.dll .
-          copy C:\Windows\System32\msvcp160.dll .
-          copy C:\opencv\build\x64\vc15\bin\opencv_videoio_ffmpeg455_64.dll .
-          copy C:\opencv\build\x64\vc15\bin\opencv_world455.dll .
-          copy C:\Windows\System32\vcruntime140.dll .
-          copy C:\Windows\System32\vcruntime140_1.dll .  
-          copy C:\Windows\System32\vccorlib140.dll .
-          copy C:\Windows\System32\libcrypto-1_1-x64.dll .
-          copy C:\Windows\System32\libssl-1_1-x64.dll .
+          windeployqt FastTrack.exe --release
+          cp ..\assets\icon.ico .
+          cp ${{ github.workspace }}/Qt/Tools/mingw900_64/bin/libgomp-1.dll . 
+          cp ${{ github.workspace }}/OpenCV_MinGW_64/bin/opencv_videoio_ffmpeg455_64.dll .
+          cp ${{ github.workspace }}/OpenCV_MinGW_64/bin/libopencv_world455.dll .
       - name: Windows artefact
         uses: actions/upload-artifact@v1
         with:
-          name: FastTrack.zip
+          name: FastTrack
           path: src/release/
 
   job_3:
