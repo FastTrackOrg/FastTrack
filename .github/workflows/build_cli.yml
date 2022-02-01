@@ -74,10 +74,47 @@ jobs:
               wget https://raw.githubusercontent.com/arl/macdeployqtfix/master/macdeployqtfix.py
               python2.7 macdeployqtfix.py fasttrack_cli.app/Contents/MacOS/fasttrack-cli ../../Qt/6.2.2/
               hdiutil create -volname FastTrack-cli -srcfolder FastTrack-cli.app -ov -format UDZO FastTrack-cli.dmg
-
-
         - name: Mac artefact
           uses: actions/upload-artifact@v1
           with:
             name: FastTrackMac
             path: ./build_cli/FastTrack-cli.dmg
+  job_3:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ilammy/msvc-dev-cmd@v1
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'
+      - name: install qt6
+        run: |
+          pip install aqtinstall
+          python3 -m aqt install-qt -O ${{ github.workspace }}/Qt/ windows desktop 6.2.2 win64_mingw
+          python3 -m aqt install-tool -O ${{ github.workspace }}/Qt/ windows desktop tools_mingw90
+          echo "${{ github.workspace }}/Qt/6.2.2/mingw_64/bin/" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          echo "${{ github.workspace }}/Qt/Tools/mingw900_64/bin/" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+      - name: install opencv
+        shell: cmd
+        run: |
+          choco install wget unzip
+          wget https://github.com/FastTrackOrg/Windows_MinGW_64_OpenCV/releases/download/4.5.5/OpenCV_MinGW_64.zip
+          unzip OpenCV_MinGW_64.zip -d ${{ github.workspace }}
+
+      - name: build
+        run: |
+          cd src/
+          qmake FastTrack-Cli.pro -spec win32-g++ CONFIG+=release
+          mingw32-make
+          mingw32-make clean
+          cd release
+          windeployqt FastTrack-Cli.exe --release
+          cp ..\assets\icon.ico .
+          cp ${{ github.workspace }}/Qt/Tools/mingw900_64/bin/*.dll . 
+          cp ${{ github.workspace }}/OpenCV_MinGW_64/bin/opencv_videoio_ffmpeg455_64.dll .
+          cp ${{ github.workspace }}/OpenCV_MinGW_64/bin/libopencv_world455.dll .
+      - name: Windows artefact
+        uses: actions/upload-artifact@v2
+        with:
+          name: FastTrackCliWindows
+          path: src/release/

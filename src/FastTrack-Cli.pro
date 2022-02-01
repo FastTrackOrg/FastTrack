@@ -61,6 +61,13 @@ unix:macx {
   ICON=assets/icon.icns
 }
 
+win32 {
+  TARGET = FastTrack-Cli
+  CONFIG += c++2a
+  LIBS += -L"$$PWD/../OpenCV_MinGW_64/bin" -lopencv_world455
+  INCLUDEPATH += "$$PWD/../OpenCV_MinGW_64/include"
+}
+
 SOURCES += \
         fasttrack-cli.cpp \
         tracking.cpp \
@@ -72,4 +79,3 @@ HEADERS += \
         tracking.h \
         videoreader.h \
         Hungarian.h \
-
