@@ -64,6 +64,7 @@ unix:macx {
 win32 {
   TARGET = FastTrack-Cli
   CONFIG += c++2a
+  CONFIG += console
   LIBS += -L"$$PWD/../OpenCV_MinGW_64/bin" -lopencv_world455
   INCLUDEPATH += "$$PWD/../OpenCV_MinGW_64/include"
 }
