@@ -1,7 +1,7 @@
 greaterThan(QT_MAJOR_VERSION, 5): QT += widgets core gui sql
 
 TEMPLATE = app
-VERSION = 6.1.2
+VERSION = 6.2.0
 DEFINES += APP_VERSION=\\\"$$VERSION\\\"
 QTPLUGIN += QSQLITE
 

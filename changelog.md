@@ -1,5 +1,19 @@
 # FastTrack changelog
 
+## 6.2.0
+
+### Added
+- Added FastTrack command line interface for Windows.
+
+### Changed
+- Changed compiler for Windows now using MinGW_64.
+
+### Fixed
+- Fixed tray behavior.
+- Fixed closing behavior.
+- Fixed start-up message behavior.
+- Fixed stdout for the cli on Windows.
+
 ## 6.1.2
 
 ### Fixed
