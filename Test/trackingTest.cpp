@@ -710,7 +710,7 @@ TEST_F(AutoLevelTest, AutoLevelStd) {
   EXPECT_EQ(sd, 26.517632067020994);
 }
 
-TEST_F(DataTest, getData) {
+TEST_F(DataTest, getDataIndexId) {
   Data data("../dataSet/images/Groundtruth/Tracking_Result/");
   QHash<QString, double> test = data.getData(2, 12);
   EXPECT_EQ(test.value("xHead"), 506.779);
@@ -718,7 +718,17 @@ TEST_F(DataTest, getData) {
   EXPECT_EQ(test.value("yHead"), 25.838);
 }
 
-TEST_F(DataTest, getData2) {
+TEST_F(DataTest, getDataRangeId) {
+  Data data("../dataSet/images/Groundtruth/Tracking_Result/");
+  QList<QHash<QString, double>> test = data.getData(1, 20, 12);
+  QList<QHash<QString, double>> ref;
+  for (int i = 1; i < 20; i++) {
+    ref.append(data.getData(i, 12));
+  }
+  EXPECT_EQ(ref, test);
+}
+
+TEST_F(DataTest, getDataIndex) {
   Data data("../dataSet/images/Groundtruth/Tracking_Result/");
   QList<QHash<QString, double>> test = data.getData(2);
   for (const auto &a : test) {

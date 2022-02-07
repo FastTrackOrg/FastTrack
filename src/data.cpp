@@ -118,8 +118,36 @@ QHash<QString, double> Data::getData(int imageIndex, int id) const {
   tmp.insert("NAN", -1);
   return tmp;
 }
+
 /**
- * @brief Get the tracking data at the selected image number/
+ * @brief Get the tracking data for a range of images and for one selected object.
+ * @param[in] imageIndexStart The index of the first image where to extracts the data.
+ * @param[in] imageIndexEnd The index of the last image (excluded) where to extracts the data.
+ * @param[in] id The id of the object.
+ * @return The tracking data for the selected object at the selected image. The data are stored in a QHash<dataName, value>.
+ */
+QList<QHash<QString, double>> Data::getData(int imageIndexStart, int imageIndexStop, int id) const {
+  QList<QHash<QString, double>> dataImage;
+  QSqlDatabase data = QSqlDatabase::database(connectionName, false);
+  QSqlQuery query(data);
+  query.prepare("SELECT * FROM tracking WHERE imageNumber >= ? AND imageNumber < ? AND id = ?");  // Sorted by imageIndex because inserted in order.
+  query.addBindValue(imageIndexStart);
+  query.addBindValue(imageIndexStop);
+  query.addBindValue(id);
+  query.exec();
+  QSqlRecord rec = query.record();
+  while (query.next()) {
+    QHash<QString, double> tmp;
+    for (int i = 0; i < rec.count(); i++) {
+      tmp.insert(rec.fieldName(i), query.value(i).toDouble());
+    }
+    dataImage.append(tmp);
+  }
+  return dataImage;
+}
+
+/**
+ * @brief Get the tracking data at the selected image number.
  * @param[in] imageIndex The index of the image where to extracts the data.
  * @return The tracking data at the selected image. The data are stored in a QList<QHash<dataName, value>>.
  */

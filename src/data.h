@@ -38,6 +38,7 @@ class Data {
   bool setPath(const QString &dataPath);
   QHash<QString, double> getData(int imageIndex, int id) const;
   QList<QHash<QString, double>> getData(int imageIndex) const;
+  QList<QHash<QString, double>> getData(int imageIndexStart, int imageIndexStop, int id) const;
   QHash<QString, QList<double>> getDataId(int id) const;
   QList<int> getId(int imageIndex) const;
   QList<int> getId(int imageIndexFirst, int imageIndexLast) const;

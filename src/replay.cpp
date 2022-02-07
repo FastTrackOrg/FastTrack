@@ -560,13 +560,9 @@ void Replay::loadFrame(int frameIndex) {
 
       if (ui->replayTrace->isChecked()) {
         vector<Point> memory;
-        for (int j = frameIndex - ui->replayTraceLength->value(); j < frameIndex; j++) {
-          if (j > 0) {
-            QHash<QString, double> coordinate = trackingData->getData(j, id);
-            if (coordinate.contains("xBody")) {
-              memory.push_back(Point(static_cast<int>(coordinate.value("xBody")), static_cast<int>(coordinate.value("yBody"))));
-            }
-          }
+        QList<QHash<QString, double>> coordinate = trackingData->getData(frameIndex - ui->replayTraceLength->value(), frameIndex + 1, id);
+        for (auto const& a : coordinate) {
+          memory.push_back(Point(static_cast<int>(a.value("xBody")), static_cast<int>(a.value("yBody"))));
         }
         cv::polylines(frame, memory, false, Scalar(colorMap[id].x, colorMap[id].y, colorMap[id].z), scale, cv::LINE_AA);
       }
