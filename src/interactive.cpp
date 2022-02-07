@@ -676,9 +676,7 @@ void Interactive::display(int index, int scale) {
     if ((roi.width != 0 || roi.height != 0) && (roi.width != originalImageSize.width() || roi.height != originalImageSize.height())) {
       frame = frame(roi);
     }
-
-    Mat image = frame.getMat(ACCESS_READ);
-    display(QImage(image.data, image.cols, image.rows, static_cast<int>(image.step), QImage::Format_RGB888));
+    display(frame);
   }
   catch (...) {
     emit(message(QString("An error occurs on image %1.").arg(index)));
@@ -728,11 +726,11 @@ void Interactive::display(const QImage &image) {
 
 /**
  * @brief This is an overloaded function to display a UMat in the display.
+ * @param[in] image UMat to display.
+ * @param[in] format enum QImage::Format.
  */
-void Interactive::display(const UMat &image) {
-  Mat frame = image.getMat(ACCESS_READ);
-  cvtColor(frame, frame, COLOR_GRAY2RGB);
-  resizedPix = (QPixmap::fromImage(QImage(frame.data, frame.cols, frame.rows, static_cast<int>(frame.step), QImage::Format_RGB888)).scaled(ui->display->size(), Qt::KeepAspectRatio));
+void Interactive::display(const UMat &image, QImage::Format format) {
+  resizedPix = (QPixmap::fromImage(QImage(image.u->data, image.cols, image.rows, static_cast<int>(image.step), format)).scaled(ui->display->size(), Qt::KeepAspectRatio));
   ui->display->setPixmap(resizedPix);
   resizedFrame.setWidth(resizedPix.width());
   resizedFrame.setHeight(resizedPix.height());
@@ -756,7 +754,7 @@ void Interactive::computeBackground() {
     // After compute background process
     QFutureWatcher<UMat> *watcher = new QFutureWatcher<UMat>();
     connect(watcher, &QFutureWatcher<UMat>::finished, [this, watcher]() {
-      background = watcher->result();
+      background = watcher->result().clone();  // Clone needed for Windows otherwise no initial display and ui buggued afterward, why if UMat is a smartpointer?
       if (!background.empty()) {
         isBackground = true;
         ui->isBin->setCheckable(true);
@@ -774,7 +772,7 @@ void Interactive::computeBackground() {
         ui->interactiveTab->setCurrentIndex(0);
         ui->previewButton->setDisabled(false);
         ui->trackButton->setDisabled(false);
-        display(background);
+        display(background, QImage::Format_Grayscale8);
       }
       else {
         isBackground = false;
@@ -835,7 +833,7 @@ void Interactive::selectBackground() {
         ui->backColor->setCurrentIndex(1);
       }
 
-      display(background);
+      display(background, QImage::Format_Grayscale8);
     }
     else {
       isBackground = false;

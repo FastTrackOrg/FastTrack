@@ -79,7 +79,7 @@ class Interactive : public QMainWindow {
 
   void display(int index, int scale = 0);
   void display(const QImage &image);
-  void display(const UMat &image);
+  void display(const UMat &image, QImage::Format format = QImage::Format_RGB888);
 
   void zoomIn();
   void zoomOut();
