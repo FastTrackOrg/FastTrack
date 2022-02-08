@@ -1,5 +1,13 @@
 # FastTrack changelog
 
+## 6.2.1
+
+### Added
+- Added log file.
+
+### Fixed
+- Fixed tracking overlay slowdowns.
+
 ## 6.2.0
 
 ### Added
