@@ -359,6 +359,11 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   connect(ui->actionContact, &QAction::triggered, []() {
     QDesktopServices::openUrl(QUrl("mailto:benjamin.gallois@fasttrack.sh?subject=[fasttrack]", QUrl::TolerantMode));
   });
+  connect(ui->actionGenerateLog, &QAction::triggered, [this]() {
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save Log File"), QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation), tr("Logs (*.log)"));
+    QFile::remove(fileName);
+    QFile::copy(QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) + "/fasttrack.log", fileName);
+  });
   connect(ui->actionAbout, &QAction::triggered, []() {
     QMessageBox aboutBox;
     aboutBox.setText("FastTrack is a desktop tracking software, easy to install, easy to use, and performant.<br>Created and maintained by Benjamin Gallois.<br>Distributed under the terms of the <a href='https://www.gnu.org/licenses/gpl-3.0'>GPL3.0 license</a>.<br>");
@@ -588,11 +593,12 @@ void Interactive::openFolder() {
       crop();
     }
     // If an error occurs during the opening, resets the information table and warns the user
-    catch (...) {
+    catch (exception &e) {
       ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Path", Qt::MatchExactly)[0]), 1)->setText("");
       ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Image number", Qt::MatchExactly)[0]), 1)->setText("0");
       ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Image width", Qt::MatchExactly)[0]), 1)->setText("0");
       ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Image height", Qt::MatchExactly)[0]), 1)->setText("0");
+      qWarning() << QString::fromStdString(e.what()) << "occurs during opening of " << dir;
       emit(message("No image found."));
     }
   }
@@ -678,7 +684,12 @@ void Interactive::display(int index, int scale) {
     }
     display(frame);
   }
+  catch (const std::exception &e) {
+    qWarning() << QString::fromStdString(e.what()) << " occurs at image " << index << " display";
+    emit(message(QString::fromStdString(e.what()) + QString(" occurs on image %1.").arg(index)));
+  }
   catch (...) {
+    qWarning() << "Unknown error occurs at image " << index << " display";
     emit(message(QString("An error occurs on image %1.").arg(index)));
   }
 }
@@ -795,11 +806,13 @@ void Interactive::computeBackground() {
       try {
         background = Tracking::backgroundExtraction(*video, nBack, method, registrationMethod);
       }
-      catch (const std::exception &ex) {
-        emit(message("An error occurs. Please change the registration method"));
-      }
       catch (const std::runtime_error &e) {
+        qWarning() << QString::fromStdString(e.what()) << "occurs during background computation";
         emit(message(e.what()));
+      }
+      catch (...) {
+        qWarning() << "Unknown error occurs during background computation";
+        emit(message("An error occurs. Please change the registration method"));
       }
       return background;
     });

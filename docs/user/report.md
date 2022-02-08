@@ -20,6 +20,6 @@ If you encounter a bug or abnormal behaviors please report it by email at benjam
 
 	Other information:  ---
 
-	You can attach an archive with the Tracking_Result folder if necessary.
+	Do not forget to attach the log file that can be generated Help -> Generate log.
 
 	Kind regards.

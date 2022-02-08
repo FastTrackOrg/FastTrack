@@ -31,22 +31,24 @@ This file is part of Fast Track.
  */
 
 /**
-  * @brief Clear the object.
-*/
+ * @brief Clear the object.
+ */
 void Annotation::clear() {
   if (!annotationFile->fileName().isEmpty()) {
     writeToFile();
+    annotationFile->close();
     annotationFile->setFileName("");
   }
   findIndexes.clear();
   findIndex = -1;
   annotations->clear();
+  isActive = false;
 }
 
 /**
-  * @brief Set the path for the annotation.
-  * @param[in] filePath Path to the tracking folder.
-*/
+ * @brief Set the path for the annotation.
+ * @param[in] filePath Path to the tracking folder.
+ */
 bool Annotation::setPath(const QString &filePath) {
   clear();
   annotationFile->setFileName(filePath + "annotation.txt");
@@ -65,30 +67,30 @@ bool Annotation::setPath(const QString &filePath) {
     }
   }
   annotationFile->close();
+  isActive = true;
   return true;
 }
 
 /**
-  * @brief Constructs the annotation object from a file path.
-  * @param[in] filePath Path to the tracking folder.
-*/
-Annotation::Annotation(const QString &filePath) {
-  annotationFile = new QFile();
-  annotations = new QMap<int, QString>();
+ * @brief Constructs the annotation object from a file path.
+ * @param[in] filePath Path to the tracking folder.
+ */
+Annotation::Annotation(const QString &filePath) : Annotation() {
   setPath(filePath);
 }
 
 /**
-  * @brief Constructs the annotation object from a file path.
-*/
+ * @brief Constructs the annotation object from a file path.
+ */
 Annotation::Annotation() {
   annotationFile = new QFile();
   annotations = new QMap<int, QString>();
+  isActive = false;
 }
 
 /**
-  * @brief Writes all the annotation to a file.
-*/
+ * @brief Writes all the annotation to a file.
+ */
 void Annotation::writeToFile() {
   if (!annotationFile->open(QIODevice::WriteOnly)) {
     qInfo() << "Can't open file";
@@ -104,28 +106,32 @@ void Annotation::writeToFile() {
 }
 
 /**
-  * @brief Adds an annotation to the annotation QMap.
-  * @param[in] index Image index.
-  * @param[in] text Annotation text.
-*/
+ * @brief Adds an annotation to the annotation QMap.
+ * @param[in] index Image index.
+ * @param[in] text Annotation text.
+ */
 void Annotation::write(int index, const QString &text) {
-  annotations->insert(index, text);
-  writeToFile();
+  if (isActive) {
+    annotations->insert(index, text);
+    writeToFile();
+  }
 }
 
 /**
-  * @brief Reads an annotation from the annotation QMap.
-  * @param[in] index Image index.
-*/
+ * @brief Reads an annotation from the annotation QMap.
+ * @param[in] index Image index.
+ */
 void Annotation::read(int index) {
-  QString text = annotations->value(index);
-  emit(annotationText(text));
+  if (isActive) {
+    QString text = annotations->value(index);
+    emit(annotationText(text));
+  }
 }
 
 /**
-  * @brief Finds the index of all the annotation with expression inside their text.
-  * @param[in] expression Expression to find, case sensitive.
-*/
+ * @brief Finds the index of all the annotation with expression inside their text.
+ * @param[in] expression Expression to find, case sensitive.
+ */
 void Annotation::find(const QString &expression) {
   findIndexes.clear();
   QMapIterator<int, QString> i(*annotations);
@@ -139,8 +145,8 @@ void Annotation::find(const QString &expression) {
 }
 
 /**
-  * @brief Returns the next element of the findIndexes list of annotations that contains the expression to find.
-*/
+ * @brief Returns the next element of the findIndexes list of annotations that contains the expression to find.
+ */
 int Annotation::next() {
   ++findIndex;
   if (findIndex >= findIndexes.length()) {
@@ -155,8 +161,8 @@ int Annotation::next() {
 }
 
 /**
-  * @brief Returns the previous element of the findIndexes list of annotations that contains the expression to find.
-*/
+ * @brief Returns the previous element of the findIndexes list of annotations that contains the expression to find.
+ */
 int Annotation::prev() {
   --findIndex;
   if (findIndex < 0) {
@@ -171,7 +177,9 @@ int Annotation::prev() {
 }
 
 Annotation::~Annotation() {
-  writeToFile();
+  if (isActive) {
+    writeToFile();
+  }
   delete annotationFile;
   delete annotations;
 }

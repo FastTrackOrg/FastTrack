@@ -770,12 +770,24 @@ void Tracking::imageProcessing() {
       m_im++;
       emit(progress(m_im));
     }
+    catch (const std::exception &e) {
+      outputDb.commit();
+      exportTrackingResult(m_savingPath, outputDb);
+      delete timer;
+      outputDb.close();
+      m_logFile.close();
+      qWarning() << QString::fromStdString(e.what()) << " at image " << QString::number(m_im);
+      emit(forceFinished(QString::fromStdString(e.what()) + " error during the processing of the image " + QString::number(m_im)));
+      return;
+    }
     catch (...) {
       outputDb.commit();
       exportTrackingResult(m_savingPath, outputDb);
+      delete timer;
       outputDb.close();
       m_logFile.close();
-      emit(forceFinished("Fatal error during the processing of the image " + QString::number(m_im)));
+      qWarning() << "Unknown at image " << QString::number(m_im);
+      emit(forceFinished("Fatal and unknown error during the processing of the image " + QString::number(m_im)));
       return;
     }
   }
@@ -790,9 +802,11 @@ void Tracking::imageProcessing() {
     emit(finished());
   }
   else if (isSaved && !m_error.isEmpty()) {
+    qWarning() << "Images" << m_error << " where skipped because unreadable";
     emit(forceFinished("Images " + m_error + " where skipped because unreadable."));
   }
   else {
+    qWarning() << "Can't write tracking.txt to the disk";
     emit(forceFinished("Can't write tracking.txt to the disk!"));
   }
 }
@@ -960,9 +974,11 @@ void Tracking::startProcess() {
     emit(finishedProcessFrame());
   }
   catch (const std::runtime_error &e) {
+    qWarning() << QString::fromStdString(e.what());
     emit(forceFinished(QString::fromStdString(e.what())));
   }
   catch (...) {
+    qWarning() << "Fatal error, tracking initialization failed";
     emit(forceFinished("Fatal error, tracking initialization failed"));
   }
 }

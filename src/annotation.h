@@ -32,9 +32,9 @@ class Annotation : public QWidget {
 
  signals:
   /**
-  * @brief Emitted when a new annotation is read.
-  * @param text Text of the requested annotation.
-  */
+   * @brief Emitted when a new annotation is read.
+   * @param text Text of the requested annotation.
+   */
   void annotationText(const QString &text);
 
  public:
@@ -44,6 +44,7 @@ class Annotation : public QWidget {
   Annotation &operator=(const Annotation &T) = delete;
   ~Annotation();
   bool setPath(const QString &annotationFile);
+  bool isActive;
 };
 
 #endif

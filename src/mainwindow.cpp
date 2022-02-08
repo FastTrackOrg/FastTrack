@@ -71,14 +71,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
   trayIcon->setContextMenu(trayMenu);
   trayIcon->show();
 
-  // Setup style
-  QFile stylesheet("");
-
-  if (stylesheet.open(QIODevice::ReadOnly | QIODevice::Text)) {  // Read the theme file
-    qApp->setStyleSheet(stylesheet.readAll());
-    stylesheet.close();
-  }
-
   QNetworkAccessManager *manager = new QNetworkAccessManager(this);
   connect(manager, &QNetworkAccessManager::finished, [this](QNetworkReply *reply) {
     if (reply->error() != QNetworkReply::NoError) {

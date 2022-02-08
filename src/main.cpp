@@ -16,23 +16,37 @@ This file is part of Fast Track.
 */
 
 #include <QApplication>
+#include <QDir>
 #include <QFont>
 #include <QFontDatabase>
 #include <QPixmap>
+#include <QScopedPointer>
 #include <QSplashScreen>
 #include <QString>
 #include "mainwindow.h"
+
+QScopedPointer<QFile> logFile;
+
+void messageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg) {
+  QTextStream out(logFile.data());
+  out << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss.zzz ");
+  out << context.category << ": " << msg << Qt::endl;
+}
 
 int main(int argc, char *argv[]) {
   QApplication a(argc, argv);
   QPixmap pixmap(":/assets/icon.png");
   QSplashScreen splash(pixmap);
   splash.show();
-  MainWindow w;
   a.setApplicationName("FastTrack");
   a.setApplicationVersion(APP_VERSION);
   a.setOrganizationName("FastTrackOrg");
   a.setOrganizationDomain("www.fasttrack.sh");
+  logFile.reset(new QFile(QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) + "/fasttrack.log"));
+  QDir().mkpath(QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation));
+  logFile.data()->open(QFile::Append | QFile::Text);
+  qInstallMessageHandler(messageHandler);
+  MainWindow w;
   w.setWindowIcon(QIcon(":/assets/icon.png"));
   QFontDatabase::addApplicationFont(":/assets/Font.ttf");
   w.setStyleSheet("QWidget {font-family: 'Lato', sans-serif;}");
