@@ -18,11 +18,13 @@ This file is part of Fast Track.
 #ifndef VIDEOREADER_H
 #define VIDEOREADER_H
 
+#include <QDebug>
 #include <filesystem>
 #include <iostream>
 #include <mutex>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/videoio.hpp>
+#include <opencv2/videoio/registry.hpp>
 #include <regex>
 #include <set>
 #include <stdexcept>
@@ -45,7 +47,7 @@ class VideoReader : public VideoCapture {
   bool getNext(Mat &destination);
   bool getImage(int index, UMat &destination);
   bool getImage(int index, Mat &destination);
-  bool open(const String &path, int apiPreference = CAP_ANY) override;
+  bool open(const String &path, int apiPreference = CAP_FFMPEG) override;
   unsigned int getImageCount() const;
   bool isSequence();
 };

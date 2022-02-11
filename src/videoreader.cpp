@@ -31,17 +31,17 @@ This file is part of Fast Track.
  */
 
 /**
-  * @brief Construct the VideoReader object from a path to a file that can be either an image from  an image sequence or a movie file.
-  * @param[in] path Path to a video or image file.
-*/
+ * @brief Construct the VideoReader object from a path to a file that can be either an image from  an image sequence or a movie file.
+ * @param[in] path Path to a video or image file.
+ */
 VideoReader::VideoReader(const string &path) {
   open(path);
 }
 
 /**
-  * @brief Copy constructor.
-  * @param[in] video.
-*/
+ * @brief Copy constructor.
+ * @param[in] video.
+ */
 VideoReader::VideoReader(const VideoReader &video) : VideoCapture(video) {
   open(video.m_path);
 }
@@ -52,7 +52,13 @@ VideoReader &VideoReader::operator=(const VideoReader &video) {
 }
 
 bool VideoReader::open(const String &path, int apiPreference) {
-  if (path.empty()) return false;
+  if (path.empty()) {
+    return false;
+  }
+  if (!videoio_registry::hasBackend(static_cast<VideoCaptureAPIs>(apiPreference))) {  // Fallback to default backend if FFMPEG not found
+    apiPreference = CAP_ANY;
+    qWarning() << "FFMPEG not found, fallback to default backend";
+  }
   m_path = path;
   string normPath;
   std::set<string> imageExtensions{".pgm", ".png", ".jpeg", ".jpg", ".tiff", ".tif", ".bmp", ".dib", ".jpe", ".jp2", ".webp", ".pbm", ".ppm", ".sr", ".ras", ".tif"};
@@ -72,13 +78,13 @@ bool VideoReader::open(const String &path, int apiPreference) {
     m_isSequence = false;
     normPath = path;
   }
-  return VideoCapture::open(normPath);
+  return VideoCapture::open(normPath, apiPreference);
 }
 
 /**
-  * @brief Get the next image, always one channel.
-	* @param[in] destination UMat to store the image.
-*/
+ * @brief Get the next image, always one channel.
+ * @param[in] destination UMat to store the image.
+ */
 bool VideoReader::getNext(UMat &destination) {
   if (!read(destination) || destination.empty()) {
     return false;
@@ -91,9 +97,9 @@ bool VideoReader::getNext(UMat &destination) {
 }
 
 /**
-  * @brief Get the next image, always one channel.
-	* @param[in] destination UMat to store the image.
-*/
+ * @brief Get the next image, always one channel.
+ * @param[in] destination UMat to store the image.
+ */
 bool VideoReader::getNext(Mat &destination) {
   if (!read(destination) || destination.empty()) {
     return false;
@@ -106,10 +112,10 @@ bool VideoReader::getNext(Mat &destination) {
 }
 
 /**
-  * @brief Get the image at selected index, always one channel.
-  * @param[in] index Index of the image.
-	* @param[in] destination UMat to store the image.
-*/
+ * @brief Get the image at selected index, always one channel.
+ * @param[in] index Index of the image.
+ * @param[in] destination UMat to store the image.
+ */
 bool VideoReader::getImage(int index, UMat &destination) {
   if (m_index == index - 1) {
     return getNext(destination);
@@ -128,10 +134,10 @@ bool VideoReader::getImage(int index, UMat &destination) {
 }
 
 /**
-  * @brief Get the image at selected index, always one channel.
-  * @param[in] index Index of the image.
-	* @param[in] destination Mat to store the image.
-*/
+ * @brief Get the image at selected index, always one channel.
+ * @param[in] index Index of the image.
+ * @param[in] destination Mat to store the image.
+ */
 bool VideoReader::getImage(int index, Mat &destination) {
   if (m_index == index - 1) {
     return getNext(destination);
@@ -150,17 +156,17 @@ bool VideoReader::getImage(int index, Mat &destination) {
 }
 
 /**
-  * @brief Get the total number of images in the video.
-  * @return total number of images.
-*/
+ * @brief Get the total number of images in the video.
+ * @return total number of images.
+ */
 unsigned int VideoReader::getImageCount() const {
   return static_cast<unsigned int>(get(CAP_PROP_FRAME_COUNT));
 }
 
 /**
-  * @brief Is the file is an image sequence.
-  * @return True if an image sequence, false otherwise.
-*/
+ * @brief Is the file is an image sequence.
+ * @return True if an image sequence, false otherwise.
+ */
 bool VideoReader::isSequence() {
   return m_isSequence;
 }
