@@ -82,7 +82,7 @@ QMap<QString, double> AutoLevel::level() {
       m_spotSuffix = "Body";
     }
     int counter = 0;
-    while (abs(stdAngle - m_parameters.value("normAngle").toDouble()) > 1E-3 && abs(stdDist - m_parameters.value("normDist").toDouble()) > 1E-3 && abs(stdArea - m_parameters.value("normArea").toDouble()) > 1E-3 && abs(stdPerimeter - m_parameters.value("normParam").toDouble()) > 1E-3) {
+    while (abs(stdAngle - m_parameters.value("normAngle").toDouble()) > 1E-3 && abs(stdDist - m_parameters.value("normDist").toDouble()) > 1E-3 && abs(stdArea - m_parameters.value("normArea").toDouble()) > 1E-3 && abs(stdPerimeter - m_parameters.value("normPerim").toDouble()) > 1E-3) {
       m_parameters.insert("normAngle", QString::number(stdAngle));
       m_parameters.insert("normDist", QString::number(stdDist));
       m_parameters.insert("normArea", QString::number(stdArea));
