@@ -4,6 +4,10 @@ on:
   push:
     branches: [master]
 
+env:
+  QT_VERSION: 6.2.3
+  OPENCV_VERSION: 4.5.5
+
 jobs:
   job_1:
       runs-on: ubuntu-20.04
@@ -25,8 +29,8 @@ jobs:
         - name: install qt6
           run: |
             pip install aqtinstall
-            python3 -m aqt install-qt -O ${{ github.workspace }}/Qt/ linux desktop 6.2.2
-            echo ${{ github.workspace }}/Qt/6.2.2/gcc_64/bin/ >> $GITHUB_PATH
+            python3 -m aqt install-qt -O ${{ github.workspace }}/Qt/ linux desktop ${{ env.QT_VERSION }}
+            echo ${{ github.workspace }}/Qt/${{ env.QT_VERSION }}/gcc_64/bin/ >> $GITHUB_PATH
         - name: build
           run: |
               ./run.sh cli
@@ -37,8 +41,8 @@ jobs:
               chmod +x deploy.AppImage
               cp sh.fasttrack.fasttrackcli.desktop build_cli/
               cp src/assets/fasttrack.png build_cli/
-              export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${{ github.workspace }}/Qt/6.2.2/gcc_64/lib/
-              ./deploy.AppImage build_cli/fasttrack-cli -appimage -no-translations -bundle-non-qt-libs -unsupported-allow-new-glibc -qmake=${{ github.workspace }}/Qt/6.2.2/gcc_64/bin/qmake6 -extra-plugins=platforms/,sqldrivers/ -exclude-libs=libgmodule-2.0.so
+              export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${{ github.workspace }}/Qt/${{ env.QT_VERSION }}/gcc_64/lib/
+              ./deploy.AppImage build_cli/fasttrack-cli -appimage -no-translations -bundle-non-qt-libs -unsupported-allow-new-glibc -qmake=${{ github.workspace }}/Qt/${{ env.QT_VERSION }}/gcc_64/bin/qmake6 -extra-plugins=platforms/,sqldrivers/ -exclude-libs=libgmodule-2.0.so
               mv FastTrack*.AppImage FastTrack-cli-x86_64.AppImage
         - name: Linux artefact
           uses: actions/upload-artifact@v2
@@ -56,8 +60,8 @@ jobs:
         - name: install qt6
           run: |
             pip install aqtinstall
-            python3 -m aqt install-qt -m qtwebengine qtwebchannel qtpositioning -O ${{ github.workspace }}/Qt/ mac desktop 6.2.2
-            echo ${{ github.workspace }}/Qt/6.2.2/macos/bin/ >> $GITHUB_PATH
+            python3 -m aqt install-qt -m qtwebengine qtwebchannel qtpositioning -O ${{ github.workspace }}/Qt/ mac desktop ${{ env.QT_VERSION }}
+            echo ${{ github.workspace }}/Qt/${{ env.QT_VERSION }}/macos/bin/ >> $GITHUB_PATH
         - name: install opencv
           run: |
               rm -rf /usr/local/bin/2to3
@@ -73,7 +77,7 @@ jobs:
               cd build_cli/
               macdeployqt FastTrack-cli.app -always-overwrite
               wget https://raw.githubusercontent.com/arl/macdeployqtfix/master/macdeployqtfix.py
-              python2.7 macdeployqtfix.py fasttrack_cli.app/Contents/MacOS/fasttrack-cli ../../Qt/6.2.2/
+              python2.7 macdeployqtfix.py fasttrack_cli.app/Contents/MacOS/fasttrack-cli ../../Qt/${{ env.QT_VERSION }}/
               hdiutil create -volname FastTrack-cli -srcfolder FastTrack-cli.app -ov -format UDZO FastTrack-cli.dmg
         - name: Mac artefact
           uses: actions/upload-artifact@v2
@@ -92,15 +96,15 @@ jobs:
       - name: install qt6
         run: |
           pip install aqtinstall
-          python3 -m aqt install-qt -O ${{ github.workspace }}/Qt/ windows desktop 6.2.2 win64_mingw
+          python3 -m aqt install-qt -O ${{ github.workspace }}/Qt/ windows desktop ${{ env.QT_VERSION }} win64_mingw
           python3 -m aqt install-tool -O ${{ github.workspace }}/Qt/ windows desktop tools_mingw90
-          echo "${{ github.workspace }}/Qt/6.2.2/mingw_64/bin/" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          echo "${{ github.workspace }}/Qt/${{ env.QT_VERSION }}/mingw_64/bin/" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
           echo "${{ github.workspace }}/Qt/Tools/mingw900_64/bin/" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
       - name: install opencv
         shell: cmd
         run: |
           choco install wget unzip
-          wget https://github.com/FastTrackOrg/Windows_MinGW_64_OpenCV/releases/download/4.5.5/OpenCV_MinGW_64.zip
+          wget https://github.com/FastTrackOrg/Windows_MinGW_64_OpenCV/releases/download/${{ env.OPENCV_VERSION }}/OpenCV_MinGW_64.zip
           unzip OpenCV_MinGW_64.zip -d ${{ github.workspace }}
 
       - name: build
