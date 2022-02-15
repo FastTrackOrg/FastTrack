@@ -4,6 +4,7 @@
 #include <string>
 #include "../src/autolevel.cpp"
 #include "../src/tracking.cpp"
+#include "../src/videoreader.cpp"
 #include "gtest/gtest.h"
 
 namespace fs = std::filesystem;
@@ -30,6 +31,15 @@ class AutoLevelTest : public ::testing::Test {
 };
 
 class DataTest : public ::testing::Test {
+ protected:
+  virtual void SetUp() {
+  }
+
+  virtual void TearDown() {
+  }
+};
+
+class VideoReaderTest : public ::testing::Test {
  protected:
   virtual void SetUp() {
   }
@@ -666,6 +676,85 @@ TEST_F(TrackingTest, costFunction) {
   order = tracking.costFunc(past, current, 0, 0, 200, 0, 1);
   test = {2, 0, 1};
   EXPECT_EQ(order, test);
+}
+
+// VideoReader test
+TEST_F(VideoReaderTest, UMatSequence) {
+  UMat diff, test, ref;
+  VideoReader video("../dataSet/images/frame_000001.pgm");
+  video.getImage(0, test);
+  imread("../dataSet/images/frame_000001.pgm", IMREAD_GRAYSCALE).copyTo(ref);
+  compare(test, ref, diff, cv::CMP_NE);
+  EXPECT_EQ(countNonZero(diff), 0);
+  video.getNext(test);
+  imread("../dataSet/images/frame_000002.pgm", IMREAD_GRAYSCALE).copyTo(ref);
+  compare(test, ref, diff, cv::CMP_NE);
+  EXPECT_EQ(countNonZero(diff), 0);
+  video.getImage(10, test);
+  imread("../dataSet/images/frame_000011.pgm", IMREAD_GRAYSCALE).copyTo(ref);
+  compare(test, ref, diff, cv::CMP_NE);
+  EXPECT_EQ(countNonZero(diff), 0);
+}
+
+TEST_F(VideoReaderTest, MatSequence) {
+  Mat diff, test, ref;
+  VideoReader video("../dataSet/images/frame_000001.pgm");
+  video.getImage(0, test);
+  imread("../dataSet/images/frame_000001.pgm", IMREAD_GRAYSCALE).copyTo(ref);
+  compare(test, ref, diff, cv::CMP_NE);
+  EXPECT_EQ(countNonZero(diff), 0);
+  video.getNext(test);
+  imread("../dataSet/images/frame_000002.pgm", IMREAD_GRAYSCALE).copyTo(ref);
+  compare(test, ref, diff, cv::CMP_NE);
+  EXPECT_EQ(countNonZero(diff), 0);
+  video.getImage(10, test);
+  imread("../dataSet/images/frame_000011.pgm", IMREAD_GRAYSCALE).copyTo(ref);
+  compare(test, ref, diff, cv::CMP_NE);
+  EXPECT_EQ(countNonZero(diff), 0);
+}
+
+TEST_F(VideoReaderTest, CountSequence) {
+  VideoReader video("../dataSet/images/frame_000001.pgm");
+  EXPECT_EQ(video.getImageCount(), 200);
+}
+
+TEST_F(VideoReaderTest, UMatVideo) {
+  UMat diff, test, ref;
+  VideoReader video("../dataSet/test.avi");
+  video.getImage(0, test);
+  imread("../dataSet/images/frame_000001.pgm", IMREAD_GRAYSCALE).copyTo(ref);
+  compare(test, ref, diff, cv::CMP_NE);
+  EXPECT_EQ(countNonZero(diff), 0);
+  video.getNext(test);
+  imread("../dataSet/images/frame_000002.pgm", IMREAD_GRAYSCALE).copyTo(ref);
+  compare(test, ref, diff, cv::CMP_NE);
+  EXPECT_EQ(countNonZero(diff), 0);
+  video.getImage(10, test);
+  imread("../dataSet/images/frame_000011.pgm", IMREAD_GRAYSCALE).copyTo(ref);
+  compare(test, ref, diff, cv::CMP_NE);
+  EXPECT_EQ(countNonZero(diff), 0);
+}
+
+TEST_F(VideoReaderTest, MatVideo) {
+  Mat diff, test, ref;
+  VideoReader video("../dataSet/test.avi");
+  video.getImage(0, test);
+  imread("../dataSet/images/frame_000001.pgm", IMREAD_GRAYSCALE).copyTo(ref);
+  compare(test, ref, diff, cv::CMP_NE);
+  EXPECT_EQ(countNonZero(diff), 0);
+  video.getNext(test);
+  imread("../dataSet/images/frame_000002.pgm", IMREAD_GRAYSCALE).copyTo(ref);
+  compare(test, ref, diff, cv::CMP_NE);
+  EXPECT_EQ(countNonZero(diff), 0);
+  video.getImage(10, test);
+  imread("../dataSet/images/frame_000011.pgm", IMREAD_GRAYSCALE).copyTo(ref);
+  compare(test, ref, diff, cv::CMP_NE);
+  EXPECT_EQ(countNonZero(diff), 0);
+}
+
+TEST_F(VideoReaderTest, CountVideo) {
+  VideoReader video("../dataSet/test.avi");
+  EXPECT_EQ(video.getImageCount(), 200);
 }
 
 // AutoSet test
