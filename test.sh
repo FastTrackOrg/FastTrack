@@ -9,13 +9,13 @@ if [ "$1" = "unix" ]; then
   qmake6 FastTrack.pro CONFIG+="NO_WEB"
   make clean
   make check
-  python -m pytest Test/accuracyTest.py
+  python -m pytest test/accuracyTest.py
 fi
 if [ "$1" = "win" ]; then
   qmake FastTrack.pro -spec win32-g++ CONFIG+="NO_WEB"
   mingw32-make clean
   mingw32-make check
-  python -m pytest Test/accuracyTest.py
+  python -m pytest test/accuracyTest.py
 fi
 if [ "$1" = "" ]; then
   echo "Please specify platform (win or unix)"
