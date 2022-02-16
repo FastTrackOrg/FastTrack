@@ -4,25 +4,22 @@ title: FastTrack Command line interface
 sidebar_label: Tracking CLI
 ---
 
+## Calling fasttrack-cli
+
+The syntax to call FastTrack command line interface differs according to the platform. Replace the generic `./fasttrack-cli` by the right version:  
+`./FastTrack-cli-x86_64.AppImage [OPTION]`  
+`FastTrack-Cli.exe [OPTION]`  
+`open -w FastTrack-cli.app --args [OPTION]`  
+`fasttrack-cli [OPTION]`   
+
 ## Installing fasttrack-cli
 
-A command-line interface is available for macOS, Linux, and Windows. It can be downloaded on [the release page](https://github.com/FastTrackOrg/FastTrack/releases/latest), or on the [downloads page](https://fasttrack.sh/download/).
+The command-line interface is available for macOS, Linux, and Windows. It can be downloaded on [the release page](https://github.com/FastTrackOrg/FastTrack/releases/latest), or on the [downloads page](https://fasttrack.sh/download/).
 
 The full list of parameters can be found by calling ```./fasttrack-cli --help```. 
 Parameters can be declared individually by calling ```./fasttrack-cli --path path/to/movie.webm --parameter1 value --parameter2 value``` or in batch with a parameters file ```./fasttrack-cli --path path/to/movie.webm --cfg path/cfg.toml```. Note that the path option need to be the first option.
 
-fasttrack-cli does not support Windows natively. The workaround is to use WSL.
-* Install WSL https://docs.microsoft.com/en-us/windows/wsl/install-win10.
-* Install FastTrack in a Linux terminal:
-```
-wget https://github.com/FastTrackOrg/FastTrack/releases/download/continuous_cli/fasttrack-cli-x86_64.AppImage
-chmod +x fasttrack-cli-x86_64.AppImage
-./fasttrack-cli-x86_64.AppImage --appimage-extract
-sudo ln -s ~/squashfs-root/usr/bin/fasttrack-cli /usr/local/bin/
-```
-* FastTrack-cli can now be called directly by typing fasttrack-cli --help 
-
-## Calling FastTrack from a Python script
+## Calling fasttrack-cli from a Python script
 
 FastTrack can be called inside a Python script to automate the tracking. 
 
