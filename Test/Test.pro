@@ -4,6 +4,7 @@ TARGET = Test
 TEMPLATE = app
 CONFIG += testcase
 CONFIG += no_testcase_installs
+CONFIG += console
 
 DESTDIR=build
 OBJECTS_DIR=build
@@ -11,11 +12,24 @@ MOC_DIR=build
 UI_DIR=build
 RCC_DIR=build
 
-
-QMAKE_LFLAGS_RELEASE += -O3
-
 DEFINES += QT_DEPRECATED_WARNINGS
 
+unix:!macx {
+  INCLUDEPATH += /usr/include/opencv4/
+  INCLUDEPATH += /usr/local/include/opencv4/ /usr/include/gtest
+  LIBS += -L /usr/local/lib64/  -lopencv_core -lopencv_imgproc -lopencv_highgui -lopencv_imgcodecs -lopencv_videoio  -lopencv_calib3d -lopencv_photo -lopencv_features2d -lopencv_photo -lopencv_video -fopenmp -lgtest -lgtest_main
+  QMAKE_LFLAGS_RELEASE += -O3
+  QMAKE_CXXFLAGS += -std=c++17 -O3 -fopenmp -g
+}
+
+win32 {
+  CONFIG += c++2a
+  QMAKE_CXXFLAGS += -O3 -fopenmp -g
+  LIBS += -L"$$PWD/../OpenCV_MinGW_64/bin" -lopencv_world455
+  INCLUDEPATH += "$$PWD/../OpenCV_MinGW_64/include"
+  LIBS += -L"$$PWD/../googletest/build/install/lib" -lgtest -lgtest_main
+  INCLUDEPATH += "$$PWD/../googletest/build/install/include/"
+}
 
 SOURCES += \
         TrackingTest.cpp \
@@ -25,17 +39,10 @@ SOURCES += \
         ../src/autolevel.cpp \
         ../src/data.cpp \
 
-QMAKE_CXXFLAGS += -std=c++17 -O3 -fopenmp -g
 
-INCLUDEPATH += /usr/include/opencv4/
-INCLUDEPATH += /usr/local/include/opencv4/ /usr/include/gtest
-LIBS += -L /usr/local/lib64/  -lopencv_core -lopencv_imgproc -lopencv_highgui -lopencv_imgcodecs -lopencv_videoio  -lopencv_calib3d -lopencv_photo -lopencv_features2d -lopencv_photo -lopencv_video -fopenmp -lgtest -lgtest_main
 HEADERS += \
         ../src/tracking.h \
         ../src/videoreader.h \
         ../src/Hungarian.h \
         ../src/autolevel.h \
         ../src/data.h \
-        /usr/include/gtest/gtest.h \
-
-

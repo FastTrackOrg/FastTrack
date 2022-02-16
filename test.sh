@@ -5,15 +5,19 @@ trap 'rm -r ../dataSet/images/Groundtruth/Tracking_Result_Copy/' ERR
 
 export QT_QPA_PLATFORM=offscreen
 
-cd Test
-qmake6 Test.pro
-make clean
-make
-cd build
-./Test
-cd ../..
+if [ "$1" = "unix" ]; then
+  qmake6 FastTrack.pro CONFIG+="NO_WEB"
+  make clean
+  make check
+  python -m pytest Test/accuracyTest.py
+fi
+if [ "$1" = "win" ]; then
+  qmake FastTrack.pro -spec win32-g++ CONFIG+="NO_WEB"
+  mingw32-make clean
+  mingw32-make check
+  python -m pytest Test/accuracyTest.py
+fi
+if [ "$1" = "" ]; then
+  echo "Please specify platform (win or unix)"
+fi
 
-qmake6 src/FastTrack-Cli.pro
-make clean
-make
-pytest Test/accuracyTest.py

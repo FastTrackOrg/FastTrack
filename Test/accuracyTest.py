@@ -1,4 +1,5 @@
 import pytest
+import platform
 import os
 import shutil
 import time
@@ -10,7 +11,6 @@ import warnings
 abspath = os.path.abspath(__file__)
 dname = os.path.dirname(abspath)
 os.chdir(dname)
-
 
 def invertId(operations, dataframe, startTime = 0):
     """Invert two objects in a dataframe in place"""
@@ -137,7 +137,7 @@ def errorsCounter(reference, tracking):
 
 def tracking(path, imagePath, normDist=None, normAngle=None, maxDist=None, maxTime=None, normArea=None, normPerim=None):
 # Import truth parameters
-  groundParameter = pandas.read_csv(path + "images/Groundtruth/Tracking_Result/cfg.toml", header=None, engine="python", sep=" = ")
+  groundParameter = pandas.read_csv(os.path.abspath(path + "images/Groundtruth/Tracking_Result/cfg.toml"), header=None, engine="python", sep=" = ")
   groundParameter = groundParameter.set_index(0)
 
 # Set detection parameter
@@ -158,17 +158,21 @@ def tracking(path, imagePath, normDist=None, normAngle=None, maxDist=None, maxTi
   morphSize = str(int(groundParameter.loc["morphSize"][1]))
   morphType = str(int(groundParameter.loc["morphType"][1]))
 
+  if platform.system() == "Windows":
+    executable = "FastTrack-Cli.exe"
+  elif platform.system() == "Linux":
+    executable = "fasttrack-cli"
 
-  cmd = "../build_cli/fasttrack-cli --maxArea " + maxArea + " --minArea " + minArea + " --lightBack "+ lightBack + " --thresh "+ thresh + " --reg " + reg + " --spot "+ spot + " --nBack "+ nBack + " --regBack "+ regBack + " --methBack " + methBack+ " --xTop "+ xTop + " --yTop "+ yTop + " --xBottom " + xBottom + " --yBottom " + yBottom+ " --morph " + morph + " --morphSize " + morphSize+ " --morphType " + morphType +" --normArea " +str(normArea) + " --normPerim "+ str(normPerim) + " --normDist " + str(normDist) + " --normAngle " + str(normAngle) + " --maxDist " + str(maxDist) + " --maxTime " + str(maxTime) + " --path "+ path + imagePath + " --backPath dataSet/images/Groundtruth/Tracking_Result/background.pgm > /dev/null 2>&1" 
+  cmd = os.path.abspath("../src/build_cli/" + executable) + " --maxArea " + maxArea + " --minArea " + minArea + " --lightBack "+ lightBack + " --thresh "+ thresh + " --reg " + reg + " --spot "+ spot + " --nBack "+ nBack + " --regBack "+ regBack + " --methBack " + methBack+ " --xTop "+ xTop + " --yTop "+ yTop + " --xBottom " + xBottom + " --yBottom " + yBottom+ " --morph " + morph + " --morphSize " + morphSize+ " --morphType " + morphType +" --normArea " +str(normArea) + " --normPerim "+ str(normPerim) + " --normDist " + str(normDist) + " --normAngle " + str(normAngle) + " --maxDist " + str(maxDist) + " --maxTime " + str(maxTime) + " --path "+ os.path.abspath(path + imagePath) + " --backPath " + os.path.abspath("dataSet/images/Groundtruth/Tracking_Result/background.pgm") #+ " > /dev/null 2>&1" 
   out = os.system(cmd)
 
 
 def test_accuracy():
-  reference = pandas.read_csv("dataSet/images/Groundtruth/Tracking_Result/tracking.txt", engine="python", sep="\t", usecols=['xBody', 'yBody','tBody', 'imageNumber', 'id'])
+  reference = pandas.read_csv(os.path.abspath("dataSet/images/Groundtruth/Tracking_Result/tracking.txt"), engine="python", sep="\t", usecols=['xBody', 'yBody','tBody', 'imageNumber', 'id'])
   tracking("dataSet/", "images/frame_000000.pgm", normDist=20, normAngle=118, maxDist=195, maxTime=40, normArea=0, normPerim=0)
   trackingData = pandas.read_csv("dataSet/images/Tracking_Result/tracking.txt", engine="python", sep="\t", usecols=['xBody', 'yBody', 'tBody', 'imageNumber', 'id'])              
   res = errorsCounter(reference, trackingData)
-  shutil.rmtree("dataSet/images/Tracking_Result/")
+  shutil.rmtree(os.path.abspath("dataSet/images/Tracking_Result/"))
   assert res[1] == 12, "If better accuracy than previously reported! Please update the benchmark comment and the test with: " + str(np.around(res[0]*100, 2)) + '%\t' + str(res[1]) + " errors"
   """
   v5.0.0 accuracy: 0.49%	12 errors  

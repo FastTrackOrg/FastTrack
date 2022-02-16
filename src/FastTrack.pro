@@ -9,16 +9,16 @@ VERSION = 6.2.1
 DEFINES += APP_VERSION=\\\"$$VERSION\\\"
 QTPLUGIN += QSQLITE
 
+DESTDIR=build
+OBJECTS_DIR=build
+MOC_DIR=build
+UI_DIR=build
+RCC_DIR=build
+
 
 unix:!macx {
   TARGET = fasttrack
   
-  DESTDIR=build
-  OBJECTS_DIR=build
-  MOC_DIR=build
-  UI_DIR=build
-  RCC_DIR=build
-
   QMAKE_CXXFLAGS += -std=c++17 -O3 -fopenmp -g -Wconversion
   QMAKE_CXXFLAGS_RELEASE -= -O1
   QMAKE_CXXFLAGS_RELEASE -= -O2
@@ -48,7 +48,8 @@ unix:!macx {
 win32 {
   TARGET = FastTrack
   CONFIG += c++2a
-  LIBS += -L"$$PWD/../OpenCV_MinGW_64/bin" -lopencv_world455
+  QMAKE_CXXFLAGS += -O3 -fopenmp -g
+  LIBS += -L"$$PWD/../OpenCV_MinGW_64/lib" -lopencv_world455
   INCLUDEPATH += "$$PWD/../OpenCV_MinGW_64/include"
 }
 
@@ -66,12 +67,6 @@ unix:macx {
   QMAKE_LFLAGS_RELEASE -= -O2
   QMAKE_LFLAGS_RELEASE += -O3
   QMAKE_LFLAGS_SONAME  = -Wl,-install_name,@executable_path/../Frameworks/
-
-  DESTDIR=build
-  OBJECTS_DIR=build
-  MOC_DIR=build
-  UI_DIR=build
-  RCC_DIR=build
 
   QT_CONFIG -= no-pkg-config
   CONFIG  += link_pkgconfig

@@ -5,14 +5,14 @@ VERSION = 6.2.1
 DEFINES += APP_VERSION=\\\"$$VERSION\\\"
 QTPLUGIN += QSQLITE
 
+DESTDIR=build_cli
+OBJECTS_DIR=build_cli
+MOC_DIR=build_cli
+UI_DIR=build_cli
+RCC_DIR=build_cli
+
 unix:!macx {
   TARGET = fasttrack-cli
-  DESTDIR=build_cli
-  OBJECTS_DIR=build_cli
-  MOC_DIR=build_cli
-  UI_DIR=build_cli
-  RCC_DIR=build_cli
-
   QMAKE_CXXFLAGS += -std=c++17 -O3 -fopenmp -g
   QMAKE_CXXFLAGS_RELEASE -= -O1
   QMAKE_CXXFLAGS_RELEASE -= -O2
@@ -48,12 +48,6 @@ unix:macx {
   QMAKE_LFLAGS_RELEASE += -O3
   QMAKE_LFLAGS_SONAME  = -Wl,-install_name,@executable_path/../Frameworks/
 
-  DESTDIR=build_cli
-  OBJECTS_DIR=build_cli
-  MOC_DIR=build_cli
-  UI_DIR=build_cli
-  RCC_DIR=build_cli
-
   QT_CONFIG -= no-pkg-config
   CONFIG  += link_pkgconfig
   PKGCONFIG += opencv4
@@ -64,8 +58,9 @@ unix:macx {
 win32 {
   TARGET = FastTrack-Cli
   CONFIG += c++2a
+  QMAKE_CXXFLAGS += -O3 -fopenmp -g
   CONFIG += console
-  LIBS += -L"$$PWD/../OpenCV_MinGW_64/bin" -lopencv_world455
+  LIBS += -L"$$PWD/../OpenCV_MinGW_64/lib" -lopencv_world455
   INCLUDEPATH += "$$PWD/../OpenCV_MinGW_64/include"
 }
 

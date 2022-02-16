@@ -1,13 +1,13 @@
 #include <QHash>
 #include <QMap>
-#include <filesystem>
+#include <QFile>
+#include <QDir>
 #include <string>
 #include "../src/autolevel.cpp"
 #include "../src/tracking.cpp"
 #include "../src/videoreader.cpp"
 #include "gtest/gtest.h"
 
-namespace fs = std::filesystem;
 using namespace std;
 using namespace cv;
 
@@ -843,7 +843,8 @@ TEST_F(DataTest, getDataId) {
 }
 
 TEST_F(DataTest, swapData) {
-  fs::copy("../dataSet/images/Groundtruth/Tracking_Result/", "../dataSet/images/Groundtruth/Tracking_Result_Copy/", fs::copy_options::overwrite_existing | fs::copy_options::recursive);
+  QDir().mkdir("../dataSet/images/Groundtruth/Tracking_Result_Copy/"); 
+  QFile::copy("../dataSet/images/Groundtruth/Tracking_Result/tracking.db", "../dataSet/images/Groundtruth/Tracking_Result_Copy/tracking.db");
   Data data("../dataSet/images/Groundtruth/Tracking_Result_Copy/");
   QHash<QString, double> a_prev = data.getData(2, 12);
   QHash<QString, double> b_prev = data.getData(2, 11);
@@ -890,7 +891,7 @@ TEST_F(DataTest, info) {
   Data data("../dataSet/images/Groundtruth/Tracking_Result_Copy/");
   data.deleteData(12, 0, 20);
   EXPECT_EQ(data.getObjectInformation(12), 21);
-  fs::remove_all("../dataSet/images/Groundtruth/Tracking_Result_Copy/");
+  QDir("../dataSet/images/Groundtruth/Tracking_Result_Copy/").removeRecursively();
 }
 }  // namespace
 
