@@ -160,10 +160,15 @@ def tracking(path, imagePath, normDist=None, normAngle=None, maxDist=None, maxTi
 
   if platform.system() == "Windows":
     executable = "FastTrack-Cli.exe"
+    prefix = ""
   elif platform.system() == "Linux":
     executable = "fasttrack-cli"
+    prefix = ""
+  elif platform.system() == "Darwin":
+    executable = "FastTrack-cli.app --args"
+    prefix = "open -W "
 
-  cmd = os.path.abspath("../src/build_cli/" + executable) + " --maxArea " + maxArea + " --minArea " + minArea + " --lightBack "+ lightBack + " --thresh "+ thresh + " --reg " + reg + " --spot "+ spot + " --nBack "+ nBack + " --regBack "+ regBack + " --methBack " + methBack+ " --xTop "+ xTop + " --yTop "+ yTop + " --xBottom " + xBottom + " --yBottom " + yBottom+ " --morph " + morph + " --morphSize " + morphSize+ " --morphType " + morphType +" --normArea " +str(normArea) + " --normPerim "+ str(normPerim) + " --normDist " + str(normDist) + " --normAngle " + str(normAngle) + " --maxDist " + str(maxDist) + " --maxTime " + str(maxTime) + " --path "+ os.path.abspath(path + imagePath) + " --backPath " + os.path.abspath("dataSet/images/Groundtruth/Tracking_Result/background.pgm") #+ " > /dev/null 2>&1" 
+  cmd = prefix + os.path.abspath("../src/build_cli/" + executable) + " --maxArea " + maxArea + " --minArea " + minArea + " --lightBack "+ lightBack + " --thresh "+ thresh + " --reg " + reg + " --spot "+ spot + " --nBack "+ nBack + " --regBack "+ regBack + " --methBack " + methBack+ " --xTop "+ xTop + " --yTop "+ yTop + " --xBottom " + xBottom + " --yBottom " + yBottom+ " --morph " + morph + " --morphSize " + morphSize+ " --morphType " + morphType +" --normArea " +str(normArea) + " --normPerim "+ str(normPerim) + " --normDist " + str(normDist) + " --normAngle " + str(normAngle) + " --maxDist " + str(maxDist) + " --maxTime " + str(maxTime) + " --path "+ os.path.abspath(path + imagePath) + " --backPath " + os.path.abspath("dataSet/images/Groundtruth/Tracking_Result/background.pgm") #+ " > /dev/null 2>&1" 
   out = os.system(cmd)
 
 

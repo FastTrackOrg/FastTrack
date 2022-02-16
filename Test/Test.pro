@@ -22,6 +22,19 @@ unix:!macx {
   QMAKE_CXXFLAGS += -std=c++17 -O3 -fopenmp -g
 }
 
+unix:macx {
+  TARGET = FastTrack-cli
+  CONFIG += c++17
+  LIBS += -L/usr/local/lib -lomp
+  QMAKE_CXXFLAGS += -std=c++1z -stdlib=libc++ -mmacosx-version-min=10.15 -O3 -g -Xpreprocessor -fopenmp
+  QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.15
+  QMAKE_LFLAGS_SONAME  = -Wl,-install_name,@executable_path/../Frameworks/
+  QT_CONFIG -= no-pkg-config
+  CONFIG  += link_pkgconfig
+  PKGCONFIG += opencv4
+  PKGCONFIG += gtest
+}
+
 win32 {
   CONFIG += c++2a
   QMAKE_CXXFLAGS += -O3 -fopenmp -g
