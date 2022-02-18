@@ -1,5 +1,9 @@
 #!/bin/bash
 
+if [ "$1" = "" ]; then
+  echo "release, debug, profile, ci, cli"
+fi
+
 if [ "$1" = "release" ]; then
   set -e
   qmake6 CONFIG+=release FastTrack.pro
@@ -47,6 +51,7 @@ if [ "$1" = "cli" ]; then
   qmake6 CONFIG+=release src/FastTrack-Cli.pro
   make clean
   make
+  make check
   make clean
   cd build_cli
 fi
