@@ -1186,10 +1186,11 @@ void Interactive::saveSettings() {
  */
 void Interactive::level() {
   if (videoStatus) {
-    QThread *thread = new QThread;
-    getParameters();
-    AutoLevel *autolevel = new AutoLevel(memoryDir.toStdString(), background, parameters);
-    autolevel->moveToThread(thread);
+    try {
+      QThread *thread = new QThread;
+      getParameters();
+      AutoLevel *autolevel = new AutoLevel(memoryDir.toStdString(), background, parameters);
+      autolevel->moveToThread(thread);
 
     connect(thread, &QThread::started, autolevel, &AutoLevel::level);
     connect(autolevel, &AutoLevel::forceFinished, [this](QString errorMessage) {
@@ -1212,9 +1213,14 @@ void Interactive::level() {
     connect(autolevel, &AutoLevel::forceFinished, autolevel, &AutoLevel::deleteLater);
     connect(thread, &QThread::finished, thread, &QThread::deleteLater);
 
-    QApplication::setOverrideCursor(Qt::WaitCursor);
-    thread->start();
-    this->setEnabled(false);
+      QApplication::setOverrideCursor(Qt::WaitCursor);
+      thread->start();
+      this->setEnabled(false);
+    }
+    catch (const std::exception &e) {
+      qWarning() << QString::fromStdString(e.what());
+      emit message(QString::fromStdString(e.what()));
+    }
   }
 }
 

@@ -34,8 +34,7 @@ This file is part of Fast Track.
  * @brief Construct the VideoReader object from a path to a file that can be either an image from  an image sequence or a movie file.
  * @param[in] path Path to a video or image file.
  */
-VideoReader::VideoReader(const string &path) {
-  open(path);
+VideoReader::VideoReader(const string &path) : m_path{path} {
 }
 
 /**
@@ -43,14 +42,17 @@ VideoReader::VideoReader(const string &path) {
  * @param[in] video.
  */
 VideoReader::VideoReader(const VideoReader &video) : VideoCapture(video) {
-  open(video.m_path);
 }
 
 VideoReader &VideoReader::operator=(const VideoReader &video) {
-  open(video.m_path);
   return *this;
 }
 
+/**
+ * @brief Open the VideoReader.
+ * @param[in] path to file.
+ * @param[in] OpenCV backend.
+ */
 bool VideoReader::open(const String &path, int apiPreference) {
   if (path.empty()) {
     return false;
@@ -79,6 +81,14 @@ bool VideoReader::open(const String &path, int apiPreference) {
     normPath = path;
   }
   return VideoCapture::open(normPath, apiPreference);
+}
+
+/**
+ * @brief Open the VideoReader.
+ * @param[in] OpenCV backend.
+ */
+bool VideoReader::open(int apiPreference) {
+  return this->open(m_path, apiPreference);
 }
 
 /**

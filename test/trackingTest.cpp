@@ -1,7 +1,7 @@
+#include <QDir>
+#include <QFile>
 #include <QHash>
 #include <QMap>
-#include <QFile>
-#include <QDir>
 #include <string>
 #include "../src/autolevel.cpp"
 #include "../src/tracking.cpp"
@@ -682,6 +682,9 @@ TEST_F(TrackingTest, costFunction) {
 TEST_F(VideoReaderTest, UMatSequence) {
   UMat diff, test, ref;
   VideoReader video("../dataSet/images/frame_000001.pgm");
+  if (!video.open()) {
+    FAIL();
+  }
   video.getImage(0, test);
   imread("../dataSet/images/frame_000001.pgm", IMREAD_GRAYSCALE).copyTo(ref);
   compare(test, ref, diff, cv::CMP_NE);
@@ -699,6 +702,9 @@ TEST_F(VideoReaderTest, UMatSequence) {
 TEST_F(VideoReaderTest, MatSequence) {
   Mat diff, test, ref;
   VideoReader video("../dataSet/images/frame_000001.pgm");
+  if (!video.open()) {
+    FAIL();
+  }
   video.getImage(0, test);
   imread("../dataSet/images/frame_000001.pgm", IMREAD_GRAYSCALE).copyTo(ref);
   compare(test, ref, diff, cv::CMP_NE);
@@ -715,12 +721,18 @@ TEST_F(VideoReaderTest, MatSequence) {
 
 TEST_F(VideoReaderTest, CountSequence) {
   VideoReader video("../dataSet/images/frame_000001.pgm");
+  if (!video.open()) {
+    FAIL();
+  }
   EXPECT_EQ(video.getImageCount(), 200);
 }
 
 TEST_F(VideoReaderTest, UMatVideo) {
   UMat diff, test, ref;
   VideoReader video("../dataSet/test.avi");
+  if (!video.open()) {
+    FAIL();
+  }
   video.getImage(0, test);
   imread("../dataSet/images/frame_000001.pgm", IMREAD_GRAYSCALE).copyTo(ref);
   compare(test, ref, diff, cv::CMP_NE);
@@ -738,6 +750,9 @@ TEST_F(VideoReaderTest, UMatVideo) {
 TEST_F(VideoReaderTest, MatVideo) {
   Mat diff, test, ref;
   VideoReader video("../dataSet/test.avi");
+  if (!video.open()) {
+    FAIL();
+  }
   video.getImage(0, test);
   imread("../dataSet/images/frame_000001.pgm", IMREAD_GRAYSCALE).copyTo(ref);
   compare(test, ref, diff, cv::CMP_NE);
@@ -754,6 +769,9 @@ TEST_F(VideoReaderTest, MatVideo) {
 
 TEST_F(VideoReaderTest, CountVideo) {
   VideoReader video("../dataSet/test.avi");
+  if (!video.open()) {
+    FAIL();
+  }
   EXPECT_EQ(video.getImageCount(), 200);
 }
 
@@ -843,7 +861,7 @@ TEST_F(DataTest, getDataId) {
 }
 
 TEST_F(DataTest, swapData) {
-  QDir().mkdir("../dataSet/images/Groundtruth/Tracking_Result_Copy/"); 
+  QDir().mkdir("../dataSet/images/Groundtruth/Tracking_Result_Copy/");
   QFile::copy("../dataSet/images/Groundtruth/Tracking_Result/tracking.db", "../dataSet/images/Groundtruth/Tracking_Result_Copy/tracking.db");
   Data data("../dataSet/images/Groundtruth/Tracking_Result_Copy/");
   QHash<QString, double> a_prev = data.getData(2, 12);

@@ -48,6 +48,7 @@ class VideoReader : public VideoCapture {
   bool getImage(int index, UMat &destination);
   bool getImage(int index, Mat &destination);
   bool open(const String &path, int apiPreference = CAP_FFMPEG) override;
+  bool open(int apiPreference = CAP_FFMPEG);
   unsigned int getImageCount() const;
   bool isSequence();
 };

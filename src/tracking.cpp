@@ -838,7 +838,7 @@ Tracking::Tracking(string path, UMat background, int startImage, int stopImage) 
  */
 void Tracking::startProcess() {
   try {
-    if (!video->isOpened()) {
+    if (!video->open()) {
       throw std::runtime_error("Fatal error, the video can be opened");
     }
 

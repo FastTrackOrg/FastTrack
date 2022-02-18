@@ -46,6 +46,9 @@ AutoLevel::AutoLevel(const string &path, const UMat &background, const QMap<QStr
   m_endImage = 200;
   // Save precedent analysis if exist
   VideoReader video(m_path);
+  if (!video.open()) {
+    throw std::runtime_error("Can't open video " + m_path);
+  }
   QFileInfo savingInfo(QString::fromStdString(m_path));
   QString savingFilename = savingInfo.baseName();
   m_savedPath = savingInfo.absolutePath();
@@ -65,7 +68,6 @@ AutoLevel::AutoLevel(const string &path, const UMat &background, const QMap<QStr
  */
 QMap<QString, double> AutoLevel::level() {
   try {
-    VideoReader video(m_path);
     srand(static_cast<unsigned int>(time(NULL)));
     double stdAngle = static_cast<double>(rand() % 360 + 1);
     double stdDist = static_cast<double>(rand() % 500 + 1);
@@ -101,7 +103,7 @@ QMap<QString, double> AutoLevel::level() {
       QDir(m_savedPath).removeRecursively();
       counter++;
       if (counter > 100) {
-        throw 0;
+        throw std::runtime_error("Level not converging");
       }
     }
     QMap<QString, double> levelParameters;
@@ -114,8 +116,8 @@ QMap<QString, double> AutoLevel::level() {
     emit(finished());
     return levelParameters;
   }
-  catch (...) {
-    emit(forceFinished("Autoleveling not converging"));
+  catch (const std::exception &e) {
+    emit forceFinished(QString::fromStdString(e.what()));
     QMap<QString, double> levelParameters;
     return levelParameters;
   }
