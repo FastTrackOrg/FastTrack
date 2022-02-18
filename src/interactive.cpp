@@ -51,7 +51,7 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   qRegisterMetaType<QMap<QString, double>>("QMap<QString, double>");
 
   // DockWidget
-  connect(ui->imageOptions, &QDockWidget::dockLocationChanged, [this](Qt::DockWidgetArea area) {
+  connect(ui->imageOptions, &QDockWidget::dockLocationChanged, this, [this](Qt::DockWidgetArea area) {
     switch (area) {
       case Qt::LeftDockWidgetArea:
         ui->optionsTab->setTabPosition(QTabWidget::West);
@@ -69,7 +69,7 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
         ui->optionsTab->setTabPosition(QTabWidget::West);
     }
   });
-  connect(ui->trackingOptions, &QDockWidget::dockLocationChanged, [this](Qt::DockWidgetArea area) {
+  connect(ui->trackingOptions, &QDockWidget::dockLocationChanged, this, [this](Qt::DockWidgetArea area) {
     switch (area) {
       case Qt::LeftDockWidgetArea:
         ui->trackingTab->setTabPosition(QTabWidget::West);
@@ -97,7 +97,7 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
 
   replayAction = new QAction(tr("Tracking replay"), this);
   replayAction->setCheckable(true);
-  connect(replayAction, &QAction::toggled, [this](bool isChecked) {
+  connect(replayAction, &QAction::toggled, this, [this](bool isChecked) {
     if (isChecked) {
       ui->interactiveTab->addTab(replay, tr("Replay"));
       ui->interactiveTab->setCurrentIndex(1);
@@ -108,7 +108,7 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   });
   ui->menuView->addAction(replayAction);
 
-  connect(ui->slider, &Timeline::valueChanged, [this](const int &newValue) {
+  connect(ui->slider, &Timeline::valueChanged, this, [this](const int &newValue) {
     int index = ui->interactiveTab->currentIndex();
     if (index == 0) {
       display(newValue);
@@ -119,7 +119,7 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   });
 
   // Stay on the same frame when changing tab
-  connect(ui->interactiveTab, &QTabWidget::currentChanged, [this]() {
+  connect(ui->interactiveTab, &QTabWidget::currentChanged, this, [this]() {
     ui->slider->setValue(ui->slider->value());
   });
 
@@ -132,7 +132,7 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   for (auto const &a : styles) {
     QAction *styleAction = new QAction(a, this);
     styleAction->setCheckable(true);
-    connect(styleAction, &QAction::triggered, [this, styleAction, menuStyle]() {
+    connect(styleAction, &QAction::triggered, this, [this, styleAction, menuStyle]() {
       qApp->setStyle(QStyleFactory::create(styleAction->text()));
       style = styleAction->text();
       foreach (QAction *action, menuStyle->actions()) {
@@ -167,7 +167,7 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   QAction *ftColor = new QAction(tr("FastTrack"), this);
   ftColor->setCheckable(true);
   menuPalette->addAction(ftColor);
-  connect(defaultColor, &QAction::triggered, [this, defaultColor, menuPalette]() {
+  connect(defaultColor, &QAction::triggered, this, [this, defaultColor, menuPalette]() {
     foreach (QAction *action, menuPalette->actions()) {
       action->setChecked(false);
     }
@@ -175,7 +175,7 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
     qApp->setStyleSheet("");
     color = "default";
   });
-  connect(darkColor, &QAction::triggered, [this, darkColor, menuPalette]() {
+  connect(darkColor, &QAction::triggered, this, [this, darkColor, menuPalette]() {
     foreach (QAction *action, menuPalette->actions()) {
       action->setChecked(false);
     }
@@ -186,7 +186,7 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
     qApp->setStyleSheet(stream.readAll());
     color = "dark";
   });
-  connect(lightColor, &QAction::triggered, [this, lightColor, menuPalette]() {
+  connect(lightColor, &QAction::triggered, this, [this, lightColor, menuPalette]() {
     foreach (QAction *action, menuPalette->actions()) {
       action->setChecked(false);
     }
@@ -197,7 +197,7 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
     qApp->setStyleSheet(stream.readAll());
     color = "light";
   });
-  connect(ftColor, &QAction::triggered, [this, ftColor, menuPalette]() {
+  connect(ftColor, &QAction::triggered, this, [this, ftColor, menuPalette]() {
     foreach (QAction *action, menuPalette->actions()) {
       action->setChecked(false);
     }
@@ -226,7 +226,7 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   // Layout options
   ui->menuBar->removeAction(ui->menuLayout->menuAction());
   ui->menuSettings->addMenu(ui->menuLayout);
-  connect(ui->actionLayout1, &QAction::triggered, [this]() {
+  connect(ui->actionLayout1, &QAction::triggered, this, [this]() {
     ui->controlOptions->setVisible(true);
     ui->imageOptions->setVisible(true);
     ui->trackingOptions->setVisible(true);
@@ -247,7 +247,7 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
 
     layout = 1;
   });
-  connect(ui->actionLayout2, &QAction::triggered, [this]() {
+  connect(ui->actionLayout2, &QAction::triggered, this, [this]() {
     ui->controlOptions->setVisible(true);
     ui->imageOptions->setVisible(true);
     ui->trackingOptions->setVisible(true);
@@ -268,7 +268,7 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
 
     layout = 2;
   });
-  connect(ui->actionLayout3, &QAction::triggered, [this]() {
+  connect(ui->actionLayout3, &QAction::triggered, this, [this]() {
     ui->controlOptions->setVisible(true);
     ui->imageOptions->setVisible(true);
     ui->trackingOptions->setVisible(true);
@@ -288,7 +288,7 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
 
     layout = 3;
   });
-  connect(ui->actionLayout4, &QAction::triggered, [this]() {
+  connect(ui->actionLayout4, &QAction::triggered, this, [this]() {
     ui->controlOptions->setVisible(true);
     ui->imageOptions->setVisible(true);
     ui->trackingOptions->setVisible(true);
@@ -334,12 +334,12 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   actionMode->setCheckable(true);
   isExpert = settingsFile.value("window/mode", false).toBool();
   actionMode->setChecked(isExpert);
-  connect(actionMode, &QAction::toggled, [this](bool isChecked) {
-    emit(modeChanged(isChecked));
+  connect(actionMode, &QAction::toggled, this, [this](bool isChecked) {
+    emit modeChanged(isChecked);
     isExpert = isChecked;
   });
   QTimer::singleShot(500, actionMode, [this]() {
-    emit(modeChanged(isExpert));
+    emit modeChanged(isExpert);
   });  // Need to wait for the connection initialization
   ui->menuSettings->addAction(actionMode);
 
@@ -359,12 +359,12 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   connect(ui->actionContact, &QAction::triggered, []() {
     QDesktopServices::openUrl(QUrl("mailto:benjamin.gallois@fasttrack.sh?subject=[fasttrack]", QUrl::TolerantMode));
   });
-  connect(ui->actionGenerateLog, &QAction::triggered, [this]() {
+  connect(ui->actionGenerateLog, &QAction::triggered, this, [this]() {
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save Log File"), QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation), tr("Logs (*.log)"));
     QFile::remove(fileName);
     QFile::copy(QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) + "/fasttrack.log", fileName);
   });
-  connect(ui->actionAbout, &QAction::triggered, []() {
+  connect(ui->actionAbout, &QAction::triggered, this, []() {
     QMessageBox aboutBox;
     aboutBox.setText("FastTrack is a desktop tracking software, easy to install, easy to use, and performant.<br>Created and maintained by Benjamin Gallois.<br>Distributed under the terms of the <a href='https://www.gnu.org/licenses/gpl-3.0'>GPL3.0 license</a>.<br>");
     aboutBox.exec();
@@ -382,22 +382,22 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   // Threshold slider and combobox
   connect(ui->threshSlider, &QSlider::valueChanged, ui->threshBox, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::setValue));
   connect(ui->threshBox, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), ui->threshSlider, &QSlider::setValue);
-  connect(ui->threshBox, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [this]() {
+  connect(ui->threshBox, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, [this]() {
     ui->isBin->setChecked(true);
     ui->interactiveTab->setCurrentIndex(0);
     display(ui->slider->value());
   });
 
   // Draws scale
-  connect(ui->lo, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [this](int scale) {
+  connect(ui->lo, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, [this](int scale) {
     display(ui->slider->value(), scale);
   });
-  connect(ui->maxL, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [this](int scale) {
+  connect(ui->maxL, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, [this](int scale) {
     display(ui->slider->value(), static_cast<int>(scale));
   });
 
   // Zoom
-  connect(ui->scrollArea->verticalScrollBar(), &QScrollBar::rangeChanged, [this]() {
+  connect(ui->scrollArea->verticalScrollBar(), &QScrollBar::rangeChanged, this, [this]() {
     QScrollBar *vertical = ui->scrollArea->verticalScrollBar();
     if (currentZoom > 0) {
       vertical->setValue(int(zoomReferencePosition.y() * 0.25 + vertical->value() * 1.25));
@@ -406,7 +406,7 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
       vertical->setValue(int(-zoomReferencePosition.y() * 0.25 + vertical->value() / 1.25));
     }
   });
-  connect(ui->scrollArea->horizontalScrollBar(), &QScrollBar::rangeChanged, [this]() {
+  connect(ui->scrollArea->horizontalScrollBar(), &QScrollBar::rangeChanged, this, [this]() {
     QScrollBar *horizontal = ui->scrollArea->horizontalScrollBar();
     if (currentZoom > 0) {
       horizontal->setValue(int(zoomReferencePosition.x() * 0.25 + horizontal->value() * 1.25));
@@ -419,7 +419,7 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   // Replay tab
   video = new VideoReader();
   replay = new Replay(this, false, ui->slider, video);
-  connect(ui->interactiveTab, &QTabWidget::tabCloseRequested, [this](int index) {
+  connect(ui->interactiveTab, &QTabWidget::tabCloseRequested, this, [this](int index) {
     if (index != 0) {
       ui->interactiveTab->removeTab(index);
       replayAction->setChecked(false);
@@ -427,41 +427,41 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   });
 
   // Updates the display after each operation
-  connect(ui->morphOperation, static_cast<void (QComboBox::*)(int)>(&QComboBox::activated), [this]() {
+  connect(ui->morphOperation, static_cast<void (QComboBox::*)(int)>(&QComboBox::activated), this, [this]() {
     display(ui->slider->value());
   });
-  connect(ui->kernelSize, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [this]() {
+  connect(ui->kernelSize, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, [this]() {
     ui->isBin->setChecked(true);
     display(ui->slider->value());
   });
-  connect(ui->kernelType, static_cast<void (QComboBox::*)(int)>(&QComboBox::activated), [this]() {
+  connect(ui->kernelType, static_cast<void (QComboBox::*)(int)>(&QComboBox::activated), this, [this]() {
     ui->isBin->setChecked(true);
     display(ui->slider->value());
   });
-  connect(ui->minSize, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [this]() {
+  connect(ui->minSize, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, [this]() {
     ui->isBin->setChecked(true);
     display(ui->slider->value());
   });
-  connect(ui->maxSize, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [this]() {
+  connect(ui->maxSize, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, [this]() {
     ui->isBin->setChecked(true);
     display(ui->slider->value());
   });
-  connect(ui->backColor, static_cast<void (QComboBox::*)(int)>(&QComboBox::activated), [this]() {
+  connect(ui->backColor, static_cast<void (QComboBox::*)(int)>(&QComboBox::activated), this, [this]() {
     ui->isBin->setChecked(true);
     display(ui->slider->value());
   });
-  connect(ui->isBin, &QRadioButton::clicked, [this]() {
+  connect(ui->isBin, &QRadioButton::clicked, this, [this]() {
     display(ui->slider->value());
   });
-  connect(ui->isOriginal, &QRadioButton::clicked, [this]() {
+  connect(ui->isOriginal, &QRadioButton::clicked, this, [this]() {
     display(ui->slider->value());
   });
-  connect(ui->isSub, &QRadioButton::clicked, [this]() {
+  connect(ui->isSub, &QRadioButton::clicked, this, [this]() {
     display(ui->slider->value());
   });
 
   // Set the image preview limits
-  connect(ui->startImage, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [this](int startImage) {
+  connect(ui->startImage, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, [this](int startImage) {
     ui->stopImage->setRange(0, video->getImageCount() - startImage);
   });
 
@@ -475,7 +475,7 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   connect(ui->backgroundSelectButton, &QPushButton::clicked, this, &Interactive::selectBackground);
   connect(ui->backgroundComputeButton, &QPushButton::clicked, this, &Interactive::computeBackground);
   connect(ui->previewButton, &QPushButton::clicked, this, &Interactive::previewTracking);
-  connect(ui->trackButton, &QPushButton::clicked, [this]() {
+  connect(ui->trackButton, &QPushButton::clicked, this, [this]() {
     QMessageBox::StandardButton reply;
     reply = QMessageBox::question(this, "Confirmation", "You are going to start a full tracking analysis. That can take some time, are you sure?", QMessageBox::Yes | QMessageBox::No);
     if (reply == QMessageBox::Yes) {
@@ -559,10 +559,10 @@ void Interactive::openFolder() {
       ui->x2->setMaximum(originalImageSize.width());
       ui->y2->setMaximum(originalImageSize.height());
 
-      ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Path", Qt::MatchExactly)[0]), 1)->setText(dir);
-      ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Image number", Qt::MatchExactly)[0]), 1)->setText(QString::number(video->getImageCount()));
-      ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Image width", Qt::MatchExactly)[0]), 1)->setText(QString::number(frame.cols));
-      ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Image height", Qt::MatchExactly)[0]), 1)->setText(QString::number(frame.rows));
+      ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Path", Qt::MatchExactly).at(0)), 1)->setText(dir);
+      ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Image number", Qt::MatchExactly).at(0)), 1)->setText(QString::number(video->getImageCount()));
+      ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Image width", Qt::MatchExactly).at(0)), 1)->setText(QString::number(frame.cols));
+      ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Image height", Qt::MatchExactly).at(0)), 1)->setText(QString::number(frame.rows));
 
       isBackground = false;
       reset();
@@ -583,7 +583,7 @@ void Interactive::openFolder() {
       else {
         cfgFile.append(QString("/Tracking_Result_") + savingFilename + QDir::separator() + "cfg.toml");
       }
-      if (QFileInfo(cfgFile).exists()) {
+      if (QFileInfo::exists(cfgFile)) {
         loadParameters(cfgFile);
       }
       if (video->isOpened()) {
@@ -594,12 +594,12 @@ void Interactive::openFolder() {
     }
     // If an error occurs during the opening, resets the information table and warns the user
     catch (exception &e) {
-      ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Path", Qt::MatchExactly)[0]), 1)->setText("");
-      ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Image number", Qt::MatchExactly)[0]), 1)->setText("0");
-      ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Image width", Qt::MatchExactly)[0]), 1)->setText("0");
-      ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Image height", Qt::MatchExactly)[0]), 1)->setText("0");
+      ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Path", Qt::MatchExactly).at(0)), 1)->setText("");
+      ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Image number", Qt::MatchExactly).at(0)), 1)->setText("0");
+      ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Image width", Qt::MatchExactly).at(0)), 1)->setText("0");
+      ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Image height", Qt::MatchExactly).at(0)), 1)->setText("0");
       qWarning() << QString::fromStdString(e.what()) << "occurs during opening of " << dir;
-      emit(message("No image found."));
+      emit message("No image found.");
     }
   }
   QApplication::restoreOverrideCursor();
@@ -686,11 +686,11 @@ void Interactive::display(int index, int scale) {
   }
   catch (const std::exception &e) {
     qWarning() << QString::fromStdString(e.what()) << " occurs at image " << index << " display";
-    emit(message(QString::fromStdString(e.what()) + QString(" occurs on image %1.").arg(index)));
+    emit message(QString::fromStdString(e.what()) + QString(" occurs on image %1.").arg(index));
   }
   catch (...) {
     qWarning() << "Unknown error occurs at image " << index << " display";
-    emit(message(QString("An error occurs on image %1.").arg(index)));
+    emit message(QString("An error occurs on image %1.").arg(index));
   }
 }
 
@@ -764,7 +764,7 @@ void Interactive::computeBackground() {
 
     // After compute background process
     QFutureWatcher<UMat> *watcher = new QFutureWatcher<UMat>();
-    connect(watcher, &QFutureWatcher<UMat>::finished, [this, watcher]() {
+    connect(watcher, &QFutureWatcher<UMat>::finished, this, [this, watcher]() {
       background = watcher->result().clone();  // Clone needed for Windows otherwise no initial display and ui buggued afterward, why if UMat is a smartpointer?
       if (!background.empty()) {
         isBackground = true;
@@ -808,11 +808,11 @@ void Interactive::computeBackground() {
       }
       catch (const std::runtime_error &e) {
         qWarning() << QString::fromStdString(e.what()) << "occurs during background computation";
-        emit(message(e.what()));
+        emit message(e.what());
       }
       catch (...) {
         qWarning() << "Unknown error occurs during background computation";
-        emit(message("An error occurs. Please change the registration method"));
+        emit message("An error occurs. Please change the registration method");
       }
       return background;
     });
@@ -850,7 +850,7 @@ void Interactive::selectBackground() {
     }
     else {
       isBackground = false;
-      emit(message("The width or height of the background image does not match the video width or height."));
+      emit message("The width or height of the background image does not match the video width or height.");
     }
   }
 }
@@ -902,8 +902,8 @@ void Interactive::previewTracking() {
 
     connect(thread, &QThread::started, tracking, &Tracking::startProcess);
     connect(tracking, &Tracking::progress, ui->progressBar, &QProgressBar::setValue);
-    connect(tracking, &Tracking::statistic, [this](int time) {
-      ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Analysis rate", Qt::MatchExactly)[0]), 1)->setText(QString::number(double(ui->stopImage->value() * 1000) / double(time)));
+    connect(tracking, &Tracking::statistic, this, [this](int time) {
+      ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Analysis rate", Qt::MatchExactly).at(0)), 1)->setText(QString::number(double(ui->stopImage->value() * 1000) / double(time)));
     });
     connect(tracking, &Tracking::finished, this, [this]() {
       ui->slider->setDisabled(false);
@@ -918,7 +918,7 @@ void Interactive::previewTracking() {
       ui->trackButton->setDisabled(false);
       replay->loadReplay(dir);
       replayAction->setChecked(true);
-      message(errorMessage);
+      emit message(errorMessage);
     });
     connect(tracking, &Tracking::forceFinished, thread, &QThread::quit);
     connect(tracking, &Tracking::forceFinished, tracking, &Tracking::deleteLater);
@@ -954,8 +954,8 @@ void Interactive::track() {
 
     connect(thread, &QThread::started, tracking, &Tracking::startProcess);
     connect(tracking, &Tracking::progress, ui->progressBar, &QProgressBar::setValue);
-    connect(tracking, &Tracking::statistic, [this, logMap](int time) {
-      ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Analysis rate", Qt::MatchExactly)[0]), 1)->setText(QString::number(double(video->getImageCount() * 1000) / double(time)));
+    connect(tracking, &Tracking::statistic, this, [this, logMap](int time) {
+      ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Analysis rate", Qt::MatchExactly).at(0)), 1)->setText(QString::number(double(video->getImageCount() * 1000) / double(time)));
       logMap->insert("time", QString::number(time));
     });
     connect(tracking, &Tracking::forceFinished, this, [this, logMap](QString errorMessage) {
@@ -965,9 +965,9 @@ void Interactive::track() {
       replay->loadReplay(dir);
       replayAction->setChecked(true);
       logMap->insert("status", errorMessage);
-      emit(log(*logMap));
-      emit(status("Tracking failed"));
-      emit(message(errorMessage));
+      emit log(*logMap);
+      emit status("Tracking failed");
+      emit message(errorMessage);
     });
     connect(tracking, &Tracking::finished, thread, &QThread::quit);
     connect(tracking, &Tracking::finished, this, [this, logMap]() {
@@ -977,8 +977,8 @@ void Interactive::track() {
       replay->loadReplay(dir);
       replayAction->setChecked(true);
       logMap->insert("status", "Done");
-      emit(log(*logMap));
-      emit(status("Tracking succeeded"));
+      emit log(*logMap);
+      emit status("Tracking succeeded");
     });
     connect(tracking, &Tracking::forceFinished, thread, &QThread::quit);
     connect(tracking, &Tracking::forceFinished, tracking, &Tracking::deleteLater);
@@ -1122,8 +1122,8 @@ void Interactive::crop() {
   roi = Rect(xTop, yTop, width, height);
   cropedImageSize.setWidth(roi.width);
   cropedImageSize.setHeight(roi.height);
-  ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Image width", Qt::MatchExactly)[0]), 1)->setText(QString::number(roi.width));
-  ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Image height", Qt::MatchExactly)[0]), 1)->setText(QString::number(roi.height));
+  ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Image width", Qt::MatchExactly).at(0)), 1)->setText(QString::number(roi.width));
+  ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Image height", Qt::MatchExactly).at(0)), 1)->setText(QString::number(roi.height));
   display(ui->slider->value());
 
   // Sets the roi limits
@@ -1155,8 +1155,8 @@ void Interactive::reset() {
   ui->y1->setValue(0);
   ui->x2->setValue(originalImageSize.width());
   ui->y2->setValue(originalImageSize.height());
-  ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Image width", Qt::MatchExactly)[0]), 1)->setText(QString::number(originalImageSize.width()));
-  ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Image height", Qt::MatchExactly)[0]), 1)->setText(QString::number(originalImageSize.height()));
+  ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Image width", Qt::MatchExactly).at(0)), 1)->setText(QString::number(originalImageSize.width()));
+  ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Image height", Qt::MatchExactly).at(0)), 1)->setText(QString::number(originalImageSize.height()));
   roi = Rect(0, 0, 0, 0);
   display(ui->slider->value());
 }
@@ -1192,26 +1192,26 @@ void Interactive::level() {
       AutoLevel *autolevel = new AutoLevel(memoryDir.toStdString(), background, parameters);
       autolevel->moveToThread(thread);
 
-    connect(thread, &QThread::started, autolevel, &AutoLevel::level);
-    connect(autolevel, &AutoLevel::forceFinished, [this](QString errorMessage) {
-      this->setEnabled(true);
-      message(errorMessage);
-    });
-    connect(autolevel, &AutoLevel::finished, this, [this]() {
-      this->setEnabled(true);
-    });
-    connect(autolevel, &AutoLevel::levelParametersChanged, this, [this](QMap<QString, double> levelParameters) {
-      ui->maxT->setValue(levelParameters.value("normAngle"));
-      ui->maxL->setValue(levelParameters.value("normDist"));
-      ui->normArea->setValue(levelParameters.value("normArea"));
-      ui->normPerim->setValue(levelParameters.value("normPerim"));
-      QApplication::restoreOverrideCursor();
-    });
-    connect(autolevel, &AutoLevel::finished, thread, &QThread::quit);
-    connect(autolevel, &AutoLevel::finished, autolevel, &AutoLevel::deleteLater);
-    connect(autolevel, &AutoLevel::forceFinished, thread, &QThread::quit);
-    connect(autolevel, &AutoLevel::forceFinished, autolevel, &AutoLevel::deleteLater);
-    connect(thread, &QThread::finished, thread, &QThread::deleteLater);
+      connect(thread, &QThread::started, autolevel, &AutoLevel::level);
+      connect(autolevel, &AutoLevel::forceFinished, this, [this](QString errorMessage) {
+        this->setEnabled(true);
+        emit message(errorMessage);
+      });
+      connect(autolevel, &AutoLevel::finished, this, [this]() {
+        this->setEnabled(true);
+      });
+      connect(autolevel, &AutoLevel::levelParametersChanged, this, [this](QMap<QString, double> levelParameters) {
+        ui->maxT->setValue(levelParameters.value("normAngle"));
+        ui->maxL->setValue(levelParameters.value("normDist"));
+        ui->normArea->setValue(levelParameters.value("normArea"));
+        ui->normPerim->setValue(levelParameters.value("normPerim"));
+        QApplication::restoreOverrideCursor();
+      });
+      connect(autolevel, &AutoLevel::finished, thread, &QThread::quit);
+      connect(autolevel, &AutoLevel::finished, autolevel, &AutoLevel::deleteLater);
+      connect(autolevel, &AutoLevel::forceFinished, thread, &QThread::quit);
+      connect(autolevel, &AutoLevel::forceFinished, autolevel, &AutoLevel::deleteLater);
+      connect(thread, &QThread::finished, thread, &QThread::deleteLater);
 
       QApplication::setOverrideCursor(Qt::WaitCursor);
       thread->start();

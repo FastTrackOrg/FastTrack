@@ -88,7 +88,7 @@ Data::Data(const QString &dataPath) : Data() {
 /**
  * @brief Construct the data object from a tracking result file.
  */
-Data::Data() : connectionName(QString("data_%1").arg(QRandomGenerator::global()->generate())) {
+Data::Data() : connectionName{QString("data_%1").arg(QRandomGenerator::global()->generate())} {
   isEmpty = true;
   QSqlDatabase data = QSqlDatabase::addDatabase("QSQLITE", connectionName);
 }
@@ -229,7 +229,8 @@ QList<int> Data::getId(int imageIndexFirst, int imageIndexLast) const {
     ids.append(query.value(0).toInt());
   }
   std::sort(ids.begin(), ids.end());
-  ids.erase(std::unique(ids.begin(), ids.end()), ids.end());
+  auto it = std::unique(ids.begin(), ids.end());
+  ids.erase(it, ids.end());
   return ids;
 }
 

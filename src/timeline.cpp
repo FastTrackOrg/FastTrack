@@ -29,7 +29,7 @@ This file is part of Fast Track.
  *
  * Contact: benjamin.gallois@fasttrack.sh
  *
-*/
+ */
 
 Timeline::Timeline(QWidget *parent)
     : QWidget(parent), ui(new Ui::Timeline) {
@@ -45,7 +45,7 @@ Timeline::Timeline(QWidget *parent)
   m_currentIndexLeft = 0;
   m_scale = 1;
   timer = new QTimer(this);
-  connect(timer, &QTimer::timeout, [this]() {
+  connect(timer, &QTimer::timeout, this, [this]() {
     if (isEnabled()) {
       if (m_currentIndexLeft < m_imageNumber) {
         setValue(m_currentIndexLeft + 1);
@@ -63,8 +63,8 @@ Timeline::Timeline(QWidget *parent)
   ui->timelineView->installEventFilter(this);
   ui->timelineView->setScene(timelineScene);
 
-  //Connection
-  connect(ui->zoom, &QAbstractSlider::valueChanged, [this](int value) {
+  // Connection
+  connect(ui->zoom, &QAbstractSlider::valueChanged, this, [this](int value) {
     m_scale = value;
     update(m_currentIndex);
     int x = ((m_width * m_scale - m_offset) * m_currentIndexLeft) / m_imageNumber + static_cast<int>(m_offset * 0.5);
@@ -74,18 +74,18 @@ Timeline::Timeline(QWidget *parent)
   // Keyboard shorcuts
   // AZERTY keyboard shorcuts are set in the ui
   QShortcut *qShortcut = new QShortcut(QKeySequence("q"), this);
-  connect(qShortcut, &QShortcut::activated, [this]() { setValue(m_currentIndexLeft - 1); });
+  connect(qShortcut, &QShortcut::activated, this, [this]() { setValue(m_currentIndexLeft - 1); });
 
   QShortcut *aShortcut = new QShortcut(QKeySequence("a"), this);
-  connect(aShortcut, &QShortcut::activated, [this]() { setValue(m_currentIndexLeft - 1); });
+  connect(aShortcut, &QShortcut::activated, this, [this]() { setValue(m_currentIndexLeft - 1); });
 
   QShortcut *dShortcut = new QShortcut(QKeySequence("d"), this);
-  connect(dShortcut, &QShortcut::activated, [this]() { setValue(m_currentIndexLeft + 1); });
+  connect(dShortcut, &QShortcut::activated, this, [this]() { setValue(m_currentIndexLeft + 1); });
 
   QShortcut *spaceShortcut = new QShortcut(Qt::Key_Space, this);
-  connect(spaceShortcut, &QShortcut::activated, [this]() { ui->playButton->animateClick(); });
+  connect(spaceShortcut, &QShortcut::activated, this, [this]() { ui->playButton->animateClick(); });
 
-  //Ui
+  // Ui
   QIcon img = QIcon(":/assets/buttons/play.png");
   ui->playButton->setIcon(img);
   ui->playButton->setIconSize(QSize(ui->playButton->width(), ui->playButton->height()));
@@ -93,10 +93,10 @@ Timeline::Timeline(QWidget *parent)
 }
 
 /**
-  * @brief Set the layout of the timeline.
-  * @param[in] width The width of the widget.
-  * @param[in] imageNumber The number of images.
-*/
+ * @brief Set the layout of the timeline.
+ * @param[in] width The width of the widget.
+ * @param[in] imageNumber The number of images.
+ */
 void Timeline::setLayout(const int width, const int imageNumber) {
   // Ruler
   double step = static_cast<double>(width * m_scale - m_offset) / static_cast<double>(imageNumber);
@@ -117,7 +117,7 @@ void Timeline::setLayout(const int width, const int imageNumber) {
   cursor = new QGraphicsLineItem(0, 5, 0, 40);
   timelineScene->addItem(cursor);
   cursorLeft = new QGraphicsLineItem(m_offset * 0.5, 5, m_offset * 0.5, 40);
-  int x = ((width * m_scale - m_offset) * m_currentIndexLeft) / imageNumber + static_cast<int>(m_offset * 0.5);
+  int x = (imageNumber > 0) ? ((width * m_scale - m_offset) * m_currentIndexLeft) / imageNumber + static_cast<int>(m_offset * 0.5) : 0;
   QPen cursorLeftPen = QPen(QColor("black"));
   cursorLeftPen.setWidth(2);
   cursorLeft->setPen(cursorLeftPen);
@@ -134,18 +134,18 @@ Timeline::~Timeline() {
 }
 
 /**
-  * @brief Handle the widget redrawing when resized.
-  * @param[in] *event Pointer to the event.
-*/
+ * @brief Handle the widget redrawing when resized.
+ * @param[in] *event Pointer to the event.
+ */
 void Timeline::resizeEvent(QResizeEvent *event) {
   update(m_currentIndexLeft);
 }
 
 /**
-  * @brief Handle the pointer event, click and hover.
-  * @param[in] *target Pointer to the target widget.
-  * @param[in] *event Pointer to the event.
-*/
+ * @brief Handle the pointer event, click and hover.
+ * @param[in] *target Pointer to the target widget.
+ * @param[in] *event Pointer to the event.
+ */
 bool Timeline::eventFilter(QObject *target, QEvent *event) {
   if (m_imageNumber == 0) {
     return false;
@@ -183,7 +183,6 @@ bool Timeline::eventFilter(QObject *target, QEvent *event) {
     if (mouseEvent->buttons() == Qt::LeftButton) {
       int x = static_cast<int>(ui->timelineView->mapToScene(mouseEvent->pos()).x());
       int image = ((x - static_cast<int>(m_offset * 0.5)) * m_imageNumber) / (m_width * m_scale - m_offset);
-      x = ((m_width * m_scale - m_offset) * image) / m_imageNumber + static_cast<int>(m_offset * 0.5);
       setValue(image);
     }
     else if (mouseEvent->buttons() == Qt::RightButton) {
@@ -196,9 +195,9 @@ bool Timeline::eventFilter(QObject *target, QEvent *event) {
 }
 
 /**
-  * @brief Draw a line marker at a given index.
-  * @param[in] index Index.
-*/
+ * @brief Draw a line marker at a given index.
+ * @param[in] index Index.
+ */
 void Timeline::drawMarker(const int index) {
   int x = ((m_width * m_scale - m_offset) * index) / m_imageNumber + static_cast<int>(m_offset * 0.5);
   QGraphicsLineItem *markerLine = new QGraphicsLineItem(x, 5, x, 40);
@@ -207,18 +206,18 @@ void Timeline::drawMarker(const int index) {
 }
 
 /**
-  * @brief Delete a line marker at a given index.
-  * @param[in] index Index.
-*/
+ * @brief Delete a line marker at a given index.
+ * @param[in] index Index.
+ */
 void Timeline::clearMarker(const int index) {
   markers.removeAll(index);
   update(m_currentIndexLeft);
 }
 
 /**
-  * @brief Redraw the widget keeping markers and cursors.
-  * @param[in] index Index.
-*/
+ * @brief Redraw the widget keeping markers and cursors.
+ * @param[in] index Index.
+ */
 void Timeline::update(const int index) {
   timelineScene->clear();
   m_width = ui->timelineView->width();
@@ -231,9 +230,9 @@ void Timeline::update(const int index) {
 }
 
 /**
-  * @brief Set the cursor at a given value.
-  * @param[in] index Index.
-*/
+ * @brief Set the cursor at a given value.
+ * @param[in] index Index.
+ */
 void Timeline::setCursorValue(const int index) {
   if (m_imageNumber == 0) {
     return;
@@ -247,13 +246,13 @@ void Timeline::setCursorValue(const int index) {
   indexNumber->setText(QString::number(index));
   indexNumber->setPos(x - 5, 55);
   m_currentIndex = index;
-  emit(valueChanged(m_currentIndex));
+  emit valueChanged(m_currentIndex);
 }
 
 /**
-  * @brief Set the left cursor (left click cursor) at a given value.
-  * @param[in] index Index.
-*/
+ * @brief Set the left cursor (left click cursor) at a given value.
+ * @param[in] index Index.
+ */
 void Timeline::setValue(const int index) {
   if ((m_imageNumber == 0) || (index < m_imageMin) | (index > m_imageNumber)) {
     return;
@@ -268,42 +267,42 @@ void Timeline::setValue(const int index) {
   indexNumber->setText(QString::number(index));
   indexNumber->setPos(x - 5, 55);
   m_currentIndexLeft = index;
-  emit(valueChanged(m_currentIndexLeft));
+  emit valueChanged(m_currentIndexLeft);
 }
 
 /**
-  * @brief Return the last left value.
-*/
+ * @brief Return the last left value.
+ */
 int Timeline::value() {
   return m_currentIndexLeft;
 }
 
 /**
-  * @brief Return the current value.
-*/
+ * @brief Return the current value.
+ */
 int Timeline::currentValue() {
   return m_currentIndex;
 }
 
 /**
-  * @brief Set the maximum value.
-  * @param[in] max Maximum value.
-*/
+ * @brief Set the maximum value.
+ * @param[in] max Maximum value.
+ */
 void Timeline::setMaximum(const int max) {
   m_imageNumber = max;
 }
 
 /**
-  * @brief Set the minimum value, currently forced to zero.
-  * @param[in] max minimum value.
-*/
+ * @brief Set the minimum value, currently forced to zero.
+ * @param[in] max minimum value.
+ */
 void Timeline::setMinimum(const int min) {
   m_imageMin = 0;
 }
 
 /**
-  * @brief Start/Stop the autoplay of the replay.
-*/
+ * @brief Start/Stop the autoplay of the replay.
+ */
 void Timeline::togglePlay() {
   if (ui->playButton->isChecked()) {
     QIcon img(":/assets/buttons/pause.png");

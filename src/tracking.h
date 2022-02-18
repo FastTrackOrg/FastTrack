@@ -151,33 +151,33 @@ class Tracking : public QObject {
    * @brief Emitted when an image is processed.
    * @param int Index of the processed image.
    */
-  void progress(int) const;
+  void progress(int);
 
   /**
    * @brief Emitted when an image to compute the background is processed.
    * @param int The number of processed image.
    */
-  void backgroundProgress(int) const;
+  void backgroundProgress(int);
 
   /**
    * @brief Emitted when the first image has been processed to trigger the starting of the analysis.
    */
-  void finishedProcessFrame() const;
+  void finishedProcessFrame();
 
   /**
    * @brief Emitted when all images have been processed.
    */
-  void finished() const;
+  void finished();
 
   /**
    * @brief Emitted when a crash occurs during the analysis.
    */
-  void forceFinished(QString message) const;
+  void forceFinished(QString message);
 
   /**
    * @brief Emitted at the end of the analysis.
    */
-  void statistic(long long int time) const;
+  void statistic(long long int time);
 };
 
 #endif

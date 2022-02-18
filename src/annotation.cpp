@@ -82,10 +82,7 @@ Annotation::Annotation(const QString &filePath) : Annotation() {
 /**
  * @brief Constructs the annotation object from a file path.
  */
-Annotation::Annotation() {
-  annotationFile = new QFile();
-  annotations = new QMap<int, QString>();
-  isActive = false;
+Annotation::Annotation() : annotationFile{new QFile()}, annotations{new QMap<int, QString>()}, isActive{false} {
 }
 
 /**
@@ -124,7 +121,7 @@ void Annotation::write(int index, const QString &text) {
 void Annotation::read(int index) {
   if (isActive) {
     QString text = annotations->value(index);
-    emit(annotationText(text));
+    emit annotationText(text);
   }
 }
 

@@ -77,7 +77,7 @@ Replay::Replay(QWidget* parent, bool standalone, Timeline* slider, VideoReader* 
   img = QIcon(":/assets/buttons/refresh.png");
   QAction* refreshAction = new QAction(img, tr("&Refresh"), this);
   refreshAction->setStatusTip(tr("Reload the latest tracking analysis"));
-  connect(refreshAction, &QAction::triggered, [this]() {
+  connect(refreshAction, &QAction::triggered, this, [this]() {
     loadReplay(memoryDir);
   });
   ui->toolBar->addAction(refreshAction);
@@ -94,7 +94,7 @@ Replay::Replay(QWidget* parent, bool standalone, Timeline* slider, VideoReader* 
   undoAction->setIcon(img);
   undoAction->setShortcuts(QKeySequence::Undo);
   undoAction->setStatusTip(tr("Undo"));
-  connect(undoAction, &QAction::triggered, [this]() {
+  connect(undoAction, &QAction::triggered, this, [this]() {
     object2Replay->clear();
     ids = trackingData->getId(0, video->getImageCount());
     std::sort(ids.begin(), ids.end());
@@ -110,7 +110,7 @@ Replay::Replay(QWidget* parent, bool standalone, Timeline* slider, VideoReader* 
   redoAction->setIcon(img);
   redoAction->setShortcuts(QKeySequence::Redo);
   redoAction->setStatusTip(tr("Redo"));
-  connect(redoAction, &QAction::triggered, [this]() {
+  connect(redoAction, &QAction::triggered, this, [this]() {
     object2Replay->clear();
     ids = trackingData->getId(0, video->getImageCount());
     std::sort(ids.begin(), ids.end());
@@ -127,7 +127,7 @@ Replay::Replay(QWidget* parent, bool standalone, Timeline* slider, VideoReader* 
   object1Replay->setEditable(true);
   object1Replay->setInsertPolicy(QComboBox::NoInsert);
   object1Replay->setStatusTip(tr("First selected object"));
-  connect(object1Replay, QOverload<int>::of(&QComboBox::currentIndexChanged), [this](int index) {
+  connect(object1Replay, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this](int index) {
     if (object1Replay->count() != 0) {
       int id = object1Replay->itemText(index).toInt();
       updateInformation(static_cast<int>(id), ui->replaySlider->value(), ui->infoTableObject1);
@@ -146,7 +146,7 @@ Replay::Replay(QWidget* parent, bool standalone, Timeline* slider, VideoReader* 
   object2Replay->setEditable(true);
   object2Replay->setInsertPolicy(QComboBox::NoInsert);
   object2Replay->setStatusTip(tr("Second selected object"));
-  connect(object2Replay, QOverload<int>::of(&QComboBox::currentIndexChanged), [this](int index) {
+  connect(object2Replay, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this](int index) {
     if (object2Replay->count() != 0) {
       int id = object2Replay->itemText(index).toInt();
       updateInformation(static_cast<int>(id), ui->replaySlider->value(), ui->infoTableObject2);
@@ -159,7 +159,7 @@ Replay::Replay(QWidget* parent, bool standalone, Timeline* slider, VideoReader* 
   QAction* deleteOneAction = new QAction(img, tr("&Delete"), this);
   deleteOneAction->setShortcut(QKeySequence("f"));
   deleteOneAction->setStatusTip(tr("Delete the object on this frame"));
-  connect(deleteOneAction, &QAction::triggered, [this]() {
+  connect(deleteOneAction, &QAction::triggered, this, [this]() {
     if (isReplayable) {
       DeleteData* del = new DeleteData(object2Replay->currentText().toInt(), ui->replaySlider->value(), ui->replaySlider->value(), trackingData);
       commandStack->push(del);
@@ -177,7 +177,7 @@ Replay::Replay(QWidget* parent, bool standalone, Timeline* slider, VideoReader* 
   QAction* deleteAction = new QAction(img, tr("&Delete"), this);
   deleteAction->setShortcut(QKeySequence(tr("G")));
   deleteAction->setStatusTip(tr("Delete the object from this frame on the selected number of frames"));
-  connect(deleteAction, &QAction::triggered, [this]() {
+  connect(deleteAction, &QAction::triggered, this, [this]() {
     if (isReplayable) {
       DeleteData* del = new DeleteData(object2Replay->currentText().toInt(), ui->replaySlider->value(), ui->replaySlider->value() + deletedFrameNumber->value() - 1, trackingData);
       commandStack->push(del);
@@ -214,7 +214,7 @@ Replay::Replay(QWidget* parent, bool standalone, Timeline* slider, VideoReader* 
   img = QIcon(":/assets/buttons/help.png");
   QAction* helpAction = new QAction(img, tr("&Help"), this);
   helpAction->setStatusTip(tr("Help"));
-  connect(helpAction, &QAction::triggered, [this]() {
+  connect(helpAction, &QAction::triggered, this, [this]() {
     QMessageBox helpBox(this);
     helpBox.setIconPixmap(QPixmap(":/assets/buttons/helpImg.png"));
     helpBox.exec();
@@ -246,7 +246,7 @@ Replay::Replay(QWidget* parent, bool standalone, Timeline* slider, VideoReader* 
   ui->scrollArea->viewport()->installEventFilter(this);
 
   // Zoom
-  connect(ui->scrollArea->verticalScrollBar(), &QScrollBar::rangeChanged, [this]() {
+  connect(ui->scrollArea->verticalScrollBar(), &QScrollBar::rangeChanged, this, [this]() {
     QScrollBar* vertical = ui->scrollArea->verticalScrollBar();
     if (currentZoom > 0) {
       vertical->setValue(int(zoomReferencePosition.y() * 0.25 + vertical->value() * 1.25));
@@ -255,7 +255,7 @@ Replay::Replay(QWidget* parent, bool standalone, Timeline* slider, VideoReader* 
       vertical->setValue(int(-zoomReferencePosition.y() * 0.25 + vertical->value() / 1.25));
     }
   });
-  connect(ui->scrollArea->horizontalScrollBar(), &QScrollBar::rangeChanged, [this]() {
+  connect(ui->scrollArea->horizontalScrollBar(), &QScrollBar::rangeChanged, this, [this]() {
     QScrollBar* horizontal = ui->scrollArea->horizontalScrollBar();
     if (currentZoom > 0) {
       horizontal->setValue(int(zoomReferencePosition.x() * 0.25 + horizontal->value() * 1.25));
@@ -267,32 +267,32 @@ Replay::Replay(QWidget* parent, bool standalone, Timeline* slider, VideoReader* 
 
   isReplayable = false;
   ui->ellipseBox->addItems({"Head + Tail", "Head", "Tail", "Body", "None"});
-  connect(ui->ellipseBox, static_cast<void (QComboBox::*)(int)>(&QComboBox::activated), [this]() {
+  connect(ui->ellipseBox, static_cast<void (QComboBox::*)(int)>(&QComboBox::activated), this, [this]() {
     loadFrame(currentIndex);
   });
   ui->arrowBox->addItems({"Head + Tail", "Head", "Tail", "Body", "None"});
-  connect(ui->arrowBox, static_cast<void (QComboBox::*)(int)>(&QComboBox::activated), [this]() {
+  connect(ui->arrowBox, static_cast<void (QComboBox::*)(int)>(&QComboBox::activated), this, [this]() {
     loadFrame(currentIndex);
   });
 
-  connect(ui->replayTrace, &QCheckBox::stateChanged, [this]() {
+  connect(ui->replayTrace, &QCheckBox::stateChanged, this, [this]() {
     loadFrame(currentIndex);
   });
-  connect(ui->replayTraceLength, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [this]() {
+  connect(ui->replayTraceLength, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, [this]() {
     loadFrame(currentIndex);
   });
 
-  connect(ui->replaySize, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), [this]() {
+  connect(ui->replaySize, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, [this]() {
     loadFrame(currentIndex);
   });
 
   // Info tables
-  connect(ui->infoTableObject1, &QTableWidget::cellClicked, [this](int row, int col) {
+  connect(ui->infoTableObject1, &QTableWidget::cellClicked, this, [this](int row, int col) {
     if (row == 1 && col == 0) {
       ui->replaySlider->setValue(ui->infoTableObject1->item(row, col)->text().toInt());
     }
   });
-  connect(ui->infoTableObject2, &QTableWidget::cellClicked, [this](int row, int col) {
+  connect(ui->infoTableObject2, &QTableWidget::cellClicked, this, [this](int row, int col) {
     if (row == 1 && col == 0) {
       ui->replaySlider->setValue(ui->infoTableObject2->item(row, col)->text().toInt());
     }
@@ -390,7 +390,7 @@ void Replay::clear() {
   object = true;
   currentZoom = 1;
   isReplayable = false;
-  emit(opened(isReplayable));
+  emit opened(isReplayable);
 }
 
 /**
@@ -439,7 +439,7 @@ void Replay::loadReplay(const QString& dir) {
     ui->replaySlider->setValue(1);  // To force the change
     ui->replaySlider->setValue(0);
     ui->annotation->blockSignals(false);
-    emit(opened(isReplayable));
+    emit opened(isReplayable);
   }
   catch (const std::exception& e) {
     qWarning() << QString::fromStdString(e.what()) << " occurs opening " << dir;

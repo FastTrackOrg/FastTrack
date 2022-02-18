@@ -97,14 +97,14 @@ class Batch : public QWidget {
   void errors(int code);
  signals:
   /**
-  * @brief Emitted when a parameter is changed.
-  * @param parameterList All parameters necessary to the tracking analysis.
-  */
+   * @brief Emitted when a parameter is changed.
+   * @param parameterList All parameters necessary to the tracking analysis.
+   */
   void newParameterList(const QMap<QString, QString> &parameterList);
 
   /**
-  * @brief Emitted when a tracking analysis is finished.
-  */
+   * @brief Emitted when a tracking analysis is finished.
+   */
   void next();
   void log(QMap<QString, QString> log);
   void status(QString messsage);

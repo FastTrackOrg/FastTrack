@@ -703,7 +703,7 @@ void Tracking::imageProcessing() {
       if (!video->getNext(m_visuFrame)) {
         m_error += QString::number(m_im) + ", ";
         m_im++;
-        emit(progress(m_im));
+        emit progress(m_im);
         continue;
       }
       if (param_registration != 0) {
@@ -768,7 +768,7 @@ void Tracking::imageProcessing() {
       cleaning(occluded, m_lost, m_id, m_out, param_to);
       m_outPrev = m_out;
       m_im++;
-      emit(progress(m_im));
+      emit progress(m_im);
     }
     catch (const std::exception &e) {
       outputDb.commit();
@@ -777,7 +777,7 @@ void Tracking::imageProcessing() {
       outputDb.close();
       m_logFile.close();
       qWarning() << QString::fromStdString(e.what()) << " at image " << QString::number(m_im);
-      emit(forceFinished(QString::fromStdString(e.what()) + " error during the processing of the image " + QString::number(m_im)));
+      emit forceFinished(QString::fromStdString(e.what()) + " error during the processing of the image " + QString::number(m_im));
       return;
     }
     catch (...) {
@@ -787,7 +787,7 @@ void Tracking::imageProcessing() {
       outputDb.close();
       m_logFile.close();
       qWarning() << "Unknown at image " << QString::number(m_im);
-      emit(forceFinished("Fatal and unknown error during the processing of the image " + QString::number(m_im)));
+      emit forceFinished("Fatal and unknown error during the processing of the image " + QString::number(m_im));
       return;
     }
   }
@@ -795,19 +795,19 @@ void Tracking::imageProcessing() {
   outputDb.commit();
   bool isSaved = exportTrackingResult(m_savingPath, outputDb);
   outputDb.close();
-  emit(statistic(timer->elapsed()));
+  emit statistic(timer->elapsed());
   delete timer;
 
   if (isSaved && m_error.isEmpty()) {
-    emit(finished());
+    emit finished();
   }
   else if (isSaved && !m_error.isEmpty()) {
     qWarning() << "Images" << m_error << " where skipped because unreadable";
-    emit(forceFinished("Images " + m_error + " where skipped because unreadable."));
+    emit forceFinished("Images " + m_error + " where skipped because unreadable.");
   }
   else {
     qWarning() << "Can't write tracking.txt to the disk";
-    emit(forceFinished("Can't write tracking.txt to the disk!"));
+    emit forceFinished("Can't write tracking.txt to the disk!");
   }
 }
 
@@ -818,8 +818,7 @@ void Tracking::imageProcessing() {
  * @param[in] startImage Index of the beginning image.
  * @param[in] stopImage Index of the ending image.
  */
-Tracking::Tracking(string path, string backgroundPath, int startImage, int stopImage) : m_path(path), m_backgroundPath(backgroundPath), m_startImage(startImage), m_stopImage(stopImage), connectionName(QString("tracking_%1").arg(QRandomGenerator::global()->generate())) {
-  video = new VideoReader(m_path);
+Tracking::Tracking(string path, string backgroundPath, int startImage, int stopImage) : m_path{path}, m_backgroundPath{backgroundPath}, video{new VideoReader(m_path)}, m_startImage{startImage}, m_stopImage{stopImage}, connectionName{QString("tracking_%1").arg(QRandomGenerator::global()->generate())} {
 }
 
 /**
@@ -829,8 +828,7 @@ Tracking::Tracking(string path, string backgroundPath, int startImage, int stopI
  * @param[in] startImage Index of the beginning image.
  * @param[in] stopImage Index of the ending image.
  */
-Tracking::Tracking(string path, UMat background, int startImage, int stopImage) : m_path(path), m_background(background), m_startImage(startImage), m_stopImage(stopImage), connectionName(QString("tracking_%1").arg(QRandomGenerator::global()->generate())) {
-  video = new VideoReader(m_path);
+Tracking::Tracking(string path, UMat background, int startImage, int stopImage) : m_path{path}, m_background{background}, video{new VideoReader(m_path)}, m_startImage{startImage}, m_stopImage{stopImage}, connectionName{QString("tracking_%1").arg(QRandomGenerator::global()->generate())} {
 }
 
 /**
@@ -926,7 +924,7 @@ void Tracking::startProcess() {
       QTextStream out(&parameterFile);
       out << "title = \"FastTrack cfg\"\"\n\n[parameters]\n";
       QList<QString> keyList = parameters.keys();
-      for (auto a : keyList) {
+      for (const auto &a : keyList) {
         out << a << " = " << parameters.value(a) << Qt::endl;
         query.prepare("INSERT INTO parameter (parameter, value) VALUES (?, ?)");
         query.addBindValue(a);
@@ -971,15 +969,15 @@ void Tracking::startProcess() {
     m_im++;
     connect(this, &Tracking::finishedProcessFrame, this, &Tracking::imageProcessing);
 
-    emit(finishedProcessFrame());
+    emit finishedProcessFrame();
   }
   catch (const std::runtime_error &e) {
     qWarning() << QString::fromStdString(e.what());
-    emit(forceFinished(QString::fromStdString(e.what())));
+    emit forceFinished(QString::fromStdString(e.what()));
   }
   catch (...) {
     qWarning() << "Fatal error, tracking initialization failed";
-    emit(forceFinished("Fatal error, tracking initialization failed"));
+    emit forceFinished("Fatal error, tracking initialization failed");
   }
 }
 

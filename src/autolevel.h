@@ -32,12 +32,12 @@ using namespace std;
 class AutoLevel : public QObject {
   Q_OBJECT
 
-  int m_endImage;                      /*!< Optimal ending image index. */
+  QString m_savedPath;                 /*!< Old tracking analysis */
   string m_path;                       /*!< Path to video file/image sequence. */
   QString m_spotSuffix;                /*!< Spot to track. */
   UMat m_background;                   /*!< Path to video file/image sequence. */
   QMap<QString, QString> m_parameters; /*!< Optimal ending image index. */
-  QString m_savedPath;                 /*!< Old tracking analysis */
+  int m_endImage;                      /*!< Optimal ending image index. */
 
   double computeStdAngle(const Data &data);
   double computeStdDistance(const Data &data);

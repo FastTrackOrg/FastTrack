@@ -39,11 +39,7 @@ This file is part of Fast Track.
  * @param[in] path Path to the movie to track.
  * @param[in] background Background image.
  */
-AutoLevel::AutoLevel(const string &path, const UMat &background, const QMap<QString, QString> &parameters) {
-  m_path = path;
-  m_background = background;
-  m_parameters = parameters;
-  m_endImage = 200;
+AutoLevel::AutoLevel(const string &path, const UMat &background, const QMap<QString, QString> &parameters) : m_path{path}, m_background{background}, m_parameters{parameters}, m_endImage{200} {
   // Save precedent analysis if exist
   VideoReader video(m_path);
   if (!video.open()) {
@@ -112,8 +108,8 @@ QMap<QString, double> AutoLevel::level() {
     levelParameters.insert("normArea", stdArea);
     levelParameters.insert("normPerim", stdPerimeter);
     levelParameters.insert("nIterations", double(counter));
-    emit(levelParametersChanged(levelParameters));
-    emit(finished());
+    emit levelParametersChanged(levelParameters);
+    emit finished();
     return levelParameters;
   }
   catch (const std::exception &e) {

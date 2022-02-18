@@ -56,7 +56,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
   QAction *close = new QAction(tr("Close"));
   connect(close, &QAction::triggered, this, &MainWindow::close);
   trayMenu->addAction(close);
-  connect(trayIcon, &QSystemTrayIcon::activated, [this](QSystemTrayIcon::ActivationReason reason) {
+  connect(trayIcon, &QSystemTrayIcon::activated, this, [this](QSystemTrayIcon::ActivationReason reason) {
     switch (reason) {
       case QSystemTrayIcon::Trigger: {
         this->setVisible(this->isHidden());
@@ -72,7 +72,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
   trayIcon->show();
 
   QNetworkAccessManager *manager = new QNetworkAccessManager(this);
-  connect(manager, &QNetworkAccessManager::finished, [this](QNetworkReply *reply) {
+  connect(manager, &QNetworkAccessManager::finished, this, [this](QNetworkReply *reply) {
     if (reply->error() != QNetworkReply::NoError) {
       return;
     }
@@ -116,14 +116,14 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 
   interactive = new Interactive(this);
   ui->tabWidget->addTab(interactive, tr("Interactive tracking"));
-  connect(interactive, &Interactive::status, [this](QString message) {
+  connect(interactive, &Interactive::status, this, [this](QString message) {
     trayIcon->showMessage("FastTrack", message, QSystemTrayIcon::Information, 3000);
   });
   connect(interactive, &Interactive::modeChanged, this, &MainWindow::setMode);
 
   batch = new Batch(this);
   ui->tabWidget->addTab(batch, tr("Batch tracking"));
-  connect(batch, &Batch::status, [this](QString message) {
+  connect(batch, &Batch::status, this, [this](QString message) {
     trayIcon->showMessage("FastTrack", message, QSystemTrayIcon::Information, 3000);
   });
 
@@ -138,14 +138,14 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 #ifndef NO_WEB
   manual = new QWebEngineView(this);
   ui->tabWidget->addTab(manual, tr("User Manual"));
-  connect(ui->tabWidget, &QTabWidget::currentChanged, [this](int index) {
+  connect(ui->tabWidget, &QTabWidget::currentChanged, this, [this](int index) {
     if (index == 4) {
       manual->setUrl(QUrl("https://www.fasttrack.sh/docs/intro"));
     }
   });
   dataset = new QWebEngineView(this);
   ui->tabWidget->addTab(dataset, tr("TD²"));
-  connect(ui->tabWidget, &QTabWidget::currentChanged, [this](int index) {
+  connect(ui->tabWidget, &QTabWidget::currentChanged, this, [this](int index) {
     if (index == 5) {
       dataset->setUrl(QUrl("http://data.ljp.upmc.fr/datasets/TD2/"));
     }

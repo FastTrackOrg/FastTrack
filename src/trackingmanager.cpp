@@ -32,22 +32,22 @@ This file is part of Fast Track.
  */
 
 /**
-  * @brief Constructs the trackingmanager object derived from a QWidget object.
-*/
+ * @brief Constructs the trackingmanager object derived from a QWidget object.
+ */
 TrackingManager::TrackingManager(QWidget *parent) : QWidget(parent),
                                                     ui(new Ui::TrackingManager) {
   ui->setupUi(this);
 
   ui->logTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
-  QString configFolder = QStandardPaths::standardLocations(QStandardPaths::ConfigLocation)[0] + "/FastTrack";
+  QString configFolder = QStandardPaths::standardLocations(QStandardPaths::ConfigLocation).at(0) + "/FastTrack";
   if (QDir(configFolder).exists()) {
   }
   else {
     QDir().mkdir(configFolder);
   }
 
-  connect(ui->pathButton, &QPushButton::clicked, [this]() {
+  connect(ui->pathButton, &QPushButton::clicked, this, [this]() {
     ui->logTable->clear();
     ui->logTable->setRowCount(0);
     QFileDialog dialog(this);
@@ -71,9 +71,9 @@ TrackingManager::~TrackingManager() {
 }
 
 /**
-  * @brief Adds a log entry inside the ui table and in a log file.
-  * @param[in] log QMap that contains the log entry.
-*/
+ * @brief Adds a log entry inside the ui table and in a log file.
+ * @param[in] log QMap that contains the log entry.
+ */
 void TrackingManager::addLogEntry(QMap<QString, QString> log) {
   ui->logTable->insertRow(0);
   ui->logTable->setItem(0, 0, new QTableWidgetItem(log["date"]));
@@ -84,10 +84,10 @@ void TrackingManager::addLogEntry(QMap<QString, QString> log) {
 }
 
 /**
-  * @brief Appends the log entry in a file.
-  * @param[in] path QString that contains the path to the output file.
-  * @param[in] line QMap that contains the log entry.
-*/
+ * @brief Appends the log entry in a file.
+ * @param[in] path QString that contains the path to the output file.
+ * @param[in] line QMap that contains the log entry.
+ */
 void TrackingManager::appendToFile(QString path, QMap<QString, QString> line) {
   QFile file(path);
   if (file.open(QIODevice::Append)) {
@@ -97,10 +97,10 @@ void TrackingManager::appendToFile(QString path, QMap<QString, QString> line) {
 }
 
 /**
-  * @brief Writes log entries in a file.
-  * @param[in] path QString that contains the path to the output file.
-  * @param[in] lines QList ofQMap that contains log entries.
-*/
+ * @brief Writes log entries in a file.
+ * @param[in] path QString that contains the path to the output file.
+ * @param[in] lines QList ofQMap that contains log entries.
+ */
 void TrackingManager::writeToFile(QString path, QList<QMap<QString, QString>> lines) {
   QFile file(path);
   if (file.open(QIODevice::WriteOnly)) {
@@ -112,9 +112,9 @@ void TrackingManager::writeToFile(QString path, QList<QMap<QString, QString>> li
 }
 
 /**
-  * @brief Reads a log file.
-  * @param[in] path QString that contains the path to the input file.
-*/
+ * @brief Reads a log file.
+ * @param[in] path QString that contains the path to the input file.
+ */
 void TrackingManager::readFromFile(QString path) {
   QFile file(path);
   if (file.open(QIODevice::ReadOnly)) {

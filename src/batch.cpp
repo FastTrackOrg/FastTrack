@@ -39,8 +39,8 @@ using namespace std;
  */
 
 /**
-  * @brief Constructs the Batch widget.
-*/
+ * @brief Constructs the Batch widget.
+ */
 Batch::Batch(QWidget *parent) : QWidget(parent),
                                 ui(new Ui::Batch) {
   ui->setupUi(this);
@@ -234,7 +234,7 @@ Batch::Batch(QWidget *parent) : QWidget(parent),
   ui->tablePath->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
   connect(ui->openPath, &QPushButton::clicked, this, &Batch::openPathFolder);
   connect(ui->removePath, &QPushButton::clicked, this, QOverload<>::of(&Batch::removePath));
-  connect(ui->clearPath, &QPushButton::clicked, [this]() {
+  connect(ui->clearPath, &QPushButton::clicked, this, [this]() {
     int rows = ui->tablePath->rowCount();
     for (int row = rows - 1; row > -1; row--) {
       removePath(row);
@@ -242,7 +242,7 @@ Batch::Batch(QWidget *parent) : QWidget(parent),
   });
   connect(ui->startButton, &QPushButton::clicked, this, &Batch::startTracking);
   connect(this, &Batch::next, this, &Batch::startTracking);
-  connect(ui->backgroundButton, &QPushButton::clicked, [this]() {
+  connect(ui->backgroundButton, &QPushButton::clicked, this, [this]() {
     QString image = QFileDialog::getOpenFileName(this, tr("Open Image"), memoryDir);
     if (image.length()) {
       ui->lineBackground->setText(image);
@@ -254,14 +254,14 @@ Batch::Batch(QWidget *parent) : QWidget(parent),
       processList[row].backgroundPath = image;
     }
   });
-  connect(ui->backgroundClear, &QPushButton::clicked, [this]() {
+  connect(ui->backgroundClear, &QPushButton::clicked, this, [this]() {
     ui->lineBackground->clear();
   });
 }
 
 /**
-  * @brief Opens a dialog window to select folders. Triggered when the openPath button is clicked. If auto-detection mode is enable, it will also selects a background image and/or a parameter file and update the list of file to process. It also possible to add a suffix to the selected path.
-*/
+ * @brief Opens a dialog window to select folders. Triggered when the openPath button is clicked. If auto-detection mode is enable, it will also selects a background image and/or a parameter file and update the list of file to process. It also possible to add a suffix to the selected path.
+ */
 void Batch::openPathFolder() {
   // Enable multiple selection
   QFileDialog dialog;
@@ -292,7 +292,6 @@ void Batch::openPathFolder() {
           QFileInfo savingInfo(dir);
           QString savingFilename = savingInfo.baseName();
           QString savingPath = savingInfo.absolutePath();
-          QString trackingDir = savingPath;
           QString resDir;
           if (QDir(savingPath + QString("/Tracking_Result")).exists()) {
             resDir = savingPath + QString("/Tracking_Result");
@@ -300,7 +299,7 @@ void Batch::openPathFolder() {
           else if (QDir(savingPath + QString("/Tracking_Result_") + savingFilename).exists()) {
             resDir = savingPath + QString("/Tracking_Result_") + savingFilename;
           }
-          if (QFileInfo(resDir + "/background.pgm").exists()) {
+          if (QFileInfo::exists(resDir + "/background.pgm")) {
             backgroundPath = resDir + "/background.pgm";
           }
           if (loadParameterFile(resDir + "/cfg.toml")) {
@@ -318,9 +317,9 @@ void Batch::openPathFolder() {
 }
 
 /**
-  * @brief Opens a dialog window to select a background image. Triggered when an open background is clicked in the pathTable.
-  * @arg[in] row Index of the row containing the button in the pathPanel.
-*/
+ * @brief Opens a dialog window to select a background image. Triggered when an open background is clicked in the pathTable.
+ * @arg[in] row Index of the row containing the button in the pathPanel.
+ */
 void Batch::openPathBackground(int row) {
   QString image = QFileDialog::getOpenFileName(this, tr("Open Image"), memoryDir);
   if (image.length()) {
@@ -331,11 +330,11 @@ void Batch::openPathBackground(int row) {
 }
 
 /**
-  * @brief Adds movie to the list of movies to analyze.
-  * @arg[in] pathMovie Path to the image sequence to analyze.
-  * @arg[in] pathBackground Path to the background image.
-  * @arg[in] pathParameter Path to the parameter file.
-*/
+ * @brief Adds movie to the list of movies to analyze.
+ * @arg[in] pathMovie Path to the image sequence to analyze.
+ * @arg[in] pathBackground Path to the background image.
+ * @arg[in] pathParameter Path to the parameter file.
+ */
 void Batch::addPath(QString pathMovie, QString pathBackground, QString pathParameter) {
   int row = ui->tablePath->rowCount();
   ui->tablePath->insertRow(row);
@@ -343,7 +342,7 @@ void Batch::addPath(QString pathMovie, QString pathBackground, QString pathParam
   if (pathBackground.isEmpty()) {
     QPushButton *button = new QPushButton("Select a background");
     ui->tablePath->setCellWidget(row, 1, button);
-    connect(button, &QPushButton::clicked, [this, row]() {
+    connect(button, &QPushButton::clicked, this, [this, row]() {
       openPathBackground(row);
     });
   }
@@ -353,7 +352,7 @@ void Batch::addPath(QString pathMovie, QString pathBackground, QString pathParam
   if (pathParameter.isEmpty()) {
     QPushButton *paramButton = new QPushButton("Select a parameter file");
     ui->tablePath->setCellWidget(row, 2, paramButton);
-    connect(paramButton, &QPushButton::clicked, [this, row]() {
+    connect(paramButton, &QPushButton::clicked, this, [this, row]() {
       openParameterFile(row);
     });
   }
@@ -373,8 +372,8 @@ void Batch::addPath(QString pathMovie, QString pathBackground, QString pathParam
 }
 
 /**
-  * @brief Deletes the selected line in the ui->tablePath and the corresponding path in the pathList. Triggered when the ui->removePath button is clicked.
-*/
+ * @brief Deletes the selected line in the ui->tablePath and the corresponding path in the pathList. Triggered when the ui->removePath button is clicked.
+ */
 void Batch::removePath() {
   int row = ui->tablePath->currentRow();
   if (row != -1) {
@@ -385,9 +384,9 @@ void Batch::removePath() {
 }
 
 /**
-  * @brief Deletes the row at index in the pathPanel.
-  * @arg[in] row Index of the row.
-*/
+ * @brief Deletes the row at index in the pathPanel.
+ * @arg[in] row Index of the row.
+ */
 void Batch::removePath(int row) {
   processList.remove(row);
   ui->tablePath->removeRow(row);
@@ -395,8 +394,8 @@ void Batch::removePath(int row) {
 }
 
 /**
-  * @brief Starts a new tracking analysis. First, it gets the path to the folder containing the image sequence. It creates a folder named Tracking_Result in this folder and a file parameters.txt containing the parameterList. It creates a new Tracking object that has to be run in a separate thread. When the analysis is finished, the Tracking object is destroyed and a new analysis is started. Triggerred when the start analysis button is clicked or when the signal finishedAnalysis() is emitted.
-*/
+ * @brief Starts a new tracking analysis. First, it gets the path to the folder containing the image sequence. It creates a folder named Tracking_Result in this folder and a file parameters.txt containing the parameterList. It creates a new Tracking object that has to be run in a separate thread. When the analysis is finished, the Tracking object is destroyed and a new analysis is started. Triggerred when the start analysis button is clicked or when the signal finishedAnalysis() is emitted.
+ */
 void Batch::startTracking() {
   // If the list that contains all the path to process is not empty
   // And if the path exists.
@@ -408,8 +407,8 @@ void Batch::startTracking() {
     ui->removePath->setDisabled(true);
     ui->clearPath->setDisabled(true);
 
-    if (QFileInfo(processList[currentPathCount].path).exists()) {
-      int count = 100;  //QDir(processList[currentPathCount].path).count();
+    if (QFileInfo::exists(processList[currentPathCount].path)) {
+      int count = 100;  // QDir(processList[currentPathCount].path).count();
       string path = (processList[currentPathCount].path).toStdString();
       string backgroundPath = processList[currentPathCount].backgroundPath.toStdString();
       QProgressBar *progressBar = qobject_cast<QProgressBar *>(ui->tablePath->cellWidget(currentPathCount, 3));
@@ -424,18 +423,18 @@ void Batch::startTracking() {
       tracking->moveToThread(thread);
 
       connect(thread, &QThread::started, tracking, &Tracking::startProcess);
-      //connect(tracking, &Tracking::progress, progressBar, &QProgressBar::setValue);
+      // connect(tracking, &Tracking::progress, progressBar, &QProgressBar::setValue);
       connect(tracking, &Tracking::statistic, [this, logMap](int time) {
         logMap->insert("time", QString::number(time));
       });
       connect(tracking, &Tracking::finished, progressBar, [this, progressBar, count, logMap]() {
         ui->tablePath->item(currentPathCount, 4)->setText("Done");
         ;
-        //progressBar->setValue(count);
+        // progressBar->setValue(count);
         currentPathCount++;
-        emit(next());
+        emit next();
         logMap->insert("status", "Done");
-        emit(log(*logMap));
+        emit log(*logMap);
       });
       connect(tracking, &Tracking::finished, thread, &QThread::quit);
       connect(tracking, &Tracking::finished, tracking, &Tracking::deleteLater);
@@ -443,9 +442,9 @@ void Batch::startTracking() {
         ui->tablePath->item(currentPathCount, 4)->setText("Error");
         ;
         currentPathCount++;
-        emit(next());
+        emit next();
         logMap->insert("status", errorMessage);
-        emit(log(*logMap));
+        emit log(*logMap);
       });
       connect(tracking, &Tracking::statistic, [this, logMap](int time) {
         logMap->insert("time", QString::number(time));
@@ -468,7 +467,7 @@ void Batch::startTracking() {
     ui->startButton->setDisabled(false);
     ui->removePath->setDisabled(false);
     ui->clearPath->setDisabled(false);
-    emit(status("Tracking finished"));
+    emit status("Tracking finished");
   }
 }
 
@@ -477,9 +476,9 @@ void Batch::startTracking() {
 \*******************************************************************************************/
 
 /**
-  * @brief Updates the parameterList vector with the new parameter when users changes a parameter in the QTableWidget of parameters. Triggered when ui->tableParameters is modified. Emits the updated parameters QMap.
-  * @param[in] item QTableWidgetItem from a QTableWidget.
-*/
+ * @brief Updates the parameterList vector with the new parameter when users changes a parameter in the QTableWidget of parameters. Triggered when ui->tableParameters is modified. Emits the updated parameters QMap.
+ * @param[in] item QTableWidgetItem from a QTableWidget.
+ */
 void Batch::updateParameters() {
   if (isEditable) {
     // Updates SpinBox parameters
@@ -498,38 +497,38 @@ void Batch::updateParameters() {
     }
 
     saveSettings();
-    emit(newParameterList(parameterList));
+    emit newParameterList(parameterList);
   }
 }
 
 /**
-  * @brief Loads the settings file at the startup of the program and updates the ui->parameterTable with the new parameters.
-*/
+ * @brief Loads the settings file at the startup of the program and updates the ui->parameterTable with the new parameters.
+ */
 void Batch::loadSettings() {
   settingsFile = new QSettings("FastTrack", "FastTrackOrg", this);
   settingsFile->setFallbacksEnabled(false);  // Shadows global variables added in MacOs system
   settingsFile->beginGroup("batch");
   QStringList keyList = settingsFile->allKeys();
-  for (auto a : keyList) {
+  for (const auto &a : keyList) {
     parameterList.insert(a, settingsFile->value(a).toString());
   }
   updateParameterTable();
 }
 
 /**
-  * @brief Saves all the parameters in the settings file.
-*/
+ * @brief Saves all the parameters in the settings file.
+ */
 void Batch::saveSettings() {
   QList<QString> keyList = parameterList.keys();
-  for (auto a : keyList) {
+  for (const auto &a : keyList) {
     settingsFile->setValue(QString(a), parameterList.value(a));
   }
 }
 
 /**
-  * @brief Opens a dialog to select a parameter file.
-  * @arg[in] row Index of the row containing the button in the pathPanel.
-*/
+ * @brief Opens a dialog to select a parameter file.
+ * @arg[in] row Index of the row containing the button in the pathPanel.
+ */
 void Batch::openParameterFile(int row) {
   QString file = QFileDialog::getOpenFileName(this, tr("Open parameter file"), memoryDir, tr("Parameter file (*.toml)"));
   if (!file.isEmpty()) {
@@ -541,8 +540,8 @@ void Batch::openParameterFile(int row) {
 }
 
 /**
-  * @brief Reads a parameter file, updates parameters.
-*/
+ * @brief Reads a parameter file, updates parameters.
+ */
 bool Batch::loadParameterFile(QString path) {
   QFile parameterFile(path);
   if (parameterFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -565,8 +564,8 @@ bool Batch::loadParameterFile(QString path) {
 }
 
 /**
-  * @brief Takes the QMap parameterList and updates the parameters panel table..
-*/
+ * @brief Takes the QMap parameterList and updates the parameters panel table..
+ */
 void Batch::updateParameterTable() {
   isEditable = false;
   for (int i = 0; i < ui->tableParameters->rowCount(); i++) {
@@ -585,8 +584,8 @@ void Batch::updateParameterTable() {
 }
 
 /**
-  * @brief Displays an error message.  
-*/
+ * @brief Displays an error message.
+ */
 void Batch::errors(int code) {
   QMessageBox errorBox(this);
   errorBox.setText("An error occurs during the tracking\n");
