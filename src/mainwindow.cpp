@@ -49,11 +49,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 
   // Tray icon
   trayIcon = new QSystemTrayIcon(QIcon(":/assets/icon.svg"), this);
-  QMenu *trayMenu = new QMenu;
-  QAction *restore = new QAction(tr("Restore"));
+  QMenu *trayMenu = new QMenu(this);
+  QAction *restore = new QAction(tr("Restore"), this);
   connect(restore, &QAction::triggered, this, &MainWindow::showNormal);
   trayMenu->addAction(restore);
-  QAction *close = new QAction(tr("Close"));
+  QAction *close = new QAction(tr("Close"), this);
   connect(close, &QAction::triggered, this, &MainWindow::close);
   trayMenu->addAction(close);
   connect(trayIcon, &QSystemTrayIcon::activated, this, [this](QSystemTrayIcon::ActivationReason reason) {
