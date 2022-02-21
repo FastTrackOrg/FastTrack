@@ -24,6 +24,7 @@
 #include <QProgressBar>
 #include <QPushButton>
 #include <QSettings>
+#include <QSharedPointer>
 #include <QShortcut>
 #include <QSlider>
 #include <QSpinBox>

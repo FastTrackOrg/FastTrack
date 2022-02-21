@@ -417,7 +417,7 @@ void Batch::startTracking() {
 
       thread = new QThread;
       tracking = new Tracking(path, backgroundPath);
-      QMap<QString, QString> *logMap = new QMap<QString, QString>;
+      QSharedPointer<QMap<QString, QString>> logMap(new QMap<QString, QString>);
       logMap->insert("date", QDateTime::currentDateTime().toString());
       logMap->insert("path", QString::fromStdString(path));
       tracking->moveToThread(thread);
@@ -430,7 +430,7 @@ void Batch::startTracking() {
       connect(tracking, &Tracking::finished, progressBar, [this, progressBar, count, logMap]() {
         ui->tablePath->item(currentPathCount, 4)->setText("Done");
         ;
-        // progressBar->setValue(count);
+        progressBar->setValue(100);
         currentPathCount++;
         emit next();
         logMap->insert("status", "Done");
@@ -438,7 +438,7 @@ void Batch::startTracking() {
       });
       connect(tracking, &Tracking::finished, thread, &QThread::quit);
       connect(tracking, &Tracking::finished, tracking, &Tracking::deleteLater);
-      connect(tracking, &Tracking::forceFinished, progressBar, [this, progressBar, count, logMap](QString errorMessage) {
+      connect(tracking, &Tracking::forceFinished, progressBar, [this, progressBar, count, logMap](const QString &errorMessage) {
         ui->tablePath->item(currentPathCount, 4)->setText("Error");
         ;
         currentPathCount++;
