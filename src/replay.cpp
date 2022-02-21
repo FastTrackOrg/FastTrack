@@ -574,7 +574,7 @@ void Replay::loadFrame(int frameIndex) {
 
     int w = ui->replayDisplay->width();
     int h = ui->replayDisplay->height();
-    QPixmap resizedPix = (QPixmap::fromImage(QImage(frame.u->data, frame.cols, frame.rows, static_cast<int>(frame.step), QImage::Format_RGB888)).scaled(w, h, Qt::KeepAspectRatio));
+    QPixmap resizedPix = (QPixmap::fromImage(QImage(frame.u->data, frame.cols, frame.rows, static_cast<int>(frame.step), QImage::Format_RGB888), Qt::NoFormatConversion).scaled(w, h, Qt::KeepAspectRatio));
     ui->replayDisplay->setPixmap(resizedPix);
     resizedFrame.setWidth(resizedPix.width());
     resizedFrame.setHeight(resizedPix.height());

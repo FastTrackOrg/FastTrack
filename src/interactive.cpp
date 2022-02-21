@@ -729,7 +729,7 @@ void Interactive::zoomOut() {
  * @brief This is an overloaded function to display a QImage in the display.
  */
 void Interactive::display(const QImage &image) {
-  resizedPix = (QPixmap::fromImage(image).scaled(ui->display->size(), Qt::KeepAspectRatio));
+  resizedPix = (QPixmap::fromImage(image, Qt::NoFormatConversion).scaled(ui->display->size(), Qt::KeepAspectRatio));
   ui->display->setPixmap(resizedPix);
   resizedFrame.setWidth(resizedPix.width());
   resizedFrame.setHeight(resizedPix.height());
@@ -741,7 +741,7 @@ void Interactive::display(const QImage &image) {
  * @param[in] format enum QImage::Format.
  */
 void Interactive::display(const UMat &image, QImage::Format format) {
-  resizedPix = (QPixmap::fromImage(QImage(image.u->data, image.cols, image.rows, static_cast<int>(image.step), format)).scaled(ui->display->size(), Qt::KeepAspectRatio));
+  resizedPix = (QPixmap::fromImage(QImage(image.u->data, image.cols, image.rows, static_cast<int>(image.step), format), Qt::NoFormatConversion).scaled(ui->display->size(), Qt::KeepAspectRatio));
   ui->display->setPixmap(resizedPix);
   resizedFrame.setWidth(resizedPix.width());
   resizedFrame.setHeight(resizedPix.height());
