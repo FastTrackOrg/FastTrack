@@ -44,6 +44,7 @@ This file is part of Fast Track.
 #include <QScrollArea>
 #include <QScrollBar>
 #include <QSettings>
+#include <QSharedPointer>
 #include <QStandardPaths>
 #include <QString>
 #include <QStyleFactory>

@@ -947,7 +947,7 @@ void Interactive::track() {
 
     QThread *thread = new QThread;
     Tracking *tracking = new Tracking(memoryDir.toStdString(), background);
-    QMap<QString, QString> *logMap = new QMap<QString, QString>;
+    QSharedPointer<QMap<QString, QString>> logMap(new QMap<QString, QString>);
     logMap->insert("date", QDateTime::currentDateTime().toString());
     logMap->insert("path", dir);
     tracking->moveToThread(thread);
@@ -958,7 +958,7 @@ void Interactive::track() {
       ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Analysis rate", Qt::MatchExactly).at(0)), 1)->setText(QString::number(double(video->getImageCount() * 1000) / double(time)));
       logMap->insert("time", QString::number(time));
     });
-    connect(tracking, &Tracking::forceFinished, this, [this, logMap](QString errorMessage) {
+    connect(tracking, &Tracking::forceFinished, this, [this, logMap](const QString &errorMessage) {
       ui->slider->setDisabled(false);
       ui->previewButton->setDisabled(false);
       ui->trackButton->setDisabled(false);
