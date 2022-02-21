@@ -26,6 +26,7 @@ class Data {
  private:
   QString dir; /*!< Path to the tracking result file. */
   int actions;
+  const QStringList columns;
 
  public:
   Data();

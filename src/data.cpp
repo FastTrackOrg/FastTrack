@@ -88,7 +88,7 @@ Data::Data(const QString &dataPath) : Data() {
 /**
  * @brief Construct the data object from a tracking result file.
  */
-Data::Data() : connectionName{QString("data_%1").arg(QRandomGenerator::global()->generate())} {
+Data::Data() : columns{"xHead", "yHead", "tHead", "xTail", "yTail", "tTail", "xBody", "yBody", "tBody", "curvature", "areaBody", "perimeterBody", "headMajorAxisLength", "headMinorAxisLength", "headExcentricity", "tailMajorAxisLength", "tailMinorAxisLength", "tailExcentricity", "bodyMajorAxisLength", "bodyMinorAxisLength", "bodyExcentricity", "imageNumber", "id"}, connectionName{QString("data_%1").arg(QRandomGenerator::global()->generate())} {
   isEmpty = true;
   QSqlDatabase data = QSqlDatabase::addDatabase("QSQLITE", connectionName);
 }
@@ -102,15 +102,14 @@ Data::Data() : connectionName{QString("data_%1").arg(QRandomGenerator::global()-
 QHash<QString, double> Data::getData(int imageIndex, int id) const {
   QSqlDatabase data = QSqlDatabase::database(connectionName, false);
   QSqlQuery query(data);
-  query.prepare("SELECT * FROM tracking WHERE imageNumber = ? AND id = ?");
+  query.prepare("SELECT xHead, yHead, tHead, xTail, yTail, tTail, xBody, yBody, tBody, curvature, areaBody, perimeterBody, headMajorAxisLength, headMinorAxisLength, headExcentricity, tailMajorAxisLength, tailMinorAxisLength, tailExcentricity, bodyMajorAxisLength, bodyMinorAxisLength, bodyExcentricity, imageNumber, id FROM tracking WHERE imageNumber = ? AND id = ?");
   query.addBindValue(imageIndex);
   query.addBindValue(id);
   query.exec();
-  QSqlRecord rec = query.record();
   if (query.first()) {
     QHash<QString, double> tmp;
-    for (int i = 0; i < rec.count(); i++) {
-      tmp.insert(rec.fieldName(i), query.value(i).toDouble());
+    for (int i = 0; i < columns.size(); i++) {
+      tmp.insert(columns[i], query.value(i).toDouble());
     }
     return tmp;
   }
@@ -130,16 +129,15 @@ QList<QHash<QString, double>> Data::getData(int imageIndexStart, int imageIndexS
   QList<QHash<QString, double>> dataImage;
   QSqlDatabase data = QSqlDatabase::database(connectionName, false);
   QSqlQuery query(data);
-  query.prepare("SELECT * FROM tracking WHERE imageNumber >= ? AND imageNumber < ? AND id = ?");  // Sorted by imageIndex because inserted in order.
+  query.prepare("SELECT xHead, yHead, tHead, xTail, yTail, tTail, xBody, yBody, tBody, curvature, areaBody, perimeterBody, headMajorAxisLength, headMinorAxisLength, headExcentricity, tailMajorAxisLength, tailMinorAxisLength, tailExcentricity, bodyMajorAxisLength, bodyMinorAxisLength, bodyExcentricity, imageNumber, id FROM tracking WHERE imageNumber >= ? AND imageNumber < ? AND id = ?");  // Sorted by imageIndex because inserted in order.
   query.addBindValue(imageIndexStart);
   query.addBindValue(imageIndexStop);
   query.addBindValue(id);
   query.exec();
-  QSqlRecord rec = query.record();
   while (query.next()) {
     QHash<QString, double> tmp;
-    for (int i = 0; i < rec.count(); i++) {
-      tmp.insert(rec.fieldName(i), query.value(i).toDouble());
+    for (int i = 0; i < columns.size(); i++) {
+      tmp.insert(columns[i], query.value(i).toDouble());
     }
     dataImage.append(tmp);
   }
@@ -155,14 +153,13 @@ QList<QHash<QString, double>> Data::getData(int imageIndex) const {
   QList<QHash<QString, double>> dataImage;
   QSqlDatabase data = QSqlDatabase::database(connectionName, false);
   QSqlQuery query(data);
-  query.prepare("SELECT * FROM tracking WHERE imageNumber = ?");
+  query.prepare("SELECT xHead, yHead, tHead, xTail, yTail, tTail, xBody, yBody, tBody, curvature, areaBody, perimeterBody, headMajorAxisLength, headMinorAxisLength, headExcentricity, tailMajorAxisLength, tailMinorAxisLength, tailExcentricity, bodyMajorAxisLength, bodyMinorAxisLength, bodyExcentricity, imageNumber, id FROM tracking WHERE imageNumber = ?");
   query.addBindValue(imageIndex);
   query.exec();
-  QSqlRecord rec = query.record();
   while (query.next()) {
     QHash<QString, double> tmp;
-    for (int i = 0; i < rec.count(); i++) {
-      tmp.insert(rec.fieldName(i), query.value(i).toDouble());
+    for (int i = 0; i < columns.size(); i++) {
+      tmp.insert(columns[i], query.value(i).toDouble());
     }
     dataImage.append(tmp);
   }
@@ -180,14 +177,13 @@ QHash<QString, QList<double>> Data::getDataId(int id) const {
   query.prepare("SELECT xHead, yHead, tHead, xTail, yTail, tTail, xBody, yBody, tBody, curvature, areaBody, perimeterBody, headMajorAxisLength, headMinorAxisLength, headExcentricity, tailMajorAxisLength, tailMinorAxisLength, tailExcentricity, bodyMajorAxisLength, bodyMinorAxisLength, bodyExcentricity, imageNumber, id FROM tracking WHERE id = ?");
   query.addBindValue(id);
   query.exec();
-  QSqlRecord rec = query.record();
   QHash<QString, QList<double>> idData;
-  for (int i = 0; i < rec.count(); i++) {
-    idData.insert(rec.fieldName(i), {});
+  for (int i = 0; i < columns.size(); i++) {
+    idData.insert(columns[i], {});
   }
   while (query.next()) {
-    for (int i = 0; i < rec.count(); i++) {
-      idData[rec.fieldName(i)].append(query.value(i).toDouble());
+    for (int i = 0; i < columns.size(); i++) {
+      idData[columns[i]].append(query.value(i).toDouble());
     }
   }
   return idData;
