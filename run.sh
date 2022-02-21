@@ -1,22 +1,31 @@
 #!/bin/bash
 
+if [ "$1" = "clean" ]; then
+  make distclean
+  echo "cleaning"
+fi
+
 if [ "$1" = "" ]; then
   echo "release, debug, profile, ci, cli"
 fi
 
 if [ "$1" = "release" ]; then
+  make distclean
   set -e
   qmake6 CONFIG+=release FastTrack.pro
   make
   make check
+  make clean
   src/build/fasttrack
 fi
 
 if [ "$1" = "no_web" ]; then
+  make distclean
   set -e
   qmake6 CONFIG+="release NO_WEB" FastTrack.pro
   make
   make check
+  make clean
   src/build/fasttrack
 fi
 
@@ -38,18 +47,18 @@ if [ "$1" = "profile" ]; then
 fi
 
 if [ "$1" = "ci" ]; then
+  make distclean
   set -e
   qmake6 CONFIG+="release NO_WEB" src/FastTrack.pro
-  make clean
   make
   make clean
   cd build
 fi
 
 if [ "$1" = "cli" ]; then
+  make distclean
   set -e
   qmake6 CONFIG+=release src/FastTrack-Cli.pro
-  make clean
   make
   make check
   make clean

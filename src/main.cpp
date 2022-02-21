@@ -45,7 +45,9 @@ int main(int argc, char *argv[]) {
   logFile.reset(new QFile(QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) + "/fasttrack.log"));
   QDir().mkpath(QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation));
   logFile.data()->open(QFile::Append | QFile::Text);
+#ifdef QT_NO_DEBUG
   qInstallMessageHandler(messageHandler);
+#endif
   MainWindow w;
   w.setWindowIcon(QIcon(":/assets/icon.png"));
   QFontDatabase::addApplicationFont(":/assets/Font.ttf");
