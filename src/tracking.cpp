@@ -937,6 +937,8 @@ void Tracking::startProcess() {
     imwrite(m_savingPath.toStdString() + "background.pgm", m_background);
 
     query.exec("PRAGMA synchronous=OFF");
+    query.exec("PRAGMA journal_mode=OFF");  // FastTrack does not use rollback and this option increase performance
+    query.exec("PRAGMA locking_mode=EXCLUSIVE");
     query.exec("CREATE TABLE tracking ( xHead REAL, yHead REAL, tHead REAL, xTail REAL, yTail REAL, tTail REAL, xBody REAL, yBody REAL, tBody REAL, curvature REAL, areaBody REAL, perimeterBody REAL, headMajorAxisLength REAL, headMinorAxisLength REAL, headExcentricity REAL, tailMajorAxisLength REAL, tailMinorAxisLength REAL, tailExcentricity REAL, bodyMajorAxisLength REAL, bodyMinorAxisLength REAL, bodyExcentricity REAL, imageNumber INTEGER, id INTEGER)");
 
     m_logFile.setFileName(m_savingPath + "log");
