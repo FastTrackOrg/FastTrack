@@ -222,11 +222,11 @@ QList<int> Data::getId(int imageIndexFirst, int imageIndexLast) const {
   query.exec();
   QList<int> ids;
   while (query.next()) {
-    ids.append(query.value(0).toInt());
+    int val = query.value(0).toInt();
+    if (!ids.contains(val)) {
+      ids.append(val);
+    }
   }
-  std::sort(ids.begin(), ids.end());
-  auto it = std::unique(ids.begin(), ids.end());
-  ids.erase(it, ids.end());
   return ids;
 }
 
