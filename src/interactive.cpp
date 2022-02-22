@@ -44,7 +44,7 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   ui->menuBar->setNativeMenuBar(false);
 
   // Loads settings
-  QSettings settingsFile("FastTrack", "FastTrackOrg");
+  QSettings settingsFile(QStringLiteral("FastTrack"), QStringLiteral("FastTrackOrg"));
   videoStatus = false;
 
   // MetaType
@@ -125,7 +125,7 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
 
   // Loads prefered style
   QStringList styles = QStyleFactory::keys();
-  style = settingsFile.value("window/style", "Fusion").toString();
+  style = settingsFile.value(QStringLiteral("window/style"), "Fusion").toString();
   QMenu *menuStyle = new QMenu(tr("Appearance"), this);
   ui->menuSettings->addMenu(menuStyle);
 
@@ -172,51 +172,51 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
       action->setChecked(false);
     }
     defaultColor->setChecked(false);
-    qApp->setStyleSheet("");
-    color = "default";
+    qApp->setStyleSheet(QLatin1String(""));
+    color = QStringLiteral("default");
   });
   connect(darkColor, &QAction::triggered, this, [this, darkColor, menuPalette]() {
     foreach (QAction *action, menuPalette->actions()) {
       action->setChecked(false);
     }
     darkColor->setChecked(true);
-    QFile file(":/dark.qss");
+    QFile file(QStringLiteral(":/dark.qss"));
     file.open(QFile::ReadOnly | QFile::Text);
     QTextStream stream(&file);
     qApp->setStyleSheet(stream.readAll());
-    color = "dark";
+    color = QStringLiteral("dark");
   });
   connect(lightColor, &QAction::triggered, this, [this, lightColor, menuPalette]() {
     foreach (QAction *action, menuPalette->actions()) {
       action->setChecked(false);
     }
     lightColor->setChecked(true);
-    QFile file(":/light.qss");
+    QFile file(QStringLiteral(":/light.qss"));
     file.open(QFile::ReadOnly | QFile::Text);
     QTextStream stream(&file);
     qApp->setStyleSheet(stream.readAll());
-    color = "light";
+    color = QStringLiteral("light");
   });
   connect(ftColor, &QAction::triggered, this, [this, ftColor, menuPalette]() {
     foreach (QAction *action, menuPalette->actions()) {
       action->setChecked(false);
     }
     ftColor->setChecked(true);
-    QFile file(":/theme.qss");
+    QFile file(QStringLiteral(":/theme.qss"));
     file.open(QFile::ReadOnly | QFile::Text);
     QTextStream stream(&file);
     qApp->setStyleSheet(stream.readAll());
-    color = "ft";
+    color = QStringLiteral("ft");
   });
 
-  color = settingsFile.value("window/color", "ft").toString();
-  if (color == "light") {
+  color = settingsFile.value(QStringLiteral("window/color"), "ft").toString();
+  if (color == QLatin1String("light")) {
     lightColor->trigger();
   }
-  else if (color == "dark") {
+  else if (color == QLatin1String("dark")) {
     darkColor->trigger();
   }
-  else if (color == "ft") {
+  else if (color == QLatin1String("ft")) {
     ftColor->trigger();
   }
   else {
@@ -311,7 +311,7 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   });
 
   // Loads previous layout
-  layout = settingsFile.value("window/layout").toInt();
+  layout = settingsFile.value(QStringLiteral("window/layout")).toInt();
 
   switch (layout) {
     case 1:
@@ -332,7 +332,7 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
 
   QAction *actionMode = new QAction(tr("Expert Mode"), this);
   actionMode->setCheckable(true);
-  isExpert = settingsFile.value("window/mode", false).toBool();
+  isExpert = settingsFile.value(QStringLiteral("window/mode"), false).toBool();
   actionMode->setChecked(isExpert);
   connect(actionMode, &QAction::toggled, this, [this](bool isChecked) {
     emit modeChanged(isChecked);
@@ -345,19 +345,19 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
 
   // Help menu
   connect(ui->actionDoc, &QAction::triggered, []() {
-    QDesktopServices::openUrl(QUrl("https://www.fasttrack.sh/docs/intro", QUrl::TolerantMode));
+    QDesktopServices::openUrl(QUrl(QStringLiteral("https://www.fasttrack.sh/docs/intro"), QUrl::TolerantMode));
   });
   connect(ui->actionTuto, &QAction::triggered, []() {
-    QDesktopServices::openUrl(QUrl("https://www.youtube.com/watch?v=RzzmcZs04E4&list=PLGjsUpRojSmO4RHrd-TbpbNpJrfjNYlIm", QUrl::TolerantMode));
+    QDesktopServices::openUrl(QUrl(QStringLiteral("https://www.youtube.com/watch?v=RzzmcZs04E4&list=PLGjsUpRojSmO4RHrd-TbpbNpJrfjNYlIm"), QUrl::TolerantMode));
   });
   connect(ui->actionAsk, &QAction::triggered, []() {
-    QDesktopServices::openUrl(QUrl("https://github.com/FastTrackOrg/FastTrack/discussions", QUrl::TolerantMode));
+    QDesktopServices::openUrl(QUrl(QStringLiteral("https://github.com/FastTrackOrg/FastTrack/discussions"), QUrl::TolerantMode));
   });
   connect(ui->actionIssue, &QAction::triggered, []() {
-    QDesktopServices::openUrl(QUrl("https://github.com/FastTrackOrg/FastTrack/issues", QUrl::TolerantMode));
+    QDesktopServices::openUrl(QUrl(QStringLiteral("https://github.com/FastTrackOrg/FastTrack/issues"), QUrl::TolerantMode));
   });
   connect(ui->actionContact, &QAction::triggered, []() {
-    QDesktopServices::openUrl(QUrl("mailto:benjamin.gallois@fasttrack.sh?subject=[fasttrack]", QUrl::TolerantMode));
+    QDesktopServices::openUrl(QUrl(QStringLiteral("mailto:benjamin.gallois@fasttrack.sh?subject=[fasttrack]"), QUrl::TolerantMode));
   });
   connect(ui->actionGenerateLog, &QAction::triggered, this, [this]() {
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save Log File"), QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation), tr("Logs (*.log)"));
@@ -366,7 +366,7 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   });
   connect(ui->actionAbout, &QAction::triggered, this, []() {
     QMessageBox aboutBox;
-    aboutBox.setText("FastTrack is a desktop tracking software, easy to install, easy to use, and performant.<br>Created and maintained by Benjamin Gallois.<br>Distributed under the terms of the <a href='https://www.gnu.org/licenses/gpl-3.0'>GPL3.0 license</a>.<br>");
+    aboutBox.setText(QStringLiteral("FastTrack is a desktop tracking software, easy to install, easy to use, and performant.<br>Created and maintained by Benjamin Gallois.<br>Distributed under the terms of the <a href='https://www.gnu.org/licenses/gpl-3.0'>GPL3.0 license</a>.<br>"));
     aboutBox.exec();
   });
   connect(ui->actionAboutQt, &QAction::triggered, qApp, &QApplication::aboutQt);
@@ -374,7 +374,7 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   connect(this, &Interactive::message, this, [this](QString msg) {
     QMessageBox msgBox;
     msgBox.setIcon(QMessageBox::Critical);
-    msgBox.setText("Error");
+    msgBox.setText(QStringLiteral("Error"));
     msgBox.setInformativeText(msg);
     msgBox.exec();
   });
@@ -477,7 +477,7 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   connect(ui->previewButton, &QPushButton::clicked, this, &Interactive::previewTracking);
   connect(ui->trackButton, &QPushButton::clicked, this, [this]() {
     QMessageBox::StandardButton reply;
-    reply = QMessageBox::question(this, "Confirmation", "You are going to start a full tracking analysis. That can take some time, are you sure?", QMessageBox::Yes | QMessageBox::No);
+    reply = QMessageBox::question(this, QStringLiteral("Confirmation"), QStringLiteral("You are going to start a full tracking analysis. That can take some time, are you sure?"), QMessageBox::Yes | QMessageBox::No);
     if (reply == QMessageBox::Yes) {
       track();
     }
@@ -559,10 +559,10 @@ void Interactive::openFolder() {
       ui->x2->setMaximum(originalImageSize.width());
       ui->y2->setMaximum(originalImageSize.height());
 
-      ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Path", Qt::MatchExactly).at(0)), 1)->setText(dir);
-      ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Image number", Qt::MatchExactly).at(0)), 1)->setText(QString::number(video->getImageCount()));
-      ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Image width", Qt::MatchExactly).at(0)), 1)->setText(QString::number(frame.cols));
-      ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Image height", Qt::MatchExactly).at(0)), 1)->setText(QString::number(frame.rows));
+      ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems(QStringLiteral("Path"), Qt::MatchExactly).at(0)), 1)->setText(dir);
+      ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems(QStringLiteral("Image number"), Qt::MatchExactly).at(0)), 1)->setText(QString::number(video->getImageCount()));
+      ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems(QStringLiteral("Image width"), Qt::MatchExactly).at(0)), 1)->setText(QString::number(frame.cols));
+      ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems(QStringLiteral("Image height"), Qt::MatchExactly).at(0)), 1)->setText(QString::number(frame.rows));
 
       isBackground = false;
       reset();
@@ -578,10 +578,10 @@ void Interactive::openFolder() {
       QString savingFilename = savingInfo.baseName();
       QString cfgFile = savingInfo.absolutePath();
       if (video->isSequence()) {
-        cfgFile.append(QString("/Tracking_Result") + QDir::separator() + "cfg.toml");
+        cfgFile.append(QStringLiteral("/Tracking_Result") + QDir::separator() + "cfg.toml");
       }
       else {
-        cfgFile.append(QString("/Tracking_Result_") + savingFilename + QDir::separator() + "cfg.toml");
+        cfgFile.append(QStringLiteral("/Tracking_Result_") + savingFilename + QDir::separator() + "cfg.toml");
       }
       if (QFileInfo::exists(cfgFile)) {
         loadParameters(cfgFile);
@@ -594,12 +594,12 @@ void Interactive::openFolder() {
     }
     // If an error occurs during the opening, resets the information table and warns the user
     catch (exception &e) {
-      ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Path", Qt::MatchExactly).at(0)), 1)->setText("");
-      ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Image number", Qt::MatchExactly).at(0)), 1)->setText("0");
-      ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Image width", Qt::MatchExactly).at(0)), 1)->setText("0");
-      ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Image height", Qt::MatchExactly).at(0)), 1)->setText("0");
+      ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems(QStringLiteral("Path"), Qt::MatchExactly).at(0)), 1)->setText(QLatin1String(""));
+      ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems(QStringLiteral("Image number"), Qt::MatchExactly).at(0)), 1)->setText(QStringLiteral("0"));
+      ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems(QStringLiteral("Image width"), Qt::MatchExactly).at(0)), 1)->setText(QStringLiteral("0"));
+      ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems(QStringLiteral("Image height"), Qt::MatchExactly).at(0)), 1)->setText(QStringLiteral("0"));
       qWarning() << QString::fromStdString(e.what()) << "occurs during opening of " << dir;
-      emit message("No image found.");
+      emit message(QStringLiteral("No image found."));
     }
   }
   QApplication::restoreOverrideCursor();
@@ -623,12 +623,12 @@ void Interactive::display(int index, int scale) {
   try {
     // Computes the image with the background subtracted
     if (ui->isSub->isChecked() && isBackground) {
-      (ui->backColor->currentText() == "Light background") ? (subtract(background, frame, frame)) : (subtract(frame, background, frame));
+      (ui->backColor->currentText() == QLatin1String("Light background")) ? (subtract(background, frame, frame)) : (subtract(frame, background, frame));
       cvtColor(frame, frame, COLOR_GRAY2RGB);
     }
     // Computes the binary image an applies morphological operations
     else if (ui->isBin->isChecked() && isBackground) {
-      (ui->backColor->currentText() == "Light background") ? (subtract(background, frame, frame)) : (subtract(frame, background, frame));
+      (ui->backColor->currentText() == QLatin1String("Light background")) ? (subtract(background, frame, frame)) : (subtract(frame, background, frame));
       Tracking::binarisation(frame, 'b', ui->threshBox->value());
       if (ui->morphOperation->currentIndex() != 8) {
         Mat element = getStructuringElement(ui->kernelType->currentIndex(), Size(2 * ui->kernelSize->value() + 1, 2 * ui->kernelSize->value() + 1), Point(ui->kernelSize->value(), ui->kernelSize->value()));
@@ -644,7 +644,7 @@ void Interactive::display(int index, int scale) {
       // If too many contours are detected to be displayed without slowdowns, ask the user what to do
       if (contours.size() > 10000) {
         QMessageBox::StandardButton reply;
-        reply = QMessageBox::question(this, "Confirmation", "Too many objects detected to be displayed. \n Do you want to display them anyway (the program can be slow)? ", QMessageBox::No | QMessageBox::Yes);
+        reply = QMessageBox::question(this, QStringLiteral("Confirmation"), QStringLiteral("Too many objects detected to be displayed. \n Do you want to display them anyway (the program can be slow)? "), QMessageBox::No | QMessageBox::Yes);
         if (reply == QMessageBox::No) {
           return;
         }
@@ -686,11 +686,11 @@ void Interactive::display(int index, int scale) {
   }
   catch (const std::exception &e) {
     qWarning() << QString::fromStdString(e.what()) << " occurs at image " << index << " display";
-    emit message(QString::fromStdString(e.what()) + QString(" occurs on image %1.").arg(index));
+    emit message(QString::fromStdString(e.what()) + QStringLiteral(" occurs on image %1.").arg(index));
   }
   catch (...) {
     qWarning() << "Unknown error occurs at image " << index << " display";
-    emit message(QString("An error occurs on image %1.").arg(index));
+    emit message(QStringLiteral("An error occurs on image %1.").arg(index));
   }
 }
 
@@ -812,7 +812,7 @@ void Interactive::computeBackground() {
       }
       catch (...) {
         qWarning() << "Unknown error occurs during background computation";
-        emit message("An error occurs. Please change the registration method");
+        emit message(QStringLiteral("An error occurs. Please change the registration method"));
       }
       return background;
     });
@@ -850,7 +850,7 @@ void Interactive::selectBackground() {
     }
     else {
       isBackground = false;
-      emit message("The width or height of the background image does not match the video width or height.");
+      emit message(QStringLiteral("The width or height of the background image does not match the video width or height."));
     }
   }
 }
@@ -859,29 +859,29 @@ void Interactive::selectBackground() {
  * @brief Gets all the tracking parameters from the ui and updates the parameter map that will be passed to the tracking object.
  */
 void Interactive::getParameters() {
-  parameters.insert("maxArea", QString::number(ui->maxSize->value()));
-  parameters.insert("minArea", QString::number(ui->minSize->value()));
-  parameters.insert("spot", QString::number(ui->spot->currentIndex()));
-  parameters.insert("normDist", QString::number(ui->maxL->value()));
-  parameters.insert("normAngle", QString::number(ui->maxT->value()));
-  parameters.insert("maxDist", QString::number(ui->lo->value()));
-  parameters.insert("maxTime", QString::number(ui->to->value()));
-  parameters.insert("normArea", QString::number(ui->normArea->value()));
-  parameters.insert("normPerim", QString::number(ui->normPerim->value()));
+  parameters.insert(QStringLiteral("maxArea"), QString::number(ui->maxSize->value()));
+  parameters.insert(QStringLiteral("minArea"), QString::number(ui->minSize->value()));
+  parameters.insert(QStringLiteral("spot"), QString::number(ui->spot->currentIndex()));
+  parameters.insert(QStringLiteral("normDist"), QString::number(ui->maxL->value()));
+  parameters.insert(QStringLiteral("normAngle"), QString::number(ui->maxT->value()));
+  parameters.insert(QStringLiteral("maxDist"), QString::number(ui->lo->value()));
+  parameters.insert(QStringLiteral("maxTime"), QString::number(ui->to->value()));
+  parameters.insert(QStringLiteral("normArea"), QString::number(ui->normArea->value()));
+  parameters.insert(QStringLiteral("normPerim"), QString::number(ui->normPerim->value()));
 
-  parameters.insert("thresh", QString::number(ui->threshBox->value()));
-  parameters.insert("nBack", QString::number(ui->nBack->value()));
-  parameters.insert("methBack", QString::number(ui->back->currentIndex()));
-  parameters.insert("regBack", QString::number(ui->registrationBack->currentIndex()));
-  parameters.insert("xTop", QString::number(roi.tl().x));
-  parameters.insert("yTop", QString::number(roi.tl().y));
-  parameters.insert("xBottom", QString::number(roi.br().x));
-  parameters.insert("yBottom", QString::number(roi.br().y));
-  parameters.insert("reg", QString::number(ui->reg->currentIndex()));
-  parameters.insert("morph", QString::number(ui->morphOperation->currentIndex()));
-  parameters.insert("morphSize", QString::number(ui->kernelSize->value()));
-  parameters.insert("morphType", QString::number(ui->kernelType->currentIndex()));
-  parameters.insert("lightBack", QString::number(ui->backColor->currentIndex()));
+  parameters.insert(QStringLiteral("thresh"), QString::number(ui->threshBox->value()));
+  parameters.insert(QStringLiteral("nBack"), QString::number(ui->nBack->value()));
+  parameters.insert(QStringLiteral("methBack"), QString::number(ui->back->currentIndex()));
+  parameters.insert(QStringLiteral("regBack"), QString::number(ui->registrationBack->currentIndex()));
+  parameters.insert(QStringLiteral("xTop"), QString::number(roi.tl().x));
+  parameters.insert(QStringLiteral("yTop"), QString::number(roi.tl().y));
+  parameters.insert(QStringLiteral("xBottom"), QString::number(roi.br().x));
+  parameters.insert(QStringLiteral("yBottom"), QString::number(roi.br().y));
+  parameters.insert(QStringLiteral("reg"), QString::number(ui->reg->currentIndex()));
+  parameters.insert(QStringLiteral("morph"), QString::number(ui->morphOperation->currentIndex()));
+  parameters.insert(QStringLiteral("morphSize"), QString::number(ui->kernelSize->value()));
+  parameters.insert(QStringLiteral("morphType"), QString::number(ui->kernelType->currentIndex()));
+  parameters.insert(QStringLiteral("lightBack"), QString::number(ui->backColor->currentIndex()));
 }
 
 /**
@@ -903,7 +903,7 @@ void Interactive::previewTracking() {
     connect(thread, &QThread::started, tracking, &Tracking::startProcess);
     connect(tracking, &Tracking::progress, ui->progressBar, &QProgressBar::setValue);
     connect(tracking, &Tracking::statistic, this, [this](int time) {
-      ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Analysis rate", Qt::MatchExactly).at(0)), 1)->setText(QString::number(double(ui->stopImage->value() * 1000) / double(time)));
+      ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems(QStringLiteral("Analysis rate"), Qt::MatchExactly).at(0)), 1)->setText(QString::number(double(ui->stopImage->value() * 1000) / double(time)));
     });
     connect(tracking, &Tracking::finished, this, [this]() {
       ui->slider->setDisabled(false);
@@ -948,15 +948,15 @@ void Interactive::track() {
     QThread *thread = new QThread;
     Tracking *tracking = new Tracking(memoryDir.toStdString(), background);
     QSharedPointer<QMap<QString, QString>> logMap(new QMap<QString, QString>);
-    logMap->insert("date", QDateTime::currentDateTime().toString());
-    logMap->insert("path", dir);
+    logMap->insert(QStringLiteral("date"), QDateTime::currentDateTime().toString());
+    logMap->insert(QStringLiteral("path"), dir);
     tracking->moveToThread(thread);
 
     connect(thread, &QThread::started, tracking, &Tracking::startProcess);
     connect(tracking, &Tracking::progress, ui->progressBar, &QProgressBar::setValue);
     connect(tracking, &Tracking::statistic, this, [this, logMap](int time) {
-      ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Analysis rate", Qt::MatchExactly).at(0)), 1)->setText(QString::number(double(video->getImageCount() * 1000) / double(time)));
-      logMap->insert("time", QString::number(time));
+      ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems(QStringLiteral("Analysis rate"), Qt::MatchExactly).at(0)), 1)->setText(QString::number(double(video->getImageCount() * 1000) / double(time)));
+      logMap->insert(QStringLiteral("time"), QString::number(time));
     });
     connect(tracking, &Tracking::forceFinished, this, [this, logMap](const QString &errorMessage) {
       ui->slider->setDisabled(false);
@@ -964,9 +964,9 @@ void Interactive::track() {
       ui->trackButton->setDisabled(false);
       replay->loadReplay(dir);
       replayAction->setChecked(true);
-      logMap->insert("status", errorMessage);
+      logMap->insert(QStringLiteral("status"), errorMessage);
       emit log(*logMap);
-      emit status("Tracking failed");
+      emit status(QStringLiteral("Tracking failed"));
       emit message(errorMessage);
     });
     connect(tracking, &Tracking::finished, thread, &QThread::quit);
@@ -976,9 +976,9 @@ void Interactive::track() {
       ui->trackButton->setDisabled(false);
       replay->loadReplay(dir);
       replayAction->setChecked(true);
-      logMap->insert("status", "Done");
+      logMap->insert(QStringLiteral("status"), QStringLiteral("Done"));
       emit log(*logMap);
-      emit status("Tracking succeeded");
+      emit status(QStringLiteral("Tracking succeeded"));
     });
     connect(tracking, &Tracking::forceFinished, thread, &QThread::quit);
     connect(tracking, &Tracking::forceFinished, tracking, &Tracking::deleteLater);
@@ -1122,8 +1122,8 @@ void Interactive::crop() {
   roi = Rect(xTop, yTop, width, height);
   cropedImageSize.setWidth(roi.width);
   cropedImageSize.setHeight(roi.height);
-  ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Image width", Qt::MatchExactly).at(0)), 1)->setText(QString::number(roi.width));
-  ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Image height", Qt::MatchExactly).at(0)), 1)->setText(QString::number(roi.height));
+  ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems(QStringLiteral("Image width"), Qt::MatchExactly).at(0)), 1)->setText(QString::number(roi.width));
+  ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems(QStringLiteral("Image height"), Qt::MatchExactly).at(0)), 1)->setText(QString::number(roi.height));
   display(ui->slider->value());
 
   // Sets the roi limits
@@ -1155,8 +1155,8 @@ void Interactive::reset() {
   ui->y1->setValue(0);
   ui->x2->setValue(originalImageSize.width());
   ui->y2->setValue(originalImageSize.height());
-  ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Image width", Qt::MatchExactly).at(0)), 1)->setText(QString::number(originalImageSize.width()));
-  ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems("Image height", Qt::MatchExactly).at(0)), 1)->setText(QString::number(originalImageSize.height()));
+  ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems(QStringLiteral("Image width"), Qt::MatchExactly).at(0)), 1)->setText(QString::number(originalImageSize.width()));
+  ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems(QStringLiteral("Image height"), Qt::MatchExactly).at(0)), 1)->setText(QString::number(originalImageSize.height()));
   roi = Rect(0, 0, 0, 0);
   display(ui->slider->value());
 }
@@ -1174,11 +1174,11 @@ Interactive::~Interactive() {
  * @brief Saves the settings.
  */
 void Interactive::saveSettings() {
-  QSettings settingsFile("FastTrack", "FastTrackOrg");
-  settingsFile.setValue("window/style", style);
-  settingsFile.setValue("window/color", color);
-  settingsFile.setValue("window/layout", layout);
-  settingsFile.setValue("window/mode", isExpert);
+  QSettings settingsFile(QStringLiteral("FastTrack"), QStringLiteral("FastTrackOrg"));
+  settingsFile.setValue(QStringLiteral("window/style"), style);
+  settingsFile.setValue(QStringLiteral("window/color"), color);
+  settingsFile.setValue(QStringLiteral("window/layout"), layout);
+  settingsFile.setValue(QStringLiteral("window/mode"), isExpert);
 }
 
 /**
@@ -1201,10 +1201,10 @@ void Interactive::level() {
         this->setEnabled(true);
       });
       connect(autolevel, &AutoLevel::levelParametersChanged, this, [this](QMap<QString, double> levelParameters) {
-        ui->maxT->setValue(levelParameters.value("normAngle"));
-        ui->maxL->setValue(levelParameters.value("normDist"));
-        ui->normArea->setValue(levelParameters.value("normArea"));
-        ui->normPerim->setValue(levelParameters.value("normPerim"));
+        ui->maxT->setValue(levelParameters.value(QStringLiteral("normAngle")));
+        ui->maxL->setValue(levelParameters.value(QStringLiteral("normDist")));
+        ui->normArea->setValue(levelParameters.value(QStringLiteral("normArea")));
+        ui->normPerim->setValue(levelParameters.value(QStringLiteral("normPerim")));
         QApplication::restoreOverrideCursor();
       });
       connect(autolevel, &AutoLevel::finished, thread, &QThread::quit);
@@ -1235,34 +1235,34 @@ void Interactive::loadParameters(QString path) {
     QStringList parameters;
     QMap<QString, QString> parameterList;
     while (in.readLineInto(&line)) {
-      if (line.contains("=")) {
-        parameters = line.split("=", Qt::SkipEmptyParts);
+      if (line.contains(QLatin1String("="))) {
+        parameters = line.split(QStringLiteral("="), Qt::SkipEmptyParts);
         parameterList.insert(parameters[0].trimmed(), parameters[1].trimmed());
       }
     }
-    ui->maxSize->setValue(parameterList.value("maxArea").toInt());
-    ui->minSize->setValue(parameterList.value("minArea").toInt());
-    ui->spot->setCurrentIndex(parameterList.value("spot").toInt());
-    ui->maxL->setValue(parameterList.value("normDist").toDouble());
-    ui->maxT->setValue(parameterList.value("normAngle").toDouble());
-    ui->lo->setValue(parameterList.value("maxDist").toInt());
-    ui->to->setValue(parameterList.value("maxTime").toInt());
-    ui->normArea->setValue(parameterList.value("normArea").toDouble());
-    ui->normPerim->setValue(parameterList.value("normPerim").toDouble());
+    ui->maxSize->setValue(parameterList.value(QStringLiteral("maxArea")).toInt());
+    ui->minSize->setValue(parameterList.value(QStringLiteral("minArea")).toInt());
+    ui->spot->setCurrentIndex(parameterList.value(QStringLiteral("spot")).toInt());
+    ui->maxL->setValue(parameterList.value(QStringLiteral("normDist")).toDouble());
+    ui->maxT->setValue(parameterList.value(QStringLiteral("normAngle")).toDouble());
+    ui->lo->setValue(parameterList.value(QStringLiteral("maxDist")).toInt());
+    ui->to->setValue(parameterList.value(QStringLiteral("maxTime")).toInt());
+    ui->normArea->setValue(parameterList.value(QStringLiteral("normArea")).toDouble());
+    ui->normPerim->setValue(parameterList.value(QStringLiteral("normPerim")).toDouble());
 
-    ui->threshBox->setValue(parameterList.value("thresh").toInt());
-    ui->nBack->setValue(parameterList.value("nBack").toInt());
-    ui->back->setCurrentIndex(parameterList.value("methBack").toInt());
-    ui->registrationBack->setCurrentIndex(parameterList.value("regBack").toInt());
-    ui->x1->setValue(parameterList.value("xTop").toInt());
-    ui->y1->setValue(parameterList.value("yTop").toInt());
-    (parameterList.value("xBottom").toInt() == 0) ? ui->x2->setValue(originalImageSize.width()) : ui->x2->setValue(parameterList.value("xBottom").toInt());
-    (parameterList.value("yBottom").toInt() == 0) ? ui->y2->setValue(originalImageSize.height()) : ui->y2->setValue(parameterList.value("yBottom").toInt());
-    ui->reg->setCurrentIndex(parameterList.value("reg").toInt());
-    ui->backColor->setCurrentIndex(parameterList.value("lightBack").toInt());
-    ui->morphOperation->setCurrentIndex(parameterList.value("morph").toInt());
-    ui->kernelSize->setValue(parameterList.value("morphSize").toInt());
-    ui->kernelType->setCurrentIndex(parameterList.value("morphType").toInt());
+    ui->threshBox->setValue(parameterList.value(QStringLiteral("thresh")).toInt());
+    ui->nBack->setValue(parameterList.value(QStringLiteral("nBack")).toInt());
+    ui->back->setCurrentIndex(parameterList.value(QStringLiteral("methBack")).toInt());
+    ui->registrationBack->setCurrentIndex(parameterList.value(QStringLiteral("regBack")).toInt());
+    ui->x1->setValue(parameterList.value(QStringLiteral("xTop")).toInt());
+    ui->y1->setValue(parameterList.value(QStringLiteral("yTop")).toInt());
+    (parameterList.value(QStringLiteral("xBottom")).toInt() == 0) ? ui->x2->setValue(originalImageSize.width()) : ui->x2->setValue(parameterList.value(QStringLiteral("xBottom")).toInt());
+    (parameterList.value(QStringLiteral("yBottom")).toInt() == 0) ? ui->y2->setValue(originalImageSize.height()) : ui->y2->setValue(parameterList.value(QStringLiteral("yBottom")).toInt());
+    ui->reg->setCurrentIndex(parameterList.value(QStringLiteral("reg")).toInt());
+    ui->backColor->setCurrentIndex(parameterList.value(QStringLiteral("lightBack")).toInt());
+    ui->morphOperation->setCurrentIndex(parameterList.value(QStringLiteral("morph")).toInt());
+    ui->kernelSize->setValue(parameterList.value(QStringLiteral("morphSize")).toInt());
+    ui->kernelType->setCurrentIndex(parameterList.value(QStringLiteral("morphType")).toInt());
   }
   parameterFile.close();
 }

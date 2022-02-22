@@ -49,10 +49,10 @@ AutoLevel::AutoLevel(const string &path, const UMat &background, const QMap<QStr
   QString savingFilename = savingInfo.baseName();
   m_savedPath = savingInfo.absolutePath();
   if (video.isSequence()) {
-    m_savedPath.append(QString("/Tracking_Result"));
+    m_savedPath.append(QStringLiteral("/Tracking_Result"));
   }
   else {
-    m_savedPath.append(QString("/Tracking_Result_") + savingFilename);
+    m_savedPath.append(QStringLiteral("/Tracking_Result_") + savingFilename);
   }
   QDir r;
   r.rename(m_savedPath, m_savedPath + "tmp");
@@ -69,22 +69,22 @@ QMap<QString, double> AutoLevel::level() {
     double stdDist = static_cast<double>(rand() % 500 + 1);
     double stdArea = static_cast<double>(rand() % 500 + 1);
     double stdPerimeter = static_cast<double>(rand() % 500 + 1);
-    int spot = m_parameters.value("spot").toInt();
+    int spot = m_parameters.value(QStringLiteral("spot")).toInt();
     if (spot == 0) {
-      m_spotSuffix = "Head";
+      m_spotSuffix = QStringLiteral("Head");
     }
     else if (spot == 1) {
-      m_spotSuffix = "Tail";
+      m_spotSuffix = QStringLiteral("Tail");
     }
     else if (spot == 2) {
-      m_spotSuffix = "Body";
+      m_spotSuffix = QStringLiteral("Body");
     }
     int counter = 0;
-    while (abs(stdAngle - m_parameters.value("normAngle").toDouble()) > 1E-3 && abs(stdDist - m_parameters.value("normDist").toDouble()) > 1E-3 && abs(stdArea - m_parameters.value("normArea").toDouble()) > 1E-3 && abs(stdPerimeter - m_parameters.value("normPerim").toDouble()) > 1E-3) {
-      m_parameters.insert("normAngle", QString::number(stdAngle));
-      m_parameters.insert("normDist", QString::number(stdDist));
-      m_parameters.insert("normArea", QString::number(stdArea));
-      m_parameters.insert("normPerim", QString::number(stdPerimeter));
+    while (abs(stdAngle - m_parameters.value(QStringLiteral("normAngle")).toDouble()) > 1E-3 && abs(stdDist - m_parameters.value(QStringLiteral("normDist")).toDouble()) > 1E-3 && abs(stdArea - m_parameters.value(QStringLiteral("normArea")).toDouble()) > 1E-3 && abs(stdPerimeter - m_parameters.value(QStringLiteral("normPerim")).toDouble()) > 1E-3) {
+      m_parameters.insert(QStringLiteral("normAngle"), QString::number(stdAngle));
+      m_parameters.insert(QStringLiteral("normDist"), QString::number(stdDist));
+      m_parameters.insert(QStringLiteral("normArea"), QString::number(stdArea));
+      m_parameters.insert(QStringLiteral("normPerim"), QString::number(stdPerimeter));
       Tracking tracking = Tracking(m_path, m_background, 0, m_endImage);
       tracking.updatingParameters(m_parameters);
       tracking.startProcess();
@@ -103,11 +103,11 @@ QMap<QString, double> AutoLevel::level() {
       }
     }
     QMap<QString, double> levelParameters;
-    levelParameters.insert("normAngle", stdAngle);
-    levelParameters.insert("normDist", stdDist);
-    levelParameters.insert("normArea", stdArea);
-    levelParameters.insert("normPerim", stdPerimeter);
-    levelParameters.insert("nIterations", double(counter));
+    levelParameters.insert(QStringLiteral("normAngle"), stdAngle);
+    levelParameters.insert(QStringLiteral("normDist"), stdDist);
+    levelParameters.insert(QStringLiteral("normArea"), stdArea);
+    levelParameters.insert(QStringLiteral("normPerim"), stdPerimeter);
+    levelParameters.insert(QStringLiteral("nIterations"), double(counter));
     emit levelParametersChanged(levelParameters);
     emit finished();
     return levelParameters;
@@ -145,8 +145,8 @@ double AutoLevel::computeStdAngle(const Data &data) {
     QList<double> angleDiff(i.value("t" + m_spotSuffix).size());
     QList<double> ang = i.value("t" + m_spotSuffix);
     std::adjacent_difference(ang.begin(), ang.end(), angleDiff.begin(), [](double a, double b) { return Tracking::angleDifference(b, a); });
-    QList<double> tDiff(i.value("imageNumber").size());
-    QList<double> image = i.value("imageNumber");
+    QList<double> tDiff(i.value(QStringLiteral("imageNumber")).size());
+    QList<double> image = i.value(QStringLiteral("imageNumber"));
     std::adjacent_difference(image.begin(), image.end(), tDiff.begin());
     std::transform(angleDiff.begin(), angleDiff.end(), tDiff.begin(), angleDiff.begin(), std::divides<double>{});  // Divide the distance by the time to account for time gaps
     angleDiff.removeFirst();
@@ -171,8 +171,8 @@ double AutoLevel::computeStdDistance(const Data &data) {
     QList<double> yDiff(i.value("y" + m_spotSuffix).size());
     QList<double> y = i.value("y" + m_spotSuffix);
     std::adjacent_difference(y.begin(), y.end(), yDiff.begin());
-    QList<double> tDiff(i.value("imageNumber").size());
-    QList<double> image = i.value("imageNumber");
+    QList<double> tDiff(i.value(QStringLiteral("imageNumber")).size());
+    QList<double> image = i.value(QStringLiteral("imageNumber"));
     std::adjacent_difference(image.begin(), image.end(), tDiff.begin());
     QList<double> dist(xDiff.size());
     std::transform(xDiff.begin(), xDiff.end(), yDiff.begin(), dist.begin(), [](double a, double b) { return std::pow(std::pow(a, 2) + std::pow(b, 2), 0.5); });
@@ -193,8 +193,8 @@ double AutoLevel::computeStdArea(const Data &data) {
   QList<int> ids = data.getId(0, data.maxFrameIndex);
   for (const int &a : ids) {
     QHash<QString, QList<double>> i = data.getDataId(a);
-    QList<double> areaDiff(i.value("areaBody").size());
-    QList<double> ar = i.value("areaBody");
+    QList<double> areaDiff(i.value(QStringLiteral("areaBody")).size());
+    QList<double> ar = i.value(QStringLiteral("areaBody"));
     std::adjacent_difference(ar.begin(), ar.end(), areaDiff.begin());
     areaDiff.removeFirst();
     area.append(areaDiff);
@@ -212,8 +212,8 @@ double AutoLevel::computeStdPerimeter(const Data &data) {
   QList<int> ids = data.getId(0, data.maxFrameIndex);
   for (const int &a : ids) {
     QHash<QString, QList<double>> i = data.getDataId(a);
-    QList<double> perimDiff(i.value("perimeterBody").size());
-    QList<double> perim = i.value("perimeterBody");
+    QList<double> perimDiff(i.value(QStringLiteral("perimeterBody")).size());
+    QList<double> perim = i.value(QStringLiteral("perimeterBody"));
     std::adjacent_difference(perim.begin(), perim.end(), perimDiff.begin());
     perimDiff.removeFirst();
     perimeter.append(perimDiff);

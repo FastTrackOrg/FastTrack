@@ -48,7 +48,7 @@ Batch::Batch(QWidget *parent) : QWidget(parent),
   // Setup the ui
   QDir::setCurrent(QCoreApplication::applicationDirPath());
   setWindowState(Qt::WindowMaximized);
-  setWindowTitle("Fast Track");
+  setWindowTitle(QStringLiteral("Fast Track"));
 
   QIcon img = QIcon(":/assets/buttons/open.png");
   ui->openPath->setIcon(img);
@@ -66,70 +66,70 @@ Batch::Batch(QWidget *parent) : QWidget(parent),
 
   // Populates the parameter table
   ui->tableParameters->insertRow(0);
-  ui->tableParameters->setItem(0, 0, new QTableWidgetItem("methBack"));
+  ui->tableParameters->setItem(0, 0, new QTableWidgetItem(QStringLiteral("methBack")));
   QComboBox *backMethod = new QComboBox(ui->tableParameters);
   backMethod->addItems({"Minimum", "Maximum", "Average"});
   ui->tableParameters->setCellWidget(0, 1, backMethod);
   connect(backMethod, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &Batch::updateParameters);
 
   ui->tableParameters->insertRow(1);
-  ui->tableParameters->setItem(1, 0, new QTableWidgetItem("nBack"));
+  ui->tableParameters->setItem(1, 0, new QTableWidgetItem(QStringLiteral("nBack")));
   QSpinBox *backNumber = new QSpinBox(ui->tableParameters);
   backNumber->setRange(0, 9999999);
   ui->tableParameters->setCellWidget(1, 1, backNumber);
   connect(backNumber, QOverload<int>::of(&QSpinBox::valueChanged), this, &Batch::updateParameters);
 
   ui->tableParameters->insertRow(2);
-  ui->tableParameters->setItem(2, 0, new QTableWidgetItem("thresh"));
+  ui->tableParameters->setItem(2, 0, new QTableWidgetItem(QStringLiteral("thresh")));
   QSpinBox *binThresh = new QSpinBox(ui->tableParameters);
   binThresh->setRange(0, 255);
   ui->tableParameters->setCellWidget(2, 1, binThresh);
   connect(binThresh, QOverload<int>::of(&QSpinBox::valueChanged), this, &Batch::updateParameters);
 
   ui->tableParameters->insertRow(3);
-  ui->tableParameters->setItem(3, 0, new QTableWidgetItem("lightBack"));
+  ui->tableParameters->setItem(3, 0, new QTableWidgetItem(QStringLiteral("lightBack")));
   QComboBox *backType = new QComboBox(ui->tableParameters);
   backType->addItems({"Yes", "No"});
   ui->tableParameters->setCellWidget(3, 1, backType);
   connect(backType, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &Batch::updateParameters);
 
   ui->tableParameters->insertRow(4);
-  ui->tableParameters->setItem(4, 0, new QTableWidgetItem("xTop"));
+  ui->tableParameters->setItem(4, 0, new QTableWidgetItem(QStringLiteral("xTop")));
   QSpinBox *xTop = new QSpinBox(ui->tableParameters);
   xTop->setRange(0, 9999999);
   ui->tableParameters->setCellWidget(4, 1, xTop);
   connect(xTop, QOverload<int>::of(&QSpinBox::valueChanged), this, &Batch::updateParameters);
 
   ui->tableParameters->insertRow(5);
-  ui->tableParameters->setItem(5, 0, new QTableWidgetItem("yTop"));
+  ui->tableParameters->setItem(5, 0, new QTableWidgetItem(QStringLiteral("yTop")));
   QSpinBox *yTop = new QSpinBox(ui->tableParameters);
   yTop->setRange(0, 9999999);
   ui->tableParameters->setCellWidget(5, 1, yTop);
   connect(yTop, QOverload<int>::of(&QSpinBox::valueChanged), this, &Batch::updateParameters);
 
   ui->tableParameters->insertRow(6);
-  ui->tableParameters->setItem(6, 0, new QTableWidgetItem("xBottom"));
+  ui->tableParameters->setItem(6, 0, new QTableWidgetItem(QStringLiteral("xBottom")));
   QSpinBox *xBottom = new QSpinBox(ui->tableParameters);
   xBottom->setRange(0, 9999999);
   ui->tableParameters->setCellWidget(6, 1, xBottom);
   connect(xBottom, QOverload<int>::of(&QSpinBox::valueChanged), this, &Batch::updateParameters);
 
   ui->tableParameters->insertRow(7);
-  ui->tableParameters->setItem(7, 0, new QTableWidgetItem("yBottom"));
+  ui->tableParameters->setItem(7, 0, new QTableWidgetItem(QStringLiteral("yBottom")));
   QSpinBox *yBottom = new QSpinBox(ui->tableParameters);
   yBottom->setRange(0, 9999999);
   ui->tableParameters->setCellWidget(7, 1, yBottom);
   connect(yBottom, QOverload<int>::of(&QSpinBox::valueChanged), this, &Batch::updateParameters);
 
   ui->tableParameters->insertRow(8);
-  ui->tableParameters->setItem(8, 0, new QTableWidgetItem("reg"));
+  ui->tableParameters->setItem(8, 0, new QTableWidgetItem(QStringLiteral("reg")));
   QComboBox *registration = new QComboBox(ui->tableParameters);
   registration->addItems({"None", "Simple", "ECC", "Features"});
   ui->tableParameters->setCellWidget(8, 1, registration);
   connect(registration, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &Batch::updateParameters);
 
   ui->tableParameters->insertRow(9);
-  ui->tableParameters->setItem(9, 0, new QTableWidgetItem("morph"));
+  ui->tableParameters->setItem(9, 0, new QTableWidgetItem(QStringLiteral("morph")));
   QComboBox *morphType = new QComboBox(ui->tableParameters);
   morphType->addItems({"Erosion", "Dilatation", "Opening", "Closing", "Gradient", "Top hat", "Black hat", "Hit miss", "None"});
   morphType->setCurrentIndex(8);
@@ -137,63 +137,63 @@ Batch::Batch(QWidget *parent) : QWidget(parent),
   connect(morphType, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &Batch::updateParameters);
 
   ui->tableParameters->insertRow(10);
-  ui->tableParameters->setItem(10, 0, new QTableWidgetItem("morphType"));
+  ui->tableParameters->setItem(10, 0, new QTableWidgetItem(QStringLiteral("morphType")));
   QComboBox *kernelType = new QComboBox(ui->tableParameters);
   kernelType->addItems({"Rectangle", "Cross", "Ellipse"});
   ui->tableParameters->setCellWidget(10, 1, kernelType);
   connect(kernelType, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &Batch::updateParameters);
 
   ui->tableParameters->insertRow(11);
-  ui->tableParameters->setItem(11, 0, new QTableWidgetItem("morphSize"));
+  ui->tableParameters->setItem(11, 0, new QTableWidgetItem(QStringLiteral("morphSize")));
   QSpinBox *kernelSize = new QSpinBox(ui->tableParameters);
   kernelSize->setRange(0, 9999999);
   ui->tableParameters->setCellWidget(11, 1, kernelSize);
   connect(kernelSize, QOverload<int>::of(&QSpinBox::valueChanged), this, &Batch::updateParameters);
 
   ui->tableParameters->insertRow(12);
-  ui->tableParameters->setItem(12, 0, new QTableWidgetItem("minArea"));
+  ui->tableParameters->setItem(12, 0, new QTableWidgetItem(QStringLiteral("minArea")));
   QSpinBox *minSize = new QSpinBox(ui->tableParameters);
   minSize->setRange(0, 9999999);
   ui->tableParameters->setCellWidget(12, 1, minSize);
   connect(minSize, QOverload<int>::of(&QSpinBox::valueChanged), this, &Batch::updateParameters);
 
   ui->tableParameters->insertRow(13);
-  ui->tableParameters->setItem(13, 0, new QTableWidgetItem("maxArea"));
+  ui->tableParameters->setItem(13, 0, new QTableWidgetItem(QStringLiteral("maxArea")));
   QSpinBox *maxSize = new QSpinBox(ui->tableParameters);
   maxSize->setRange(0, 9999999);
   ui->tableParameters->setCellWidget(13, 1, maxSize);
   connect(maxSize, QOverload<int>::of(&QSpinBox::valueChanged), this, &Batch::updateParameters);
 
   ui->tableParameters->insertRow(14);
-  ui->tableParameters->setItem(14, 0, new QTableWidgetItem("normDist"));
+  ui->tableParameters->setItem(14, 0, new QTableWidgetItem(QStringLiteral("normDist")));
   QDoubleSpinBox *maxLength = new QDoubleSpinBox(ui->tableParameters);
   maxLength->setRange(0, 9999999);
   ui->tableParameters->setCellWidget(14, 1, maxLength);
   connect(maxLength, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &Batch::updateParameters);
 
   ui->tableParameters->insertRow(15);
-  ui->tableParameters->setItem(15, 0, new QTableWidgetItem("normAngle"));
+  ui->tableParameters->setItem(15, 0, new QTableWidgetItem(QStringLiteral("normAngle")));
   QDoubleSpinBox *maxAngle = new QDoubleSpinBox(ui->tableParameters);
   maxAngle->setRange(0, 360);
   ui->tableParameters->setCellWidget(15, 1, maxAngle);
   connect(maxAngle, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &Batch::updateParameters);
 
   ui->tableParameters->insertRow(16);
-  ui->tableParameters->setItem(16, 0, new QTableWidgetItem("maxTime"));
+  ui->tableParameters->setItem(16, 0, new QTableWidgetItem(QStringLiteral("maxTime")));
   QSpinBox *maxTime = new QSpinBox(ui->tableParameters);
   maxTime->setRange(0, 9999999);
   ui->tableParameters->setCellWidget(16, 1, maxTime);
   connect(maxTime, QOverload<int>::of(&QSpinBox::valueChanged), this, &Batch::updateParameters);
 
   ui->tableParameters->insertRow(17);
-  ui->tableParameters->setItem(17, 0, new QTableWidgetItem("maxDist"));
+  ui->tableParameters->setItem(17, 0, new QTableWidgetItem(QStringLiteral("maxDist")));
   QSpinBox *maxOccl = new QSpinBox(ui->tableParameters);
   maxOccl->setRange(0, 9999999);
   ui->tableParameters->setCellWidget(17, 1, maxOccl);
   connect(maxOccl, QOverload<int>::of(&QSpinBox::valueChanged), this, &Batch::updateParameters);
 
   ui->tableParameters->insertRow(18);
-  ui->tableParameters->setItem(18, 0, new QTableWidgetItem("spot"));
+  ui->tableParameters->setItem(18, 0, new QTableWidgetItem(QStringLiteral("spot")));
   QComboBox *spotType = new QComboBox(ui->tableParameters);
   spotType->addItems({"Head", "Tail", "Body"});
   spotType->setCurrentIndex(2);
@@ -201,14 +201,14 @@ Batch::Batch(QWidget *parent) : QWidget(parent),
   connect(spotType, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &Batch::updateParameters);
 
   ui->tableParameters->insertRow(19);
-  ui->tableParameters->setItem(19, 0, new QTableWidgetItem("regBack"));
+  ui->tableParameters->setItem(19, 0, new QTableWidgetItem(QStringLiteral("regBack")));
   QComboBox *backRegistrationMethod = new QComboBox(ui->tableParameters);
   backRegistrationMethod->addItems({"None", "Simple", "ECC", "Features"});
   ui->tableParameters->setCellWidget(19, 1, backRegistrationMethod);
   connect(backRegistrationMethod, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &Batch::updateParameters);
 
   ui->tableParameters->insertRow(20);
-  ui->tableParameters->setItem(20, 0, new QTableWidgetItem("normArea"));
+  ui->tableParameters->setItem(20, 0, new QTableWidgetItem(QStringLiteral("normArea")));
   QDoubleSpinBox *area = new QDoubleSpinBox(ui->tableParameters);
   area->setRange(0, 999);
   area->setValue(0.0);
@@ -217,7 +217,7 @@ Batch::Batch(QWidget *parent) : QWidget(parent),
   connect(area, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &Batch::updateParameters);
 
   ui->tableParameters->insertRow(21);
-  ui->tableParameters->setItem(21, 0, new QTableWidgetItem("normPerim"));
+  ui->tableParameters->setItem(21, 0, new QTableWidgetItem(QStringLiteral("normPerim")));
   QDoubleSpinBox *perim = new QDoubleSpinBox(ui->tableParameters);
   perim->setRange(0, 999);
   perim->setValue(0.0);
@@ -267,7 +267,7 @@ void Batch::openPathFolder() {
   QFileDialog dialog;
   dialog.setOption(QFileDialog::DontUseNativeDialog, true);
   dialog.setFileMode(QFileDialog::AnyFile);
-  QListView *listView = dialog.findChild<QListView *>("listView");
+  QListView *listView = dialog.findChild<QListView *>(QStringLiteral("listView"));
   if (listView) {
     listView->setSelectionMode(QAbstractItemView::MultiSelection);
   }
@@ -293,11 +293,11 @@ void Batch::openPathFolder() {
           QString savingFilename = savingInfo.baseName();
           QString savingPath = savingInfo.absolutePath();
           QString resDir;
-          if (QDir(savingPath + QString("/Tracking_Result")).exists()) {
-            resDir = savingPath + QString("/Tracking_Result");
+          if (QDir(savingPath + QStringLiteral("/Tracking_Result")).exists()) {
+            resDir = savingPath + QStringLiteral("/Tracking_Result");
           }
-          else if (QDir(savingPath + QString("/Tracking_Result_") + savingFilename).exists()) {
-            resDir = savingPath + QString("/Tracking_Result_") + savingFilename;
+          else if (QDir(savingPath + QStringLiteral("/Tracking_Result_") + savingFilename).exists()) {
+            resDir = savingPath + QStringLiteral("/Tracking_Result_") + savingFilename;
           }
           if (QFileInfo::exists(resDir + "/background.pgm")) {
             backgroundPath = resDir + "/background.pgm";
@@ -340,7 +340,7 @@ void Batch::addPath(QString pathMovie, QString pathBackground, QString pathParam
   ui->tablePath->insertRow(row);
   ui->tablePath->setItem(row, 0, new QTableWidgetItem(pathMovie));
   if (pathBackground.isEmpty()) {
-    QPushButton *button = new QPushButton("Select a background");
+    QPushButton *button = new QPushButton(QStringLiteral("Select a background"));
     ui->tablePath->setCellWidget(row, 1, button);
     connect(button, &QPushButton::clicked, this, [this, row]() {
       openPathBackground(row);
@@ -350,7 +350,7 @@ void Batch::addPath(QString pathMovie, QString pathBackground, QString pathParam
     ui->tablePath->setItem(row, 1, new QTableWidgetItem(pathBackground));
   }
   if (pathParameter.isEmpty()) {
-    QPushButton *paramButton = new QPushButton("Select a parameter file");
+    QPushButton *paramButton = new QPushButton(QStringLiteral("Select a parameter file"));
     ui->tablePath->setCellWidget(row, 2, paramButton);
     connect(paramButton, &QPushButton::clicked, this, [this, row]() {
       openParameterFile(row);
@@ -361,7 +361,7 @@ void Batch::addPath(QString pathMovie, QString pathBackground, QString pathParam
   }
   QProgressBar *progressBarPath = new QProgressBar(ui->tablePath);
   ui->tablePath->setCellWidget(row, 3, progressBarPath);
-  ui->tablePath->setItem(row, 4, new QTableWidgetItem("Waiting"));
+  ui->tablePath->setItem(row, 4, new QTableWidgetItem(QStringLiteral("Waiting")));
   ui->tablePath->item(row, 4)->setTextAlignment(Qt::AlignCenter);
 
   process tmpProcess = {
@@ -418,36 +418,36 @@ void Batch::startTracking() {
       thread = new QThread;
       tracking = new Tracking(path, backgroundPath);
       QSharedPointer<QMap<QString, QString>> logMap(new QMap<QString, QString>);
-      logMap->insert("date", QDateTime::currentDateTime().toString());
-      logMap->insert("path", QString::fromStdString(path));
+      logMap->insert(QStringLiteral("date"), QDateTime::currentDateTime().toString());
+      logMap->insert(QStringLiteral("path"), QString::fromStdString(path));
       tracking->moveToThread(thread);
 
       connect(thread, &QThread::started, tracking, &Tracking::startProcess);
       // connect(tracking, &Tracking::progress, progressBar, &QProgressBar::setValue);
       connect(tracking, &Tracking::statistic, [this, logMap](int time) {
-        logMap->insert("time", QString::number(time));
+        logMap->insert(QStringLiteral("time"), QString::number(time));
       });
       connect(tracking, &Tracking::finished, progressBar, [this, progressBar, count, logMap]() {
-        ui->tablePath->item(currentPathCount, 4)->setText("Done");
+        ui->tablePath->item(currentPathCount, 4)->setText(QStringLiteral("Done"));
         ;
         progressBar->setValue(100);
         currentPathCount++;
         emit next();
-        logMap->insert("status", "Done");
+        logMap->insert(QStringLiteral("status"), QStringLiteral("Done"));
         emit log(*logMap);
       });
       connect(tracking, &Tracking::finished, thread, &QThread::quit);
       connect(tracking, &Tracking::finished, tracking, &Tracking::deleteLater);
       connect(tracking, &Tracking::forceFinished, progressBar, [this, progressBar, count, logMap](const QString &errorMessage) {
-        ui->tablePath->item(currentPathCount, 4)->setText("Error");
+        ui->tablePath->item(currentPathCount, 4)->setText(QStringLiteral("Error"));
         ;
         currentPathCount++;
         emit next();
-        logMap->insert("status", errorMessage);
+        logMap->insert(QStringLiteral("status"), errorMessage);
         emit log(*logMap);
       });
       connect(tracking, &Tracking::statistic, [this, logMap](int time) {
-        logMap->insert("time", QString::number(time));
+        logMap->insert(QStringLiteral("time"), QString::number(time));
       });
       connect(tracking, &Tracking::forceFinished, thread, &QThread::quit);
       connect(tracking, &Tracking::forceFinished, tracking, &Tracking::deleteLater);
@@ -467,7 +467,7 @@ void Batch::startTracking() {
     ui->startButton->setDisabled(false);
     ui->removePath->setDisabled(false);
     ui->clearPath->setDisabled(false);
-    emit status("Tracking finished");
+    emit status(QStringLiteral("Tracking finished"));
   }
 }
 
@@ -505,9 +505,9 @@ void Batch::updateParameters() {
  * @brief Loads the settings file at the startup of the program and updates the ui->parameterTable with the new parameters.
  */
 void Batch::loadSettings() {
-  settingsFile = new QSettings("FastTrack", "FastTrackOrg", this);
+  settingsFile = new QSettings(QStringLiteral("FastTrack"), QStringLiteral("FastTrackOrg"), this);
   settingsFile->setFallbacksEnabled(false);  // Shadows global variables added in MacOs system
-  settingsFile->beginGroup("batch");
+  settingsFile->beginGroup(QStringLiteral("batch"));
   QStringList keyList = settingsFile->allKeys();
   for (const auto &a : keyList) {
     parameterList.insert(a, settingsFile->value(a).toString());
@@ -550,12 +550,12 @@ bool Batch::loadParameterFile(QString path) {
     QStringList parameters;
     parameterList.clear();
     while (in.readLineInto(&line)) {
-      if (line.contains("=")) {
-        parameters = line.split("=", Qt::SkipEmptyParts);
+      if (line.contains(QLatin1String("="))) {
+        parameters = line.split(QStringLiteral("="), Qt::SkipEmptyParts);
         parameterList.insert(parameters[0].trimmed(), parameters[1].trimmed());
       }
     }
-    parameterList.remove("title");
+    parameterList.remove(QStringLiteral("title"));
   }
   else
     return false;
@@ -588,10 +588,10 @@ void Batch::updateParameterTable() {
  */
 void Batch::errors(int code) {
   QMessageBox errorBox(this);
-  errorBox.setText("An error occurs during the tracking\n");
+  errorBox.setText(QStringLiteral("An error occurs during the tracking\n"));
   switch (code) {
     case 0:
-      errorBox.setText("Error message: provided background image is not correct. New background image is calculated instead.");
+      errorBox.setText(QStringLiteral("Error message: provided background image is not correct. New background image is calculated instead."));
   }
   errorBox.exec();
 }

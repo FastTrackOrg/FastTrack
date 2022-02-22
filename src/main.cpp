@@ -29,19 +29,19 @@ QScopedPointer<QFile> logFile;
 
 void messageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg) {
   QTextStream out(logFile.data());
-  out << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss.zzz ");
+  out << QDateTime::currentDateTime().toString(QStringLiteral("yyyy-MM-dd hh:mm:ss.zzz "));
   out << context.category << ": " << msg << Qt::endl;
 }
 
 int main(int argc, char *argv[]) {
   QApplication a(argc, argv);
-  QPixmap pixmap(":/assets/icon.png");
+  QPixmap pixmap(QStringLiteral(":/assets/icon.png"));
   QSplashScreen splash(pixmap);
   splash.show();
-  a.setApplicationName("FastTrack");
-  a.setApplicationVersion(APP_VERSION);
-  a.setOrganizationName("FastTrackOrg");
-  a.setOrganizationDomain("www.fasttrack.sh");
+  a.setApplicationName(QStringLiteral("FastTrack"));
+  a.setApplicationVersion(APP_VERSION);  // clazy:exclude=qstring-allocations
+  a.setOrganizationName(QStringLiteral("FastTrackOrg"));
+  a.setOrganizationDomain(QStringLiteral("www.fasttrack.sh"));
   logFile.reset(new QFile(QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) + "/fasttrack.log"));
   QDir().mkpath(QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation));
   logFile.data()->open(QFile::Append | QFile::Text);
@@ -50,8 +50,8 @@ int main(int argc, char *argv[]) {
 #endif
   MainWindow w;
   w.setWindowIcon(QIcon(":/assets/icon.png"));
-  QFontDatabase::addApplicationFont(":/assets/Font.ttf");
-  w.setStyleSheet("QWidget {font-family: 'Lato', sans-serif;}");
+  QFontDatabase::addApplicationFont(QStringLiteral(":/assets/Font.ttf"));
+  w.setStyleSheet(QStringLiteral("QWidget {font-family: 'Lato', sans-serif;}"));
   w.show();
   splash.finish(&w);
   a.exec();

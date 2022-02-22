@@ -38,7 +38,7 @@ void Data::clear() {
   if (!isEmpty) {
     save();
     QSqlQuery query(data);
-    query.exec("DROP TABLE deleted");
+    query.exec(QStringLiteral("DROP TABLE deleted"));
   }
   data.close();
   maxId = 0;
@@ -64,8 +64,8 @@ bool Data::setPath(const QString &dataPath) {
     if (!isDbExist) {  // Import tracking.txt in db for retrocompatibility
       Tracking::importTrackingResult(dataPath, data);
     }
-    query.exec("CREATE TABLE deleted ( xHead REAL, yHead REAL, tHead REAL, xTail REAL, yTail REAL, tTail REAL, xBody REAL, yBody REAL, tBody REAL, curvature REAL, areaBody REAL, perimeterBody REAL, headMajorAxisLength REAL, headMinorAxisLength REAL, headExcentricity REAL, tailMajorAxisLength REAL, tailMinorAxisLength REAL, tailExcentricity REAL, bodyMajorAxisLength REAL, bodyMinorAxisLength REAL, bodyExcentricity REAL, imageNumber INTEGER, id INTEGER)");
-    query.exec("SELECT MAX(imageNumber), MAX(id) FROM tracking");
+    query.exec(QStringLiteral("CREATE TABLE deleted ( xHead REAL, yHead REAL, tHead REAL, xTail REAL, yTail REAL, tTail REAL, xBody REAL, yBody REAL, tBody REAL, curvature REAL, areaBody REAL, perimeterBody REAL, headMajorAxisLength REAL, headMinorAxisLength REAL, headExcentricity REAL, tailMajorAxisLength REAL, tailMinorAxisLength REAL, tailExcentricity REAL, bodyMajorAxisLength REAL, bodyMinorAxisLength REAL, bodyExcentricity REAL, imageNumber INTEGER, id INTEGER)"));
+    query.exec(QStringLiteral("SELECT MAX(imageNumber), MAX(id) FROM tracking"));
     if (query.first()) {
       maxFrameIndex = query.value(0).toInt();
       maxId = query.value(1).toInt();
@@ -90,7 +90,7 @@ Data::Data(const QString &dataPath) : Data() {
  */
 Data::Data() : columns{"xHead", "yHead", "tHead", "xTail", "yTail", "tTail", "xBody", "yBody", "tBody", "curvature", "areaBody", "perimeterBody", "headMajorAxisLength", "headMinorAxisLength", "headExcentricity", "tailMajorAxisLength", "tailMinorAxisLength", "tailExcentricity", "bodyMajorAxisLength", "bodyMinorAxisLength", "bodyExcentricity", "imageNumber", "id"}, connectionName{QString("data_%1").arg(QRandomGenerator::global()->generate())} {
   isEmpty = true;
-  QSqlDatabase data = QSqlDatabase::addDatabase("QSQLITE", connectionName);
+  QSqlDatabase data = QSqlDatabase::addDatabase(QStringLiteral("QSQLITE"), connectionName);
 }
 
 /**
@@ -102,7 +102,7 @@ Data::Data() : columns{"xHead", "yHead", "tHead", "xTail", "yTail", "tTail", "xB
 QHash<QString, double> Data::getData(int imageIndex, int id) const {
   QSqlDatabase data = QSqlDatabase::database(connectionName, false);
   QSqlQuery query(data);
-  query.prepare("SELECT xHead, yHead, tHead, xTail, yTail, tTail, xBody, yBody, tBody, curvature, areaBody, perimeterBody, headMajorAxisLength, headMinorAxisLength, headExcentricity, tailMajorAxisLength, tailMinorAxisLength, tailExcentricity, bodyMajorAxisLength, bodyMinorAxisLength, bodyExcentricity, imageNumber, id FROM tracking WHERE imageNumber = ? AND id = ?");
+  query.prepare(QStringLiteral("SELECT xHead, yHead, tHead, xTail, yTail, tTail, xBody, yBody, tBody, curvature, areaBody, perimeterBody, headMajorAxisLength, headMinorAxisLength, headExcentricity, tailMajorAxisLength, tailMinorAxisLength, tailExcentricity, bodyMajorAxisLength, bodyMinorAxisLength, bodyExcentricity, imageNumber, id FROM tracking WHERE imageNumber = ? AND id = ?"));
   query.addBindValue(imageIndex);
   query.addBindValue(id);
   query.exec();
@@ -114,7 +114,7 @@ QHash<QString, double> Data::getData(int imageIndex, int id) const {
     return tmp;
   }
   QHash<QString, double> tmp;
-  tmp.insert("NAN", -1);
+  tmp.insert(QStringLiteral("NAN"), -1);
   return tmp;
 }
 
@@ -129,7 +129,7 @@ QList<QHash<QString, double>> Data::getData(int imageIndexStart, int imageIndexS
   QList<QHash<QString, double>> dataImage;
   QSqlDatabase data = QSqlDatabase::database(connectionName, false);
   QSqlQuery query(data);
-  query.prepare("SELECT xHead, yHead, tHead, xTail, yTail, tTail, xBody, yBody, tBody, curvature, areaBody, perimeterBody, headMajorAxisLength, headMinorAxisLength, headExcentricity, tailMajorAxisLength, tailMinorAxisLength, tailExcentricity, bodyMajorAxisLength, bodyMinorAxisLength, bodyExcentricity, imageNumber, id FROM tracking WHERE imageNumber >= ? AND imageNumber < ? AND id = ?");  // Sorted by imageIndex because inserted in order.
+  query.prepare(QStringLiteral("SELECT xHead, yHead, tHead, xTail, yTail, tTail, xBody, yBody, tBody, curvature, areaBody, perimeterBody, headMajorAxisLength, headMinorAxisLength, headExcentricity, tailMajorAxisLength, tailMinorAxisLength, tailExcentricity, bodyMajorAxisLength, bodyMinorAxisLength, bodyExcentricity, imageNumber, id FROM tracking WHERE imageNumber >= ? AND imageNumber < ? AND id = ?"));  // Sorted by imageIndex because inserted in order.
   query.addBindValue(imageIndexStart);
   query.addBindValue(imageIndexStop);
   query.addBindValue(id);
@@ -153,7 +153,7 @@ QList<QHash<QString, double>> Data::getData(int imageIndex) const {
   QList<QHash<QString, double>> dataImage;
   QSqlDatabase data = QSqlDatabase::database(connectionName, false);
   QSqlQuery query(data);
-  query.prepare("SELECT xHead, yHead, tHead, xTail, yTail, tTail, xBody, yBody, tBody, curvature, areaBody, perimeterBody, headMajorAxisLength, headMinorAxisLength, headExcentricity, tailMajorAxisLength, tailMinorAxisLength, tailExcentricity, bodyMajorAxisLength, bodyMinorAxisLength, bodyExcentricity, imageNumber, id FROM tracking WHERE imageNumber = ?");
+  query.prepare(QStringLiteral("SELECT xHead, yHead, tHead, xTail, yTail, tTail, xBody, yBody, tBody, curvature, areaBody, perimeterBody, headMajorAxisLength, headMinorAxisLength, headExcentricity, tailMajorAxisLength, tailMinorAxisLength, tailExcentricity, bodyMajorAxisLength, bodyMinorAxisLength, bodyExcentricity, imageNumber, id FROM tracking WHERE imageNumber = ?"));
   query.addBindValue(imageIndex);
   query.exec();
   while (query.next()) {
@@ -174,7 +174,7 @@ QList<QHash<QString, double>> Data::getData(int imageIndex) const {
 QHash<QString, QList<double>> Data::getDataId(int id) const {
   QSqlDatabase data = QSqlDatabase::database(connectionName, false);
   QSqlQuery query(data);
-  query.prepare("SELECT xHead, yHead, tHead, xTail, yTail, tTail, xBody, yBody, tBody, curvature, areaBody, perimeterBody, headMajorAxisLength, headMinorAxisLength, headExcentricity, tailMajorAxisLength, tailMinorAxisLength, tailExcentricity, bodyMajorAxisLength, bodyMinorAxisLength, bodyExcentricity, imageNumber, id FROM tracking WHERE id = ?");
+  query.prepare(QStringLiteral("SELECT xHead, yHead, tHead, xTail, yTail, tTail, xBody, yBody, tBody, curvature, areaBody, perimeterBody, headMajorAxisLength, headMinorAxisLength, headExcentricity, tailMajorAxisLength, tailMinorAxisLength, tailExcentricity, bodyMajorAxisLength, bodyMinorAxisLength, bodyExcentricity, imageNumber, id FROM tracking WHERE id = ?"));
   query.addBindValue(id);
   query.exec();
   QHash<QString, QList<double>> idData;
@@ -197,7 +197,7 @@ QHash<QString, QList<double>> Data::getDataId(int id) const {
 QList<int> Data::getId(int imageIndex) const {
   QSqlDatabase data = QSqlDatabase::database(connectionName, false);
   QSqlQuery query(data);
-  query.prepare("SELECT id FROM tracking where imageNumber = ? ORDER BY id");
+  query.prepare(QStringLiteral("SELECT id FROM tracking where imageNumber = ? ORDER BY id"));
   query.addBindValue(imageIndex);
   query.exec();
   QList<int> ids;
@@ -216,7 +216,7 @@ QList<int> Data::getId(int imageIndex) const {
 QList<int> Data::getId(int imageIndexFirst, int imageIndexLast) const {
   QSqlDatabase data = QSqlDatabase::database(connectionName, false);
   QSqlQuery query(data);
-  query.prepare("SELECT id FROM tracking where imageNumber >= ? AND imageNumber <= ?");
+  query.prepare(QStringLiteral("SELECT id FROM tracking where imageNumber >= ? AND imageNumber <= ?"));
   query.addBindValue(imageIndexFirst);
   query.addBindValue(imageIndexLast);
   query.exec();
@@ -239,7 +239,7 @@ int Data::getObjectInformation(int objectId) const {
   int firstAppearance = 0;
   QSqlDatabase data = QSqlDatabase::database(connectionName, false);
   QSqlQuery query(data);
-  query.prepare("SELECT MIN(imageNumber) FROM tracking where id = ?");
+  query.prepare(QStringLiteral("SELECT MIN(imageNumber) FROM tracking where id = ?"));
   query.addBindValue(objectId);
   query.exec();
   if (query.first()) {
@@ -257,10 +257,10 @@ int Data::getObjectInformation(int objectId) const {
 void Data::swapData(int firstObject, int secondObject, int from) {
   QSqlDatabase data = QSqlDatabase::database(connectionName, false);
   QSqlQuery query(data);
-  query.prepare("UPDATE tracking SET id = (CASE WHEN id = :first THEN :second ELSE :first END) WHERE id IN (:first, :second) AND imageNumber >= :from");
-  query.bindValue(":first", firstObject);
-  query.bindValue(":second", secondObject);
-  query.bindValue(":from", from);
+  query.prepare(QStringLiteral("UPDATE tracking SET id = (CASE WHEN id = :first THEN :second ELSE :first END) WHERE id IN (:first, :second) AND imageNumber >= :from"));
+  query.bindValue(QStringLiteral(":first"), firstObject);
+  query.bindValue(QStringLiteral(":second"), secondObject);
+  query.bindValue(QStringLiteral(":from"), from);
   query.exec();
   save(false);
 }
@@ -274,12 +274,12 @@ void Data::swapData(int firstObject, int secondObject, int from) {
 void Data::deleteData(int objectId, int from, int to) {
   QSqlDatabase data = QSqlDatabase::database(connectionName, false);
   QSqlQuery query(data);
-  query.prepare("INSERT INTO deleted SELECT xHead, yHead, tHead, xTail, yTail, tTail, xBody, yBody, tBody, curvature, areaBody, perimeterBody, headMajorAxisLength, headMinorAxisLength, headExcentricity, tailMajorAxisLength, tailMinorAxisLength, tailExcentricity, bodyMajorAxisLength, bodyMinorAxisLength, bodyExcentricity, imageNumber, id FROM tracking WHERE id = ? AND imageNumber >= ? AND imageNumber <= ?");
+  query.prepare(QStringLiteral("INSERT INTO deleted SELECT xHead, yHead, tHead, xTail, yTail, tTail, xBody, yBody, tBody, curvature, areaBody, perimeterBody, headMajorAxisLength, headMinorAxisLength, headExcentricity, tailMajorAxisLength, tailMinorAxisLength, tailExcentricity, bodyMajorAxisLength, bodyMinorAxisLength, bodyExcentricity, imageNumber, id FROM tracking WHERE id = ? AND imageNumber >= ? AND imageNumber <= ?"));
   query.addBindValue(objectId);
   query.addBindValue(from);
   query.addBindValue(to);
   query.exec();
-  query.prepare("DELETE FROM tracking WHERE id = ? AND imageNumber >= ? AND imageNumber <= ?");
+  query.prepare(QStringLiteral("DELETE FROM tracking WHERE id = ? AND imageNumber >= ? AND imageNumber <= ?"));
   query.addBindValue(objectId);
   query.addBindValue(from);
   query.addBindValue(to);
@@ -296,12 +296,12 @@ void Data::deleteData(int objectId, int from, int to) {
 void Data::insertData(int objectId, int from, int to) {
   QSqlDatabase data = QSqlDatabase::database(connectionName, false);
   QSqlQuery query(data);
-  query.prepare("INSERT INTO tracking SELECT xHead, yHead, tHead, xTail, yTail, tTail, xBody, yBody, tBody, curvature, areaBody, perimeterBody, headMajorAxisLength, headMinorAxisLength, headExcentricity, tailMajorAxisLength, tailMinorAxisLength, tailExcentricity, bodyMajorAxisLength, bodyMinorAxisLength, bodyExcentricity, imageNumber, id FROM deleted WHERE id = ? AND imageNumber >= ? AND imageNumber <= ?");
+  query.prepare(QStringLiteral("INSERT INTO tracking SELECT xHead, yHead, tHead, xTail, yTail, tTail, xBody, yBody, tBody, curvature, areaBody, perimeterBody, headMajorAxisLength, headMinorAxisLength, headExcentricity, tailMajorAxisLength, tailMinorAxisLength, tailExcentricity, bodyMajorAxisLength, bodyMinorAxisLength, bodyExcentricity, imageNumber, id FROM deleted WHERE id = ? AND imageNumber >= ? AND imageNumber <= ?"));
   query.addBindValue(objectId);
   query.addBindValue(from);
   query.addBindValue(to);
   query.exec();
-  query.prepare("DELETE FROM deleted WHERE id = ? AND imageNumber >= ? AND imageNumber <= ?");
+  query.prepare(QStringLiteral("DELETE FROM deleted WHERE id = ? AND imageNumber >= ? AND imageNumber <= ?"));
   query.addBindValue(objectId);
   query.addBindValue(from);
   query.addBindValue(to);
@@ -338,11 +338,11 @@ Data::~Data() {
 };
 
 SwapData::SwapData(int firstObject, int secondObject, int from, Data *data)
-    : m_firstObject(firstObject), m_secondObject(secondObject), m_from(from), m_data(data) { setText("swap data"); }
+    : m_firstObject(firstObject), m_secondObject(secondObject), m_from(from), m_data(data) { setText(QStringLiteral("swap data")); }
 void SwapData::redo() { m_data->swapData(m_firstObject, m_secondObject, m_from); }
 void SwapData::undo() { m_data->swapData(m_secondObject, m_firstObject, m_from); }
 
 DeleteData::DeleteData(int object, int from, int to, Data *data)
-    : m_object(object), m_from(from), m_to(to), m_data(data) { setText("delete data"); }
+    : m_object(object), m_from(from), m_to(to), m_data(data) { setText(QStringLiteral("delete data")); }
 void DeleteData::redo() { m_data->deleteData(m_object, m_from, m_to); }
 void DeleteData::undo() { m_data->insertData(m_object, m_from, m_to); }

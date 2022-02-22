@@ -73,13 +73,13 @@ Timeline::Timeline(QWidget *parent)
 
   // Keyboard shorcuts
   // AZERTY keyboard shorcuts are set in the ui
-  QShortcut *qShortcut = new QShortcut(QKeySequence("q"), this);
+  QShortcut *qShortcut = new QShortcut(QKeySequence(QStringLiteral("q")), this);
   connect(qShortcut, &QShortcut::activated, this, [this]() { setValue(m_currentIndexLeft - 1); });
 
-  QShortcut *aShortcut = new QShortcut(QKeySequence("a"), this);
+  QShortcut *aShortcut = new QShortcut(QKeySequence(QStringLiteral("a")), this);
   connect(aShortcut, &QShortcut::activated, this, [this]() { setValue(m_currentIndexLeft - 1); });
 
-  QShortcut *dShortcut = new QShortcut(QKeySequence("d"), this);
+  QShortcut *dShortcut = new QShortcut(QKeySequence(QStringLiteral("d")), this);
   connect(dShortcut, &QShortcut::activated, this, [this]() { setValue(m_currentIndexLeft + 1); });
 
   QShortcut *spaceShortcut = new QShortcut(Qt::Key_Space, this);

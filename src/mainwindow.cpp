@@ -95,16 +95,16 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 
     if (lastVersion != APP_VERSION) {
       QMessageBox msgBox;
-      msgBox.setWindowTitle("FastTrack Version");
+      msgBox.setWindowTitle(QStringLiteral("FastTrack Version"));
       msgBox.setTextFormat(Qt::RichText);
       msgBox.setIcon(QMessageBox::Information);
-      msgBox.setText(QString("<strong>FastTrack version %1 is available!</strong> <br> Please update. <br> <a href='http://www.fasttrack.sh/docs/installation/#update'>Need help to update?</a> <br> %2").arg(lastVersion, message));
+      msgBox.setText(QStringLiteral("<strong>FastTrack version %1 is available!</strong> <br> Please update. <br> <a href='http://www.fasttrack.sh/docs/installation/#update'>Need help to update?</a> <br> %2").arg(lastVersion, message));
       msgBox.exec();
-      this->statusBar()->addWidget(new QLabel(QString("FastTrack version %1 is available!").arg(lastVersion)));
+      this->statusBar()->addWidget(new QLabel(QStringLiteral("FastTrack version %1 is available!").arg(lastVersion)));
     }
     if (!warning.isEmpty()) {
       QMessageBox msgBox;
-      msgBox.setWindowTitle("Warning");
+      msgBox.setWindowTitle(QStringLiteral("Warning"));
       msgBox.setTextFormat(Qt::RichText);
       msgBox.setIcon(QMessageBox::Warning);
       msgBox.setText(warning);
@@ -112,19 +112,19 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
     }
   });
 
-  manager->get(QNetworkRequest(QUrl("https://www.fasttrack.sh/download/FastTrack/platforms.txt")));
+  manager->get(QNetworkRequest(QUrl(QStringLiteral("https://www.fasttrack.sh/download/FastTrack/platforms.txt"))));
 
   interactive = new Interactive(this);
   ui->tabWidget->addTab(interactive, tr("Interactive tracking"));
   connect(interactive, &Interactive::status, this, [this](QString message) {
-    trayIcon->showMessage("FastTrack", message, QSystemTrayIcon::Information, 3000);
+    trayIcon->showMessage(QStringLiteral("FastTrack"), message, QSystemTrayIcon::Information, 3000);
   });
   connect(interactive, &Interactive::modeChanged, this, &MainWindow::setMode);
 
   batch = new Batch(this);
   ui->tabWidget->addTab(batch, tr("Batch tracking"));
   connect(batch, &Batch::status, this, [this](QString message) {
-    trayIcon->showMessage("FastTrack", message, QSystemTrayIcon::Information, 3000);
+    trayIcon->showMessage(QStringLiteral("FastTrack"), message, QSystemTrayIcon::Information, 3000);
   });
 
   replay = new Replay(this);
@@ -161,8 +161,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 void MainWindow::closeEvent(QCloseEvent *event) {
   QMessageBox msgBox(this);
   msgBox.setTextFormat(Qt::RichText);
-  msgBox.setWindowTitle("Confirmation");
-  msgBox.setText("<b>Are you sure you want to quit?</b>");
+  msgBox.setWindowTitle(QStringLiteral("Confirmation"));
+  msgBox.setText(QStringLiteral("<b>Are you sure you want to quit?</b>"));
   msgBox.setIcon(QMessageBox::Question);
   msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
   QPushButton *minimizeButton = msgBox.addButton(tr("Minimize"), QMessageBox::AcceptRole);

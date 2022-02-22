@@ -37,7 +37,7 @@ void Annotation::clear() {
   if (!annotationFile->fileName().isEmpty()) {
     writeToFile();
     annotationFile->close();
-    annotationFile->setFileName("");
+    annotationFile->setFileName(QLatin1String(""));
   }
   findIndexes.clear();
   findIndex = -1;
@@ -58,10 +58,10 @@ bool Annotation::setPath(const QString &filePath) {
 
   QTextStream in(annotationFile);
   QString data = in.readAll();
-  QStringList annotationEntries = data.split("\n\t\n");
+  QStringList annotationEntries = data.split(QStringLiteral("\n\t\n"));
 
   for (auto const &a : annotationEntries) {
-    QStringList entry = a.split("\t\n\t");
+    QStringList entry = a.split(QStringLiteral("\t\n\t"));
     if (entry.length() == 2) {
       annotations->insert(entry[0].toInt(), entry[1]);
     }

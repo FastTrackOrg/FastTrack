@@ -35,12 +35,12 @@ void loadConfig(QString path, QMap<QString, QString> &parameters) {
     QString line;
     QStringList params;
     while (in.readLineInto(&line)) {
-      if (line.contains("=")) {
-        params = line.split("=", Qt::SkipEmptyParts);
+      if (line.contains(QLatin1String("="))) {
+        params = line.split(QStringLiteral("="), Qt::SkipEmptyParts);
         parameters.insert(params[0].trimmed(), params[1].trimmed());
       }
     }
-    parameters.remove("title");
+    parameters.remove(QStringLiteral("title"));
     parameterFile.close();
   }
 }
@@ -157,76 +157,76 @@ int main(int argc, char **argv) {
 
     switch (c) {
       case 'a':
-        parameters.insert("maxArea", QString::QString::fromStdString(optarg));
+        parameters.insert(QStringLiteral("maxArea"), QString::QString::fromStdString(optarg));
         break;
       case 'b':
-        parameters.insert("minArea", QString::fromStdString(optarg));
+        parameters.insert(QStringLiteral("minArea"), QString::fromStdString(optarg));
         break;
       case 'c':
-        parameters.insert("spot", QString::fromStdString(optarg));
+        parameters.insert(QStringLiteral("spot"), QString::fromStdString(optarg));
         break;
       case 'd':
-        parameters.insert("normDist", QString::fromStdString(optarg));
+        parameters.insert(QStringLiteral("normDist"), QString::fromStdString(optarg));
         break;
       case 'e':
-        parameters.insert("normAngle", QString::fromStdString(optarg));
+        parameters.insert(QStringLiteral("normAngle"), QString::fromStdString(optarg));
         break;
       case 'g':
-        parameters.insert("maxDist", QString::fromStdString(optarg));
+        parameters.insert(QStringLiteral("maxDist"), QString::fromStdString(optarg));
         break;
       case 'h':
-        parameters.insert("maxTime", QString::fromStdString(optarg));
+        parameters.insert(QStringLiteral("maxTime"), QString::fromStdString(optarg));
         break;
       case 'i':
-        parameters.insert("thresh", QString::fromStdString(optarg));
+        parameters.insert(QStringLiteral("thresh"), QString::fromStdString(optarg));
         break;
       case 'j':
-        parameters.insert("nBack", QString::fromStdString(optarg));
+        parameters.insert(QStringLiteral("nBack"), QString::fromStdString(optarg));
         break;
       case 'k':
-        parameters.insert("methBack", QString::fromStdString(optarg));
+        parameters.insert(QStringLiteral("methBack"), QString::fromStdString(optarg));
         break;
       case 'l':
-        parameters.insert("regBack", QString::fromStdString(optarg));
+        parameters.insert(QStringLiteral("regBack"), QString::fromStdString(optarg));
         break;
       case 'm':
-        parameters.insert("xTop", QString::fromStdString(optarg));
+        parameters.insert(QStringLiteral("xTop"), QString::fromStdString(optarg));
         break;
       case 'n':
-        parameters.insert("yTop", QString::fromStdString(optarg));
+        parameters.insert(QStringLiteral("yTop"), QString::fromStdString(optarg));
         break;
       case 'o':
-        parameters.insert("xBottom", QString::fromStdString(optarg));
+        parameters.insert(QStringLiteral("xBottom"), QString::fromStdString(optarg));
         break;
       case 'p':
-        parameters.insert("yBottom", QString::fromStdString(optarg));
+        parameters.insert(QStringLiteral("yBottom"), QString::fromStdString(optarg));
         break;
       case 'q':
-        parameters.insert("reg", QString::fromStdString(optarg));
+        parameters.insert(QStringLiteral("reg"), QString::fromStdString(optarg));
         break;
       case 'r':
-        parameters.insert("lightBack", QString::fromStdString(optarg));
+        parameters.insert(QStringLiteral("lightBack"), QString::fromStdString(optarg));
         break;
       case 's':
-        parameters.insert("morph", QString::fromStdString(optarg));
+        parameters.insert(QStringLiteral("morph"), QString::fromStdString(optarg));
         break;
       case 't':
-        parameters.insert("morphSize", QString::fromStdString(optarg));
+        parameters.insert(QStringLiteral("morphSize"), QString::fromStdString(optarg));
         break;
       case 'u':
-        parameters.insert("morphType", QString::fromStdString(optarg));
+        parameters.insert(QStringLiteral("morphType"), QString::fromStdString(optarg));
         break;
       case 'v':
-        parameters.insert("path", QString::fromStdString(optarg));
+        parameters.insert(QStringLiteral("path"), QString::fromStdString(optarg));
         break;
       case 'w':
-        parameters.insert("backPath", QString::fromStdString(optarg));
+        parameters.insert(QStringLiteral("backPath"), QString::fromStdString(optarg));
         break;
       case 'y':
-        parameters.insert("normArea", QString::fromStdString(optarg));
+        parameters.insert(QStringLiteral("normArea"), QString::fromStdString(optarg));
         break;
       case 'z':
-        parameters.insert("normPerim", QString::fromStdString(optarg));
+        parameters.insert(QStringLiteral("normPerim"), QString::fromStdString(optarg));
         break;
     }
   }
@@ -237,11 +237,11 @@ int main(int argc, char **argv) {
     cout << i.key().toStdString() << " set to: " << i.value().toStdString() << endl;
   }
   Tracking *tracking;
-  if (parameters.contains("backPath")) {
-    tracking = new Tracking(parameters.value("path").toStdString(), parameters.value("backPath").toStdString());
+  if (parameters.contains(QStringLiteral("backPath"))) {
+    tracking = new Tracking(parameters.value(QStringLiteral("path")).toStdString(), parameters.value(QStringLiteral("backPath")).toStdString());
   }
   else {
-    tracking = new Tracking(parameters.value("path").toStdString(), "");
+    tracking = new Tracking(parameters.value(QStringLiteral("path")).toStdString(), "");
   }
   QObject::connect(tracking, &Tracking::finished, []() {
     cout << "Tracking ended normally" << endl;

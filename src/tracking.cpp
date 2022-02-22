@@ -807,7 +807,7 @@ void Tracking::imageProcessing() {
   }
   else {
     qWarning() << "Can't write tracking.txt to the disk";
-    emit forceFinished("Can't write tracking.txt to the disk!");
+    emit forceFinished(QStringLiteral("Can't write tracking.txt to the disk!"));
   }
 }
 
@@ -897,24 +897,24 @@ void Tracking::startProcess() {
     QString savingFilename = savingInfo.baseName();
     m_savingPath = savingInfo.absolutePath();
     if (video->isSequence()) {
-      m_savingPath.append(QString("/Tracking_Result"));
+      m_savingPath.append(QStringLiteral("/Tracking_Result"));
     }
     else {
-      m_savingPath.append(QString("/Tracking_Result_") + savingFilename);
+      m_savingPath.append(QStringLiteral("/Tracking_Result_") + savingFilename);
     }
     QDir r;
-    r.rename(m_savingPath, m_savingPath + "_Archive-" + QDate::currentDate().toString("dd-MMM-yyyy-") + QTime::currentTime().toString("hh-mm-ss"));
+    r.rename(m_savingPath, m_savingPath + "_Archive-" + QDate::currentDate().toString(QStringLiteral("dd-MMM-yyyy-")) + QTime::currentTime().toString(QStringLiteral("hh-mm-ss")));
     QDir().mkdir(m_savingPath);
     m_savingPath.append(QDir::separator());
 
-    QSqlDatabase outputDb = QSqlDatabase::addDatabase("QSQLITE", connectionName);
+    QSqlDatabase outputDb = QSqlDatabase::addDatabase(QStringLiteral("QSQLITE"), connectionName);
     outputDb.setDatabaseName(m_savingPath + "tracking.db");
     QSqlQuery query(outputDb);
     if (!outputDb.open()) {
       throw std::runtime_error("Can't write tracking.db to the disk!");
     }
 
-    query.exec("CREATE TABLE parameter ( parameter TEXT, value REAL)");
+    query.exec(QStringLiteral("CREATE TABLE parameter ( parameter TEXT, value REAL)"));
     QFile parameterFile(m_savingPath + "cfg.toml");
     if (!parameterFile.open(QFile::WriteOnly | QFile::Text)) {
       throw std::runtime_error("Can't write cfg.toml to the disk!");
@@ -926,7 +926,7 @@ void Tracking::startProcess() {
       QList<QString> keyList = parameters.keys();
       for (const auto &a : keyList) {
         out << a << " = " << parameters.value(a) << Qt::endl;
-        query.prepare("INSERT INTO parameter (parameter, value) VALUES (?, ?)");
+        query.prepare(QStringLiteral("INSERT INTO parameter (parameter, value) VALUES (?, ?)"));
         query.addBindValue(a);
         query.addBindValue(parameters.value(a));
         query.exec();
@@ -936,10 +936,10 @@ void Tracking::startProcess() {
 
     imwrite(m_savingPath.toStdString() + "background.pgm", m_background);
 
-    query.exec("PRAGMA synchronous=OFF");
-    query.exec("PRAGMA journal_mode=OFF");  // FastTrack does not use rollback and this option increase performance
-    query.exec("PRAGMA locking_mode=EXCLUSIVE");
-    query.exec("CREATE TABLE tracking ( xHead REAL, yHead REAL, tHead REAL, xTail REAL, yTail REAL, tTail REAL, xBody REAL, yBody REAL, tBody REAL, curvature REAL, areaBody REAL, perimeterBody REAL, headMajorAxisLength REAL, headMinorAxisLength REAL, headExcentricity REAL, tailMajorAxisLength REAL, tailMinorAxisLength REAL, tailExcentricity REAL, bodyMajorAxisLength REAL, bodyMinorAxisLength REAL, bodyExcentricity REAL, imageNumber INTEGER, id INTEGER)");
+    query.exec(QStringLiteral("PRAGMA synchronous=OFF"));
+    query.exec(QStringLiteral("PRAGMA journal_mode=OFF"));  // FastTrack does not use rollback and this option increase performance
+    query.exec(QStringLiteral("PRAGMA locking_mode=EXCLUSIVE"));
+    query.exec(QStringLiteral("CREATE TABLE tracking ( xHead REAL, yHead REAL, tHead REAL, xTail REAL, yTail REAL, tTail REAL, xBody REAL, yBody REAL, tBody REAL, curvature REAL, areaBody REAL, perimeterBody REAL, headMajorAxisLength REAL, headMinorAxisLength REAL, headExcentricity REAL, tailMajorAxisLength REAL, tailMinorAxisLength REAL, tailExcentricity REAL, bodyMajorAxisLength REAL, bodyMinorAxisLength REAL, bodyExcentricity REAL, imageNumber INTEGER, id INTEGER)"));
 
     m_logFile.setFileName(m_savingPath + "log");
     if (!m_logFile.open(QFile::WriteOnly | QFile::Text)) {
@@ -948,7 +948,7 @@ void Tracking::startProcess() {
     else {
       connect(this, &Tracking::forceFinished, [this](QString message) {
         QTextStream out(&m_logFile);
-        out << QDate::currentDate().toString("dd-MMM-yyyy-") + QTime::currentTime().toString("hh-mm-ss") + '\t' + message.toLower() + '\n';
+        out << QDate::currentDate().toString(QStringLiteral("dd-MMM-yyyy-")) + QTime::currentTime().toString(QStringLiteral("hh-mm-ss")) + '\t' + message.toLower() + '\n';
       });
     }
 
@@ -979,7 +979,7 @@ void Tracking::startProcess() {
   }
   catch (...) {
     qWarning() << "Fatal error, tracking initialization failed";
-    emit forceFinished("Fatal error, tracking initialization failed");
+    emit forceFinished(QStringLiteral("Fatal error, tracking initialization failed"));
   }
 }
 
@@ -989,30 +989,30 @@ void Tracking::startProcess() {
  */
 void Tracking::updatingParameters(const QMap<QString, QString> &parameterList) {
   parameters = parameterList;
-  param_maxArea = parameterList.value("maxArea").toInt();
-  param_minArea = parameterList.value("minArea").toInt();
-  param_spot = parameterList.value("spot").toInt();
-  param_len = parameterList.value("normDist").toDouble();
-  param_angle = (M_PI * parameterList.value("normAngle").toDouble() / 180);
-  param_lo = parameterList.value("maxDist").toDouble();
-  param_to = parameterList.value("maxTime").toDouble();
-  param_area = parameterList.value("normArea").toDouble();
-  param_perimeter = parameterList.value("normPerim").toDouble();
+  param_maxArea = parameterList.value(QStringLiteral("maxArea")).toInt();
+  param_minArea = parameterList.value(QStringLiteral("minArea")).toInt();
+  param_spot = parameterList.value(QStringLiteral("spot")).toInt();
+  param_len = parameterList.value(QStringLiteral("normDist")).toDouble();
+  param_angle = (M_PI * parameterList.value(QStringLiteral("normAngle")).toDouble() / 180);
+  param_lo = parameterList.value(QStringLiteral("maxDist")).toDouble();
+  param_to = parameterList.value(QStringLiteral("maxTime")).toDouble();
+  param_area = parameterList.value(QStringLiteral("normArea")).toDouble();
+  param_perimeter = parameterList.value(QStringLiteral("normPerim")).toDouble();
 
-  param_thresh = parameterList.value("thresh").toInt();
-  param_nBackground = parameterList.value("nBack").toDouble();
-  param_methodBackground = parameterList.value("methBack").toInt();
-  param_methodRegistrationBackground = parameterList.value("regBack").toInt();
-  param_x1 = parameterList.value("xTop").toInt();
-  param_y1 = parameterList.value("yTop").toInt();
-  param_x2 = parameterList.value("xBottom").toInt();
-  param_y2 = parameterList.value("yBottom").toInt();
+  param_thresh = parameterList.value(QStringLiteral("thresh")).toInt();
+  param_nBackground = parameterList.value(QStringLiteral("nBack")).toDouble();
+  param_methodBackground = parameterList.value(QStringLiteral("methBack")).toInt();
+  param_methodRegistrationBackground = parameterList.value(QStringLiteral("regBack")).toInt();
+  param_x1 = parameterList.value(QStringLiteral("xTop")).toInt();
+  param_y1 = parameterList.value(QStringLiteral("yTop")).toInt();
+  param_x2 = parameterList.value(QStringLiteral("xBottom")).toInt();
+  param_y2 = parameterList.value(QStringLiteral("yBottom")).toInt();
   m_ROI = Rect(param_x1, param_y1, param_x2 - param_x1, param_y2 - param_y1);
-  param_registration = parameterList.value("reg").toInt();
-  statusBinarisation = (parameterList.value("lightBack") == "0") ? true : false;
-  param_morphOperation = parameterList.value("morph").toInt();
-  param_kernelSize = parameterList.value("morphSize").toInt();
-  param_kernelType = parameterList.value("morphType").toInt();
+  param_registration = parameterList.value(QStringLiteral("reg")).toInt();
+  statusBinarisation = (parameterList.value(QStringLiteral("lightBack")) == QLatin1String("0")) ? true : false;
+  param_morphOperation = parameterList.value(QStringLiteral("morph")).toInt();
+  param_kernelSize = parameterList.value(QStringLiteral("morphSize")).toInt();
+  param_kernelType = parameterList.value(QStringLiteral("morphType")).toInt();
 }
 
 /**
@@ -1039,7 +1039,7 @@ bool Tracking::exportTrackingResult(const QString path, QSqlDatabase db) {
   savefile << "xHead" << '\t' << "yHead" << '\t' << "tHead" << '\t' << "xTail" << '\t' << "yTail" << '\t' << "tTail" << '\t' << "xBody" << '\t' << "yBody" << '\t' << "tBody" << '\t' << "curvature" << '\t' << "areaBody" << '\t' << "perimeterBody" << '\t' << "headMajorAxisLength" << '\t' << "headMinorAxisLength" << '\t' << "headExcentricity" << '\t' << "tailMajorAxisLength" << '\t' << "tailMinorAxisLength" << '\t' << "tailExcentricity" << '\t' << "bodyMajorAxisLength" << '\t' << "bodyMinorAxisLength" << '\t' << "bodyExcentricity" << '\t' << "imageNumber" << '\t' << "id"
            << "\n";
   QSqlQuery query(db);
-  query.prepare("SELECT xHead, yHead, tHead, xTail, yTail, tTail, xBody, yBody, tBody, curvature, areaBody, perimeterBody, headMajorAxisLength, headMinorAxisLength, headExcentricity, tailMajorAxisLength, tailMinorAxisLength, tailExcentricity, bodyMajorAxisLength, bodyMinorAxisLength, bodyExcentricity, imageNumber, id FROM tracking");
+  query.prepare(QStringLiteral("SELECT xHead, yHead, tHead, xTail, yTail, tTail, xBody, yBody, tBody, curvature, areaBody, perimeterBody, headMajorAxisLength, headMinorAxisLength, headExcentricity, tailMajorAxisLength, tailMinorAxisLength, tailExcentricity, bodyMajorAxisLength, bodyMinorAxisLength, bodyExcentricity, imageNumber, id FROM tracking"));
   query.exec();
   while (query.next()) {
     int size = 23;
@@ -1069,14 +1069,14 @@ bool Tracking::importTrackingResult(const QString path, QSqlDatabase db) {
 
   db.transaction();
   QSqlQuery query(db);
-  query.exec("CREATE TABLE tracking ( xHead REAL, yHead REAL, tHead REAL, xTail REAL, yTail REAL, tTail REAL, xBody REAL, yBody REAL, tBody REAL, curvature REAL, areaBody REAL, perimeterBody REAL, headMajorAxisLength REAL, headMinorAxisLength REAL, headExcentricity REAL, tailMajorAxisLength REAL, tailMinorAxisLength REAL, tailExcentricity REAL, bodyMajorAxisLength REAL, bodyMinorAxisLength REAL, bodyExcentricity REAL, imageNumber INTEGER, id INTEGER)");
+  query.exec(QStringLiteral("CREATE TABLE tracking ( xHead REAL, yHead REAL, tHead REAL, xTail REAL, yTail REAL, tTail REAL, xBody REAL, yBody REAL, tBody REAL, curvature REAL, areaBody REAL, perimeterBody REAL, headMajorAxisLength REAL, headMinorAxisLength REAL, headExcentricity REAL, tailMajorAxisLength REAL, tailMinorAxisLength REAL, tailExcentricity REAL, bodyMajorAxisLength REAL, bodyMinorAxisLength REAL, bodyExcentricity REAL, imageNumber INTEGER, id INTEGER)"));
 
   QTextStream in(&file);
   QString line;
   QStringList values;
   in.readLineInto(&line);  // Ignore header
   while (in.readLineInto(&line)) {
-    values = line.split("\t", Qt::SkipEmptyParts);
+    values = line.split(QStringLiteral("\t"), Qt::SkipEmptyParts);
     query.prepare(
         "INSERT INTO tracking (xHead, yHead, tHead, xTail, yTail, tTail, xBody, yBody, tBody, curvature, areaBody, perimeterBody, headMajorAxisLength, headMinorAxisLength, headExcentricity, tailMajorAxisLength, tailMinorAxisLength, tailExcentricity, bodyMajorAxisLength, bodyMinorAxisLength, bodyExcentricity, imageNumber, id) "
         "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");

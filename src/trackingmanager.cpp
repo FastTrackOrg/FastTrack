@@ -76,10 +76,10 @@ TrackingManager::~TrackingManager() {
  */
 void TrackingManager::addLogEntry(QMap<QString, QString> log) {
   ui->logTable->insertRow(0);
-  ui->logTable->setItem(0, 0, new QTableWidgetItem(log["date"]));
-  ui->logTable->setItem(0, 1, new QTableWidgetItem(log["path"]));
-  ui->logTable->setItem(0, 2, new QTableWidgetItem(log["status"]));
-  ui->logTable->setItem(0, 3, new QTableWidgetItem(log["time"]));
+  ui->logTable->setItem(0, 0, new QTableWidgetItem(log[QStringLiteral("date")]));
+  ui->logTable->setItem(0, 1, new QTableWidgetItem(log[QStringLiteral("path")]));
+  ui->logTable->setItem(0, 2, new QTableWidgetItem(log[QStringLiteral("status")]));
+  ui->logTable->setItem(0, 3, new QTableWidgetItem(log[QStringLiteral("time")]));
   appendToFile(logPath, log);
 }
 
@@ -123,10 +123,10 @@ void TrackingManager::readFromFile(QString path) {
     in >> log;
     while (in.status() == QDataStream::Ok) {
       ui->logTable->insertRow(0);
-      ui->logTable->setItem(0, 0, new QTableWidgetItem(log["date"]));
-      ui->logTable->setItem(0, 1, new QTableWidgetItem(log["path"]));
-      ui->logTable->setItem(0, 2, new QTableWidgetItem(log["status"]));
-      ui->logTable->setItem(0, 3, new QTableWidgetItem(log["time"]));
+      ui->logTable->setItem(0, 0, new QTableWidgetItem(log[QStringLiteral("date")]));
+      ui->logTable->setItem(0, 1, new QTableWidgetItem(log[QStringLiteral("path")]));
+      ui->logTable->setItem(0, 2, new QTableWidgetItem(log[QStringLiteral("status")]));
+      ui->logTable->setItem(0, 3, new QTableWidgetItem(log[QStringLiteral("time")]));
       in >> log;
     }
   }
