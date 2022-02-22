@@ -88,7 +88,7 @@ void TrackingManager::addLogEntry(QMap<QString, QString> log) {
  * @param[in] path QString that contains the path to the output file.
  * @param[in] line QMap that contains the log entry.
  */
-void TrackingManager::appendToFile(QString path, QMap<QString, QString> line) {
+void TrackingManager::appendToFile(const QString &path, const QMap<QString, QString> &line) {
   QFile file(path);
   if (file.open(QIODevice::Append)) {
     QDataStream out(&file);
@@ -101,7 +101,7 @@ void TrackingManager::appendToFile(QString path, QMap<QString, QString> line) {
  * @param[in] path QString that contains the path to the output file.
  * @param[in] lines QList ofQMap that contains log entries.
  */
-void TrackingManager::writeToFile(QString path, QList<QMap<QString, QString>> lines) {
+void TrackingManager::writeToFile(const QString &path, const QList<QMap<QString, QString>> &lines) {
   QFile file(path);
   if (file.open(QIODevice::WriteOnly)) {
     QDataStream out(&file);
@@ -115,7 +115,7 @@ void TrackingManager::writeToFile(QString path, QList<QMap<QString, QString>> li
  * @brief Reads a log file.
  * @param[in] path QString that contains the path to the input file.
  */
-void TrackingManager::readFromFile(QString path) {
+void TrackingManager::readFromFile(const QString &path) {
   QFile file(path);
   if (file.open(QIODevice::ReadOnly)) {
     QDataStream in(&file);

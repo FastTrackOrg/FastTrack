@@ -335,7 +335,7 @@ void Batch::openPathBackground(int row) {
  * @arg[in] pathBackground Path to the background image.
  * @arg[in] pathParameter Path to the parameter file.
  */
-void Batch::addPath(QString pathMovie, QString pathBackground, QString pathParameter) {
+void Batch::addPath(const QString &pathMovie, const QString &pathBackground, const QString &pathParameter) {
   int row = ui->tablePath->rowCount();
   ui->tablePath->insertRow(row);
   ui->tablePath->setItem(row, 0, new QTableWidgetItem(pathMovie));
@@ -542,7 +542,7 @@ void Batch::openParameterFile(int row) {
 /**
  * @brief Reads a parameter file, updates parameters.
  */
-bool Batch::loadParameterFile(QString path) {
+bool Batch::loadParameterFile(const QString &path) {
   QFile parameterFile(path);
   if (parameterFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
     QTextStream in(&parameterFile);

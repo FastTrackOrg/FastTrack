@@ -99,7 +99,7 @@ class Interactive : public QMainWindow {
   void reset();
 
   void saveSettings();
-  void loadParameters(QString path);
+  void loadParameters(const QString &path);
   void level();
 
  private:

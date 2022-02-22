@@ -28,7 +28,7 @@ This file is part of Fast Track.
 
 using namespace std;
 
-void loadConfig(QString path, QMap<QString, QString> &parameters) {
+void loadConfig(const QString &path, QMap<QString, QString> &parameters) {
   QFile parameterFile(path);
   if (parameterFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
     QTextStream in(&parameterFile);
@@ -246,7 +246,7 @@ int main(int argc, char **argv) {
   QObject::connect(tracking, &Tracking::finished, []() {
     cout << "Tracking ended normally" << endl;
   });
-  QObject::connect(tracking, &Tracking::forceFinished, [](QString message) {
+  QObject::connect(tracking, &Tracking::forceFinished, [](const QString &message) {
     cout << message.toStdString() << endl;
   });
 

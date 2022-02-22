@@ -108,7 +108,7 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   });
   ui->menuView->addAction(replayAction);
 
-  connect(ui->slider, &Timeline::valueChanged, this, [this](const int &newValue) {
+  connect(ui->slider, &Timeline::valueChanged, this, [this](int newValue) {
     int index = ui->interactiveTab->currentIndex();
     if (index == 0) {
       display(newValue);
@@ -371,7 +371,7 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   });
   connect(ui->actionAboutQt, &QAction::triggered, qApp, &QApplication::aboutQt);
 
-  connect(this, &Interactive::message, this, [this](QString msg) {
+  connect(this, &Interactive::message, this, [this](const QString &msg) {
     QMessageBox msgBox;
     msgBox.setIcon(QMessageBox::Critical);
     msgBox.setText(QStringLiteral("Error"));
@@ -912,7 +912,7 @@ void Interactive::previewTracking() {
       replay->loadReplay(dir);
       replayAction->setChecked(true);
     });
-    connect(tracking, &Tracking::forceFinished, this, [this](QString errorMessage) {
+    connect(tracking, &Tracking::forceFinished, this, [this](const QString &errorMessage) {
       ui->slider->setDisabled(false);
       ui->previewButton->setDisabled(false);
       ui->trackButton->setDisabled(false);
@@ -1193,14 +1193,14 @@ void Interactive::level() {
       autolevel->moveToThread(thread);
 
       connect(thread, &QThread::started, autolevel, &AutoLevel::level);
-      connect(autolevel, &AutoLevel::forceFinished, this, [this](QString errorMessage) {
+      connect(autolevel, &AutoLevel::forceFinished, this, [this](const QString &errorMessage) {
         this->setEnabled(true);
         emit message(errorMessage);
       });
       connect(autolevel, &AutoLevel::finished, this, [this]() {
         this->setEnabled(true);
       });
-      connect(autolevel, &AutoLevel::levelParametersChanged, this, [this](QMap<QString, double> levelParameters) {
+      connect(autolevel, &AutoLevel::levelParametersChanged, this, [this](const QMap<QString, double> &levelParameters) {
         ui->maxT->setValue(levelParameters.value(QStringLiteral("normAngle")));
         ui->maxL->setValue(levelParameters.value(QStringLiteral("normDist")));
         ui->normArea->setValue(levelParameters.value(QStringLiteral("normArea")));
@@ -1227,7 +1227,7 @@ void Interactive::level() {
 /**
  * @brief Reads a parameter file, updates parameters.
  */
-void Interactive::loadParameters(QString path) {
+void Interactive::loadParameters(const QString &path) {
   QFile parameterFile(path);
   if (parameterFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
     QTextStream in(&parameterFile);

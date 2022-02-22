@@ -818,7 +818,7 @@ void Tracking::imageProcessing() {
  * @param[in] startImage Index of the beginning image.
  * @param[in] stopImage Index of the ending image.
  */
-Tracking::Tracking(string path, string backgroundPath, int startImage, int stopImage) : m_path{path}, m_backgroundPath{backgroundPath}, video{new VideoReader(m_path)}, m_startImage{startImage}, m_stopImage{stopImage}, connectionName{QString("tracking_%1").arg(QRandomGenerator::global()->generate())} {
+Tracking::Tracking(const string &path, const string &backgroundPath, int startImage, int stopImage) : m_path{path}, m_backgroundPath{backgroundPath}, video{new VideoReader(m_path)}, m_startImage{startImage}, m_stopImage{stopImage}, connectionName{QString("tracking_%1").arg(QRandomGenerator::global()->generate())} {
 }
 
 /**
@@ -828,7 +828,7 @@ Tracking::Tracking(string path, string backgroundPath, int startImage, int stopI
  * @param[in] startImage Index of the beginning image.
  * @param[in] stopImage Index of the ending image.
  */
-Tracking::Tracking(string path, UMat background, int startImage, int stopImage) : m_path{path}, m_background{background}, video{new VideoReader(m_path)}, m_startImage{startImage}, m_stopImage{stopImage}, connectionName{QString("tracking_%1").arg(QRandomGenerator::global()->generate())} {
+Tracking::Tracking(const string &path, const UMat &background, int startImage, int stopImage) : m_path{path}, m_background{background}, video{new VideoReader(m_path)}, m_startImage{startImage}, m_stopImage{stopImage}, connectionName{QString("tracking_%1").arg(QRandomGenerator::global()->generate())} {
 }
 
 /**
@@ -946,7 +946,7 @@ void Tracking::startProcess() {
       throw std::runtime_error("Can't write log to the disk!");
     }
     else {
-      connect(this, &Tracking::forceFinished, [this](QString message) {
+      connect(this, &Tracking::forceFinished, [this](const QString &message) {
         QTextStream out(&m_logFile);
         out << QDate::currentDate().toString(QStringLiteral("dd-MMM-yyyy-")) + QTime::currentTime().toString(QStringLiteral("hh-mm-ss")) + '\t' + message.toLower() + '\n';
       });
@@ -1028,7 +1028,7 @@ Tracking::~Tracking() {
  * @param[in] path The path to a folder where to write the text file.
  * @param[in] db The database where tracking results are stored already opened.
  */
-bool Tracking::exportTrackingResult(const QString path, QSqlDatabase db) {
+bool Tracking::exportTrackingResult(const QString &path, const QSqlDatabase &db) {
   QFile outputFile(path + "/tracking.txt");
   if (!outputFile.open(QFile::WriteOnly | QFile::Text)) {
     return false;
@@ -1061,7 +1061,7 @@ bool Tracking::exportTrackingResult(const QString path, QSqlDatabase db) {
  * @param[in] path The path to a folder where to write the text file.
  * @param[in] db The database where tracking results are stored already opened.
  */
-bool Tracking::importTrackingResult(const QString path, QSqlDatabase db) {
+bool Tracking::importTrackingResult(const QString &path, QSqlDatabase db) {
   QFile file(path + "/tracking.txt");
   if (!file.open(QFile::ReadOnly | QFile::Text)) {
     return false;

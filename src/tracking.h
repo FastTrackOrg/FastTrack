@@ -110,8 +110,8 @@ class Tracking : public QObject {
 
  public:
   Tracking() = default;
-  Tracking(string path, string background, int startImage = 0, int stopImage = -1);
-  Tracking(string path, UMat background, int startImage = 0, int stopImage = -1);
+  Tracking(const string &path, const string &background, int startImage = 0, int stopImage = -1);
+  Tracking(const string &path, const UMat &background, int startImage = 0, int stopImage = -1);
   Tracking(const Tracking &) = delete;
   Tracking &operator=(const Tracking &) = delete;
   ~Tracking();
@@ -133,8 +133,8 @@ class Tracking : public QObject {
   static UMat backgroundExtraction(VideoReader &video, int n, const int method, const int registrationMethod);
   static void registration(UMat imageReference, UMat &frame, int method);
   static void binarisation(UMat &frame, char backgroundColor, int value);
-  static bool exportTrackingResult(const QString path, QSqlDatabase db);
-  static bool importTrackingResult(const QString path, QSqlDatabase db);
+  static bool exportTrackingResult(const QString &path, const QSqlDatabase &db);
+  static bool importTrackingResult(const QString &path, QSqlDatabase db);
 
   UMat m_binaryFrame;                /*!< Binary image CV_8U */
   UMat m_visuFrame;                  /*!< Image 8 bit CV_8U */

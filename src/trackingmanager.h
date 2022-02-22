@@ -45,9 +45,9 @@ class TrackingManager : public QWidget {
 
  public slots:
   void addLogEntry(QMap<QString, QString> log);
-  void appendToFile(QString path, QMap<QString, QString> line);
-  void writeToFile(QString path, QList<QMap<QString, QString>> lines);
-  void readFromFile(QString path);
+  void appendToFile(const QString &path, const QMap<QString, QString> &line);
+  void writeToFile(const QString &path, const QList<QMap<QString, QString>> &lines);
+  void readFromFile(const QString &path);
 };
 
 #endif  // TRACKINGMANAGER_H

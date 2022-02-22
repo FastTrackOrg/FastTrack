@@ -88,11 +88,11 @@ class Batch : public QWidget {
   void startTracking();
   void openPathFolder();
   void openPathBackground(int);
-  void addPath(QString, QString, QString);
+  void addPath(const QString &, const QString &, const QString &);
   void removePath();
   void removePath(int index);
   void updateParameterTable();
-  bool loadParameterFile(QString path);
+  bool loadParameterFile(const QString &path);
   void openParameterFile(int);
 
   void errors(int code);

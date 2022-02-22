@@ -116,14 +116,14 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 
   interactive = new Interactive(this);
   ui->tabWidget->addTab(interactive, tr("Interactive tracking"));
-  connect(interactive, &Interactive::status, this, [this](QString message) {
+  connect(interactive, &Interactive::status, this, [this](const QString &message) {
     trayIcon->showMessage(QStringLiteral("FastTrack"), message, QSystemTrayIcon::Information, 3000);
   });
   connect(interactive, &Interactive::modeChanged, this, &MainWindow::setMode);
 
   batch = new Batch(this);
   ui->tabWidget->addTab(batch, tr("Batch tracking"));
-  connect(batch, &Batch::status, this, [this](QString message) {
+  connect(batch, &Batch::status, this, [this](const QString &message) {
     trayIcon->showMessage(QStringLiteral("FastTrack"), message, QSystemTrayIcon::Information, 3000);
   });
 
