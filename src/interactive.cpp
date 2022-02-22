@@ -1099,7 +1099,7 @@ bool Interactive::eventFilter(QObject *target, QEvent *event) {
       qApp->restoreOverrideCursor();
     }
   }
-  return false;
+  return QWidget::eventFilter(target, event);
 }
 
 /**
