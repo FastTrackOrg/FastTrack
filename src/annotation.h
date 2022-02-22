@@ -38,7 +38,7 @@ class Annotation : public QWidget {
   void annotationText(const QString &text);
 
  public:
-  Annotation();
+  explicit Annotation(QWidget *parent = nullptr);
   Annotation(const QString &annotationFile);
   Annotation(const Annotation &T) = delete;
   Annotation &operator=(const Annotation &T) = delete;
