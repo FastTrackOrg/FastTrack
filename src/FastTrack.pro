@@ -19,7 +19,7 @@ RCC_DIR=build
 unix:!macx {
   TARGET = fasttrack
   
-  QMAKE_CXXFLAGS += -std=c++17 -O3 -fopenmp -g -Wconversion
+  QMAKE_CXXFLAGS += -std=c++17 -O3 -fopenmp
   QMAKE_CXXFLAGS_RELEASE -= -O1
   QMAKE_CXXFLAGS_RELEASE -= -O2
   QMAKE_CXXFLAGS_RELEASE += -O3
@@ -48,7 +48,7 @@ unix:!macx {
 win32 {
   TARGET = FastTrack
   CONFIG += c++2a
-  QMAKE_CXXFLAGS += -O3 -fopenmp -g
+  QMAKE_CXXFLAGS += -O3 -fopenmp
   LIBS += -L"$$PWD/../OpenCV_MinGW_64/lib" -lopencv_world455
   INCLUDEPATH += "$$PWD/../OpenCV_MinGW_64/include"
 }
@@ -57,7 +57,7 @@ unix:macx {
   TARGET = FastTrack
   CONFIG += c++17
   LIBS += -L/usr/local/lib -lomp
-  QMAKE_CXXFLAGS += -std=c++1z -stdlib=libc++ -mmacosx-version-min=10.15 -O3 -g -Xpreprocessor -fopenmp
+  QMAKE_CXXFLAGS += -std=c++1z -stdlib=libc++ -mmacosx-version-min=10.15 -O3 -Xpreprocessor -fopenmp
   QMAKE_CXXFLAGS_RELEASE -= -O1
   QMAKE_CXXFLAGS_RELEASE -= -O2
   QMAKE_CXXFLAGS_RELEASE += -O3

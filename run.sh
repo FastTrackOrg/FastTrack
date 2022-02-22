@@ -31,7 +31,7 @@ fi
 
 if [ "$1" = "debug" ]; then
   set -e
-  qmake6 CONFIG+=debug FastTrack.pro
+  qmake6 CONFIG+=debug QMAKE_CXXFLAGS+="-Wall -Wextra -g -Wconversion" FastTrack.pro
   make
   make check
   src/build/fasttrack
