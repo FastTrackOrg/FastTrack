@@ -38,17 +38,6 @@ VideoReader::VideoReader(const string &path) : m_path{path} {
 }
 
 /**
- * @brief Copy constructor.
- * @param[in] video.
- */
-VideoReader::VideoReader(const VideoReader &video) : VideoCapture(video) {
-}
-
-VideoReader &VideoReader::operator=(const VideoReader &video) {
-  return *this;
-}
-
-/**
  * @brief Open the VideoReader.
  * @param[in] path to file.
  * @param[in] OpenCV backend.
