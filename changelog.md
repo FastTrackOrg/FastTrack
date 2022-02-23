@@ -1,5 +1,28 @@
 # FastTrack changelog
 
+## 6.2.2
+
+### Added
+- Enforced FFMPEG backend.
+- Added tests for Windows and MacOS.
+- Added clang clazy and tidy code checks.
+
+### Fixed
+- Fixed convergence criterion in AutoLevel.
+- Fixed VideoReader behavior.
+- Fixed several minor memory leaks in the UI.
+- Fixed ctor parent argument for QObject.
+- Fixed move and assignment move ctor to follow cppcoreguidelines.
+
+### Optimized
+- Optimized qstring-allocations.
+- Optimized Data reading.
+- Optimized image display.
+- Optimized args-by-ref and args-by-value.
+
+### Changed
+- Update to Qt6.2.3 LTS.
+
 ## 6.2.1
 
 ### Added
