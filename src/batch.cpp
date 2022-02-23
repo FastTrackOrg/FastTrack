@@ -42,7 +42,8 @@ using namespace std;
  * @brief Constructs the Batch widget.
  */
 Batch::Batch(QWidget *parent) : QWidget(parent),
-                                ui(new Ui::Batch) {
+                                ui(new Ui::Batch),
+                                currentPathCount(0) {
   ui->setupUi(this);
 
   // Setup the ui
@@ -229,7 +230,6 @@ Batch::Batch(QWidget *parent) : QWidget(parent),
 
   // Setups the path panel
   ui->tablePath->horizontalHeader()->setStretchLastSection(true);
-  currentPathCount = 0;
   ui->tablePath->setSortingEnabled(false);
   ui->tablePath->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
   connect(ui->openPath, &QPushButton::clicked, this, &Batch::openPathFolder);

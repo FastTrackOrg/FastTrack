@@ -20,7 +20,7 @@ class Annotation : public QWidget {
   QMap<int, QString> *annotations;
   void writeToFile();
   QList<int> findIndexes;
-  int findIndex;
+  qsizetype findIndex;
 
  public slots:
   void clear();
@@ -42,6 +42,8 @@ class Annotation : public QWidget {
   Annotation(const QString &annotationFile);
   Annotation(const Annotation &T) = delete;
   Annotation &operator=(const Annotation &T) = delete;
+  Annotation &operator=(Annotation &&T) = delete;
+  Annotation(Annotation &&T) = delete;
   ~Annotation();
   bool setPath(const QString &annotationFile);
   bool isActive;

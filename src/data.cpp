@@ -88,8 +88,7 @@ Data::Data(const QString &dataPath) : Data() {
 /**
  * @brief Construct the data object from a tracking result file.
  */
-Data::Data() : columns{"xHead", "yHead", "tHead", "xTail", "yTail", "tTail", "xBody", "yBody", "tBody", "curvature", "areaBody", "perimeterBody", "headMajorAxisLength", "headMinorAxisLength", "headExcentricity", "tailMajorAxisLength", "tailMinorAxisLength", "tailExcentricity", "bodyMajorAxisLength", "bodyMinorAxisLength", "bodyExcentricity", "imageNumber", "id"}, connectionName{QString("data_%1").arg(QRandomGenerator::global()->generate())} {
-  isEmpty = true;
+Data::Data() : columns{"xHead", "yHead", "tHead", "xTail", "yTail", "tTail", "xBody", "yBody", "tBody", "curvature", "areaBody", "perimeterBody", "headMajorAxisLength", "headMinorAxisLength", "headExcentricity", "tailMajorAxisLength", "tailMinorAxisLength", "tailExcentricity", "bodyMajorAxisLength", "bodyMinorAxisLength", "bodyExcentricity", "imageNumber", "id"}, connectionName{QString("data_%1").arg(QRandomGenerator::global()->generate())}, isEmpty{true} {
   QSqlDatabase data = QSqlDatabase::addDatabase(QStringLiteral("QSQLITE"), connectionName);
 }
 

@@ -113,7 +113,9 @@ class Tracking : public QObject {
   Tracking(const string &path, const string &background, int startImage = 0, int stopImage = -1);
   Tracking(const string &path, const UMat &background, int startImage = 0, int stopImage = -1);
   Tracking(const Tracking &) = delete;
-  Tracking &operator=(const Tracking &) = delete;
+  Tracking &operator=(const Tracking &T) = delete;
+  Tracking &operator=(Tracking &&T) = delete;
+  Tracking(Tracking &&T) = delete;
   ~Tracking();
 
   const QString connectionName;

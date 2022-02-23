@@ -54,12 +54,16 @@ class MainWindow : public QMainWindow {
 
  public:
   explicit MainWindow(QWidget *parent = 0);
+  MainWindow(const MainWindow &T) = delete;
+  MainWindow &operator=(const MainWindow &T) = delete;
+  MainWindow &operator=(MainWindow &&T) = delete;
+  MainWindow(MainWindow &&T) = delete;
   ~MainWindow();
   void setMode(bool isExpert);
 
  private:
   Ui::MainWindow *ui; /*!< ui file from Qt designer. */
-  void closeEvent(QCloseEvent *event);
+  void closeEvent(QCloseEvent *event) override;
   Interactive *interactive;
   Batch *batch;
   Replay *replay;

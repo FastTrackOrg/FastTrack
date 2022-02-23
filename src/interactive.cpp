@@ -39,13 +39,13 @@ This file is part of Fast Track.
  * @brief Constructs the interactive object derived from a QMainWindow object.
  */
 Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
-                                            ui(new Ui::Interactive) {
+                                            ui(new Ui::Interactive),
+                                            videoStatus(false) {
   ui->setupUi(this);
   ui->menuBar->setNativeMenuBar(false);
 
   // Loads settings
   QSettings settingsFile(QStringLiteral("FastTrack"), QStringLiteral("FastTrackOrg"));
-  videoStatus = false;
 
   // MetaType
   qRegisterMetaType<QMap<QString, double>>("QMap<QString, double>");
@@ -462,7 +462,7 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
 
   // Set the image preview limits
   connect(ui->startImage, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, [this](int startImage) {
-    ui->stopImage->setRange(0, video->getImageCount() - startImage);
+    ui->stopImage->setRange(0, static_cast<int>(video->getImageCount()) - startImage);
   });
 
   // Events filter to zoom in/out in the display
@@ -539,12 +539,12 @@ void Interactive::openFolder() {
       memoryDir = dir;
       video->open(dir.toStdString());
       ui->slider->setMinimum(0);
-      ui->slider->setMaximum(video->getImageCount() - 1);
+      ui->slider->setMaximum(static_cast<int>(video->getImageCount()) - 1);
       ui->previewButton->setDisabled(true);
       ui->trackButton->setDisabled(true);
-      ui->nBack->setMaximum(video->getImageCount());
-      ui->nBack->setValue(video->getImageCount());
-      ui->startImage->setRange(0, video->getImageCount() - 1);
+      ui->nBack->setMaximum(static_cast<int>(video->getImageCount()));
+      ui->nBack->setValue(static_cast<int>(video->getImageCount()));
+      ui->startImage->setRange(0, static_cast<int>(video->getImageCount()) - 1);
       ui->startImage->setValue(0);
 
       Mat frame;
@@ -938,7 +938,7 @@ void Interactive::previewTracking() {
  */
 void Interactive::track() {
   if (videoStatus) {
-    ui->progressBar->setRange(0, video->getImageCount() - 1);
+    ui->progressBar->setRange(0, static_cast<int>(video->getImageCount()) - 1);
     ui->progressBar->setValue(0);
     ui->previewButton->setDisabled(true);
     ui->trackButton->setDisabled(true);
@@ -1003,25 +1003,25 @@ bool Interactive::eventFilter(QObject *target, QEvent *event) {
   if (target == ui->display) {
     // Set the first point for the ROI at user click
     if (event->type() == QEvent::MouseButtonPress) {
-      QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
+      QMouseEvent *mouseEvent = dynamic_cast<QMouseEvent *>(event);
       if (mouseEvent->buttons() == Qt::LeftButton) {
         clicks.first = mouseEvent->pos();
         // The QPixmap is V/Hcentered in the Qlabel widget
         // Gets the click coordinate in the frame of reference of the centered display
-        clicks.first.setX(static_cast<unsigned int>(clicks.first.x() - 0.5 * (ui->display->width() - resizedFrame.width())));
-        clicks.first.setY(static_cast<unsigned int>(clicks.first.y() - 0.5 * (ui->display->height() - resizedFrame.height())));
+        clicks.first.setX(static_cast<int>(clicks.first.x() - 0.5 * (ui->display->width() - resizedFrame.width())));
+        clicks.first.setY(static_cast<int>(clicks.first.y() - 0.5 * (ui->display->height() - resizedFrame.height())));
       }
     }
 
     // Sets the second point and draw the roi
     if (event->type() == QEvent::MouseMove) {
-      QMouseEvent *moveEvent = static_cast<QMouseEvent *>(event);
+      QMouseEvent *moveEvent = dynamic_cast<QMouseEvent *>(event);
       if (moveEvent->buttons() == Qt::LeftButton) {
         clicks.second = moveEvent->pos();
         // The QPixmap is V/Hcentered in the Qlabel widget
         // Gets the click coordinate in the frame of reference of the centered display
-        clicks.second.setX(static_cast<unsigned int>(clicks.second.x() - 0.5 * (ui->display->width() - resizedFrame.width())));
-        clicks.second.setY(static_cast<unsigned int>(clicks.second.y() - 0.5 * (ui->display->height() - resizedFrame.height())));
+        clicks.second.setX(static_cast<int>(clicks.second.x() - 0.5 * (ui->display->width() - resizedFrame.width())));
+        clicks.second.setY(static_cast<int>(clicks.second.y() - 0.5 * (ui->display->height() - resizedFrame.height())));
 
         // Draws the ROI with
         QPixmap tmpImage = resizedPix;
@@ -1065,21 +1065,21 @@ bool Interactive::eventFilter(QObject *target, QEvent *event) {
   if (target == ui->scrollArea->viewport()) {
     // Moves in the image by middle click
     if (event->type() == QEvent::MouseMove) {
-      QMouseEvent *moveEvent = static_cast<QMouseEvent *>(event);
+      QMouseEvent *moveEvent = dynamic_cast<QMouseEvent *>(event);
       if (moveEvent->buttons() == Qt::MiddleButton) {
-        ui->scrollArea->horizontalScrollBar()->setValue(static_cast<unsigned int>(ui->scrollArea->horizontalScrollBar()->value() + (panReferenceClick.x() - moveEvent->localPos().x())));
-        ui->scrollArea->verticalScrollBar()->setValue(static_cast<unsigned int>(ui->scrollArea->verticalScrollBar()->value() + (panReferenceClick.y() - moveEvent->localPos().y())));
+        ui->scrollArea->horizontalScrollBar()->setValue(static_cast<int>(ui->scrollArea->horizontalScrollBar()->value() + (panReferenceClick.x() - moveEvent->localPos().x())));
+        ui->scrollArea->verticalScrollBar()->setValue(static_cast<int>(ui->scrollArea->verticalScrollBar()->value() + (panReferenceClick.y() - moveEvent->localPos().y())));
         panReferenceClick = moveEvent->localPos();
       }
     }
     if (event->type() == QEvent::Wheel) {
-      QWheelEvent *wheelEvent = static_cast<QWheelEvent *>(event);
+      QWheelEvent *wheelEvent = dynamic_cast<QWheelEvent *>(event);
       zoomReferencePosition = wheelEvent->position();
     }
 
     // Zoom/unzoom the display by wheel
     if (event->type() == QEvent::Wheel) {
-      QWheelEvent *wheelEvent = static_cast<QWheelEvent *>(event);
+      QWheelEvent *wheelEvent = dynamic_cast<QWheelEvent *>(event);
       if (wheelEvent->angleDelta().y() > 0) {
         zoomIn();
       }
@@ -1089,7 +1089,7 @@ bool Interactive::eventFilter(QObject *target, QEvent *event) {
       return true;
     }
     if (event->type() == QEvent::MouseButtonPress) {
-      QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
+      QMouseEvent *mouseEvent = dynamic_cast<QMouseEvent *>(event);
       if (mouseEvent->buttons() == Qt::MiddleButton) {
         qApp->setOverrideCursor(Qt::ClosedHandCursor);
         panReferenceClick = mouseEvent->localPos();

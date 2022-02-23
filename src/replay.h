@@ -75,6 +75,10 @@ class Replay : public QMainWindow {
 
  public:
   explicit Replay(QWidget *parent = nullptr, bool standalone = true, Timeline *slider = nullptr, VideoReader *videoReader = nullptr);
+  Replay(const Replay &T) = delete;
+  Replay &operator=(const Replay &T) = delete;
+  Replay &operator=(Replay &&T) = delete;
+  Replay(Replay &&T) = delete;
   ~Replay();
   Data *trackingData;
   Annotation *annotation;
@@ -120,7 +124,7 @@ class Replay : public QMainWindow {
   void loadFrame(int frameIndex);
   void zoomIn();
   void zoomOut();
-  bool eventFilter(QObject *target, QEvent *event);
+  bool eventFilter(QObject *target, QEvent *event) override;
   void updateInformation(int objectId, int imageIndex, QTableWidget *table);
   void correctTracking();
   void nextOcclusionEvent();

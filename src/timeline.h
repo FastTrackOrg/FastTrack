@@ -28,6 +28,10 @@ class Timeline : public QWidget {
 
  public:
   Timeline(QWidget *parent = nullptr);
+  Timeline(const Timeline &T) = delete;
+  Timeline &operator=(const Timeline &T) = delete;
+  Timeline &operator=(Timeline &&T) = delete;
+  Timeline(Timeline &&T) = delete;
   ~Timeline();
   void setValue(const int index);
   void setCursorValue(const int index);
@@ -58,8 +62,8 @@ class Timeline : public QWidget {
   QList<int> markers;
 
   void setLayout(const int width, const int imageNumber);
-  void resizeEvent(QResizeEvent *event);
-  bool eventFilter(QObject *target, QEvent *event);
+  void resizeEvent(QResizeEvent *event) override;
+  bool eventFilter(QObject *target, QEvent *event) override;
   void drawMarker(const int index);
   void clearMarker(const int index);
   void update(const int index);

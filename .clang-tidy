@@ -1,0 +1,88 @@
+---
+Checks:          'clang-diagnostic-*,clang-analyzer-*,-*,clang-*,cppcoreguidelines-avoid-c-arrays,cppcoreguidelines-avoid-goto,cppcoreguidelines-avoid-non-const-global-variables,cppcoreguidelines-c-copy-assignment-signature,cppcoreguidelines-explicit-virtual-functions,cppcoreguidelines-interfaces-global-init,cppcoreguidelines-macro-usage,cppcoreguidelines-narrowing-conversions,cppcoreguidelines-no-malloc,cppcoreguidelines-prefer-member-initializer,cppcoreguidelines-pro-bounds-*,cppcoreguidelines-pro-type-const-cast,cppcoreguidelines-pro-type-reinterpret-cast,cppcoreguidelines-pro-type-static-cast-downcast,cppcoreguidelines-pro-type-union-access,cppcoreguidelines-pro-type-vararg,cppcoreguidelines-slicing,cppcoreguidelines-special-member-functions'
+WarningsAsErrors: ''
+HeaderFilterRegex: ''
+AnalyzeTemporaryDtors: false
+FormatStyle:     none
+User:            bgallois
+CheckOptions:
+  - key:             modernize-loop-convert.MinConfidence
+    value:           reasonable
+  - key:             modernize-replace-auto-ptr.IncludeStyle
+    value:           llvm
+  - key:             cppcoreguidelines-no-malloc.Reallocations
+    value:           '::realloc'
+  - key:             cppcoreguidelines-special-member-functions.AllowMissingMoveFunctionsWhenCopyIsDeleted
+    value:           'false'
+  - key:             google-readability-namespace-comments.ShortNamespaceLines
+    value:           '10'
+  - key:             google-readability-namespace-comments.SpacesBeforeComments
+    value:           '2'
+  - key:             cppcoreguidelines-non-private-member-variables-in-classes.IgnoreClassesWithAllMemberVariablesBeingPublic
+    value:           'true'
+  - key:             cert-dcl16-c.NewSuffixes
+    value:           'L;LL;LU;LLU'
+  - key:             cert-oop54-cpp.WarnOnlyIfThisHasSuspiciousField
+    value:           'false'
+  - key:             modernize-loop-convert.MaxCopySize
+    value:           '16'
+  - key:             cppcoreguidelines-narrowing-conversions.WarnOnIntegerNarrowingConversion
+    value:           'true'
+  - key:             cppcoreguidelines-no-malloc.Allocations
+    value:           '::malloc;::calloc'
+  - key:             cppcoreguidelines-special-member-functions.AllowMissingMoveFunctions
+    value:           'false'
+  - key:             cppcoreguidelines-prefer-member-initializer.UseAssignment
+    value:           'false'
+  - key:             cppcoreguidelines-macro-usage.CheckCapsOnly
+    value:           'false'
+  - key:             cppcoreguidelines-explicit-virtual-functions.IgnoreDestructors
+    value:           'true'
+  - key:             cppcoreguidelines-pro-bounds-constant-array-index.GslHeader
+    value:           ''
+  - key:             cppcoreguidelines-explicit-virtual-functions.FinalSpelling
+    value:           final
+  - key:             llvm-qualified-auto.AddConstToQualified
+    value:           'false'
+  - key:             modernize-loop-convert.NamingStyle
+    value:           CamelCase
+  - key:             google-readability-function-size.StatementThreshold
+    value:           '800'
+  - key:             llvm-else-after-return.WarnOnConditionVariables
+    value:           'false'
+  - key:             cppcoreguidelines-narrowing-conversions.IgnoreConversionFromTypes
+    value:           ''
+  - key:             modernize-pass-by-value.IncludeStyle
+    value:           llvm
+  - key:             cert-str34-c.DiagnoseSignedUnsignedCharComparisons
+    value:           'false'
+  - key:             cppcoreguidelines-explicit-virtual-functions.AllowOverrideAndFinal
+    value:           'false'
+  - key:             google-readability-braces-around-statements.ShortStatementLines
+    value:           '1'
+  - key:             cppcoreguidelines-explicit-virtual-functions.OverrideSpelling
+    value:           override
+  - key:             cppcoreguidelines-special-member-functions.AllowSoleDefaultDtor
+    value:           'false'
+  - key:             modernize-use-nullptr.NullMacros
+    value:           'NULL'
+  - key:             cppcoreguidelines-no-malloc.Deallocations
+    value:           '::free'
+  - key:             cppcoreguidelines-macro-usage.IgnoreCommandLineMacros
+    value:           'true'
+  - key:             cppcoreguidelines-pro-bounds-constant-array-index.IncludeStyle
+    value:           llvm
+  - key:             cppcoreguidelines-macro-usage.AllowedRegexp
+    value:           '^DEBUG_*'
+  - key:             cppcoreguidelines-narrowing-conversions.WarnWithinTemplateInstantiation
+    value:           'false'
+  - key:             cppcoreguidelines-narrowing-conversions.PedanticMode
+    value:           'false'
+  - key:             cppcoreguidelines-narrowing-conversions.WarnOnFloatingPointNarrowingConversion
+    value:           'true'
+  - key:             llvm-else-after-return.WarnOnUnfixable
+    value:           'false'
+  - key:             cppcoreguidelines-narrowing-conversions.WarnOnEquivalentBitWidth
+    value:           'true'
+...
+

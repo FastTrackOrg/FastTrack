@@ -32,19 +32,10 @@ This file is part of Fast Track.
  */
 
 Timeline::Timeline(QWidget *parent)
-    : QWidget(parent), ui(new Ui::Timeline) {
+    : QWidget(parent), ui(new Ui::Timeline), isAutoplay(false), m_imageNumber(100), m_imageMin(0), m_offset(30), m_currentIndex(0), m_currentIndexLeft(0), m_scale(1), timer(new QTimer(this)), timelineScene(new QGraphicsScene(this)) {
   ui->setupUi(this);
+  m_width = ui->timelineView->width();  // NOLINT Need ui to be setup
 
-  // Class members
-  isAutoplay = false;
-  m_imageNumber = 100;
-  m_imageMin = 0;
-  m_width = ui->timelineView->width();
-  m_offset = 30;
-  m_currentIndex = 0;
-  m_currentIndexLeft = 0;
-  m_scale = 1;
-  timer = new QTimer(this);
   connect(timer, &QTimer::timeout, this, [this]() {
     if (isEnabled()) {
       if (m_currentIndexLeft < m_imageNumber) {
@@ -57,7 +48,6 @@ Timeline::Timeline(QWidget *parent)
   });
 
   // Scene setup
-  timelineScene = new QGraphicsScene(this);
   setLayout(m_width, m_imageNumber);
   ui->timelineView->setAttribute(Qt::WA_Hover);
   ui->timelineView->installEventFilter(this);
@@ -156,7 +146,7 @@ bool Timeline::eventFilter(QObject *target, QEvent *event) {
 
   // Move the cursor when the timeline is hovered by the mouse cursor
   if (target == ui->timelineView && event->type() == QEvent::HoverMove) {
-    QHoverEvent *hoverEvent = static_cast<QHoverEvent *>(event);
+    QHoverEvent *hoverEvent = dynamic_cast<QHoverEvent *>(event);
     int x = static_cast<int>(ui->timelineView->mapToScene(hoverEvent->pos()).x());
     if (x >= 15 && x <= m_width * m_scale - static_cast<int>(m_offset * 0.5)) {
       int image = ((x - static_cast<int>(m_offset * 0.5)) * m_imageNumber) / (m_width * m_scale - m_offset);
@@ -170,7 +160,7 @@ bool Timeline::eventFilter(QObject *target, QEvent *event) {
   // Double left click to place marker
   // Left click to remove markers
   if (target == ui->timelineView && event->type() == QEvent::MouseButtonDblClick) {
-    QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
+    QMouseEvent *mouseEvent = dynamic_cast<QMouseEvent *>(event);
     if (mouseEvent->buttons() == Qt::LeftButton) {
       int x = static_cast<int>(ui->timelineView->mapToScene(mouseEvent->pos()).x());
       int image = ((x - static_cast<int>(m_offset * 0.5)) * m_imageNumber) / (m_width * m_scale - m_offset);
@@ -179,7 +169,7 @@ bool Timeline::eventFilter(QObject *target, QEvent *event) {
     }
   }
   if (target == ui->timelineView && event->type() == QEvent::MouseButtonPress) {
-    QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
+    QMouseEvent *mouseEvent = dynamic_cast<QMouseEvent *>(event);
     if (mouseEvent->buttons() == Qt::LeftButton) {
       int x = static_cast<int>(ui->timelineView->mapToScene(mouseEvent->pos()).x());
       int image = ((x - static_cast<int>(m_offset * 0.5)) * m_imageNumber) / (m_width * m_scale - m_offset);

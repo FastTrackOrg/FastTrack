@@ -40,9 +40,13 @@ class VideoReader : public VideoCapture {
 
  public:
   VideoReader() = default;
+  ~VideoReader() = default;
   VideoReader(const string &path);
   VideoReader(const VideoReader &) = delete;
   VideoReader &operator=(const VideoReader &) = delete;
+  VideoReader &operator=(VideoReader &&T) = delete;
+  VideoReader(VideoReader &&T) = delete;
+
   bool getNext(UMat &destination);
   bool getNext(Mat &destination);
   bool getImage(int index, UMat &destination);

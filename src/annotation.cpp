@@ -82,7 +82,7 @@ Annotation::Annotation(const QString &filePath) : Annotation() {
 /**
  * @brief Constructs the annotation object from a file path.
  */
-Annotation::Annotation(QWidget *parent) : annotationFile{new QFile()}, annotations{new QMap<int, QString>()}, isActive{false} {
+Annotation::Annotation(QWidget *parent) : annotationFile{new QFile()}, annotations{new QMap<int, QString>()}, findIndex{-1}, isActive{false} {
 }
 
 /**

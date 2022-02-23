@@ -37,6 +37,10 @@ class TrackingManager : public QWidget {
 
  public:
   explicit TrackingManager(QWidget *parent = nullptr);
+  TrackingManager(const TrackingManager &T) = delete;
+  TrackingManager &operator=(const TrackingManager &T) = delete;
+  TrackingManager &operator=(TrackingManager &&T) = delete;
+  TrackingManager(TrackingManager &&T) = delete;
   ~TrackingManager();
 
  private:

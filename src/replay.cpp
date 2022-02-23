@@ -39,9 +39,9 @@ using namespace std;
  */
 
 Replay::Replay(QWidget* parent, bool standalone, Timeline* slider, VideoReader* videoReader) : QMainWindow(parent),
-                                                                                               ui(new Ui::Replay) {
+                                                                                               ui(new Ui::Replay),
+                                                                                               isStandalone(standalone) {
   ui->setupUi(this);
-  isStandalone = standalone;
   ui->replayDisplay->setAttribute(Qt::WA_Hover);
 
   // Generates a color map.
@@ -96,7 +96,7 @@ Replay::Replay(QWidget* parent, bool standalone, Timeline* slider, VideoReader* 
   undoAction->setStatusTip(tr("Undo"));
   connect(undoAction, &QAction::triggered, this, [this]() {
     object2Replay->clear();
-    ids = trackingData->getId(0, video->getImageCount());
+    ids = trackingData->getId(0, static_cast<int>(video->getImageCount()));
     std::sort(ids.begin(), ids.end());
     for (auto const& a : ids) {
       object2Replay->addItem(QString::number(a));
@@ -112,7 +112,7 @@ Replay::Replay(QWidget* parent, bool standalone, Timeline* slider, VideoReader* 
   redoAction->setStatusTip(tr("Redo"));
   connect(redoAction, &QAction::triggered, this, [this]() {
     object2Replay->clear();
-    ids = trackingData->getId(0, video->getImageCount());
+    ids = trackingData->getId(0, static_cast<int>(video->getImageCount()));
     std::sort(ids.begin(), ids.end());
     for (auto const& a : ids) {
       object2Replay->addItem(QString::number(a));
@@ -163,7 +163,7 @@ Replay::Replay(QWidget* parent, bool standalone, Timeline* slider, VideoReader* 
     if (isReplayable) {
       DeleteData* del = new DeleteData(object2Replay->currentText().toInt(), ui->replaySlider->value(), ui->replaySlider->value(), trackingData);
       commandStack->push(del);
-      ids = trackingData->getId(0, video->getImageCount());
+      ids = trackingData->getId(0, static_cast<int>(video->getImageCount()));
       object2Replay->clear();
       for (auto const& a : ids) {
         object2Replay->addItem(QString::number(a));
@@ -181,7 +181,7 @@ Replay::Replay(QWidget* parent, bool standalone, Timeline* slider, VideoReader* 
     if (isReplayable) {
       DeleteData* del = new DeleteData(object2Replay->currentText().toInt(), ui->replaySlider->value(), ui->replaySlider->value() + deletedFrameNumber->value() - 1, trackingData);
       commandStack->push(del);
-      ids = trackingData->getId(0, video->getImageCount());
+      ids = trackingData->getId(0, static_cast<int>(video->getImageCount()));
       object2Replay->clear();
       for (auto const& a : ids) {
         object2Replay->addItem(QString::number(a));
@@ -417,16 +417,16 @@ void Replay::loadReplay(const QString& dir) {
       video->open(dir.toStdString());
     }
     ui->replaySlider->setMinimum(0);
-    ui->replaySlider->setMaximum(video->getImageCount() - 1);
-    maxIndex = video->getImageCount();
+    ui->replaySlider->setMaximum(static_cast<int>(video->getImageCount()) - 1);
+    maxIndex = static_cast<int>(video->getImageCount());
 
     Mat frame;
     video->getImage(0, frame);
     cvtColor(frame, frame, COLOR_GRAY2RGB);
     originalImageSize.setWidth(frame.cols);
     originalImageSize.setHeight(frame.rows);
-    deletedFrameNumber->setRange(1, video->getImageCount());
-    deletedFrameNumber->setValue(video->getImageCount());
+    deletedFrameNumber->setRange(1, static_cast<int>(video->getImageCount()));
+    deletedFrameNumber->setValue(static_cast<int>(video->getImageCount()));
     if (video->isOpened()) {
       isReplayable = true;
     }
@@ -479,7 +479,7 @@ void Replay::loadTrackingDir(const QString& dir) {
   }
 
   trackingData->setPath(trackingDir);
-  ids = trackingData->getId(0, video->getImageCount());
+  ids = trackingData->getId(0, static_cast<int>(video->getImageCount()));
   for (auto const& a : ids) {
     object2Replay->addItem(QString::number(a));
   }
@@ -511,7 +511,7 @@ void Replay::loadFrame(int frameIndex) {
       int scale = ui->replaySize->value();
       QList<QHash<QString, double>> dataImage = trackingData->getData(frameIndex);
       for (const QHash<QString, double>& coordinate : dataImage) {
-        int id = coordinate.value(QStringLiteral("id"));
+        int id = static_cast<int>(coordinate.value(QStringLiteral("id")));
 
         object1Replay->addItem(QString::number(id));
 
@@ -622,7 +622,7 @@ bool Replay::eventFilter(QObject* target, QEvent* event) {
   if (target == ui->replayDisplay) {
     // Mouse click event
     if (event->type() == QEvent::MouseButtonPress) {
-      QMouseEvent* mouseEvent = static_cast<QMouseEvent*>(event);
+      QMouseEvent* mouseEvent = dynamic_cast<QMouseEvent*>(event);
 
       // Left click to select an object
       if (mouseEvent->buttons() == Qt::LeftButton && isReplayable) {
@@ -664,7 +664,7 @@ bool Replay::eventFilter(QObject* target, QEvent* event) {
 
     // Hover screen
     if (event->type() == QEvent::HoverMove) {
-      QHoverEvent* hoverEvent = static_cast<QHoverEvent*>(event);
+      QHoverEvent* hoverEvent = dynamic_cast<QHoverEvent*>(event);
       int xPix = static_cast<int>(((double(hoverEvent->position().x()) - 0.5 * (ui->replayDisplay->width() - resizedFrame.width())) * double(originalImageSize.width())) / double(resizedFrame.width()));
       int yPix = static_cast<int>(((double(hoverEvent->position().y()) - 0.5 * (ui->replayDisplay->height() - resizedFrame.height())) * double(originalImageSize.height())) / double(resizedFrame.height()));
       if (xPix > 0 && yPix > 0 && xPix < originalImageSize.width() && yPix < originalImageSize.height()) {
@@ -677,7 +677,7 @@ bool Replay::eventFilter(QObject* target, QEvent* event) {
   if (target == ui->scrollArea->viewport()) {
     // Moves in the image by middle click
     if (event->type() == QEvent::MouseMove) {
-      QMouseEvent* moveEvent = static_cast<QMouseEvent*>(event);
+      QMouseEvent* moveEvent = dynamic_cast<QMouseEvent*>(event);
       if (moveEvent->buttons() == Qt::MiddleButton) {
         ui->scrollArea->horizontalScrollBar()->setValue(static_cast<int>(ui->scrollArea->horizontalScrollBar()->value() + (panReferenceClick.x() - moveEvent->localPos().x())));
         ui->scrollArea->verticalScrollBar()->setValue(static_cast<int>(ui->scrollArea->verticalScrollBar()->value() + (panReferenceClick.y() - moveEvent->localPos().y())));
@@ -685,13 +685,13 @@ bool Replay::eventFilter(QObject* target, QEvent* event) {
       }
     }
     if (event->type() == QEvent::Wheel) {
-      QWheelEvent* wheelEvent = static_cast<QWheelEvent*>(event);
+      QWheelEvent* wheelEvent = dynamic_cast<QWheelEvent*>(event);
       zoomReferencePosition = wheelEvent->position();
     }
 
     // Zoom/unzoom the display by wheel
     if (event->type() == QEvent::Wheel) {
-      QWheelEvent* wheelEvent = static_cast<QWheelEvent*>(event);
+      QWheelEvent* wheelEvent = dynamic_cast<QWheelEvent*>(event);
       if (wheelEvent->angleDelta().y() > 0) {
         zoomIn();
       }
@@ -701,7 +701,7 @@ bool Replay::eventFilter(QObject* target, QEvent* event) {
       return true;
     }
     if (event->type() == QEvent::MouseButtonPress) {
-      QMouseEvent* mouseEvent = static_cast<QMouseEvent*>(event);
+      QMouseEvent* mouseEvent = dynamic_cast<QMouseEvent*>(event);
       if (mouseEvent->buttons() == Qt::MiddleButton) {
         qApp->setOverrideCursor(Qt::ClosedHandCursor);
         panReferenceClick = mouseEvent->localPos();

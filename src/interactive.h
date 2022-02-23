@@ -74,6 +74,10 @@ class Interactive : public QMainWindow {
 
  public:
   explicit Interactive(QWidget *parent = nullptr);
+  Interactive(const Interactive &T) = delete;
+  Interactive &operator=(const Interactive &T) = delete;
+  Interactive &operator=(Interactive &&T) = delete;
+  Interactive(Interactive &&T) = delete;
   ~Interactive();
 
  private slots:
@@ -94,7 +98,7 @@ class Interactive : public QMainWindow {
   void computeBackground();
   void selectBackground();
 
-  bool eventFilter(QObject *target, QEvent *event);
+  bool eventFilter(QObject *target, QEvent *event) override;
   void crop();
   void reset();
 

@@ -52,6 +52,11 @@ class Batch : public QWidget {
 
  public:
   explicit Batch(QWidget *parent = nullptr);
+  Batch(const Batch &T) = delete;
+  Batch &operator=(const Batch &T) = delete;
+  Batch &operator=(Batch &&T) = delete;
+  Batch(Batch &&T) = delete;
+
   ~Batch();
 
  private:

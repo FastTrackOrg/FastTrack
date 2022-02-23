@@ -33,6 +33,8 @@ class Data {
   explicit Data(const QString &dataPath);
   Data(const Data &T) = delete;
   Data &operator=(const Data &T) = delete;
+  Data &operator=(Data &&T) = delete;
+  Data(Data &&T) = delete;
   ~Data();
 
   const QString connectionName;

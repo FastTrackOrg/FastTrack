@@ -40,7 +40,11 @@ using namespace std;
  * @brief Constructs the MainWindow QObject and initializes the UI.
  */
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
-                                          ui(new Ui::MainWindow) {
+                                          ui(new Ui::MainWindow),
+                                          interactive(new Interactive(this)),
+                                          batch(new Batch(this)),
+                                          replay(new Replay(this)),
+                                          trackingManager(new TrackingManager(this)) {
   QDir::setCurrent(QCoreApplication::applicationDirPath());
   ui->setupUi(this);
   setWindowTitle(qApp->applicationName() + " " + APP_VERSION);
@@ -114,23 +118,19 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 
   manager->get(QNetworkRequest(QUrl(QStringLiteral("https://www.fasttrack.sh/download/FastTrack/platforms.txt"))));
 
-  interactive = new Interactive(this);
   ui->tabWidget->addTab(interactive, tr("Interactive tracking"));
   connect(interactive, &Interactive::status, this, [this](const QString &message) {
     trayIcon->showMessage(QStringLiteral("FastTrack"), message, QSystemTrayIcon::Information, 3000);
   });
   connect(interactive, &Interactive::modeChanged, this, &MainWindow::setMode);
 
-  batch = new Batch(this);
   ui->tabWidget->addTab(batch, tr("Batch tracking"));
   connect(batch, &Batch::status, this, [this](const QString &message) {
     trayIcon->showMessage(QStringLiteral("FastTrack"), message, QSystemTrayIcon::Information, 3000);
   });
 
-  replay = new Replay(this);
   ui->tabWidget->addTab(replay, tr("Tracking inspector"));
 
-  trackingManager = new TrackingManager(this);
   ui->tabWidget->addTab(trackingManager, tr("Tracking Manager"));
   connect(interactive, &Interactive::log, trackingManager, &TrackingManager::addLogEntry);
   connect(batch, &Batch::log, trackingManager, &TrackingManager::addLogEntry);
