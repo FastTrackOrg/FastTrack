@@ -1,11 +1,12 @@
 #!/bin/bash
 
 make distclean -s
-qmake6 CONFIG+="debug NO_WEB" QMAKE_CXXFLAGS+=-w -spec linux-clang QMAKE_CXX="clazy" FastTrack.pro
+
 export CLAZY_CHECKS="level2"
 export CLAZY_EXPORT_FIXES=ON
-export CLAZY_HEADER_FILTER="./src/" 
-export CLAZY_IGNORE_DIRS="./test/*"
+export CLAZY_HEADER_FILTER="./src/"
+
+qmake6 CONFIG+="debug NO_WEB SKIP_TEST" QMAKE_CXXFLAGS+=-w -spec linux-clang QMAKE_CXX="clazy" FastTrack.pro
 
 if [ "$1" = "fail" ]; then
   VAR=$(make -s 2>&1 >/dev/null | grep "warning")
