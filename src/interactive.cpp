@@ -528,6 +528,8 @@ void Interactive::openFolder() {
   ui->isBin->setCheckable(false);
   ui->isSub->setCheckable(false);
   ui->isOriginal->setChecked(true);
+  ui->backgroundStatus->setText(QStringLiteral("No background selected"));
+  ui->backgroundStatus->setStyleSheet(QStringLiteral("background: red; color: white;"));
 
   dir = QFileDialog::getOpenFileName(this, tr("Open File"), memoryDir);
 
@@ -784,6 +786,8 @@ void Interactive::computeBackground() {
         ui->interactiveTab->setCurrentIndex(0);
         ui->previewButton->setDisabled(false);
         ui->trackButton->setDisabled(false);
+        ui->backgroundStatus->setText(QStringLiteral("Using COMPUTED background"));
+        ui->backgroundStatus->setStyleSheet(QStringLiteral("background: green; color: white;"));
         display(background, QImage::Format_Grayscale8);
       }
       else {
@@ -837,6 +841,8 @@ void Interactive::selectBackground() {
       ui->isSub->setCheckable(true);
       ui->previewButton->setDisabled(false);
       ui->trackButton->setDisabled(false);
+      ui->backgroundStatus->setText(QStringLiteral("Using %1 as background").arg(dir));
+      ui->backgroundStatus->setStyleSheet(QStringLiteral("background: green; color: white;"));
 
       // Automatic background type selection based on image mean
       int meanValue = int(mean(background)[0]);
