@@ -1,5 +1,13 @@
 # FastTrack changelog
 
+## 6.2.3
+
+### Added
+- Added background status in interactive tracking.
+
+### Fixed
+- Fixed crop in interactive tracking.
+
 ## 6.2.2
 
 ### Added

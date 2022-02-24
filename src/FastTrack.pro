@@ -5,7 +5,7 @@ NO_WEB {
 }
 
 TEMPLATE = app
-VERSION = 6.2.2
+include("../FastTrack.pri")
 DEFINES += APP_VERSION=\\\"$$VERSION\\\"
 QTPLUGIN += QSQLITE
 
