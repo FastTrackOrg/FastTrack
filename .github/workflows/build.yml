@@ -129,3 +129,30 @@ jobs:
         with:
           name: FastTrack.dmg
           path: ./build/FastTrack.dmg
+
+  job_4:
+      needs: [job_1, job_2, job_3]
+      runs-on: ubuntu-20.04
+      steps:
+      - uses: actions/checkout@v2
+      - name: Create dir
+        run: |
+            mkdir ./tmp/
+      - uses: actions/download-artifact@v2
+        with:
+          path: ./tmp/
+      - name: Install SSH key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.KEY }}
+          known_hosts: ${{ secrets.HOST }}
+      - name: Upload
+        run: |
+            cd tmp/FastTrack/
+            zip -r FastTrack.zip ./* 
+            cd ..
+            mkdir rel/
+            mv FastTrack/FastTrack.zip ./rel
+            rm -r ./FastTrack
+            cp FastTrack*/* ./rel
+            rsync ./rel/* ${{ secrets.USER }}@${{ secrets.ADDRESS }}:${{ secrets.PATH }}

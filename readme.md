@@ -4,7 +4,7 @@
 
 ## About
 
-Tracking objects in video recording can be tedious. Existing software are expensive, the learning curve can be steep, necessitate a powerful computer, and the workflow can not be easily adapted when the project evolved.
+Tracking objects in video recording can be tedious. Existing software can be expensive, the learning curve can be steep, necessitate a powerful computer, and the workflow can not be easily adapted when the project evolved.
 
 **FastTrack** is a free (as freedom) desktop tracking software, easy to install, easy to use, and performant. The software can be downloaded for Linux, macOS, and Windows, and a public API is available to embed the core of the software in any C++/Qt project.
 
@@ -16,7 +16,7 @@ Two main features are implemented in the software:
 
 ## Installation
 
-Stable builds of the software are available for Linux, Mac, and Windows on the [download page](https://www.fasttrack.sh/docs/installation/). Nightly builds are available on the [Github Actions artifacts](https://github.com/FastTrackOrg/FastTrack/actions).
+Stable builds of the software are available for Linux, Mac, and Windows on the [download page](https://www.fasttrack.sh/docs/installation/) and the [GitHub repository](https://github.com/FastTrackOrg/FastTrack/releases). Continuous builds triggered after each modification are available on the [continuous download page](https://www.fasttrack.sh/download/Continuous/).
 
 ## Documentation
 
