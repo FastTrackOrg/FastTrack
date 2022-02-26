@@ -40,9 +40,14 @@ using namespace std;
 
 Replay::Replay(QWidget* parent, bool standalone, Timeline* slider, VideoReader* videoReader) : QMainWindow(parent),
                                                                                                ui(new Ui::Replay),
-                                                                                               isStandalone(standalone) {
+                                                                                               isStandalone(standalone),
+                                                                                               settingsFile(new QSettings(QStringLiteral("FastTrack"), QStringLiteral("FastTrackOrg"), this)) {
   ui->setupUi(this);
   ui->replayDisplay->setAttribute(Qt::WA_Hover);
+
+  // Loads settings
+  settingsFile->beginGroup(QStringLiteral("replay"));
+  restoreState(settingsFile->value(QStringLiteral("windowState")).toByteArray());
 
   // Generates a color map.
   int a, b, c;
@@ -345,6 +350,7 @@ void Replay::sliderConnection(const int index) {
 }
 
 Replay::~Replay() {
+  settingsFile->setValue(QStringLiteral("windowState"), saveState());
   delete ui;
   delete trackingData;
   delete annotation;

@@ -34,6 +34,7 @@ This file is part of Fast Track.
 #include <QMainWindow>
 #include <QMenu>
 #include <QMessageBox>
+#include <QSettings>
 #include <QSysInfo>
 #include <QSystemTrayIcon>
 #include <QUrl>
@@ -69,6 +70,7 @@ class MainWindow : public QMainWindow {
   Replay *replay;
   TrackingManager *trackingManager;
   QSystemTrayIcon *trayIcon;
+  QSettings *settingsFile;
 #ifndef NO_WEB
   QWebEngineView *manual;
   QWebEngineView *dataset;

@@ -40,12 +40,14 @@ This file is part of Fast Track.
  */
 Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
                                             ui(new Ui::Interactive),
-                                            videoStatus(false) {
+                                            videoStatus(false),
+                                            settingsFile(new QSettings(QStringLiteral("FastTrack"), QStringLiteral("FastTrackOrg"), this)) {
   ui->setupUi(this);
   ui->menuBar->setNativeMenuBar(false);
 
   // Loads settings
-  QSettings settingsFile(QStringLiteral("FastTrack"), QStringLiteral("FastTrackOrg"));
+  settingsFile->beginGroup(QStringLiteral("interactive"));
+  restoreState(settingsFile->value(QStringLiteral("windowState")).toByteArray());
 
   // MetaType
   qRegisterMetaType<QMap<QString, double>>("QMap<QString, double>");
@@ -125,7 +127,7 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
 
   // Loads prefered style
   QStringList styles = QStyleFactory::keys();
-  style = settingsFile.value(QStringLiteral("window/style"), "Fusion").toString();
+  style = settingsFile->value(QStringLiteral("window/style"), "Fusion").toString();
   QMenu *menuStyle = new QMenu(tr("Appearance"), this);
   ui->menuSettings->addMenu(menuStyle);
 
@@ -209,7 +211,7 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
     color = QStringLiteral("ft");
   });
 
-  color = settingsFile.value(QStringLiteral("window/color"), "ft").toString();
+  color = settingsFile->value(QStringLiteral("color"), "ft").toString();
   if (color == QLatin1String("light")) {
     lightColor->trigger();
   }
@@ -223,9 +225,13 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
     ftColor->trigger();
   }
 
-  // Layout options
+  // Layout option serves as a template of QDock placement.
+  // At closing, the customized layout is saved and restored.
+  // This, no action is check by default of the layoutGroup.
+  QActionGroup *layoutGroup = new QActionGroup(this);
   ui->menuBar->removeAction(ui->menuLayout->menuAction());
   ui->menuSettings->addMenu(ui->menuLayout);
+  layoutGroup->addAction(ui->actionLayout1);
   connect(ui->actionLayout1, &QAction::triggered, this, [this]() {
     ui->controlOptions->setVisible(true);
     ui->imageOptions->setVisible(true);
@@ -239,14 +245,8 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
     tabifyDockWidget(ui->imageOptions, ui->trackingOptions);
     ui->imageOptions->raise();
     addDockWidget(Qt::BottomDockWidgetArea, ui->controlOptions);
-
-    ui->actionLayout1->setChecked(true);
-    ui->actionLayout2->setChecked(false);
-    ui->actionLayout3->setChecked(false);
-    ui->actionLayout4->setChecked(false);
-
-    layout = 1;
   });
+  layoutGroup->addAction(ui->actionLayout2);
   connect(ui->actionLayout2, &QAction::triggered, this, [this]() {
     ui->controlOptions->setVisible(true);
     ui->imageOptions->setVisible(true);
@@ -260,14 +260,8 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
     tabifyDockWidget(ui->imageOptions, ui->trackingOptions);
     ui->imageOptions->raise();
     addDockWidget(Qt::BottomDockWidgetArea, ui->controlOptions);
-
-    ui->actionLayout1->setChecked(false);
-    ui->actionLayout2->setChecked(true);
-    ui->actionLayout3->setChecked(false);
-    ui->actionLayout4->setChecked(false);
-
-    layout = 2;
   });
+  layoutGroup->addAction(ui->actionLayout3);
   connect(ui->actionLayout3, &QAction::triggered, this, [this]() {
     ui->controlOptions->setVisible(true);
     ui->imageOptions->setVisible(true);
@@ -280,14 +274,8 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
     addDockWidget(Qt::LeftDockWidgetArea, ui->imageOptions);
     addDockWidget(Qt::RightDockWidgetArea, ui->trackingOptions);
     addDockWidget(Qt::BottomDockWidgetArea, ui->controlOptions);
-
-    ui->actionLayout1->setChecked(false);
-    ui->actionLayout2->setChecked(false);
-    ui->actionLayout3->setChecked(true);
-    ui->actionLayout4->setChecked(false);
-
-    layout = 3;
   });
+  layoutGroup->addAction(ui->actionLayout4);
   connect(ui->actionLayout4, &QAction::triggered, this, [this]() {
     ui->controlOptions->setVisible(true);
     ui->imageOptions->setVisible(true);
@@ -301,38 +289,11 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
     tabifyDockWidget(ui->imageOptions, ui->trackingOptions);
     ui->imageOptions->raise();
     addDockWidget(Qt::LeftDockWidgetArea, ui->controlOptions);
-
-    ui->actionLayout1->setChecked(false);
-    ui->actionLayout2->setChecked(false);
-    ui->actionLayout3->setChecked(false);
-    ui->actionLayout4->setChecked(true);
-
-    layout = 4;
   });
-
-  // Loads previous layout
-  layout = settingsFile.value(QStringLiteral("window/layout")).toInt();
-
-  switch (layout) {
-    case 1:
-      ui->actionLayout1->activate(QAction::Trigger);
-      break;
-    case 2:
-      ui->actionLayout2->activate(QAction::Trigger);
-      break;
-    case 3:
-      ui->actionLayout3->activate(QAction::Trigger);
-      break;
-    case 4:
-      ui->actionLayout4->activate(QAction::Trigger);
-      break;
-    default:
-      ui->actionLayout1->activate(QAction::Trigger);
-  }
 
   QAction *actionMode = new QAction(tr("Expert Mode"), this);
   actionMode->setCheckable(true);
-  isExpert = settingsFile.value(QStringLiteral("window/mode"), false).toBool();
+  isExpert = settingsFile->value(QStringLiteral("mode"), false).toBool();
   actionMode->setChecked(isExpert);
   connect(actionMode, &QAction::toggled, this, [this](bool isChecked) {
     emit modeChanged(isChecked);
@@ -1181,11 +1142,10 @@ Interactive::~Interactive() {
  * @brief Saves the settings.
  */
 void Interactive::saveSettings() {
-  QSettings settingsFile(QStringLiteral("FastTrack"), QStringLiteral("FastTrackOrg"));
-  settingsFile.setValue(QStringLiteral("window/style"), style);
-  settingsFile.setValue(QStringLiteral("window/color"), color);
-  settingsFile.setValue(QStringLiteral("window/layout"), layout);
-  settingsFile.setValue(QStringLiteral("window/mode"), isExpert);
+  settingsFile->setValue(QStringLiteral("style"), style);
+  settingsFile->setValue(QStringLiteral("color"), color);
+  settingsFile->setValue(QStringLiteral("mode"), isExpert);
+  settingsFile->setValue(QStringLiteral("windowState"), saveState());
 }
 
 /**

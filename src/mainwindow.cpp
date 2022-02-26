@@ -44,12 +44,14 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
                                           interactive(new Interactive(this)),
                                           batch(new Batch(this)),
                                           replay(new Replay(this)),
-                                          trackingManager(new TrackingManager(this)) {
+                                          trackingManager(new TrackingManager(this)),
+                                          settingsFile(new QSettings(QStringLiteral("FastTrack"), QStringLiteral("FastTrackOrg"), this)) {
   QDir::setCurrent(QCoreApplication::applicationDirPath());
   ui->setupUi(this);
   setWindowTitle(qApp->applicationName() + " " + APP_VERSION);
-  setWindowState(Qt::WindowActive);
-  QTimer::singleShot(1500, this, &QMainWindow::showMaximized);  // Workaround to wait for a showEvent() that defines the screen geometry
+
+  settingsFile->beginGroup(QStringLiteral("main"));
+  restoreGeometry(settingsFile->value(QStringLiteral("geometry")).toByteArray());
 
   // Tray icon
   trayIcon = new QSystemTrayIcon(QIcon(":/assets/icon.svg"), this);
@@ -169,6 +171,7 @@ void MainWindow::closeEvent(QCloseEvent *event) {
   msgBox.setDefaultButton(minimizeButton);
   int reply = msgBox.exec();
   if (reply == QMessageBox::Yes) {
+    settingsFile->setValue(QStringLiteral("geometry"), saveGeometry());
     event->accept();
   }
   else if (reply == QMessageBox::AcceptRole) {

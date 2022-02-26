@@ -22,6 +22,7 @@ This file is part of Fast Track.
 #include <stdlib.h>
 #include <time.h>
 #include <QAction>
+#include <QActionGroup>
 #include <QDateTime>
 #include <QDesktopServices>
 #include <QDir>
@@ -108,7 +109,6 @@ class Interactive : public QMainWindow {
 
  private:
   Ui::Interactive *ui;
-  int currentLayout;
   QLabel *counterLabel;
   QAction *replayAction;
   QString memoryDir;                 /*!< Saves the path to the last opened folder in dialog. */
@@ -135,8 +135,8 @@ class Interactive : public QMainWindow {
 
   QString style;
   QString color;
-  int layout;
   bool isExpert; /*!< Is FastTrack is in expert mode with advanced capabilities. */
+  QSettings *settingsFile;
 
  signals:
   void message(QString message);

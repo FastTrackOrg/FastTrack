@@ -87,6 +87,7 @@ class Replay : public QMainWindow {
   Ui::Replay *ui;
   QShortcut *deletedFrameFocus; /*!< Keyboard shortcut to next frame. */
   bool isStandalone;
+  QSettings *settingsFile;
 
   QUndoStack *commandStack;
   QAction *undoAction;
