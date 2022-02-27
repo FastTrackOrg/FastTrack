@@ -173,32 +173,26 @@ vector<double> Tracking::objectInformation(const UMat &image) const {
  * @return True if the direction angle is the orientation angle. False if the direction angle is the orientation angle plus pi.
  */
 bool Tracking::objectDirection(const UMat &image, vector<double> &information) const {
-  // Computes the distribution of the image on the horizontal axis.
-
+  // Compute the probability function of the binary image projection
+  // projection / total number of non zero pixels
   vector<double> projection;
   reduce(image, projection, 0, REDUCE_SUM);
+  double tot = accumulate(projection.begin(), projection.end(), 0);
+  transform(projection.begin(), projection.end(), projection.begin(), [tot](double &c) { return c / tot; });
 
-  vector<double> distribution;  // tmp
-  distribution.reserve(projection.size());
-  double ccMax = *max_element(projection.begin(), projection.end()) / 100;
+  double mean = 0;
   for (size_t it = 0; it < projection.size(); ++it) {
-    int cc = static_cast<int>(projection[it]);
-    for (int jt = 0; jt < cc / ccMax; ++jt) {
-      distribution.push_back((double)(it + 1));
-    }
+    mean += projection[it] * (it + 1);
   }
 
-  double mean = accumulate(distribution.begin(), distribution.end(), 0) / double(distribution.size());
-
-  double sd = 0, skew = 0;
-
-  for (size_t it = 0; it < distribution.size(); ++it) {
-    sd += pow(distribution[it] - mean, 2);
-    skew += pow(distribution[it] - mean, 3);
+  double sd = 0, skewT = 0;
+  for (size_t it = 0; it < projection.size(); ++it) {
+    sd += pow((it + 1) - mean, 2) * projection[it];
+    skewT += pow((it + 1), 3) * projection[it];
   }
 
-  sd = pow(sd / ((double)distribution.size() - 1), 0.5);
-  skew *= (1 / (((double)distribution.size() - 1) * pow(sd, 3)));
+  sd = pow(sd, 0.5);
+  double skew = (skewT - 3 * mean * pow(sd, 2) - pow(mean, 3)) / pow(sd, 3);
 
   if (skew > 0) {
     information[2] = modul(information[2] - M_PI);
