@@ -1,5 +1,13 @@
 # FastTrack changelog
 
+## 6.2.4
+
+### Changed
+- Optimized object's direction computation. Analysis is now ~15% faster.
+
+### Added
+- UI geometry and state saving.
+
 ## 6.2.3
 
 ### Added
