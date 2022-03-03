@@ -818,7 +818,9 @@ TEST_F(AutoLevelTest, AutoLevelStd) {
 }
 
 TEST_F(DataTest, getDataIndexId) {
-  Data data("../dataSet/images/Groundtruth/Tracking_Result/");
+  QDir().mkdir("../dataSet/images/Groundtruth/Tracking_Result_Copy/");
+  QFile::copy("../dataSet/images/Groundtruth/Tracking_Result/tracking.db", "../dataSet/images/Groundtruth/Tracking_Result_Copy/tracking.db");
+  Data data("../dataSet/images/Groundtruth/Tracking_Result_Copy/");
   QHash<QString, double> test = data.getData(2, 12);
   EXPECT_EQ(test.value("xHead"), 506.779);
   test = data.getData(198, 3);
@@ -826,7 +828,7 @@ TEST_F(DataTest, getDataIndexId) {
 }
 
 TEST_F(DataTest, getDataRangeId) {
-  Data data("../dataSet/images/Groundtruth/Tracking_Result/");
+  Data data("../dataSet/images/Groundtruth/Tracking_Result_Copy/");
   QList<QHash<QString, double>> test = data.getData(1, 20, 12);
   QList<QHash<QString, double>> ref;
   for (int i = 1; i < 20; i++) {
@@ -836,7 +838,7 @@ TEST_F(DataTest, getDataRangeId) {
 }
 
 TEST_F(DataTest, getDataIndex) {
-  Data data("../dataSet/images/Groundtruth/Tracking_Result/");
+  Data data("../dataSet/images/Groundtruth/Tracking_Result_Copy/");
   QList<QHash<QString, double>> test = data.getData(2);
   for (const auto &a : test) {
     if (a.value("id") == 12) {
@@ -852,7 +854,7 @@ TEST_F(DataTest, getDataIndex) {
 }
 
 TEST_F(DataTest, getDataId) {
-  Data data("../dataSet/images/Groundtruth/Tracking_Result/");
+  Data data("../dataSet/images/Groundtruth/Tracking_Result_Copy/");
   QHash<QString, QList<double>> test = data.getDataId(12);
   EXPECT_EQ(test.value("xHead")[2], 506.779);
   EXPECT_EQ(test.value("xHead")[3], 512.988);
@@ -861,8 +863,6 @@ TEST_F(DataTest, getDataId) {
 }
 
 TEST_F(DataTest, swapData) {
-  QDir().mkdir("../dataSet/images/Groundtruth/Tracking_Result_Copy/");
-  QFile::copy("../dataSet/images/Groundtruth/Tracking_Result/tracking.db", "../dataSet/images/Groundtruth/Tracking_Result_Copy/tracking.db");
   Data data("../dataSet/images/Groundtruth/Tracking_Result_Copy/");
   QHash<QString, double> a_prev = data.getData(2, 12);
   QHash<QString, double> b_prev = data.getData(2, 11);
@@ -900,7 +900,7 @@ TEST_F(DataTest, deleteInsertData) {
 }
 
 TEST_F(DataTest, id) {
-  Data data("../dataSet/images/Groundtruth/Tracking_Result/");
+  Data data("../dataSet/images/Groundtruth/Tracking_Result_Copy/");
   EXPECT_EQ(data.getId(0, 999), QList({0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13}));
   EXPECT_EQ(data.getId(29), QList({0, 2, 3, 5, 6, 7, 8, 9, 10, 11, 12, 13}));
 }
