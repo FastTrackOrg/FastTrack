@@ -1,5 +1,13 @@
 # FastTrack changelog
 
+## 6.2.5
+
+### Fixed
+- Fixed memory leaks on Windows by disabling OpenCL
+
+### Optimized
+- Disabled OpenCL increases performance by 55% on Windows.
+
 ## 6.2.4
 
 ### Changed
