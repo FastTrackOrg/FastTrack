@@ -15,6 +15,7 @@ This file is part of Fast Track.
     along with FastTrack.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+#include <stdlib.h>
 #include <QApplication>
 #include <QDir>
 #include <QFont>
@@ -34,6 +35,8 @@ void messageHandler(QtMsgType type, const QMessageLogContext &context, const QSt
 }
 
 int main(int argc, char *argv[]) {
+  char env[] = "OPENCV_OPENCL_DEVICE=disabled";
+  putenv(env);  // disable OpenCL to fix windows memory leaks and increase performance
   QApplication a(argc, argv);
   QPixmap pixmap(QStringLiteral(":/assets/icon.png"));
   QSplashScreen splash(pixmap);

@@ -100,6 +100,8 @@ All arguments are mandatory except --backPath and --cfg. Loading a configuration
 }
 
 int main(int argc, char **argv) {
+  char env[] = "OPENCV_OPENCL_DEVICE=disabled";
+  putenv(env);  // disable OpenCL to fix windows memory leaks and increase performance
   static struct option long_options[] =
       {
           {"maxArea", required_argument, 0, 'a'},
