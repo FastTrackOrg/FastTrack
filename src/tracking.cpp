@@ -694,17 +694,18 @@ void Tracking::imageProcessing() {
   while (m_im < m_stopImage) {
     try {
       // Reads the next image in the image sequence and applies the image processing workflow
-      if (!video->getNext(m_visuFrame)) {
+      UMat visuFrame;
+      if (!video->getNext(visuFrame)) {
         m_error += QString::number(m_im) + ", ";
         m_im++;
         emit progress(m_im);
         continue;
       }
       if (param_registration != 0) {
-        registration(m_background, m_visuFrame, param_registration - 1);
+        registration(m_background, visuFrame, param_registration - 1);
       }
 
-      (statusBinarisation) ? (subtract(m_background, m_visuFrame, m_binaryFrame)) : (subtract(m_visuFrame, m_background, m_binaryFrame));
+      (statusBinarisation) ? (subtract(m_background, visuFrame, m_binaryFrame)) : (subtract(visuFrame, m_background, m_binaryFrame));
       binarisation(m_binaryFrame, 'b', param_thresh);
 
       if (param_kernelSize != 0 && param_morphOperation != 8) {
@@ -714,7 +715,7 @@ void Tracking::imageProcessing() {
 
       if (m_ROI.width != 0 || m_ROI.height != 0) {
         m_binaryFrame = m_binaryFrame(m_ROI);
-        m_visuFrame = m_visuFrame(m_ROI);
+        visuFrame = visuFrame(m_ROI);
       }
 
       // Detects the objects and extracts  parameters
@@ -856,9 +857,10 @@ void Tracking::startProcess() {
     }
 
     // First frame
-    video->getImage(m_im, m_visuFrame);
+    UMat visuFrame;
+    video->getImage(m_im, visuFrame);
 
-    (statusBinarisation) ? (subtract(m_background, m_visuFrame, m_binaryFrame)) : (subtract(m_visuFrame, m_background, m_binaryFrame));
+    (statusBinarisation) ? (subtract(m_background, visuFrame, m_binaryFrame)) : (subtract(visuFrame, m_background, m_binaryFrame));
 
     binarisation(m_binaryFrame, 'b', param_thresh);
 
@@ -869,7 +871,7 @@ void Tracking::startProcess() {
 
     if (m_ROI.width != 0) {
       m_binaryFrame = m_binaryFrame(m_ROI);
-      m_visuFrame = m_visuFrame(m_ROI);
+      visuFrame = visuFrame(m_ROI);
     }
 
     m_out = objectPosition(m_binaryFrame, param_minArea, param_maxArea);

@@ -139,7 +139,6 @@ class Tracking : public QObject {
   static bool importTrackingResult(const QString &path, QSqlDatabase db);
 
   UMat m_binaryFrame;                /*!< Binary image CV_8U */
-  UMat m_visuFrame;                  /*!< Image 8 bit CV_8U */
   vector<vector<Point3d>> m_out;     /*!< Objects information at iteration minus one */
   vector<vector<Point3d>> m_outPrev; /*!< Objects information at current iteration */
 
