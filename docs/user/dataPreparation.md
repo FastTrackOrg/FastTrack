@@ -10,4 +10,4 @@ FastTrack is able to open image sequences if they follow the standard leading 0 
 
 ## Video
 
-FastTrack can open video files, and a lot of codecs are supported. To open a video file, select the file.
+FastTrack can open video files, and a lot of [codecs](https://www.ffmpeg.org/ffmpeg-codecs.html) are supported. To open a video file, select the file.

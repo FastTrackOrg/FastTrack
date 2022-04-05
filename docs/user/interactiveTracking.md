@@ -46,7 +46,7 @@ Objects are detected by their size. Select the maximum and minimum size of the d
 
 ## Tuning the tracking parameters
 
-Several parameters can be modified to ensure a good tracking analysis. See [this page](http://www.fasttrack.sh/UserManual/docs/trackingParameters/) for more details:
+Several parameters can be modified to ensure a good tracking analysis. See [this page](http://www.fasttrack.sh/docs/trackingParameters/) for more details:
 
 ### Hard parameters
 
@@ -58,7 +58,7 @@ Hard parameters have to be set manually by the user:
 
 ### Soft parameters
 
-The soft parameters can be leveled automatically by clicking on the Level button. This will automatically compute the soft parameters as each contribution weighs one quarter of the total cost. It has to be manually tuned by the user to find the optimal soft parameters with the system's knowledge. For example, for a system where the objects' direction is not relevant, the user will select the Normalization angle equal to 0.
+The soft parameters can be leveled automatically by clicking on the Level button. This will automatically compute the soft parameters as each contribution weighs one quarter of the total cost (see more at [this page](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1008697#sec003) section "automatic tracking parameters"). It has to be manually fine-tuned by the user to find the optimal soft parameters with the system's knowledge. For example, for a system where the objects' direction is not relevant, the user will select the Normalization angle equal to 0.
 
 * Normalization distance (legacy Maximal length/ Typical length): typical distance traveled between two consecutive images.
 * Normalization angle (legacy Maximal angle/Typical angle): typical reorientation possible between two consecutive images.

@@ -17,8 +17,21 @@ The cost is calculated from a cost function that can be constructed from several
 * The perimeter $p_{ij} = abs(perimeter_i - perimeter_j)$
 
 The relative weight of these contributions to the cost function are set by 4 normalization parameters:
-$$ c_{ij} = \frac{d{ij}}{D} + \frac{a{ij}}{A}+ \frac{ar{ij}}{AR} + \frac{p{ij}}{P}$$
-These parameters can be set to 0 to cancel one or several tracking feature from the cost computation. All these features are not always relevant and has to be chosen carrefully for the best tracking accuracy. For example, for tracking circles of radius r, and squares of the same area moving at 10px/image, it is best to set $$(D=10, A=0, AR=0, P=2r(\pi-2\sqrt{\pi}))$$. For tracking fish of the same size, travelling at 35px/image, doing small reorientation of 20°, it is best to set $$(D=35, A=20, AR=0, P=0))$$. For tracking fish of different size, travelling at 35px/image, doing small reorientation of 20°, with size difference of 100px it is best to set $$(D=35, A=20, AR=100, P=0))$$. 
+$$
+c_{ij} = \frac{d{ij}}{D} + \frac{a{ij}}{A}+ \frac{ar{ij}}{AR} + \frac{p{ij}}{P}
+$$
+These parameters can be set to 0 to cancel one or several tracking feature from the cost computation. All these features are not always relevant and has to be chosen carrefully for the best tracking accuracy. For example, for tracking circles of radius r, and squares of the same area moving at 10px/image, it is best to set
+$$
+(D=10, A=0, AR=0, P=2r(\pi-2\sqrt{\pi}))
+$$
+For tracking fish of the same size, travelling at 35px/image, doing small reorientation of 20°, it is best to set
+$$
+(D=35, A=20, AR=0, P=0))
+$$
+For tracking fish of different size, travelling at 35px/image, doing small reorientation of 20°, with size difference of 100px it is best to set
+$$
+(D=35, A=20, AR=100, P=0))
+$$ 
 
 The best way to set the parameter is to first set the normalization parameters to the mean of the variable, .ie the typical change between two consecutive images:
 * $D = mean(d_{ij})$ where i and j are the same object.
