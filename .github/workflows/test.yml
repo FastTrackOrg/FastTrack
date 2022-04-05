@@ -8,7 +8,7 @@ on:
     branches:
     - master
 env:
-  QT_VERSION: 6.2.3
+  QT_VERSION: 6.2.4
   OPENCV_VERSION: 4.5.5
 
 jobs:
@@ -53,7 +53,7 @@ jobs:
           python3 -m aqt install-qt -O ${{ github.workspace }}/Qt/ windows desktop ${{ env.QT_VERSION }} win64_mingw
           python3 -m aqt install-tool -O ${{ github.workspace }}/Qt/ windows desktop tools_mingw90
           echo "${{ github.workspace }}/Qt/${{ env.QT_VERSION }}/mingw_64/bin/" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-          echo "${{ github.workspace }}/Qt/Tools/mingw900_64/bin/" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          echo "${{ github.workspace }}/Qt/Tools/mingw1120_64/bin/" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
       - name: install opencv and gtest
         run: |
           choco install wget unzip cmake git
