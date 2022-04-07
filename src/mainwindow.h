@@ -29,11 +29,14 @@ This file is part of Fast Track.
 #include <QAction>
 #include <QByteArray>
 #include <QCloseEvent>
+#include <QCoreApplication>
+#include <QDesktopServices>
 #include <QFile>
 #include <QIcon>
 #include <QMainWindow>
 #include <QMenu>
 #include <QMessageBox>
+#include <QProcess>
 #include <QSettings>
 #include <QSysInfo>
 #include <QSystemTrayIcon>

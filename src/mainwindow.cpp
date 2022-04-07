@@ -105,6 +105,20 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
       msgBox.setTextFormat(Qt::RichText);
       msgBox.setIcon(QMessageBox::Information);
       msgBox.setText(QStringLiteral("<strong>FastTrack version %1 is available!</strong> <br> Please update. <br> <a href='http://www.fasttrack.sh/docs/installation/#update'>Need help to update?</a> <br> %2").arg(lastVersion, message));
+      QPushButton *downloadButton = msgBox.addButton(QStringLiteral("Download new version"), QMessageBox::ActionRole);
+#ifdef Q_OS_UNIX
+      connect(downloadButton, &QPushButton::clicked, this, [this]() {
+        QDesktopServices::openUrl(QUrl(QStringLiteral("https://www.fasttrack.sh/download/FastTrack-x86_64.AppImage"), QUrl::TolerantMode));
+      });
+#elif defined(Q_OS_WIN32)
+      connect(downloadButton, &QPushButton::clicked, this, [this]() {
+        QProcess::startDetached(QCoreApplication::applicationDirPath() + QStringLiteral("/MaintenanceTool.exe"));
+      });
+#elif defined(Q_OS_MAC)
+      connect(downloadButton, &QPushButton::clicked, this, [this]() {
+        QDesktopServices::openUrl(QUrl(QStringLiteral("https://www.fasttrack.sh/download/FastTrack.dmg"), QUrl::TolerantMode));
+      });
+#endif
       msgBox.exec();
       this->statusBar()->addWidget(new QLabel(QStringLiteral("FastTrack version %1 is available!").arg(lastVersion)));
     }
