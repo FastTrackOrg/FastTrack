@@ -151,24 +151,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
   connect(interactive, &Interactive::log, trackingManager, &TrackingManager::addLogEntry);
   connect(batch, &Batch::log, trackingManager, &TrackingManager::addLogEntry);
 
-#ifndef NO_WEB
-  manual = new QWebEngineView(this);
-  ui->tabWidget->addTab(manual, tr("User Manual"));
-  connect(ui->tabWidget, &QTabWidget::currentChanged, this, [this](int index) {
-    if (index == 4) {
-      manual->setUrl(QUrl("https://www.fasttrack.sh/docs/intro"));
-    }
-  });
-  dataset = new QWebEngineView(this);
-  ui->tabWidget->addTab(dataset, tr("TD²"));
-  connect(ui->tabWidget, &QTabWidget::currentChanged, this, [this](int index) {
-    if (index == 5) {
-      dataset->setUrl(QUrl("http://data.ljp.upmc.fr/datasets/TD2/"));
-    }
-  });
-
-#endif
-
 }  // Constructor
 
 /**

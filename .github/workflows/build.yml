@@ -73,7 +73,7 @@ jobs:
       - name: build
         run: |
           cd src/
-          qmake FastTrack.pro -spec win32-g++ CONFIG+="release NO_WEB"
+          qmake FastTrack.pro -spec win32-g++ CONFIG+=release
           mingw32-make
           mingw32-make clean
           cd build/

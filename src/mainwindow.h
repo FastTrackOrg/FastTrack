@@ -18,13 +18,6 @@ This file is part of Fast Track.
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#ifndef NO_WEB
-#include <QNetworkAccessManager>
-#include <QNetworkReply>
-#include <QNetworkRequest>
-#include <QWebEngineView>
-#endif
-
 #include <QAbstractButton>
 #include <QAction>
 #include <QByteArray>
@@ -74,10 +67,6 @@ class MainWindow : public QMainWindow {
   TrackingManager *trackingManager;
   QSystemTrayIcon *trayIcon;
   QSettings *settingsFile;
-#ifndef NO_WEB
-  QWebEngineView *manual;
-  QWebEngineView *dataset;
-#endif
 };
 
 #endif  // MAINWINDOW_H

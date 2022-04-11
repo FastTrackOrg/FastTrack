@@ -19,16 +19,6 @@ if [ "$1" = "release" ]; then
   src/build/fasttrack
 fi
 
-if [ "$1" = "no_web" ]; then
-  make distclean
-  set -e
-  qmake6 CONFIG+="release NO_WEB" FastTrack.pro
-  make
-  make check
-  make clean
-  src/build/fasttrack
-fi
-
 if [ "$1" = "debug" ]; then
   set -e
   qmake6 CONFIG+=debug QMAKE_CXXFLAGS+="-Wall -Wextra -g -Wconversion" FastTrack.pro
@@ -49,7 +39,7 @@ fi
 if [ "$1" = "ci" ]; then
   make distclean
   set -e
-  qmake6 CONFIG+="release NO_WEB" src/FastTrack.pro
+  qmake6 CONFIG+=release src/FastTrack.pro
   make
   make clean
   cd build
