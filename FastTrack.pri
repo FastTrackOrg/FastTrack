@@ -1,1 +1,1 @@
-VERSION = 6.2.5.2
+VERSION = 6.2.5.3

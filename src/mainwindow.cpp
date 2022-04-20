@@ -41,6 +41,7 @@ using namespace std;
  */
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
                                           ui(new Ui::MainWindow),
+                                          updater(new Updater(this)),
                                           interactive(new Interactive(this)),
                                           batch(new Batch(this)),
                                           replay(new Replay(this)),
@@ -77,62 +78,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
   trayIcon->setContextMenu(trayMenu);
   trayIcon->show();
 
-  QNetworkAccessManager *manager = new QNetworkAccessManager(this);
-  connect(manager, &QNetworkAccessManager::finished, this, [this](QNetworkReply *reply) {
-    if (reply->error() != QNetworkReply::NoError) {
-      return;
-    }
-
-    QByteArray downloadedData = reply->readAll();
-    reply->deleteLater();
-
-#ifdef Q_OS_UNIX
-    QByteArray lastVersion = downloadedData.mid(downloadedData.indexOf("lin") + 4, 5);
-#elif defined(Q_OS_WIN32)
-    QByteArray lastVersion = downloadedData.mid(downloadedData.indexOf("win") + 4, 5);
-#elif defined(Q_OS_MAC)
-    QByteArray lastVersion = downloadedData.mid(downloadedData.indexOf("mac") + 4, 5);
-#else
-    QByteArray lastVersion = "unknown version";
-#endif
-
-    QByteArray message = downloadedData.mid(downloadedData.indexOf("message") + 7, downloadedData.indexOf("!message") - downloadedData.indexOf("message") - 7);
-    QByteArray warning = downloadedData.mid(downloadedData.indexOf("warning") + 7, downloadedData.indexOf("!warning") - downloadedData.indexOf("warning") - 7);
-
-    if (lastVersion != APP_VERSION) {
-      QMessageBox msgBox;
-      msgBox.setWindowTitle(QStringLiteral("FastTrack Version"));
-      msgBox.setTextFormat(Qt::RichText);
-      msgBox.setIcon(QMessageBox::Information);
-      msgBox.setText(QStringLiteral("<strong>FastTrack version %1 is available!</strong> <br> Please update. <br> <a href='http://www.fasttrack.sh/docs/installation/#update'>Need help to update?</a> <br> %2").arg(lastVersion, message));
-      QPushButton *downloadButton = msgBox.addButton(QStringLiteral("Download new version"), QMessageBox::ActionRole);
-#ifdef Q_OS_UNIX
-      connect(downloadButton, &QPushButton::clicked, this, [this]() {
-        QDesktopServices::openUrl(QUrl(QStringLiteral("https://www.fasttrack.sh/download/FastTrack-x86_64.AppImage"), QUrl::TolerantMode));
-      });
-#elif defined(Q_OS_WIN32)
-      connect(downloadButton, &QPushButton::clicked, this, [this]() {
-        QProcess::startDetached(QCoreApplication::applicationDirPath() + QStringLiteral("/MaintenanceTool.exe"));
-      });
-#elif defined(Q_OS_MAC)
-      connect(downloadButton, &QPushButton::clicked, this, [this]() {
-        QDesktopServices::openUrl(QUrl(QStringLiteral("https://www.fasttrack.sh/download/FastTrack.dmg"), QUrl::TolerantMode));
-      });
-#endif
-      msgBox.exec();
-      this->statusBar()->addWidget(new QLabel(QStringLiteral("FastTrack version %1 is available!").arg(lastVersion)));
-    }
-    if (!warning.isEmpty()) {
-      QMessageBox msgBox;
-      msgBox.setWindowTitle(QStringLiteral("Warning"));
-      msgBox.setTextFormat(Qt::RichText);
-      msgBox.setIcon(QMessageBox::Warning);
-      msgBox.setText(warning);
-      msgBox.exec();
-    }
-  });
-
-  manager->get(QNetworkRequest(QUrl(QStringLiteral("https://www.fasttrack.sh/download/FastTrack/platforms.txt"))));
+  updater->checkForUpdate();
 
   ui->tabWidget->addTab(interactive, tr("Interactive tracking"));
   connect(interactive, &Interactive::status, this, [this](const QString &message) {

@@ -18,18 +18,14 @@ This file is part of Fast Track.
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QAbstractButton>
 #include <QAction>
 #include <QByteArray>
 #include <QCloseEvent>
-#include <QCoreApplication>
-#include <QDesktopServices>
 #include <QFile>
 #include <QIcon>
 #include <QMainWindow>
 #include <QMenu>
 #include <QMessageBox>
-#include <QProcess>
 #include <QSettings>
 #include <QSysInfo>
 #include <QSystemTrayIcon>
@@ -39,6 +35,7 @@ This file is part of Fast Track.
 #include "replay.h"
 #include "trackingmanager.h"
 #include "ui_mainwindow.h"
+#include "updater.h"
 
 using namespace std;
 
@@ -61,6 +58,7 @@ class MainWindow : public QMainWindow {
  private:
   Ui::MainWindow *ui; /*!< ui file from Qt designer. */
   void closeEvent(QCloseEvent *event) override;
+  Updater *updater;
   Interactive *interactive;
   Batch *batch;
   Replay *replay;

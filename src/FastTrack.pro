@@ -73,6 +73,7 @@ unix:macx {
 }
 
 SOURCES += \
+        updater.cpp \
         main.cpp \
         mainwindow.cpp \
         tracking.cpp \
@@ -89,6 +90,7 @@ SOURCES += \
 
 
 HEADERS += \
+        updater.h \
         mainwindow.h\
         tracking.h \
         Hungarian.h \
@@ -113,4 +115,6 @@ FORMS += \
 
 RESOURCES += resources.qrc \
         assets/theme.qrc
+
+QT += widgets
 
