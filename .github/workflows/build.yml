@@ -29,7 +29,7 @@ jobs:
       - name: install qt6
         run: |
           pip install aqtinstall
-          python3 -m aqt install-qt -O ${{ github.workspace }}/Qt/ linux desktop ${{ env.QT_VERSION }}
+          python3 -m aqt install-qt -m qtcharts -O ${{ github.workspace }}/Qt/ linux desktop ${{ env.QT_VERSION }}
           echo ${{ github.workspace }}/Qt/${{ env.QT_VERSION }}/gcc_64/bin/ >> $GITHUB_PATH
       - name: build
         run: |
@@ -61,7 +61,7 @@ jobs:
         run: |
           choco uninstall mingw
           pip install aqtinstall
-          python3 -m aqt install-qt -O ${{ github.workspace }}/Qt/ windows desktop ${{ env.QT_VERSION }} win64_mingw
+          python3 -m aqt install-qt -m qtcharts -O ${{ github.workspace }}/Qt/ windows desktop ${{ env.QT_VERSION }} win64_mingw
           python3 -m aqt install-tool -O ${{ github.workspace }}/Qt/ windows desktop tools_mingw90
           echo "${{ github.workspace }}/Qt/${{ env.QT_VERSION }}/mingw_64/bin/" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
           echo "${{ github.workspace }}/Qt/Tools/mingw1120_64/bin/" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
@@ -98,7 +98,7 @@ jobs:
       - name: install qt6
         run: |
           pip install aqtinstall
-          python3 -m aqt install-qt -m qtwebengine qtwebchannel qtpositioning -O ${{ github.workspace }}/Qt/ mac desktop ${{ env.QT_VERSION }}
+          python3 -m aqt install-qt -m qtcharts -O ${{ github.workspace }}/Qt/ mac desktop ${{ env.QT_VERSION }}
           echo ${{ github.workspace }}/Qt/${{ env.QT_VERSION }}/macos/bin/ >> $GITHUB_PATH
       - name: install opencv
         run: |

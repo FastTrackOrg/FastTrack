@@ -1,4 +1,4 @@
-greaterThan(QT_MAJOR_VERSION, 5): QT += widgets core gui network svg sql
+greaterThan(QT_MAJOR_VERSION, 5): QT += widgets core gui network svg sql charts
 
 TEMPLATE = app
 include("../FastTrack.pri")
@@ -73,6 +73,7 @@ unix:macx {
 }
 
 SOURCES += \
+        statanalysis.cpp \
         updater.cpp \
         main.cpp \
         mainwindow.cpp \
@@ -90,6 +91,7 @@ SOURCES += \
 
 
 HEADERS += \
+        statanalysis.h \
         updater.h \
         mainwindow.h\
         tracking.h \
@@ -108,6 +110,7 @@ HEADERS += \
 FORMS += \
         mainwindow.ui \
         replay.ui \
+        statanalysis.ui \
         trackingmanager.ui \
         batch.ui \ 
         interactive.ui \ 

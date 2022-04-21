@@ -45,6 +45,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
                                           interactive(new Interactive(this)),
                                           batch(new Batch(this)),
                                           replay(new Replay(this)),
+                                          statAnalysis(new StatAnalysis(this)),
                                           trackingManager(new TrackingManager(this)),
                                           settingsFile(new QSettings(QStringLiteral("FastTrack"), QStringLiteral("FastTrackOrg"), this)) {
   QDir::setCurrent(QCoreApplication::applicationDirPath());
@@ -92,6 +93,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
   });
 
   ui->tabWidget->addTab(replay, tr("Tracking inspector"));
+
+  ui->tabWidget->addTab(statAnalysis, tr("Stat Analysis"));
 
   ui->tabWidget->addTab(trackingManager, tr("Tracking Manager"));
   connect(interactive, &Interactive::log, trackingManager, &TrackingManager::addLogEntry);
