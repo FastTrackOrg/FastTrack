@@ -19,6 +19,8 @@ This file is part of Fast Track.
 #define STATANALYSIS_H
 
 #include <QAction>
+#include <QBoxPlotSeries>
+#include <QBoxSet>
 #include <QChart>
 #include <QChartView>
 #include <QCheckBox>
@@ -28,12 +30,16 @@ This file is part of Fast Track.
 #include <QHash>
 #include <QHashIterator>
 #include <QIcon>
+#include <QInputDialog>
 #include <QLineSeries>
 #include <QMainWindow>
 #include <QObject>
 #include <QSettings>
 #include <QString>
 #include <QTableWidgetItem>
+#include <algorithm>
+#include <cmath>
+#include <functional>
 
 #include "data.h"
 
@@ -61,6 +67,7 @@ class StatAnalysis : public QMainWindow {
   void refreshPlots(const QList<int> &objects);
   void clearPlots();
   QList<int> getSelectedObjects();
+  double median(int begin, int end, const QList<double> &sortedList);
 
  private:
   Ui::StatAnalysis *ui;
@@ -69,6 +76,7 @@ class StatAnalysis : public QMainWindow {
   QVector<QChart *> plots;
   QSettings *settingsFile;
   QString memoryDir;
+  double ruler;
 };
 
 #endif  // STATANALYSIS_H

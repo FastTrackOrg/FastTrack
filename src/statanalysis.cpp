@@ -22,7 +22,8 @@ StatAnalysis::StatAnalysis(QWidget* parent, bool isStandalone) : QMainWindow(par
                                                                  ui(new Ui::StatAnalysis),
                                                                  isStandalone(isStandalone),
                                                                  trackingData(new Data()),
-                                                                 settingsFile(new QSettings(QStringLiteral("FastTrack"), QStringLiteral("FastTrackOrg"), this)) {
+                                                                 settingsFile(new QSettings(QStringLiteral("FastTrack"), QStringLiteral("FastTrackOrg"), this)),
+                                                                 ruler(1) {
   ui->setupUi(this);
 
   // Loads settings
@@ -36,6 +37,25 @@ StatAnalysis::StatAnalysis(QWidget* parent, bool isStandalone) : QMainWindow(par
   openAction->setStatusTip(tr("Open tracking data"));
   connect(openAction, &QAction::triggered, this, &StatAnalysis::openTrackingData);
   ui->toolBar->addAction(openAction);
+
+  img = QIcon(":/assets/buttons/option.png");
+  QAction* optionAction = new QAction(img, tr("&Ruler"), this);
+  optionAction->setIcon(img);
+  optionAction->setStatusTip(tr("Set scale"));
+  connect(optionAction, &QAction::triggered, this, [this]() {
+    bool ok;
+    double d = QInputDialog::getDouble(this, QStringLiteral("Get convertion factor"),
+                                       QStringLiteral("1px equal ? (in meters)"), ruler, -10000000, 1000000, 9, &ok,
+                                       Qt::WindowFlags(), 1);
+    if (ok) {
+      ruler = d;
+      clearPlots();
+      QList<int> objects = trackingData->getId(0, trackingData->maxFrameIndex);
+      initPlots(objects);
+      emit ui->objectAll->clicked(true);
+    }
+  });
+  ui->toolBar->addAction(optionAction);
 
   connect(ui->objectAll, &QPushButton::clicked, this, [this](bool state) {
     for (int i = 0; i < ui->objectList->rowCount(); i++) {
@@ -58,6 +78,8 @@ StatAnalysis::StatAnalysis(QWidget* parent, bool isStandalone) : QMainWindow(par
   // Then refresh and clear are automatically endled.
   plots.append(new QChart());
   ui->tabPlot->addTab(new QChartView(plots[0]), QStringLiteral("Trajectory"));
+  plots.append(new QChart());
+  ui->tabPlot->addTab(new QChartView(plots[1]), QStringLiteral("Displacement"));
 }
 
 /**
@@ -71,7 +93,7 @@ void StatAnalysis::openTrackingData() {
     QApplication::setOverrideCursor(Qt::WaitCursor);
     trackingData->setPath(dir);
     loadObjectList();
-    QList<int> objects = getSelectedObjects();
+    QList<int> objects = trackingData->getId(0, trackingData->maxFrameIndex);
     initPlots(objects);
     QApplication::restoreOverrideCursor();
   }
@@ -111,6 +133,7 @@ void StatAnalysis::clear() {
   trackingData->clear();
   ui->objectList->setRowCount(0);  // Remove all rows
   clearPlots();
+  ruler = 1;
 }
 
 void StatAnalysis::initPlots(const QList<int>& objects) {
@@ -120,13 +143,42 @@ void StatAnalysis::initPlots(const QList<int>& objects) {
     QLineSeries* series = new QLineSeries(traj);
     QHash<QString, QList<double>> data = trackingData->getDataId(object);
     for (int i = 0; i < data.value(QStringLiteral("xBody")).size(); i++) {
-      series->append(data.value(QStringLiteral("xBody")).at(i), data.value(QStringLiteral("yBody")).at(i));
+      series->append(data.value(QStringLiteral("xBody")).at(i) * ruler, data.value(QStringLiteral("yBody")).at(i) * ruler);
     }
     series->setName(QString::number(object));
     traj->addSeries(series);
   }
   traj->createDefaultAxes();
   traj->setTitle(QStringLiteral("Trajectories"));
+
+  // Displacement plot
+  QChart* dis = plots[1];
+  for (auto const& object : objects) {
+    QBoxPlotSeries* displacements = new QBoxPlotSeries();
+    QHash<QString, QList<double>> data = trackingData->getDataId(object);
+    QBoxSet* set = new QBoxSet(QString::number(object));
+    auto x = data.value(QStringLiteral("xBody"));
+    std::adjacent_difference(x.begin(), x.end(), x.begin());
+    auto y = data.value(QStringLiteral("yBody"));
+    std::adjacent_difference(y.begin(), y.end(), y.begin());
+    auto t = data.value(QStringLiteral("imageNumber"));
+    std::transform(x.begin(), x.end(), y.begin(), x.begin(), [](double& a, double& b) { return pow(pow(a, 2) + pow(b, 2), 0.5); });
+    std::adjacent_difference(t.begin(), t.end(), t.begin());
+    std::transform(x.begin(), x.end(), t.begin(), x.begin(), std::divides<double>());
+    x.removeAt(0);  // Remove first element that is keep unchanged with adjacent_difference to keep size.
+    std::sort(x.begin(), x.end());
+    set->setValue(QBoxSet::LowerExtreme, x.first() * ruler);
+    set->setValue(QBoxSet::UpperExtreme, x.last() * ruler);
+    set->setValue(QBoxSet::Median, median(0, x.size(), x) * ruler);
+    set->setValue(QBoxSet::LowerQuartile, median(0, x.size() / 2, x) * ruler);
+    set->setValue(QBoxSet::UpperQuartile, median(x.size() / 2 + (x.size() / 2 % 2), x.size(), x) * ruler);
+    displacements->setName(QString::number(object));
+    displacements->append(set);
+    dis->addSeries(displacements);
+  }
+  dis->createDefaultAxes();
+  dis->axes(Qt::Vertical).at(0)->setTitleText(QStringLiteral("Displacement (m)"));
+  dis->setTitle(QStringLiteral("Displacement"));
 }
 
 void StatAnalysis::refreshPlots(const QList<int>& objects) {
@@ -146,6 +198,18 @@ void StatAnalysis::refreshPlots(const QList<int>& objects) {
 void StatAnalysis::clearPlots() {
   for (auto const plot : plots) {
     plot->removeAllSeries();
+  }
+}
+
+double StatAnalysis::median(int begin, int end, const QList<double>& sortedList) {
+  int count = end - begin;
+  if (count % 2) {
+    return sortedList.at(count / 2 + begin);
+  }
+  else {
+    double right = sortedList.at(count / 2 + begin);
+    double left = sortedList.at(count / 2 - 1 + begin);
+    return (right + left) / 2.0;
   }
 }
 
