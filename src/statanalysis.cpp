@@ -35,7 +35,7 @@ StatAnalysis::StatAnalysis(QWidget* parent, bool isStandalone) : QMainWindow(par
   QAction* openAction = new QAction(img, tr("&Open"), this);
   openAction->setShortcuts(QKeySequence::Open);
   openAction->setStatusTip(tr("Open tracking data"));
-  connect(openAction, &QAction::triggered, this, &StatAnalysis::openTrackingData);
+  connect(openAction, &QAction::triggered, this, qOverload<>(&StatAnalysis::openTrackingData));
   ui->toolBar->addAction(openAction);
 
   img = QIcon(":/assets/buttons/option.png");
@@ -74,7 +74,10 @@ StatAnalysis::StatAnalysis(QWidget* parent, bool isStandalone) : QMainWindow(par
     refresh();
   });
 
-  // Chart and ChartView are added their. Plots are defined in initPlots.
+  if (!isStandalone) {
+    openAction->setVisible(false);
+  }
+  // Chart and ChartView are added there. Plots are defined in initPlots.
   // Then refresh and clear are automatically endled.
   plots.append(new QChart());
   ui->tabPlot->addTab(new QChartView(plots[0]), QStringLiteral("Trajectory"));
@@ -86,18 +89,36 @@ StatAnalysis::StatAnalysis(QWidget* parent, bool isStandalone) : QMainWindow(par
  * @brief Opens a dialogue to select tracking data.
  */
 void StatAnalysis::openTrackingData() {
-  clear();
   QString file = QFileDialog::getOpenFileName(this, tr("Open Tracking Data"), memoryDir, tr("Tracking Database (*.db)"));
   if (!file.isEmpty()) {
-    QString dir = QFileInfo(file).dir().path();  // Data takes the tracking folder.
-    QApplication::setOverrideCursor(Qt::WaitCursor);
-    trackingData->setPath(dir);
+    openTrackingData(file);
+  }
+  memoryDir = file;
+}
+
+void StatAnalysis::openTrackingData(const QString& file) {
+  clear();
+  QString dir = QFileInfo(file).dir().path();  // Data takes the tracking folder.
+  QApplication::setOverrideCursor(Qt::WaitCursor);
+  trackingData->setPath(dir);
+  if (!trackingData->isEmpty) {
     loadObjectList();
     QList<int> objects = trackingData->getId(0, trackingData->maxFrameIndex);
     initPlots(objects);
-    QApplication::restoreOverrideCursor();
   }
-  memoryDir = file;
+  QApplication::restoreOverrideCursor();
+}
+
+void StatAnalysis::openTrackingData(Data* data) {
+  clear();
+  QApplication::setOverrideCursor(Qt::WaitCursor);
+  trackingData = new Data(*data);
+  if (!trackingData->isEmpty) {
+    loadObjectList();
+    QList<int> objects = trackingData->getId(0, trackingData->maxFrameIndex);
+    initPlots(objects);
+  }
+  QApplication::restoreOverrideCursor();
 }
 
 void StatAnalysis::loadObjectList() {
@@ -154,27 +175,29 @@ void StatAnalysis::initPlots(const QList<int>& objects) {
   // Displacement plot
   QChart* dis = plots[1];
   for (auto const& object : objects) {
-    QBoxPlotSeries* displacements = new QBoxPlotSeries();
     QHash<QString, QList<double>> data = trackingData->getDataId(object);
-    QBoxSet* set = new QBoxSet(QString::number(object));
-    auto x = data.value(QStringLiteral("xBody"));
-    std::adjacent_difference(x.begin(), x.end(), x.begin());
-    auto y = data.value(QStringLiteral("yBody"));
-    std::adjacent_difference(y.begin(), y.end(), y.begin());
-    auto t = data.value(QStringLiteral("imageNumber"));
-    std::transform(x.begin(), x.end(), y.begin(), x.begin(), [](double& a, double& b) { return pow(pow(a, 2) + pow(b, 2), 0.5); });
-    std::adjacent_difference(t.begin(), t.end(), t.begin());
-    std::transform(x.begin(), x.end(), t.begin(), x.begin(), std::divides<double>());
-    x.removeAt(0);  // Remove first element that is keep unchanged with adjacent_difference to keep size.
-    std::sort(x.begin(), x.end());
-    set->setValue(QBoxSet::LowerExtreme, x.first() * ruler);
-    set->setValue(QBoxSet::UpperExtreme, x.last() * ruler);
-    set->setValue(QBoxSet::Median, median(0, x.size(), x) * ruler);
-    set->setValue(QBoxSet::LowerQuartile, median(0, x.size() / 2, x) * ruler);
-    set->setValue(QBoxSet::UpperQuartile, median(x.size() / 2 + (x.size() / 2 % 2), x.size(), x) * ruler);
-    displacements->setName(QString::number(object));
-    displacements->append(set);
-    dis->addSeries(displacements);
+    if (data.value(QStringLiteral("imageNumber")).size() > 4) {  // Need at least 4 points in the trajectory
+      QBoxPlotSeries* displacements = new QBoxPlotSeries();
+      QBoxSet* set = new QBoxSet(QString::number(object));
+      auto x = data.value(QStringLiteral("xBody"));
+      std::adjacent_difference(x.begin(), x.end(), x.begin());
+      auto y = data.value(QStringLiteral("yBody"));
+      std::adjacent_difference(y.begin(), y.end(), y.begin());
+      auto t = data.value(QStringLiteral("imageNumber"));
+      std::transform(x.begin(), x.end(), y.begin(), x.begin(), [](double& a, double& b) { return pow(pow(a, 2) + pow(b, 2), 0.5); });
+      std::adjacent_difference(t.begin(), t.end(), t.begin());
+      std::transform(x.begin(), x.end(), t.begin(), x.begin(), std::divides<double>());
+      x.removeAt(0);  // Remove first element that is keep unchanged with adjacent_difference to keep size.
+      std::sort(x.begin(), x.end());
+      set->setValue(QBoxSet::LowerExtreme, x.first() * ruler);
+      set->setValue(QBoxSet::UpperExtreme, x.last() * ruler);
+      set->setValue(QBoxSet::Median, median(0, x.size(), x) * ruler);
+      set->setValue(QBoxSet::LowerQuartile, median(0, x.size() / 2, x) * ruler);
+      set->setValue(QBoxSet::UpperQuartile, median(x.size() / 2 + (x.size() / 2 % 2), x.size(), x) * ruler);
+      displacements->setName(QString::number(object));
+      displacements->append(set);
+      dis->addSeries(displacements);
+    }
   }
   dis->createDefaultAxes();
   dis->axes(Qt::Vertical).at(0)->setTitleText(QStringLiteral("Displacement (m)"));

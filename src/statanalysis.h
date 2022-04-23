@@ -57,12 +57,14 @@ class StatAnalysis : public QMainWindow {
   StatAnalysis &operator=(StatAnalysis &&T) = delete;
   StatAnalysis(StatAnalysis &&T) = delete;
   ~StatAnalysis();
+  void openTrackingData(const QString &file);
+  void openTrackingData(Data *data);
+  void clear();
 
  private slots:
   void openTrackingData();
   void loadObjectList();
   void refresh();
-  void clear();
   void initPlots(const QList<int> &objects);
   void refreshPlots(const QList<int> &objects);
   void clearPlots();

@@ -85,6 +85,10 @@ Data::Data(const QString &dataPath) : Data() {
   setPath(dataPath);
 }
 
+Data::Data(const Data &T) : Data() {
+  setPath(T.dir);
+}
+
 /**
  * @brief Construct the data object from a tracking result file.
  */

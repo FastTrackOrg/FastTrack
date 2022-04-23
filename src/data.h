@@ -24,19 +24,19 @@
 
 class Data {
  private:
-  QString dir; /*!< Path to the tracking result file. */
   int actions;
   const QStringList columns;
 
  public:
   Data();
   explicit Data(const QString &dataPath);
-  Data(const Data &T) = delete;
+  Data(const Data &T);
   Data &operator=(const Data &T) = delete;
   Data &operator=(Data &&T) = delete;
   Data(Data &&T) = delete;
   ~Data();
 
+  QString dir; /*!< Path to the tracking result file. */
   const QString connectionName;
   bool setPath(const QString &dataPath);
   QHash<QString, double> getData(int imageIndex, int id) const;
