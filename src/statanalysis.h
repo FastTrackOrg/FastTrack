@@ -57,8 +57,9 @@ class StatAnalysis : public QMainWindow {
   StatAnalysis &operator=(StatAnalysis &&T) = delete;
   StatAnalysis(StatAnalysis &&T) = delete;
   ~StatAnalysis();
-  void openTrackingData(const QString &file);
-  void openTrackingData(Data *data);
+  void openTrackingData(const QString &file, bool loadOnDemand = false);
+  void openTrackingData(Data *data, bool loadOnDemand = false);
+  void reload();
   void clear();
 
  private slots:
@@ -79,6 +80,7 @@ class StatAnalysis : public QMainWindow {
   QSettings *settingsFile;
   QString memoryDir;
   double ruler;
+  bool isData;
 };
 
 #endif  // STATANALYSIS_H

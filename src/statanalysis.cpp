@@ -23,7 +23,8 @@ StatAnalysis::StatAnalysis(QWidget* parent, bool isStandalone) : QMainWindow(par
                                                                  isStandalone(isStandalone),
                                                                  trackingData(new Data()),
                                                                  settingsFile(new QSettings(QStringLiteral("FastTrack"), QStringLiteral("FastTrackOrg"), this)),
-                                                                 ruler(1) {
+                                                                 ruler(1),
+                                                                 isData(false) {
   ui->setupUi(this);
 
   // Loads settings
@@ -96,28 +97,30 @@ void StatAnalysis::openTrackingData() {
   memoryDir = file;
 }
 
-void StatAnalysis::openTrackingData(const QString& file) {
+void StatAnalysis::openTrackingData(const QString& file, bool loadOnDemand) {
   clear();
   QString dir = QFileInfo(file).dir().path();  // Data takes the tracking folder.
   QApplication::setOverrideCursor(Qt::WaitCursor);
   trackingData->setPath(dir);
-  if (!trackingData->isEmpty) {
+  if (!trackingData->isEmpty && !loadOnDemand) {  // If loadOnDemand is true, need to call reload to actually load data.
     loadObjectList();
     QList<int> objects = trackingData->getId(0, trackingData->maxFrameIndex);
     initPlots(objects);
   }
+  isData = !trackingData->isEmpty;
   QApplication::restoreOverrideCursor();
 }
 
-void StatAnalysis::openTrackingData(Data* data) {
+void StatAnalysis::openTrackingData(Data* data, bool loadOnDemand) {
   clear();
   QApplication::setOverrideCursor(Qt::WaitCursor);
   trackingData = new Data(*data);
-  if (!trackingData->isEmpty) {
+  if (!trackingData->isEmpty && !loadOnDemand) {  // If loadOnDemand is true, need to call reload to actually load data.
     loadObjectList();
     QList<int> objects = trackingData->getId(0, trackingData->maxFrameIndex);
     initPlots(objects);
   }
+  isData = !trackingData->isEmpty;
   QApplication::restoreOverrideCursor();
 }
 
@@ -143,6 +146,19 @@ QList<int> StatAnalysis::getSelectedObjects() {
     }
   }
   return objects;
+}
+
+void StatAnalysis::reload() {
+  if (isData) {
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+    ui->objectList->setRowCount(0);  // Remove all rows
+    clearPlots();
+    ruler = 1;
+    loadObjectList();
+    QList<int> objects = trackingData->getId(0, trackingData->maxFrameIndex);
+    initPlots(objects);
+    QApplication::restoreOverrideCursor();
+  }
 }
 
 void StatAnalysis::refresh() {
