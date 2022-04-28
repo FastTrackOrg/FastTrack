@@ -24,8 +24,12 @@ StatAnalysis::StatAnalysis(QWidget* parent, bool isStandalone) : QMainWindow(par
                                                                  trackingData(new Data()),
                                                                  settingsFile(new QSettings(QStringLiteral("FastTrack"), QStringLiteral("FastTrackOrg"), this)),
                                                                  ruler(1),
+                                                                 timeScale(1),
                                                                  isData(false) {
   ui->setupUi(this);
+
+  scale = new QLabel(QStringLiteral("1px = 1m and 1 timestep = 1s"), this);
+  ui->statusbar->addPermanentWidget(scale);
 
   // Loads settings
   settingsFile->beginGroup(QStringLiteral("statanalysis"));
@@ -50,10 +54,18 @@ StatAnalysis::StatAnalysis(QWidget* parent, bool isStandalone) : QMainWindow(par
                                        Qt::WindowFlags(), 1);
     if (ok) {
       ruler = d;
-      clearPlots();
-      QList<int> objects = trackingData->getId(0, trackingData->maxFrameIndex);
-      initPlots(objects);
-      emit ui->objectAll->clicked(true);
+
+      d = QInputDialog::getDouble(this, QStringLiteral("Get convertion factor"),
+                                  QStringLiteral("1 timestep equal ? (in seconds)"), timeScale, -10000000, 1000000, 9, &ok,
+                                  Qt::WindowFlags(), 1);
+      if (ok) {
+        timeScale = d;
+        clearPlots();
+        QList<int> objects = trackingData->getId(0, trackingData->maxFrameIndex);
+        initPlots(objects);
+        emit ui->objectAll->clicked(true);
+        scale->setText(QString("1px = %1m and 1 timestep = %2s").arg(QString::number(ruler), QString::number(timeScale)));
+      }
     }
   });
   ui->toolBar->addAction(optionAction);
@@ -78,12 +90,16 @@ StatAnalysis::StatAnalysis(QWidget* parent, bool isStandalone) : QMainWindow(par
   if (!isStandalone) {
     openAction->setVisible(false);
   }
+
   // Chart and ChartView are added there. Plots are defined in initPlots.
   // Then refresh and clear are automatically endled.
-  plots.append(new QChart());
-  ui->tabPlot->addTab(new QChartView(plots[0]), QStringLiteral("Trajectory"));
-  plots.append(new QChart());
-  ui->tabPlot->addTab(new QChartView(plots[1]), QStringLiteral("Displacement"));
+  QList<QString> plotLabel{"Trajectory", "Displacement", "Velocity"};
+  for (int i = 0; i < plotLabel.size(); i++) {
+    plots.append(new QChart());
+    QChartView* chartView = new QChartView(plots[i]);
+    chartView->setRubberBand(QChartView::RectangleRubberBand);
+    ui->tabPlot->addTab(chartView, plotLabel[i]);
+  }
 }
 
 /**
@@ -170,7 +186,6 @@ void StatAnalysis::clear() {
   trackingData->clear();
   ui->objectList->setRowCount(0);  // Remove all rows
   clearPlots();
-  ruler = 1;
 }
 
 void StatAnalysis::initPlots(const QList<int>& objects) {
@@ -186,15 +201,14 @@ void StatAnalysis::initPlots(const QList<int>& objects) {
     traj->addSeries(series);
   }
   traj->createDefaultAxes();
-  traj->setTitle(QStringLiteral("Trajectories"));
 
   // Displacement plot
+  QList<QList<double>> velocity;
+
   QChart* dis = plots[1];
   for (auto const& object : objects) {
     QHash<QString, QList<double>> data = trackingData->getDataId(object);
     if (data.value(QStringLiteral("imageNumber")).size() > 4) {  // Need at least 4 points in the trajectory
-      QBoxPlotSeries* displacements = new QBoxPlotSeries();
-      QBoxSet* set = new QBoxSet(QString::number(object));
       auto x = data.value(QStringLiteral("xBody"));
       std::adjacent_difference(x.begin(), x.end(), x.begin());
       auto y = data.value(QStringLiteral("yBody"));
@@ -204,20 +218,41 @@ void StatAnalysis::initPlots(const QList<int>& objects) {
       std::adjacent_difference(t.begin(), t.end(), t.begin());
       std::transform(x.begin(), x.end(), t.begin(), x.begin(), std::divides<double>());
       x.removeAt(0);  // Remove first element that is keep unchanged with adjacent_difference to keep size.
+      velocity.append(x);
       std::sort(x.begin(), x.end());
+      QBoxPlotSeries* displacements = new QBoxPlotSeries();
+      QBoxSet* set = new QBoxSet(" ");  // " " Avoid number label on xaxis
       set->setValue(QBoxSet::LowerExtreme, x.first() * ruler);
       set->setValue(QBoxSet::UpperExtreme, x.last() * ruler);
       set->setValue(QBoxSet::Median, median(0, x.size(), x) * ruler);
       set->setValue(QBoxSet::LowerQuartile, median(0, x.size() / 2, x) * ruler);
       set->setValue(QBoxSet::UpperQuartile, median(x.size() / 2 + (x.size() / 2 % 2), x.size(), x) * ruler);
-      displacements->setName(QString::number(object));
       displacements->append(set);
+      displacements->setName(QString::number(object));
       dis->addSeries(displacements);
     }
   }
   dis->createDefaultAxes();
   dis->axes(Qt::Vertical).at(0)->setTitleText(QStringLiteral("Displacement (m)"));
-  dis->setTitle(QStringLiteral("Displacement"));
+
+  // Time plot
+  QChart* time = plots[2];
+  for (auto const& object : objects) {
+    QLineSeries* series = new QLineSeries(traj);
+    QHash<QString, QList<double>> data = trackingData->getDataId(object);
+    if (data.value(QStringLiteral("imageNumber")).size() > 4) {  // Need at least 4 points in the trajectory
+      int i = 0;
+      for (auto const& a : velocity[object]) {
+        series->append(data.value(QStringLiteral("imageNumber")).at(i) * timeScale, a / timeScale);
+        i++;
+      }
+      series->setName(QString::number(object));
+      time->addSeries(series);
+    }
+  }
+  time->createDefaultAxes();
+  time->axes(Qt::Vertical).at(0)->setTitleText(QStringLiteral("Velocity (m/s)"));
+  time->axes(Qt::Horizontal).at(0)->setTitleText(QStringLiteral("Time (s)"));
 }
 
 void StatAnalysis::refreshPlots(const QList<int>& objects) {

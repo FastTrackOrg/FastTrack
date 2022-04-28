@@ -19,6 +19,7 @@ This file is part of Fast Track.
 #define STATANALYSIS_H
 
 #include <QAction>
+#include <QBarCategoryAxis>
 #include <QBoxPlotSeries>
 #include <QBoxSet>
 #include <QChart>
@@ -32,11 +33,13 @@ This file is part of Fast Track.
 #include <QIcon>
 #include <QInputDialog>
 #include <QLineSeries>
+#include <QList>
 #include <QMainWindow>
 #include <QObject>
 #include <QSettings>
 #include <QString>
 #include <QTableWidgetItem>
+#include <QValueAxis>
 #include <algorithm>
 #include <cmath>
 #include <functional>
@@ -80,7 +83,9 @@ class StatAnalysis : public QMainWindow {
   QSettings *settingsFile;
   QString memoryDir;
   double ruler;
+  double timeScale;
   bool isData;
+  QLabel *scale;
 };
 
 #endif  // STATANALYSIS_H
