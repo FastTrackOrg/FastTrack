@@ -36,6 +36,7 @@ This file is part of Fast Track.
 #include <QList>
 #include <QMainWindow>
 #include <QObject>
+#include <QPixmap>
 #include <QSettings>
 #include <QString>
 #include <QTableWidgetItem>

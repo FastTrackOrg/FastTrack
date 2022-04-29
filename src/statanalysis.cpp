@@ -36,7 +36,7 @@ StatAnalysis::StatAnalysis(QWidget* parent, bool isStandalone) : QMainWindow(par
   restoreState(settingsFile->value(QStringLiteral("windowState")).toByteArray());
 
   QIcon img;
-  img = QIcon(":/assets/buttons/openImage.png");
+  img = QIcon(":/assets/buttons/openFile.png");
   QAction* openAction = new QAction(img, tr("&Open"), this);
   openAction->setShortcuts(QKeySequence::Open);
   openAction->setStatusTip(tr("Open tracking data"));
@@ -64,11 +64,27 @@ StatAnalysis::StatAnalysis(QWidget* parent, bool isStandalone) : QMainWindow(par
         QList<int> objects = trackingData->getId(0, trackingData->maxFrameIndex);
         initPlots(objects);
         emit ui->objectAll->clicked(true);
-        scale->setText(QString("1px = %1m and 1 timestep = %2s").arg(QString::number(ruler), QString::number(timeScale)));
+        scale->setText(QStringLiteral("1px = %1m and 1 timestep = %2s").arg(QString::number(ruler), QString::number(timeScale)));
       }
     }
   });
   ui->toolBar->addAction(optionAction);
+
+  img = QIcon(":/assets/buttons/save.png");
+  QAction* saveAction = new QAction(img, tr("&Save"), this);
+  saveAction->setShortcuts(QKeySequence::Open);
+  saveAction->setStatusTip(tr("Save current graph"));
+  connect(saveAction, &QAction::triggered, this, [this]() {
+    QString file = QFileDialog::getSaveFileName(this, tr("Save current graph"), memoryDir, tr("Image (*.png)"));
+    if (!file.isEmpty()) {
+      QWidget* chartView = ui->tabPlot->currentWidget();
+      QPixmap p(chartView->size());
+      chartView->render(&p);
+      p.save(file, "PNG");
+      memoryDir = file;
+    }
+  });
+  ui->toolBar->addAction(saveAction);
 
   connect(ui->objectAll, &QPushButton::clicked, this, [this](bool state) {
     for (int i = 0; i < ui->objectList->rowCount(); i++) {
@@ -221,7 +237,7 @@ void StatAnalysis::initPlots(const QList<int>& objects) {
       velocity.append(x);
       std::sort(x.begin(), x.end());
       QBoxPlotSeries* displacements = new QBoxPlotSeries();
-      QBoxSet* set = new QBoxSet(" ");  // " " Avoid number label on xaxis
+      QBoxSet* set = new QBoxSet(QStringLiteral(" "));  // " " Avoid number label on xaxis
       set->setValue(QBoxSet::LowerExtreme, x.first() * ruler);
       set->setValue(QBoxSet::UpperExtreme, x.last() * ruler);
       set->setValue(QBoxSet::Median, median(0, x.size(), x) * ruler);
