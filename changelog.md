@@ -1,5 +1,20 @@
 # FastTrack changelog
 
+## 6.2.6
+
+### Added
+- New version download button.
+- Stat_analysis feature preview.
+
+### Changed
+- Update to Qt6.2.4 LTS.
+
+### Removed
+- Remove webengine requirement.
+
+### Refactored
+- Check for updates.
+
 ## 6.2.5
 
 ### Fixed
