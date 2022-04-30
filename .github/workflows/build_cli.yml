@@ -5,7 +5,7 @@ on:
     branches: [master]
 
 env:
-  QT_VERSION: 6.2.4
+  QT_VERSION: 6.3.0 # Need <6.3.0 for macdeployqt to work https://github.com/FastTrackOrg/FastTrack/issues/51
   OPENCV_VERSION: 4.5.5
 
 jobs:
@@ -51,7 +51,7 @@ jobs:
             path: ./FastTrack-cli-x86_64.AppImage
 
   job_2:
-      runs-on: macos-latest
+      runs-on: macos-10.15
       steps:
         - uses: actions/checkout@v2
         - uses: actions/setup-python@v2
@@ -60,7 +60,7 @@ jobs:
         - name: install qt6
           run: |
             pip install aqtinstall
-            python3 -m aqt install-qt -m qtwebengine qtwebchannel qtpositioning -O ${{ github.workspace }}/Qt/ mac desktop ${{ env.QT_VERSION }}
+            python3 -m aqt install-qt -O ${{ github.workspace }}/Qt/ mac desktop ${{ env.QT_VERSION }}
             echo ${{ github.workspace }}/Qt/${{ env.QT_VERSION }}/macos/bin/ >> $GITHUB_PATH
         - name: install opencv
           run: |
@@ -70,6 +70,9 @@ jobs:
               brew install libomp
               brew install pkg-config
               brew install opencv
+              brew install openssl
+              brew unlink unixodbc
+              brew install libiodbc
               export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig/
         - name: build
           run: |
@@ -78,7 +81,8 @@ jobs:
               cd build_cli/
               macdeployqt FastTrack-cli.app -always-overwrite
               wget https://raw.githubusercontent.com/arl/macdeployqtfix/master/macdeployqtfix.py
-              python2.7 macdeployqtfix.py fasttrack_cli.app/Contents/MacOS/fasttrack-cli ../../Qt/${{ env.QT_VERSION }}/
+              cp /usr/local/opt/gcc/lib/gcc/11/libgcc_s.1.1.dylib FastTrack-cli.app/Contents/Frameworks/ ## See workaround header
+              python2.7 macdeployqtfix.py FastTrack-cli.app/Contents/MacOS/FastTrack-cli ../../Qt/${{ env.QT_VERSION }}/
               hdiutil create -volname FastTrack-cli -srcfolder FastTrack-cli.app -ov -format UDZO FastTrack-cli.dmg
         - name: Mac artefact
           uses: actions/upload-artifact@v2
