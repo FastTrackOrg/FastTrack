@@ -332,6 +332,9 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
     QFile::remove(fileName);
     QFile::copy(QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) + "/fasttrack.log", fileName);
   });
+  connect(ui->actionSupport, &QAction::triggered, []() {
+    QDesktopServices::openUrl(QUrl(QStringLiteral("https://ko-fi.com/bgallois"), QUrl::TolerantMode));
+  });
   connect(ui->actionAbout, &QAction::triggered, this, []() {
     QMessageBox aboutBox;
     aboutBox.setText(QStringLiteral("FastTrack version %1 is a desktop tracking software, easy to install, easy to use, and performant.<br>Created and maintained by Benjamin Gallois.<br>Distributed under the terms of the <a href='https://www.gnu.org/licenses/gpl-3.0'>GPL3.0 license</a>.<br>").arg(qApp->applicationVersion()));

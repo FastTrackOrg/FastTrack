@@ -1246,6 +1246,7 @@ corner: </string>
     <addaction name="actionIssue"/>
     <addaction name="actionContact"/>
     <addaction name="separator"/>
+    <addaction name="actionSupport"/>
     <addaction name="actionAbout"/>
     <addaction name="actionAboutQt"/>
    </widget>
@@ -1746,6 +1747,14 @@ corner: </string>
   <action name="actionGenerateLog">
    <property name="text">
     <string>Generate a log</string>
+   </property>
+  </action>
+  <action name="actionSupport">
+   <property name="text">
+    <string>Support FastTrack</string>
+   </property>
+   <property name="toolTip">
+    <string>Donate to support FastTrack development</string>
    </property>
   </action>
  </widget>
