@@ -23,7 +23,6 @@ unix:!macx {
 }
 
 unix:macx {
-  TARGET = FastTrack-cli
   CONFIG += c++17
   LIBS += -L/usr/local/lib -lomp
   QMAKE_CXXFLAGS += -std=c++1z -stdlib=libc++ -mmacosx-version-min=10.15 -O3 -g -Xpreprocessor -fopenmp
