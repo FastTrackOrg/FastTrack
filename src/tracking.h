@@ -28,6 +28,7 @@ This file is part of Fast Track.
 #include <QElapsedTimer>
 #include <QFile>
 #include <QFileInfo>
+#include <QHash>
 #include <QList>
 #include <QMap>
 #include <QObject>
@@ -83,30 +84,7 @@ class Tracking : public QObject {
   vector<int> m_id;           /*!< Vector containing the objets Id. */
   vector<int> m_lost;         /*!< Vector containing the lost objects. */
   int m_idMax;
-
-  int param_n;                            /*!< Number of objects. */
-  int param_maxArea;                      /*!< Maximal area of an object. */
-  int param_minArea;                      /*!< Minimal area of an object. */
-  int param_spot;                         /*!< Which spot parameters are used to computes the cost function. 0: head, 1: tail, 2: body. */
-  double param_len;                       /*!< Maximal length travelled by an object between two images. */
-  double param_angle;                     /*!< Maximal change in direction of an object between two images. */
-  double param_area;                      /*!< Normalization area. */
-  double param_perimeter;                 /*!< Normalization perimeter. */
-  double param_lo;                        /*!< Maximal distance allowed by an object to travel during an occlusion event. */
-  double param_to;                        /*!< Maximal time. */
-  int param_thresh;                       /*!< Value of the threshold to binarize the image. */
-  double param_nBackground;               /*!< Number of images to average to compute the background. */
-  int param_methodBackground;             /*!< The method used to compute the background. */
-  int param_methodRegistrationBackground; /*!< The method used to register the images for the background. */
-  int param_registration;                 /*!< Method of registration. */
-  int param_x1;                           /*!< Top x corner of the region of interest. */
-  int param_y1;                           /*!< Top y corner of the region of interest. */
-  int param_x2;                           /*!< Bottom x corner of the region of interest. */
-  int param_y2;                           /*!< Bottom y corner of the region of interest. */
-  int param_kernelSize;                   /*!< Size of the kernel of the morphological operation. */
-  int param_kernelType;                   /*!< Type of the kernel of the morphological operation. */
-  int param_morphOperation;               /*!< Type of the morphological operation. */
-  QMap<QString, QString> parameters;      /*!< map of all the parameters for the tracking. */
+  QMap<QString, QString> parameters; /*!< map of all the parameters for the tracking. */
 
  public:
   explicit Tracking(QWidget *parent = nullptr) : QObject(parent){};

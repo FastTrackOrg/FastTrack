@@ -541,10 +541,10 @@ vector<int> Tracking::costFunc(const vector<vector<Point3d>> &prevPos, const vec
     vector<pair<int, int>> distances;
 
     for (int i = 0; i < n; ++i) {  // Loop on previous objects
-      Point3d prevCoord = prevPos[param_spot][i];
+      Point3d prevCoord = prevPos[parameters.value(QStringLiteral("spot")).toInt()][i];
       Point3d prevData = prevPos[3][i];
       for (int j = 0; j < m; ++j) {  // Loop on current objects
-        Point3d coord = pos[param_spot][j];
+        Point3d coord = pos[parameters.value(QStringLiteral("spot")).toInt()][j];
         Point3d data = pos[3][j];
         double distanceDiff = pow(pow(prevCoord.x - coord.x, 2) + pow(prevCoord.y - coord.y, 2), 0.5);
         double angleDiff = abs(angleDifference(prevCoord.z, coord.z));
@@ -701,16 +701,16 @@ void Tracking::imageProcessing() {
         emit progress(m_im);
         continue;
       }
-      if (param_registration != 0) {
-        registration(m_background, visuFrame, param_registration - 1);
+      if (parameters.value(QStringLiteral("reg")).toInt() != 0) {
+        registration(m_background, visuFrame, parameters.value(QStringLiteral("reg")).toInt() - 1);
       }
 
       (statusBinarisation) ? (subtract(m_background, visuFrame, m_binaryFrame)) : (subtract(visuFrame, m_background, m_binaryFrame));
-      binarisation(m_binaryFrame, 'b', param_thresh);
+      binarisation(m_binaryFrame, 'b', parameters.value(QStringLiteral("thresh")).toInt());
 
-      if (param_kernelSize != 0 && param_morphOperation != 8) {
-        Mat element = getStructuringElement(param_kernelType, Size(2 * param_kernelSize + 1, 2 * param_kernelSize + 1), Point(param_kernelSize, param_kernelSize));
-        morphologyEx(m_binaryFrame, m_binaryFrame, param_morphOperation, element);
+      if (parameters.value(QStringLiteral("morphSize")).toInt() != 0 && parameters.value(QStringLiteral("morph")).toInt() != 8) {
+        Mat element = getStructuringElement(parameters.value(QStringLiteral("morphType")).toInt(), Size(2 * parameters.value(QStringLiteral("morphSize")).toInt() + 1, 2 * parameters.value(QStringLiteral("morphSize")).toInt() + 1), Point(parameters.value(QStringLiteral("morphSize")).toInt(), parameters.value(QStringLiteral("morphSize")).toInt()));
+        morphologyEx(m_binaryFrame, m_binaryFrame, parameters.value(QStringLiteral("morph")).toInt(), element);
       }
 
       if (m_ROI.width != 0 || m_ROI.height != 0) {
@@ -719,10 +719,10 @@ void Tracking::imageProcessing() {
       }
 
       // Detects the objects and extracts  parameters
-      m_out = objectPosition(m_binaryFrame, param_minArea, param_maxArea);
+      m_out = objectPosition(m_binaryFrame, parameters.value(QStringLiteral("minArea")).toInt(), parameters.value(QStringLiteral("maxArea")).toInt());
 
       // Associates the objets with the previous image
-      vector<int> identity = costFunc(m_outPrev, m_out, param_len, param_angle, param_lo, param_area, param_perimeter);
+      vector<int> identity = costFunc(m_outPrev, m_out, parameters.value(QStringLiteral("normDist")).toDouble(), M_PI * parameters.value(QStringLiteral("normAngle")).toDouble() / 180, parameters.value(QStringLiteral("maxDist")).toDouble(), parameters.value(QStringLiteral("normArea")).toDouble(), parameters.value(QStringLiteral("normPerim")).toDouble());
       vector<int> occluded = findOcclusion(identity);
 
       // Reassignes the m_out vector regarding the identities of the objects
@@ -760,7 +760,7 @@ void Tracking::imageProcessing() {
         }
       }
 
-      cleaning(occluded, m_lost, m_id, m_out, param_to);
+      cleaning(occluded, m_lost, m_id, m_out, parameters.value(QStringLiteral("maxTime")).toDouble());
       m_outPrev = m_out;
       m_im++;
       emit progress(m_im);
@@ -842,7 +842,7 @@ void Tracking::startProcess() {
 
     // Loads the background image is provided and check if the image has the correct size
     if (m_background.empty() && m_backgroundPath.empty()) {
-      m_background = backgroundExtraction(*video, static_cast<int>(param_nBackground), param_methodBackground, param_methodRegistrationBackground);
+      m_background = backgroundExtraction(*video, parameters.value(QStringLiteral("nBack")).toInt(), parameters.value(QStringLiteral("methBack")).toInt(), parameters.value(QStringLiteral("regBack")).toInt());
     }
     else if (m_background.empty()) {
       try {
@@ -862,11 +862,11 @@ void Tracking::startProcess() {
 
     (statusBinarisation) ? (subtract(m_background, visuFrame, m_binaryFrame)) : (subtract(visuFrame, m_background, m_binaryFrame));
 
-    binarisation(m_binaryFrame, 'b', param_thresh);
+    binarisation(m_binaryFrame, 'b', parameters.value(QStringLiteral("thresh")).toInt());
 
-    if (param_kernelSize != 0 && param_morphOperation != 8) {
-      Mat element = getStructuringElement(param_kernelType, Size(2 * param_kernelSize + 1, 2 * param_kernelSize + 1), Point(param_kernelSize, param_kernelSize));
-      morphologyEx(m_binaryFrame, m_binaryFrame, param_morphOperation, element);
+    if (parameters.value(QStringLiteral("morphSize")).toInt() != 0 && parameters.value(QStringLiteral("morph")).toInt() != 8) {
+      Mat element = getStructuringElement(parameters.value(QStringLiteral("morphType")).toInt(), Size(2 * parameters.value(QStringLiteral("morphSize")).toInt() + 1, 2 * parameters.value(QStringLiteral("morphSize")).toInt() + 1), Point(parameters.value(QStringLiteral("morphSize")).toInt(), parameters.value(QStringLiteral("morphSize")).toInt()));
+      morphologyEx(m_binaryFrame, m_binaryFrame, parameters.value(QStringLiteral("morph")).toInt(), element);
     }
 
     if (m_ROI.width != 0) {
@@ -874,7 +874,7 @@ void Tracking::startProcess() {
       visuFrame = visuFrame(m_ROI);
     }
 
-    m_out = objectPosition(m_binaryFrame, param_minArea, param_maxArea);
+    m_out = objectPosition(m_binaryFrame, parameters.value(QStringLiteral("minArea")).toInt(), parameters.value(QStringLiteral("maxArea")).toInt());
 
     // Assigns an id and a counter at each object detected
     for (int i = 0; i < static_cast<int>(m_out[0].size()); i++) {
@@ -984,31 +984,11 @@ void Tracking::startProcess() {
  * @param[in] parameterList The list of all the parameters used in the tracking.
  */
 void Tracking::updatingParameters(const QMap<QString, QString> &parameterList) {
+  // Remarks:
+  // normAngle is in deg for compatibility reason and need to be converted in rad when used.
   parameters = parameterList;
-  param_maxArea = parameterList.value(QStringLiteral("maxArea")).toInt();
-  param_minArea = parameterList.value(QStringLiteral("minArea")).toInt();
-  param_spot = parameterList.value(QStringLiteral("spot")).toInt();
-  param_len = parameterList.value(QStringLiteral("normDist")).toDouble();
-  param_angle = (M_PI * parameterList.value(QStringLiteral("normAngle")).toDouble() / 180);
-  param_lo = parameterList.value(QStringLiteral("maxDist")).toDouble();
-  param_to = parameterList.value(QStringLiteral("maxTime")).toDouble();
-  param_area = parameterList.value(QStringLiteral("normArea")).toDouble();
-  param_perimeter = parameterList.value(QStringLiteral("normPerim")).toDouble();
-
-  param_thresh = parameterList.value(QStringLiteral("thresh")).toInt();
-  param_nBackground = parameterList.value(QStringLiteral("nBack")).toDouble();
-  param_methodBackground = parameterList.value(QStringLiteral("methBack")).toInt();
-  param_methodRegistrationBackground = parameterList.value(QStringLiteral("regBack")).toInt();
-  param_x1 = parameterList.value(QStringLiteral("xTop")).toInt();
-  param_y1 = parameterList.value(QStringLiteral("yTop")).toInt();
-  param_x2 = parameterList.value(QStringLiteral("xBottom")).toInt();
-  param_y2 = parameterList.value(QStringLiteral("yBottom")).toInt();
-  m_ROI = Rect(param_x1, param_y1, param_x2 - param_x1, param_y2 - param_y1);
-  param_registration = parameterList.value(QStringLiteral("reg")).toInt();
-  statusBinarisation = (parameterList.value(QStringLiteral("lightBack")) == QLatin1String("0")) ? true : false;
-  param_morphOperation = parameterList.value(QStringLiteral("morph")).toInt();
-  param_kernelSize = parameterList.value(QStringLiteral("morphSize")).toInt();
-  param_kernelType = parameterList.value(QStringLiteral("morphType")).toInt();
+  m_ROI = Rect(parameters.value(QStringLiteral("xTop")).toInt(), parameters.value(QStringLiteral("yTop")).toInt(), parameters.value(QStringLiteral("xBottom")).toInt() - parameters.value(QStringLiteral("xTop")).toInt(), parameters.value(QStringLiteral("yBottom")).toInt() - parameters.value(QStringLiteral("yTop")).toInt());
+  statusBinarisation = (parameters.value(QStringLiteral("lightBack")) == QLatin1String("0")) ? true : false;
 }
 
 /**
