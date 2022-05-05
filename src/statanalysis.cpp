@@ -146,6 +146,7 @@ void StatAnalysis::openTrackingData(const QString& file, bool loadOnDemand) {
 void StatAnalysis::openTrackingData(Data* data, bool loadOnDemand) {
   clear();
   QApplication::setOverrideCursor(Qt::WaitCursor);
+  delete trackingData;
   trackingData = new Data(*data);
   if (!trackingData->isEmpty && !loadOnDemand) {  // If loadOnDemand is true, need to call reload to actually load data.
     loadObjectList();
