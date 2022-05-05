@@ -541,10 +541,10 @@ vector<int> Tracking::costFunc(const vector<vector<Point3d>> &prevPos, const vec
     vector<pair<int, int>> distances;
 
     for (int i = 0; i < n; ++i) {  // Loop on previous objects
-      Point3d prevCoord = prevPos[parameters.value(QStringLiteral("spot")).toInt()][i];
+      Point3d prevCoord = prevPos[m_parameters.value(QStringLiteral("spot")).toInt()][i];
       Point3d prevData = prevPos[3][i];
       for (int j = 0; j < m; ++j) {  // Loop on current objects
-        Point3d coord = pos[parameters.value(QStringLiteral("spot")).toInt()][j];
+        Point3d coord = pos[m_parameters.value(QStringLiteral("spot")).toInt()][j];
         Point3d data = pos[3][j];
         double distanceDiff = pow(pow(prevCoord.x - coord.x, 2) + pow(prevCoord.y - coord.y, 2), 0.5);
         double angleDiff = abs(angleDifference(prevCoord.z, coord.z));
@@ -701,16 +701,16 @@ void Tracking::imageProcessing() {
         emit progress(m_im);
         continue;
       }
-      if (parameters.value(QStringLiteral("reg")).toInt() != 0) {
-        registration(m_background, visuFrame, parameters.value(QStringLiteral("reg")).toInt() - 1);
+      if (m_parameters.value(QStringLiteral("reg")).toInt() != 0) {
+        registration(m_background, visuFrame, m_parameters.value(QStringLiteral("reg")).toInt() - 1);
       }
 
-      (statusBinarisation) ? (subtract(m_background, visuFrame, m_binaryFrame)) : (subtract(visuFrame, m_background, m_binaryFrame));
-      binarisation(m_binaryFrame, 'b', parameters.value(QStringLiteral("thresh")).toInt());
+      (m_statusBinarisation) ? (subtract(m_background, visuFrame, m_binaryFrame)) : (subtract(visuFrame, m_background, m_binaryFrame));
+      binarisation(m_binaryFrame, 'b', m_parameters.value(QStringLiteral("thresh")).toInt());
 
-      if (parameters.value(QStringLiteral("morphSize")).toInt() != 0 && parameters.value(QStringLiteral("morph")).toInt() != 8) {
-        Mat element = getStructuringElement(parameters.value(QStringLiteral("morphType")).toInt(), Size(2 * parameters.value(QStringLiteral("morphSize")).toInt() + 1, 2 * parameters.value(QStringLiteral("morphSize")).toInt() + 1), Point(parameters.value(QStringLiteral("morphSize")).toInt(), parameters.value(QStringLiteral("morphSize")).toInt()));
-        morphologyEx(m_binaryFrame, m_binaryFrame, parameters.value(QStringLiteral("morph")).toInt(), element);
+      if (m_isMorph) {
+        Mat element = getStructuringElement(m_parameters.value(QStringLiteral("morphType")).toInt(), Size(2 * m_parameters.value(QStringLiteral("morphSize")).toInt() + 1, 2 * m_parameters.value(QStringLiteral("morphSize")).toInt() + 1), Point(m_parameters.value(QStringLiteral("morphSize")).toInt(), m_parameters.value(QStringLiteral("morphSize")).toInt()));
+        morphologyEx(m_binaryFrame, m_binaryFrame, m_parameters.value(QStringLiteral("morph")).toInt(), element);
       }
 
       if (m_ROI.width != 0 || m_ROI.height != 0) {
@@ -719,10 +719,10 @@ void Tracking::imageProcessing() {
       }
 
       // Detects the objects and extracts  parameters
-      m_out = objectPosition(m_binaryFrame, parameters.value(QStringLiteral("minArea")).toInt(), parameters.value(QStringLiteral("maxArea")).toInt());
+      m_out = objectPosition(m_binaryFrame, m_parameters.value(QStringLiteral("minArea")).toInt(), m_parameters.value(QStringLiteral("maxArea")).toInt());
 
       // Associates the objets with the previous image
-      vector<int> identity = costFunc(m_outPrev, m_out, parameters.value(QStringLiteral("normDist")).toDouble(), M_PI * parameters.value(QStringLiteral("normAngle")).toDouble() / 180, parameters.value(QStringLiteral("maxDist")).toDouble(), parameters.value(QStringLiteral("normArea")).toDouble(), parameters.value(QStringLiteral("normPerim")).toDouble());
+      vector<int> identity = costFunc(m_outPrev, m_out, m_parameters.value(QStringLiteral("normDist")).toDouble(), M_PI * m_parameters.value(QStringLiteral("normAngle")).toDouble() / 180, m_parameters.value(QStringLiteral("maxDist")).toDouble(), m_parameters.value(QStringLiteral("normArea")).toDouble(), m_parameters.value(QStringLiteral("normPerim")).toDouble());
       vector<int> occluded = findOcclusion(identity);
 
       // Reassignes the m_out vector regarding the identities of the objects
@@ -760,7 +760,7 @@ void Tracking::imageProcessing() {
         }
       }
 
-      cleaning(occluded, m_lost, m_id, m_out, parameters.value(QStringLiteral("maxTime")).toDouble());
+      cleaning(occluded, m_lost, m_id, m_out, m_parameters.value(QStringLiteral("maxTime")).toDouble());
       m_outPrev = m_out;
       m_im++;
       emit progress(m_im);
@@ -768,7 +768,6 @@ void Tracking::imageProcessing() {
     catch (const std::exception &e) {
       outputDb.commit();
       exportTrackingResult(m_savingPath, outputDb);
-      delete timer;
       outputDb.close();
       m_logFile.close();
       qWarning() << QString::fromStdString(e.what()) << " at image " << QString::number(m_im);
@@ -778,7 +777,6 @@ void Tracking::imageProcessing() {
     catch (...) {
       outputDb.commit();
       exportTrackingResult(m_savingPath, outputDb);
-      delete timer;
       outputDb.close();
       m_logFile.close();
       qWarning() << "Unknown at image " << QString::number(m_im);
@@ -790,8 +788,7 @@ void Tracking::imageProcessing() {
   outputDb.commit();
   bool isSaved = exportTrackingResult(m_savingPath, outputDb);
   outputDb.close();
-  emit statistic(timer->elapsed());
-  delete timer;
+  emit statistic(m_timer.data()->elapsed());
 
   if (isSaved && m_error.isEmpty()) {
     emit finished();
@@ -813,7 +810,7 @@ void Tracking::imageProcessing() {
  * @param[in] startImage Index of the beginning image.
  * @param[in] stopImage Index of the ending image.
  */
-Tracking::Tracking(const string &path, const string &backgroundPath, int startImage, int stopImage) : m_path{path}, m_backgroundPath{backgroundPath}, video{new VideoReader(m_path)}, m_startImage{startImage}, m_stopImage{stopImage}, connectionName{QString("tracking_%1").arg(QRandomGenerator::global()->generate())} {
+Tracking::Tracking(const string &path, const string &backgroundPath, int startImage, int stopImage) : m_timer{QSharedPointer<QElapsedTimer>(new QElapsedTimer())}, m_path{path}, m_backgroundPath{backgroundPath}, video{new VideoReader(m_path)}, m_startImage{startImage}, m_stopImage{stopImage}, connectionName{QString("tracking_%1").arg(QRandomGenerator::global()->generate())} {
 }
 
 /**
@@ -823,7 +820,7 @@ Tracking::Tracking(const string &path, const string &backgroundPath, int startIm
  * @param[in] startImage Index of the beginning image.
  * @param[in] stopImage Index of the ending image.
  */
-Tracking::Tracking(const string &path, const UMat &background, int startImage, int stopImage) : m_path{path}, m_background{background}, video{new VideoReader(m_path)}, m_startImage{startImage}, m_stopImage{stopImage}, connectionName{QString("tracking_%1").arg(QRandomGenerator::global()->generate())} {
+Tracking::Tracking(const string &path, const UMat &background, int startImage, int stopImage) : m_timer{QSharedPointer<QElapsedTimer>(new QElapsedTimer())}, m_path{path}, m_background{background}, video{new VideoReader(m_path)}, m_startImage{startImage}, m_stopImage{stopImage}, connectionName{QString("tracking_%1").arg(QRandomGenerator::global()->generate())} {
 }
 
 /**
@@ -835,14 +832,13 @@ void Tracking::startProcess() {
       throw std::runtime_error("Fatal error, the video can be opened");
     }
 
-    timer = new QElapsedTimer();
-    timer->start();
+    m_timer.data()->start();
     m_im = m_startImage;
     (m_stopImage == -1) ? (m_stopImage = int(video->getImageCount())) : (m_stopImage = m_stopImage);
 
     // Loads the background image is provided and check if the image has the correct size
     if (m_background.empty() && m_backgroundPath.empty()) {
-      m_background = backgroundExtraction(*video, parameters.value(QStringLiteral("nBack")).toInt(), parameters.value(QStringLiteral("methBack")).toInt(), parameters.value(QStringLiteral("regBack")).toInt());
+      m_background = backgroundExtraction(*video, m_parameters.value(QStringLiteral("nBack")).toInt(), m_parameters.value(QStringLiteral("methBack")).toInt(), m_parameters.value(QStringLiteral("regBack")).toInt());
     }
     else if (m_background.empty()) {
       try {
@@ -860,13 +856,13 @@ void Tracking::startProcess() {
     UMat visuFrame;
     video->getImage(m_im, visuFrame);
 
-    (statusBinarisation) ? (subtract(m_background, visuFrame, m_binaryFrame)) : (subtract(visuFrame, m_background, m_binaryFrame));
+    (m_statusBinarisation) ? (subtract(m_background, visuFrame, m_binaryFrame)) : (subtract(visuFrame, m_background, m_binaryFrame));
 
-    binarisation(m_binaryFrame, 'b', parameters.value(QStringLiteral("thresh")).toInt());
+    binarisation(m_binaryFrame, 'b', m_parameters.value(QStringLiteral("thresh")).toInt());
 
-    if (parameters.value(QStringLiteral("morphSize")).toInt() != 0 && parameters.value(QStringLiteral("morph")).toInt() != 8) {
-      Mat element = getStructuringElement(parameters.value(QStringLiteral("morphType")).toInt(), Size(2 * parameters.value(QStringLiteral("morphSize")).toInt() + 1, 2 * parameters.value(QStringLiteral("morphSize")).toInt() + 1), Point(parameters.value(QStringLiteral("morphSize")).toInt(), parameters.value(QStringLiteral("morphSize")).toInt()));
-      morphologyEx(m_binaryFrame, m_binaryFrame, parameters.value(QStringLiteral("morph")).toInt(), element);
+    if (m_isMorph) {
+      Mat element = getStructuringElement(m_parameters.value(QStringLiteral("morphType")).toInt(), Size(2 * m_parameters.value(QStringLiteral("morphSize")).toInt() + 1, 2 * m_parameters.value(QStringLiteral("morphSize")).toInt() + 1), Point(m_parameters.value(QStringLiteral("morphSize")).toInt(), m_parameters.value(QStringLiteral("morphSize")).toInt()));
+      morphologyEx(m_binaryFrame, m_binaryFrame, m_parameters.value(QStringLiteral("morph")).toInt(), element);
     }
 
     if (m_ROI.width != 0) {
@@ -874,7 +870,7 @@ void Tracking::startProcess() {
       visuFrame = visuFrame(m_ROI);
     }
 
-    m_out = objectPosition(m_binaryFrame, parameters.value(QStringLiteral("minArea")).toInt(), parameters.value(QStringLiteral("maxArea")).toInt());
+    m_out = objectPosition(m_binaryFrame, m_parameters.value(QStringLiteral("minArea")).toInt(), m_parameters.value(QStringLiteral("maxArea")).toInt());
 
     // Assigns an id and a counter at each object detected
     for (int i = 0; i < static_cast<int>(m_out[0].size()); i++) {
@@ -919,12 +915,12 @@ void Tracking::startProcess() {
       outputDb.transaction();
       QTextStream out(&parameterFile);
       out << "title = \"FastTrack cfg\"\"\n\n[parameters]\n";
-      QList<QString> keyList = parameters.keys();
+      QList<QString> keyList = m_parameters.keys();
       for (const auto &a : keyList) {
-        out << a << " = " << parameters.value(a) << Qt::endl;
+        out << a << " = " << m_parameters.value(a) << Qt::endl;
         query.prepare(QStringLiteral("INSERT INTO parameter (parameter, value) VALUES (?, ?)"));
         query.addBindValue(a);
-        query.addBindValue(parameters.value(a));
+        query.addBindValue(m_parameters.value(a));
         query.exec();
       }
       outputDb.commit();
@@ -986,9 +982,10 @@ void Tracking::startProcess() {
 void Tracking::updatingParameters(const QHash<QString, QString> &parameterList) {
   // Remarks:
   // normAngle is in deg for compatibility reason and need to be converted in rad when used.
-  parameters = parameterList;
-  m_ROI = Rect(parameters.value(QStringLiteral("xTop")).toInt(), parameters.value(QStringLiteral("yTop")).toInt(), parameters.value(QStringLiteral("xBottom")).toInt() - parameters.value(QStringLiteral("xTop")).toInt(), parameters.value(QStringLiteral("yBottom")).toInt() - parameters.value(QStringLiteral("yTop")).toInt());
-  statusBinarisation = (parameters.value(QStringLiteral("lightBack")) == QLatin1String("0")) ? true : false;
+  m_parameters = parameterList;
+  m_ROI = Rect(m_parameters.value(QStringLiteral("xTop")).toInt(), m_parameters.value(QStringLiteral("yTop")).toInt(), m_parameters.value(QStringLiteral("xBottom")).toInt() - m_parameters.value(QStringLiteral("xTop")).toInt(), m_parameters.value(QStringLiteral("yBottom")).toInt() - m_parameters.value(QStringLiteral("yTop")).toInt());
+  m_statusBinarisation = (m_parameters.value(QStringLiteral("lightBack")) == QLatin1String("0")) ? true : false;
+  m_isMorph = m_parameters.value(QStringLiteral("morphSize")).toInt() != 0 && m_parameters.value(QStringLiteral("morph")).toInt() != 8;
 }
 
 /**

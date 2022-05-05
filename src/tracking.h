@@ -33,6 +33,7 @@ This file is part of Fast Track.
 #include <QObject>
 #include <QProgressBar>
 #include <QRandomGenerator>
+#include <QSharedPointer>
 #include <QSqlDatabase>
 #include <QSqlQuery>
 #include <QString>
@@ -62,9 +63,9 @@ using namespace std;
 class Tracking : public QObject {
   Q_OBJECT
 
-  QElapsedTimer *timer; /*!< Timer that measured the time during the analysis execution. */
+  QSharedPointer<QElapsedTimer> m_timer; /*!< Timer that measured the time during the analysis execution. */
 
-  bool statusBinarisation; /*!< True if wite objects on dark background, flase otherwise. */
+  bool m_statusBinarisation; /*!< True if wite objects on dark background, flase otherwise. */
 
   string m_path;           /*!< Path to an image sequence. */
   string m_backgroundPath; /*!< Path to an image background. */
@@ -83,7 +84,8 @@ class Tracking : public QObject {
   vector<int> m_id;           /*!< Vector containing the objets Id. */
   vector<int> m_lost;         /*!< Vector containing the lost objects. */
   int m_idMax;
-  QHash<QString, QString> parameters; /*!< map of all the parameters for the tracking. */
+  bool m_isMorph;                       /*!< Is morphological application selected. */
+  QHash<QString, QString> m_parameters; /*!< map of all the parameters for the tracking. */
 
  public:
   explicit Tracking(QWidget *parent = nullptr) : QObject(parent){};
