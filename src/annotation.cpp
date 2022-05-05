@@ -82,7 +82,7 @@ Annotation::Annotation(const QString &filePath) : Annotation() {
 /**
  * @brief Constructs the annotation object from a file path.
  */
-Annotation::Annotation(QWidget *parent) : annotationFile{new QFile()}, annotations{new QMap<int, QString>()}, findIndex{-1}, isActive{false} {
+Annotation::Annotation(QWidget *parent) : annotationFile{new QFile()}, annotations{new QHash<int, QString>()}, findIndex{-1}, isActive{false} {
 }
 
 /**
@@ -94,7 +94,7 @@ void Annotation::writeToFile() {
   }
 
   QTextStream out(annotationFile);
-  QMapIterator<int, QString> i(*annotations);
+  QHashIterator<int, QString> i(*annotations);
   while (i.hasNext()) {
     i.next();
     out << i.key() << "\t\n\t" << i.value() << "\n\t\n";
@@ -103,7 +103,7 @@ void Annotation::writeToFile() {
 }
 
 /**
- * @brief Adds an annotation to the annotation QMap.
+ * @brief Adds an annotation to the annotation QHash.
  * @param[in] index Image index.
  * @param[in] text Annotation text.
  */
@@ -115,7 +115,7 @@ void Annotation::write(int index, const QString &text) {
 }
 
 /**
- * @brief Reads an annotation from the annotation QMap.
+ * @brief Reads an annotation from the annotation QHash.
  * @param[in] index Image index.
  */
 void Annotation::read(int index) {
@@ -131,7 +131,7 @@ void Annotation::read(int index) {
  */
 void Annotation::find(const QString &expression) {
   findIndexes.clear();
-  QMapIterator<int, QString> i(*annotations);
+  QHashIterator<int, QString> i(*annotations);
   while (i.hasNext()) {
     i.next();
     if (i.value().contains(expression)) {

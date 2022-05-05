@@ -30,7 +30,6 @@ This file is part of Fast Track.
 #include <QFileInfo>
 #include <QHash>
 #include <QList>
-#include <QMap>
 #include <QObject>
 #include <QProgressBar>
 #include <QRandomGenerator>
@@ -84,7 +83,7 @@ class Tracking : public QObject {
   vector<int> m_id;           /*!< Vector containing the objets Id. */
   vector<int> m_lost;         /*!< Vector containing the lost objects. */
   int m_idMax;
-  QMap<QString, QString> parameters; /*!< map of all the parameters for the tracking. */
+  QHash<QString, QString> parameters; /*!< map of all the parameters for the tracking. */
 
  public:
   explicit Tracking(QWidget *parent = nullptr) : QObject(parent){};
@@ -122,7 +121,7 @@ class Tracking : public QObject {
 
  public slots:
   virtual void startProcess();
-  void updatingParameters(const QMap<QString, QString> &);
+  void updatingParameters(const QHash<QString, QString> &);
   virtual void imageProcessing();
 
  signals:

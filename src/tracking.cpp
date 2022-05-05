@@ -983,7 +983,7 @@ void Tracking::startProcess() {
  * @brief Updates the private members from the external parameters. This function links the tracking logic with the graphical user interface.
  * @param[in] parameterList The list of all the parameters used in the tracking.
  */
-void Tracking::updatingParameters(const QMap<QString, QString> &parameterList) {
+void Tracking::updatingParameters(const QHash<QString, QString> &parameterList) {
   // Remarks:
   // normAngle is in deg for compatibility reason and need to be converted in rad when used.
   parameters = parameterList;

@@ -23,8 +23,8 @@ This file is part of Fast Track.
 #include <QDir>
 #include <QFile>
 #include <QFileDialog>
+#include <QHash>
 #include <QHeaderView>
-#include <QMap>
 #include <QStandardPaths>
 #include <QWidget>
 
@@ -48,9 +48,9 @@ class TrackingManager : public QWidget {
   Ui::TrackingManager *ui;
 
  public slots:
-  void addLogEntry(QMap<QString, QString> log);
-  void appendToFile(const QString &path, const QMap<QString, QString> &line);
-  void writeToFile(const QString &path, const QList<QMap<QString, QString>> &lines);
+  void addLogEntry(QHash<QString, QString> log);
+  void appendToFile(const QString &path, const QHash<QString, QString> &line);
+  void writeToFile(const QString &path, const QList<QHash<QString, QString>> &lines);
   void readFromFile(const QString &path);
 };
 

@@ -37,7 +37,6 @@ This file is part of Fast Track.
 #include <QLayout>
 #include <QLineEdit>
 #include <QMainWindow>
-#include <QMap>
 #include <QMessageBox>
 #include <QMouseEvent>
 #include <QProgressBar>

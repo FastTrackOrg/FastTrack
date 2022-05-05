@@ -11,6 +11,7 @@
 #include <QFile>
 #include <QFileDialog>
 #include <QFileInfo>
+#include <QHash>
 #include <QImage>
 #include <QKeySequence>
 #include <QLCDNumber>
@@ -19,7 +20,6 @@
 #include <QLineEdit>
 #include <QListView>
 #include <QMainWindow>
-#include <QMap>
 #include <QMessageBox>
 #include <QProgressBar>
 #include <QPushButton>
@@ -60,8 +60,8 @@ class Batch : public QWidget {
   ~Batch();
 
  private:
-  Ui::Batch *ui;                        /*!< ui file from Qt designer. */
-  QMap<QString, QString> parameterList; /*!< All the parameters necessary for the tracking analysis. */
+  Ui::Batch *ui;                         /*!< ui file from Qt designer. */
+  QHash<QString, QString> parameterList; /*!< All the parameters necessary for the tracking analysis. */
 
   QThread *thread;    /*!< Thread where lives the Tracking object. */
   Tracking *tracking; /*!< Objects that track images sequence. */
@@ -75,7 +75,7 @@ class Batch : public QWidget {
   {
     QString path;
     QString backgroundPath;
-    QMap<QString, QString> trackingParameters;
+    QHash<QString, QString> trackingParameters;
   };
   QList<process> processList;
 
@@ -106,13 +106,13 @@ class Batch : public QWidget {
    * @brief Emitted when a parameter is changed.
    * @param parameterList All parameters necessary to the tracking analysis.
    */
-  void newParameterList(const QMap<QString, QString> &parameterList);
+  void newParameterList(const QHash<QString, QString> &parameterList);
 
   /**
    * @brief Emitted when a tracking analysis is finished.
    */
   void next();
-  void log(QMap<QString, QString> log);
+  void log(QHash<QString, QString> log);
   void status(QString messsage);
 };
 

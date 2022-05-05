@@ -1,7 +1,6 @@
 #include <QDir>
 #include <QFile>
 #include <QHash>
-#include <QMap>
 #include <string>
 #include "../src/autolevel.cpp"
 #include "../src/tracking.cpp"
@@ -499,7 +498,7 @@ TEST_F(TrackingTest, InformationOrientation) {
 
 TEST_F(TrackingTest, costFunction) {
   Tracking tracking("", "");
-  QMap<QString, QString> params;
+  QHash<QString, QString> params;
   params["Spot to track"] = "0";
   tracking.updatingParameters(params);
 
@@ -779,7 +778,7 @@ TEST_F(VideoReaderTest, CountVideo) {
 TEST_F(AutoLevelTest, AutoLevel) {
   UMat background;
   imread("../dataSet/images/Groundtruth/Tracking_Result/background.pgm", IMREAD_GRAYSCALE).copyTo(background);
-  QMap<QString, QString> parameters;
+  QHash<QString, QString> parameters;
   parameters.insert("methBack", "1");
   parameters.insert("regBack", "0");
   parameters.insert("thresh", "60");
@@ -804,7 +803,7 @@ TEST_F(AutoLevelTest, AutoLevel) {
   parameters.insert("normPerim", "0");
 
   AutoLevel autolevel("../dataSet/images/frame_000001.pgm", background, parameters);
-  QMap<QString, double> test = autolevel.level();
+  QHash<QString, double> test = autolevel.level();
   EXPECT_EQ(std::lround(test.value("normArea")), 10);
   EXPECT_EQ(std::lround(test.value("normPerim")), 8);
   EXPECT_EQ(std::lround(test.value("normAngle")), 20);

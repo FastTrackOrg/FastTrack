@@ -39,7 +39,7 @@ This file is part of Fast Track.
  * @param[in] path Path to the movie to track.
  * @param[in] background Background image.
  */
-AutoLevel::AutoLevel(const string &path, const UMat &background, const QMap<QString, QString> &parameters) : m_path{path}, m_background{background}, m_parameters{parameters}, m_endImage{200} {
+AutoLevel::AutoLevel(const string &path, const UMat &background, const QHash<QString, QString> &parameters) : m_path{path}, m_background{background}, m_parameters{parameters}, m_endImage{200} {
   // Save precedent analysis if exist
   VideoReader video(m_path);
   if (!video.open()) {
@@ -62,7 +62,7 @@ AutoLevel::AutoLevel(const string &path, const UMat &background, const QMap<QStr
  * @brief Levels the tracking parameters.
  * @return Map containing the levelled parameters.
  */
-QMap<QString, double> AutoLevel::level() {
+QHash<QString, double> AutoLevel::level() {
   try {
     srand(static_cast<unsigned int>(time(NULL)));
     double stdAngle = static_cast<double>(rand() % 360 + 1);
@@ -102,7 +102,7 @@ QMap<QString, double> AutoLevel::level() {
         throw std::runtime_error("Level not converging");
       }
     }
-    QMap<QString, double> levelParameters;
+    QHash<QString, double> levelParameters;
     levelParameters.insert(QStringLiteral("normAngle"), stdAngle);
     levelParameters.insert(QStringLiteral("normDist"), stdDist);
     levelParameters.insert(QStringLiteral("normArea"), stdArea);
@@ -114,7 +114,7 @@ QMap<QString, double> AutoLevel::level() {
   }
   catch (const std::exception &e) {
     emit forceFinished(QString::fromStdString(e.what()));
-    QMap<QString, double> levelParameters;
+    QHash<QString, double> levelParameters;
     return levelParameters;
   }
 }

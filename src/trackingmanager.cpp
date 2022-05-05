@@ -72,9 +72,9 @@ TrackingManager::~TrackingManager() {
 
 /**
  * @brief Adds a log entry inside the ui table and in a log file.
- * @param[in] log QMap that contains the log entry.
+ * @param[in] log QHash that contains the log entry.
  */
-void TrackingManager::addLogEntry(QMap<QString, QString> log) {
+void TrackingManager::addLogEntry(QHash<QString, QString> log) {
   ui->logTable->insertRow(0);
   ui->logTable->setItem(0, 0, new QTableWidgetItem(log[QStringLiteral("date")]));
   ui->logTable->setItem(0, 1, new QTableWidgetItem(log[QStringLiteral("path")]));
@@ -86,9 +86,9 @@ void TrackingManager::addLogEntry(QMap<QString, QString> log) {
 /**
  * @brief Appends the log entry in a file.
  * @param[in] path QString that contains the path to the output file.
- * @param[in] line QMap that contains the log entry.
+ * @param[in] line QHash that contains the log entry.
  */
-void TrackingManager::appendToFile(const QString &path, const QMap<QString, QString> &line) {
+void TrackingManager::appendToFile(const QString &path, const QHash<QString, QString> &line) {
   QFile file(path);
   if (file.open(QIODevice::Append)) {
     QDataStream out(&file);
@@ -99,9 +99,9 @@ void TrackingManager::appendToFile(const QString &path, const QMap<QString, QStr
 /**
  * @brief Writes log entries in a file.
  * @param[in] path QString that contains the path to the output file.
- * @param[in] lines QList ofQMap that contains log entries.
+ * @param[in] lines QList ofQHash that contains log entries.
  */
-void TrackingManager::writeToFile(const QString &path, const QList<QMap<QString, QString>> &lines) {
+void TrackingManager::writeToFile(const QString &path, const QList<QHash<QString, QString>> &lines) {
   QFile file(path);
   if (file.open(QIODevice::WriteOnly)) {
     QDataStream out(&file);
@@ -119,7 +119,7 @@ void TrackingManager::readFromFile(const QString &path) {
   QFile file(path);
   if (file.open(QIODevice::ReadOnly)) {
     QDataStream in(&file);
-    QMap<QString, QString> log;
+    QHash<QString, QString> log;
     in >> log;
     while (in.status() == QDataStream::Ok) {
       ui->logTable->insertRow(0);

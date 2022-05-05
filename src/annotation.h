@@ -4,8 +4,8 @@
 #include <QDebug>
 #include <QDir>
 #include <QFile>
-#include <QMap>
-#include <QMapIterator>
+#include <QHash>
+#include <QHashIterator>
 #include <QMessageBox>
 #include <QString>
 #include <QTextStream>
@@ -17,7 +17,7 @@ class Annotation : public QWidget {
 
  private:
   QFile *annotationFile;
-  QMap<int, QString> *annotations;
+  QHash<int, QString> *annotations;
   void writeToFile();
   QList<int> findIndexes;
   qsizetype findIndex;

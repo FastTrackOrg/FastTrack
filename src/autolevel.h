@@ -18,7 +18,6 @@ This file is part of Fast Track.
 #define AUTOLEVEL_H
 
 #include <QHash>
-#include <QMap>
 #include <algorithm>
 #include <functional>
 #include <opencv2/core/types.hpp>
@@ -32,12 +31,12 @@ using namespace std;
 class AutoLevel : public QObject {
   Q_OBJECT
 
-  QString m_savedPath;                 /*!< Old tracking analysis */
-  string m_path;                       /*!< Path to video file/image sequence. */
-  QString m_spotSuffix;                /*!< Spot to track. */
-  UMat m_background;                   /*!< Path to video file/image sequence. */
-  QMap<QString, QString> m_parameters; /*!< Optimal ending image index. */
-  int m_endImage;                      /*!< Optimal ending image index. */
+  QString m_savedPath;                  /*!< Old tracking analysis */
+  string m_path;                        /*!< Path to video file/image sequence. */
+  QString m_spotSuffix;                 /*!< Spot to track. */
+  UMat m_background;                    /*!< Path to video file/image sequence. */
+  QHash<QString, QString> m_parameters; /*!< Optimal ending image index. */
+  int m_endImage;                       /*!< Optimal ending image index. */
 
   double computeStdAngle(const Data &data);
   double computeStdDistance(const Data &data);
@@ -47,7 +46,7 @@ class AutoLevel : public QObject {
  public:
   explicit AutoLevel(QWidget *parent = nullptr) : QObject(parent){};
   ~AutoLevel();
-  AutoLevel(const string &path, const UMat &background, const QMap<QString, QString> &parameters);
+  AutoLevel(const string &path, const UMat &background, const QHash<QString, QString> &parameters);
   AutoLevel(const AutoLevel &T) = delete;
   AutoLevel &operator=(const AutoLevel &T) = delete;
   AutoLevel &operator=(AutoLevel &&T) = delete;
@@ -55,11 +54,11 @@ class AutoLevel : public QObject {
   static double stdev(const QList<double> &vect);
 
  public slots:
-  QMap<QString, double> level();
+  QHash<QString, double> level();
 
  signals:
   void forceFinished(QString message);
-  void levelParametersChanged(QMap<QString, double>);
+  void levelParametersChanged(QHash<QString, double>);
   void finished();
 };
 

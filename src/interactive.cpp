@@ -52,7 +52,7 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   restoreState(settingsFile->value(QStringLiteral("windowState")).toByteArray());
 
   // MetaType
-  qRegisterMetaType<QMap<QString, double>>("QMap<QString, double>");
+  qRegisterMetaType<QHash<QString, double>>("QHash<QString, double>");
 
   // DockWidget
   connect(ui->imageOptions, &QDockWidget::dockLocationChanged, this, [this](Qt::DockWidgetArea area) {
@@ -929,7 +929,7 @@ void Interactive::track() {
 
     QThread *thread = new QThread;
     Tracking *tracking = new Tracking(memoryDir.toStdString(), background);
-    QSharedPointer<QMap<QString, QString>> logMap(new QMap<QString, QString>);
+    QSharedPointer<QHash<QString, QString>> logMap(new QHash<QString, QString>);
     logMap->insert(QStringLiteral("date"), QDateTime::currentDateTime().toString());
     logMap->insert(QStringLiteral("path"), dir);
     tracking->moveToThread(thread);
@@ -1183,7 +1183,7 @@ void Interactive::level() {
       connect(autolevel, &AutoLevel::finished, this, [this]() {
         this->setEnabled(true);
       });
-      connect(autolevel, &AutoLevel::levelParametersChanged, this, [this](const QMap<QString, double> &levelParameters) {
+      connect(autolevel, &AutoLevel::levelParametersChanged, this, [this](const QHash<QString, double> &levelParameters) {
         ui->maxT->setValue(levelParameters.value(QStringLiteral("normAngle")));
         ui->maxL->setValue(levelParameters.value(QStringLiteral("normDist")));
         ui->normArea->setValue(levelParameters.value(QStringLiteral("normArea")));
@@ -1216,7 +1216,7 @@ void Interactive::loadParameters(const QString &path) {
     QTextStream in(&parameterFile);
     QString line;
     QStringList parameters;
-    QMap<QString, QString> parameterList;
+    QHash<QString, QString> parameterList;
     while (in.readLineInto(&line)) {
       if (line.contains(QLatin1String("="))) {
         parameters = line.split(QStringLiteral("="), Qt::SkipEmptyParts);

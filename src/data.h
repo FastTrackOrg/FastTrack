@@ -6,8 +6,7 @@
 #include <QDir>
 #include <QFile>
 #include <QHash>
-#include <QMap>
-#include <QMapIterator>
+#include <QHashIterator>
 #include <QMessageBox>
 #include <QRandomGenerator>
 #include <QSqlDatabase>

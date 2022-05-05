@@ -57,7 +57,7 @@ Batch::Batch(QWidget *parent) : QWidget(parent),
 
   // Registers QMetaType
   qRegisterMetaType<UMat>("UMat&");
-  qRegisterMetaType<QMap<QString, QString>>("QMap<QString, QString>");
+  qRegisterMetaType<QHash<QString, QString>>("QHash<QString, QString>");
 
   // Unactivates OpenCl that can slow-down the program
   cv::ocl::setUseOpenCL(false);
@@ -417,7 +417,7 @@ void Batch::startTracking() {
 
       thread = new QThread;
       tracking = new Tracking(path, backgroundPath);
-      QSharedPointer<QMap<QString, QString>> logMap(new QMap<QString, QString>);
+      QSharedPointer<QHash<QString, QString>> logMap(new QHash<QString, QString>);
       logMap->insert(QStringLiteral("date"), QDateTime::currentDateTime().toString());
       logMap->insert(QStringLiteral("path"), QString::fromStdString(path));
       tracking->moveToThread(thread);
@@ -476,7 +476,7 @@ void Batch::startTracking() {
 \*******************************************************************************************/
 
 /**
- * @brief Updates the parameterList vector with the new parameter when users changes a parameter in the QTableWidget of parameters. Triggered when ui->tableParameters is modified. Emits the updated parameters QMap.
+ * @brief Updates the parameterList vector with the new parameter when users changes a parameter in the QTableWidget of parameters. Triggered when ui->tableParameters is modified. Emits the updated parameters QHash.
  * @param[in] item QTableWidgetItem from a QTableWidget.
  */
 void Batch::updateParameters() {
@@ -564,7 +564,7 @@ bool Batch::loadParameterFile(const QString &path) {
 }
 
 /**
- * @brief Takes the QMap parameterList and updates the parameters panel table..
+ * @brief Takes the QHash parameterList and updates the parameters panel table..
  */
 void Batch::updateParameterTable() {
   isEditable = false;

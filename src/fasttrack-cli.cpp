@@ -19,8 +19,8 @@ This file is part of Fast Track.
 #include <stdio.h>
 #include <stdlib.h>
 #include <tracking.h>
-#include <QMap>
-#include <QMapIterator>
+#include <QHash>
+#include <QHashIterator>
 #include <QObject>
 #include <QString>
 #include <QStringList>
@@ -28,7 +28,7 @@ This file is part of Fast Track.
 
 using namespace std;
 
-void loadConfig(const QString &path, QMap<QString, QString> &parameters) {
+void loadConfig(const QString &path, QHash<QString, QString> &parameters) {
   QFile parameterFile(path);
   if (parameterFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
     QTextStream in(&parameterFile);
@@ -135,7 +135,7 @@ int main(int argc, char **argv) {
 
   int option_index = 0;
   int c;
-  QMap<QString, QString> parameters;
+  QHash<QString, QString> parameters;
   while (1) {
     c = getopt_long(argc, argv, "a:b:c:d:e:f:g:h:i:j:k:l:m:n:o:p:q:r:s:t:u:v:w:x:y:z:A", long_options, &option_index);
 
@@ -233,7 +233,7 @@ int main(int argc, char **argv) {
     }
   }
 
-  QMapIterator<QString, QString> i(parameters);
+  QHashIterator<QString, QString> i(parameters);
   while (i.hasNext()) {
     i.next();
     cout << i.key().toStdString() << " set to: " << i.value().toStdString() << endl;

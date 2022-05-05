@@ -33,8 +33,8 @@ This file is part of Fast Track.
 #include <QFileDialog>
 #include <QFuture>
 #include <QFutureWatcher>
+#include <QHash>
 #include <QMainWindow>
-#include <QMap>
 #include <QMessageBox>
 #include <QMetaType>
 #include <QNetworkAccessManager>
@@ -112,17 +112,17 @@ class Interactive : public QMainWindow {
   Ui::Interactive *ui;
   QLabel *counterLabel;
   QAction *replayAction;
-  QString memoryDir;                 /*!< Saves the path to the last opened folder in dialog. */
-  QSize resizedFrame;                /*!< Size of the resized image in the display QWidget. */
-  QSize originalImageSize;           /*!< Size of the original image. */
-  QSize cropedImageSize;             /*!< Size of the croped image. */
-  QMap<QString, QString> parameters; /*!< Tracking parameters. */
-  QString path;                      /*!< */
-  QString backgroundPath;            /*!< Path to the background image. */
-  QString dir;                       /*!< Path to the folder where the image sequence to display is stored. */
-  Tracking *tracking;                /*!< Tracking object. */
-  UMat background;                   /*!< Background image. */
-  bool isBackground;                 /*!< Is the background computed. */
+  QString memoryDir;                  /*!< Saves the path to the last opened folder in dialog. */
+  QSize resizedFrame;                 /*!< Size of the resized image in the display QWidget. */
+  QSize originalImageSize;            /*!< Size of the original image. */
+  QSize cropedImageSize;              /*!< Size of the croped image. */
+  QHash<QString, QString> parameters; /*!< Tracking parameters. */
+  QString path;                       /*!< */
+  QString backgroundPath;             /*!< Path to the background image. */
+  QString dir;                        /*!< Path to the folder where the image sequence to display is stored. */
+  Tracking *tracking;                 /*!< Tracking object. */
+  UMat background;                    /*!< Background image. */
+  bool isBackground;                  /*!< Is the background computed. */
   QPair<QPoint, QPoint> clicks;
   QPointF panReferenceClick;
   QPointF zoomReferencePosition;
@@ -142,7 +142,7 @@ class Interactive : public QMainWindow {
 
  signals:
   void message(QString message);
-  void log(QMap<QString, QString> log);
+  void log(QHash<QString, QString> log);
   void status(QString messsage);
   void modeChanged(bool isSimple);
 };
