@@ -124,10 +124,23 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
     }
   });
 
-  // Stay on the same frame when changing tab
   connect(ui->interactiveTab, &QTabWidget::currentChanged, this, [this](int index) {
-    ui->slider->setValue(ui->slider->value());
-    if (index == 2) {
+    ui->slider->setValue(ui->slider->value());  // Stay on the same frame when changing tab
+    if (index == 0) {                           // Interactive tracking
+      ui->imageOptions->setVisible(true);
+      ui->trackingOptions->setVisible(true);
+      ui->controlOptions->setVisible(true);
+    }
+    else if (index == 1) {  // Replay tab
+      ui->imageOptions->setVisible(false);
+      ui->trackingOptions->setVisible(false);
+      ui->controlOptions->setVisible(true);
+      analysis->reload();
+    }
+    else if (index == 2) {  // Analysis tab
+      ui->imageOptions->setVisible(false);
+      ui->trackingOptions->setVisible(false);
+      ui->controlOptions->setVisible(false);
       analysis->reload();
     }
   });
@@ -514,6 +527,7 @@ void Interactive::openFolder() {
       ui->slider->setMaximum(static_cast<int>(video->getImageCount()) - 1);
       ui->previewButton->setDisabled(true);
       ui->trackButton->setDisabled(true);
+      ui->trackingStatus->setText(QStringLiteral("Compute the background to continue"));
       ui->nBack->setMaximum(static_cast<int>(video->getImageCount()));
       ui->nBack->setValue(static_cast<int>(video->getImageCount()));
       ui->startImage->setRange(0, static_cast<int>(video->getImageCount()) - 1);
@@ -759,6 +773,7 @@ void Interactive::computeBackground() {
         ui->trackButton->setDisabled(false);
         ui->backgroundStatus->setText(QStringLiteral("Using COMPUTED background"));
         ui->backgroundStatus->setStyleSheet(QStringLiteral("background: green; color: white;"));
+        ui->trackingStatus->setText(QStringLiteral());
         display(background, QImage::Format_Grayscale8);
       }
       else {
@@ -814,6 +829,7 @@ void Interactive::selectBackground() {
       ui->trackButton->setDisabled(false);
       ui->backgroundStatus->setText(QStringLiteral("Using %1 as background").arg(dir));
       ui->backgroundStatus->setStyleSheet(QStringLiteral("background: green; color: white;"));
+      ui->trackingStatus->setText(QStringLiteral());
 
       // Automatic background type selection based on image mean
       int meanValue = int(mean(background)[0]);
@@ -1149,6 +1165,7 @@ void Interactive::reset() {
  * @brief Destructors.
  */
 Interactive::~Interactive() {
+  ui->interactiveTab->setCurrentIndex(0);
   saveSettings();
   delete video;
   delete ui;
