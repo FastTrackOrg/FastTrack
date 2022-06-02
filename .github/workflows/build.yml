@@ -34,21 +34,27 @@ jobs:
       - name: build_ft
         run: |
           ./run.sh ci
-          make clean
       - name: build_appimage
         run: |
+          cd build
           wget -O deploy.AppImage https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage
-          chmod +x deploy.AppImage
-          cp sh.fasttrack.fasttrack.desktop build/
-          cp src/assets/fasttrack.png build/
+          mkdir appdir
+          cp ../sh.fasttrack.fasttrack.desktop appdir
+          cp ../src/assets/fasttrack.png appdir
+          cp fasttrack appdir
           export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${{ github.workspace }}/Qt/${{ env.QT_VERSION }}/gcc_64/lib/
-          ./deploy.AppImage build/fasttrack -appimage -no-translations -bundle-non-qt-libs -unsupported-allow-new-glibc -qmake=${{ github.workspace }}/Qt/${{ env.QT_VERSION }}/gcc_64/bin/qmake6 -extra-plugins=platforms/,sqldrivers/ -exclude-libs=libgmodule-2.0.so
-          mv FastTrack*.AppImage FastTrack-x86_64.AppImage
+          chmod +x deploy.AppImage
+          ./deploy.AppImage appdir/fasttrack -bundle-non-qt-libs -unsupported-allow-new-glibc -qmake=${{ github.workspace }}/Qt/${{ env.QT_VERSION }}/gcc_64/bin/qmake6 -extra-plugins=platforms/,sqldrivers/ -exclude-libs=libgmodule-2.0.so
+          mkdir -p appdir/usr/share/fasttrack/
+          cp *.qm appdir/usr/share/fasttrack
+          wget -O tool.AppImage https://github.com/AppImage/AppImageKit/releases/download/13/appimagetool-x86_64.AppImage
+          chmod +x tool.AppImage
+          ./tool.AppImage appdir/
       - name: upload_artefact
         uses: actions/upload-artifact@v2
         with:
           name: FastTrack-x86_64.AppImage
-          path: ./FastTrack-x86_64.AppImage
+          path: ./build/FastTrack-x86_64.AppImage
 
   build_win:
     runs-on: windows-latest
@@ -75,18 +81,20 @@ jobs:
           cd src/
           qmake FastTrack.pro -spec win32-g++ CONFIG+=release
           mingw32-make
-          mingw32-make clean
           cd build/
-          windeployqt FastTrack.exe --release
-          cp ..\assets\icon.ico .
-          cp ${{ github.workspace }}/Qt/Tools/mingw*/bin/libgomp-1.dll .
-          cp ${{ github.workspace }}/OpenCV_MinGW_64/bin/opencv_videoio_ffmpeg455_64.dll .
-          cp ${{ github.workspace }}/OpenCV_MinGW_64/bin/libopencv_world455.dll .
+          mkdir FastTrack
+          cp FastTrack.exe FastTrack
+          windeployqt FastTrack/FastTrack.exe --release
+          cp ..\assets\icon.ico FastTrack
+          cp ${{ github.workspace }}/Qt/Tools/mingw*/bin/libgomp-1.dll FastTrack
+          cp ${{ github.workspace }}/OpenCV_MinGW_64/bin/opencv_videoio_ffmpeg455_64.dll FastTrack
+          cp ${{ github.workspace }}/OpenCV_MinGW_64/bin/libopencv_world455.dll FastTrack
+          cp *.qm FastTrack
       - name: upload_artefact
         uses: actions/upload-artifact@v1
         with:
           name: FastTrack
-          path: src/build/
+          path: src/build/FastTrack
 
   build_mac:
     runs-on: macos-10.15
@@ -119,6 +127,7 @@ jobs:
           cd build/
           macdeployqt FastTrack.app -always-overwrite
           wget https://raw.githubusercontent.com/arl/macdeployqtfix/master/macdeployqtfix.py
+          cp *.qm FastTrack.app/Contents/Resources/
           cp /usr/local/opt/gcc/lib/gcc/11/libgcc_s.1.1.dylib FastTrack.app/Contents/Frameworks/ ## See workaround header
           python2.7 macdeployqtfix.py FastTrack.app/Contents/MacOS/FastTrack ../../Qt/${{ env.QT_VERSION }}/
           hdiutil create -volname FastTrack -srcfolder FastTrack.app -ov -format UDZO FastTrack.dmg

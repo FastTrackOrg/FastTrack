@@ -41,8 +41,6 @@ if [ "$1" = "ci" ]; then
   set -e
   qmake6 CONFIG+=release src/FastTrack.pro
   make
-  make clean
-  cd build
 fi
 
 if [ "$1" = "cli" ]; then

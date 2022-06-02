@@ -11,10 +11,18 @@ MOC_DIR=build
 UI_DIR=build
 RCC_DIR=build
 
+TRANSLATIONS = \
+            ../translations/fasttrack_en.ts
+qtPrepareTool(LRELEASE, lrelease)
+updateqm.input = TRANSLATIONS
+updateqm.output = ${QMAKE_VAR_OBJECTS_DIR}/${QMAKE_FILE_BASE}.qm
+updateqm.commands = $$LRELEASE -silent ${QMAKE_FILE_IN} -qm ${QMAKE_FILE_OUT}
+updateqm.CONFIG += no_link target_predeps
+QMAKE_EXTRA_COMPILERS += updateqm
 
 unix:!macx {
   TARGET = fasttrack
-  
+
   QMAKE_CXXFLAGS += -std=c++17 -O3 -fopenmp
   QMAKE_CXXFLAGS_RELEASE -= -O1
   QMAKE_CXXFLAGS_RELEASE -= -O2
@@ -38,6 +46,7 @@ unix:!macx {
   icon.files = src/assets/fasttrack.png
   license.path = /usr/share/licenses/fasttrack/
   license.files = LICENSE
+  translation.files = $$DESTDIR/fasttrack_en.qm
   INSTALLS += target desktop metainfo icon license
 }
 
@@ -86,8 +95,8 @@ SOURCES += \
         annotation.cpp \
         trackingmanager.cpp \
         videoreader.cpp \
-        timeline.cpp \ 
-        autolevel.cpp \ 
+        timeline.cpp \
+        autolevel.cpp \
 
 
 HEADERS += \
@@ -103,8 +112,8 @@ HEADERS += \
         annotation.h \
         trackingmanager.h\
         videoreader.h \
-        timeline.h \ 
-        autolevel.h \ 
+        timeline.h \
+        autolevel.h \
 
 
 FORMS += \
@@ -112,12 +121,9 @@ FORMS += \
         replay.ui \
         statanalysis.ui \
         trackingmanager.ui \
-        batch.ui \ 
-        interactive.ui \ 
-        timeline.ui \ 
+        batch.ui \
+        interactive.ui \
+        timeline.ui \
 
 RESOURCES += resources.qrc \
         assets/theme.qrc
-
-QT += widgets
-
