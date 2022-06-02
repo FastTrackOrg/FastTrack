@@ -710,12 +710,12 @@ bool Replay::eventFilter(QObject* target, QEvent* event) {
     if (event->type() == QEvent::MouseButtonPress) {
       QMouseEvent* mouseEvent = dynamic_cast<QMouseEvent*>(event);
       if (mouseEvent->buttons() == Qt::MiddleButton) {
-        qApp->setOverrideCursor(Qt::ClosedHandCursor);
+        QApplication::setOverrideCursor(Qt::ClosedHandCursor);
         panReferenceClick = mouseEvent->position();
       }
     }
     if (event->type() == QEvent::MouseButtonRelease) {
-      qApp->restoreOverrideCursor();
+      QApplication::restoreOverrideCursor();
     }
   }
   return QWidget::eventFilter(target, event);

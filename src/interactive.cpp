@@ -155,7 +155,7 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
     QAction *styleAction = new QAction(a, this);
     styleAction->setCheckable(true);
     connect(styleAction, &QAction::triggered, this, [this, styleAction, menuStyle]() {
-      qApp->setStyle(QStyleFactory::create(styleAction->text()));
+      QApplication::setStyle(QStyleFactory::create(styleAction->text()));
       style = styleAction->text();
       foreach (QAction *action, menuStyle->actions()) {
         action->setChecked(false);
@@ -166,7 +166,7 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   }
 
   if (styles.contains(style)) {
-    qApp->setStyle(QStyleFactory::create(style));
+    QApplication::setStyle(QStyleFactory::create(style));
     foreach (QAction *action, menuStyle->actions()) {
       if (action->text() == style) {
         action->setChecked(true);
@@ -350,12 +350,12 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   });
   connect(ui->actionAbout, &QAction::triggered, this, []() {
     QMessageBox aboutBox;
-    aboutBox.setText(tr("FastTrack version %1 is a desktop tracking software, easy to install, easy to use, and performant.<br>Created and maintained by Benjamin Gallois.<br>Distributed under the terms of the <a href='https://www.gnu.org/licenses/gpl-3.0'>GPL3.0 license</a>.<br>").arg(qApp->applicationVersion()));
+    aboutBox.setText(tr("FastTrack version %1 is a desktop tracking software, easy to install, easy to use, and performant.<br>Created and maintained by Benjamin Gallois.<br>Distributed under the terms of the <a href='https://www.gnu.org/licenses/gpl-3.0'>GPL3.0 license</a>.<br>").arg(QApplication::applicationVersion()));
     aboutBox.exec();
   });
   connect(ui->actionAboutQt, &QAction::triggered, qApp, &QApplication::aboutQt);
 
-  connect(this, &Interactive::message, this, [this](const QString &msg) {
+  connect(this, &Interactive::message, this, [](const QString &msg) {
     QMessageBox msgBox;
     msgBox.setIcon(QMessageBox::Critical);
     msgBox.setText(tr("Error"));
@@ -900,7 +900,7 @@ void Interactive::previewTracking() {
     connect(thread, &QThread::started, tracking, &Tracking::startProcess);
     connect(tracking, &Tracking::progress, ui->progressBar, &QProgressBar::setValue);
     connect(tracking, &Tracking::statistic, this, [this](int time) {
-        // Need to be changed for traduction
+      // Need to be changed for traduction
       ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems(QStringLiteral("Analysis rate"), Qt::MatchExactly).at(0)), 1)->setText(QString::number(double(ui->stopImage->value() * 1000) / double(time)));
     });
     connect(tracking, &Tracking::finished, this, [this]() {
@@ -1095,12 +1095,12 @@ bool Interactive::eventFilter(QObject *target, QEvent *event) {
     if (event->type() == QEvent::MouseButtonPress) {
       QMouseEvent *mouseEvent = dynamic_cast<QMouseEvent *>(event);
       if (mouseEvent->buttons() == Qt::MiddleButton) {
-        qApp->setOverrideCursor(Qt::ClosedHandCursor);
+        QApplication::setOverrideCursor(Qt::ClosedHandCursor);
         panReferenceClick = mouseEvent->position();
       }
     }
     if (event->type() == QEvent::MouseButtonRelease) {
-      qApp->restoreOverrideCursor();
+      QApplication::restoreOverrideCursor();
     }
   }
   return QWidget::eventFilter(target, event);
