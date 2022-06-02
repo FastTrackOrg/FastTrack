@@ -350,7 +350,7 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   });
   connect(ui->actionAbout, &QAction::triggered, this, []() {
     QMessageBox aboutBox;
-    aboutBox.setText(QStringLiteral("FastTrack version %1 is a desktop tracking software, easy to install, easy to use, and performant.<br>Created and maintained by Benjamin Gallois.<br>Distributed under the terms of the <a href='https://www.gnu.org/licenses/gpl-3.0'>GPL3.0 license</a>.<br>").arg(qApp->applicationVersion()));
+    aboutBox.setText(tr("FastTrack version %1 is a desktop tracking software, easy to install, easy to use, and performant.<br>Created and maintained by Benjamin Gallois.<br>Distributed under the terms of the <a href='https://www.gnu.org/licenses/gpl-3.0'>GPL3.0 license</a>.<br>").arg(qApp->applicationVersion()));
     aboutBox.exec();
   });
   connect(ui->actionAboutQt, &QAction::triggered, qApp, &QApplication::aboutQt);
@@ -358,7 +358,7 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   connect(this, &Interactive::message, this, [this](const QString &msg) {
     QMessageBox msgBox;
     msgBox.setIcon(QMessageBox::Critical);
-    msgBox.setText(QStringLiteral("Error"));
+    msgBox.setText(tr("Error"));
     msgBox.setInformativeText(msg);
     msgBox.exec();
   });
@@ -459,7 +459,7 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   connect(ui->previewButton, &QPushButton::clicked, this, &Interactive::previewTracking);
   connect(ui->trackButton, &QPushButton::clicked, this, [this]() {
     QMessageBox::StandardButton reply;
-    reply = QMessageBox::question(this, QStringLiteral("Confirmation"), QStringLiteral("You are going to start a full tracking analysis. That can take some time, are you sure?"), QMessageBox::Yes | QMessageBox::No);
+    reply = QMessageBox::question(this, tr("Confirmation"), tr("You are going to start a full tracking analysis. That can take some time, are you sure?"), QMessageBox::Yes | QMessageBox::No);
     if (reply == QMessageBox::Yes) {
       track();
     }
@@ -511,7 +511,7 @@ void Interactive::openFolder() {
   ui->isBin->setCheckable(false);
   ui->isSub->setCheckable(false);
   ui->isOriginal->setChecked(true);
-  ui->backgroundStatus->setText(QStringLiteral("No background selected"));
+  ui->backgroundStatus->setText(tr("No background selected"));
   ui->backgroundStatus->setStyleSheet(QStringLiteral("background: red; color: white;"));
 
   dir = QFileDialog::getOpenFileName(this, tr("Open File"), memoryDir);
@@ -527,7 +527,7 @@ void Interactive::openFolder() {
       ui->slider->setMaximum(static_cast<int>(video->getImageCount()) - 1);
       ui->previewButton->setDisabled(true);
       ui->trackButton->setDisabled(true);
-      ui->trackingStatus->setText(QStringLiteral("Compute the background to continue"));
+      ui->trackingStatus->setText(tr("Compute the background to continue"));
       ui->nBack->setMaximum(static_cast<int>(video->getImageCount()));
       ui->nBack->setValue(static_cast<int>(video->getImageCount()));
       ui->startImage->setRange(0, static_cast<int>(video->getImageCount()) - 1);
@@ -545,6 +545,7 @@ void Interactive::openFolder() {
       ui->x2->setMaximum(originalImageSize.width());
       ui->y2->setMaximum(originalImageSize.height());
 
+      // Need to be changed for traduction
       ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems(QStringLiteral("Path"), Qt::MatchExactly).at(0)), 1)->setText(dir);
       ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems(QStringLiteral("Image number"), Qt::MatchExactly).at(0)), 1)->setText(QString::number(video->getImageCount()));
       ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems(QStringLiteral("Image width"), Qt::MatchExactly).at(0)), 1)->setText(QString::number(frame.cols));
@@ -581,12 +582,13 @@ void Interactive::openFolder() {
     }
     // If an error occurs during the opening, resets the information table and warns the user
     catch (exception &e) {
+      // Need to be changed for traduction
       ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems(QStringLiteral("Path"), Qt::MatchExactly).at(0)), 1)->setText(QLatin1String(""));
       ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems(QStringLiteral("Image number"), Qt::MatchExactly).at(0)), 1)->setText(QStringLiteral("0"));
       ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems(QStringLiteral("Image width"), Qt::MatchExactly).at(0)), 1)->setText(QStringLiteral("0"));
       ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems(QStringLiteral("Image height"), Qt::MatchExactly).at(0)), 1)->setText(QStringLiteral("0"));
       qWarning() << QString::fromStdString(e.what()) << "occurs during opening of " << dir;
-      emit message(QStringLiteral("No image found."));
+      emit message(tr("No image found."));
     }
   }
   QApplication::restoreOverrideCursor();
@@ -631,7 +633,7 @@ void Interactive::display(int index, int scale) {
       // If too many contours are detected to be displayed without slowdowns, ask the user what to do
       if (contours.size() > 10000) {
         QMessageBox::StandardButton reply;
-        reply = QMessageBox::question(this, QStringLiteral("Confirmation"), QStringLiteral("Too many objects detected to be displayed. \n Do you want to display them anyway (the program can be slow)? "), QMessageBox::No | QMessageBox::Yes);
+        reply = QMessageBox::question(this, tr("Confirmation"), tr("Too many objects detected to be displayed. \n Do you want to display them anyway (the program can be slow)? "), QMessageBox::No | QMessageBox::Yes);
         if (reply == QMessageBox::No) {
           return;
         }
@@ -673,11 +675,11 @@ void Interactive::display(int index, int scale) {
   }
   catch (const std::exception &e) {
     qWarning() << QString::fromStdString(e.what()) << " occurs at image " << index << " display";
-    emit message(QString::fromStdString(e.what()) + QStringLiteral(" occurs on image %1.").arg(index));
+    emit message(QString::fromStdString(e.what()) + tr(" occurs on image %1.").arg(index));
   }
   catch (...) {
     qWarning() << "Unknown error occurs at image " << index << " display";
-    emit message(QStringLiteral("An error occurs on image %1.").arg(index));
+    emit message(tr("An error occurs on image %1.").arg(index));
   }
 }
 
@@ -771,7 +773,7 @@ void Interactive::computeBackground() {
         ui->interactiveTab->setCurrentIndex(0);
         ui->previewButton->setDisabled(false);
         ui->trackButton->setDisabled(false);
-        ui->backgroundStatus->setText(QStringLiteral("Using COMPUTED background"));
+        ui->backgroundStatus->setText(tr("Using COMPUTED background"));
         ui->backgroundStatus->setStyleSheet(QStringLiteral("background: green; color: white;"));
         ui->trackingStatus->setText(QStringLiteral());
         display(background, QImage::Format_Grayscale8);
@@ -803,7 +805,7 @@ void Interactive::computeBackground() {
       }
       catch (...) {
         qWarning() << "Unknown error occurs during background computation";
-        emit message(QStringLiteral("An error occurs. Please change the registration method"));
+        emit message(tr("An error occurs. Please change the registration method"));
       }
       return background;
     });
@@ -827,7 +829,7 @@ void Interactive::selectBackground() {
       ui->isSub->setCheckable(true);
       ui->previewButton->setDisabled(false);
       ui->trackButton->setDisabled(false);
-      ui->backgroundStatus->setText(QStringLiteral("Using %1 as background").arg(dir));
+      ui->backgroundStatus->setText(tr("Using %1 as background").arg(dir));
       ui->backgroundStatus->setStyleSheet(QStringLiteral("background: green; color: white;"));
       ui->trackingStatus->setText(QStringLiteral());
 
@@ -844,7 +846,7 @@ void Interactive::selectBackground() {
     }
     else {
       isBackground = false;
-      emit message(QStringLiteral("The width or height of the background image does not match the video width or height."));
+      emit message(tr("The width or height of the background image does not match the video width or height."));
     }
   }
 }
@@ -898,6 +900,7 @@ void Interactive::previewTracking() {
     connect(thread, &QThread::started, tracking, &Tracking::startProcess);
     connect(tracking, &Tracking::progress, ui->progressBar, &QProgressBar::setValue);
     connect(tracking, &Tracking::statistic, this, [this](int time) {
+        // Need to be changed for traduction
       ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems(QStringLiteral("Analysis rate"), Qt::MatchExactly).at(0)), 1)->setText(QString::number(double(ui->stopImage->value() * 1000) / double(time)));
     });
     connect(tracking, &Tracking::finished, this, [this]() {
@@ -953,6 +956,7 @@ void Interactive::track() {
     connect(thread, &QThread::started, tracking, &Tracking::startProcess);
     connect(tracking, &Tracking::progress, ui->progressBar, &QProgressBar::setValue);
     connect(tracking, &Tracking::statistic, this, [this, logMap](int time) {
+      // Need to be changed for traduction
       ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems(QStringLiteral("Analysis rate"), Qt::MatchExactly).at(0)), 1)->setText(QString::number(double(video->getImageCount() * 1000) / double(time)));
       logMap->insert(QStringLiteral("time"), QString::number(time));
     });
@@ -965,7 +969,7 @@ void Interactive::track() {
       replayAction->setChecked(true);
       logMap->insert(QStringLiteral("status"), errorMessage);
       emit log(*logMap);
-      emit status(QStringLiteral("Tracking failed"));
+      emit status(tr("Tracking failed"));
       emit message(errorMessage);
     });
     connect(tracking, &Tracking::finished, thread, &QThread::quit);
@@ -978,7 +982,7 @@ void Interactive::track() {
       replayAction->setChecked(true);
       logMap->insert(QStringLiteral("status"), QStringLiteral("Done"));
       emit log(*logMap);
-      emit status(QStringLiteral("Tracking succeeded"));
+      emit status(tr("Tracking succeeded"));
     });
     connect(tracking, &Tracking::forceFinished, thread, &QThread::quit);
     connect(tracking, &Tracking::forceFinished, tracking, &Tracking::deleteLater);
@@ -1122,6 +1126,7 @@ void Interactive::crop() {
   roi = Rect(xTop, yTop, width, height);
   cropedImageSize.setWidth(roi.width);
   cropedImageSize.setHeight(roi.height);
+  // Need to be changed for traduction
   ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems(QStringLiteral("Image width"), Qt::MatchExactly).at(0)), 1)->setText(QString::number(roi.width));
   ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems(QStringLiteral("Image height"), Qt::MatchExactly).at(0)), 1)->setText(QString::number(roi.height));
   display(ui->slider->value());
@@ -1155,6 +1160,7 @@ void Interactive::reset() {
   ui->y1->setValue(0);
   ui->x2->setValue(originalImageSize.width());
   ui->y2->setValue(originalImageSize.height());
+  // Need to be changed for traduction
   ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems(QStringLiteral("Image width"), Qt::MatchExactly).at(0)), 1)->setText(QString::number(originalImageSize.width()));
   ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems(QStringLiteral("Image height"), Qt::MatchExactly).at(0)), 1)->setText(QString::number(originalImageSize.height()));
   roi = Rect(0, 0, 0, 0);

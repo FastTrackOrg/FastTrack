@@ -49,7 +49,7 @@ Batch::Batch(QWidget *parent) : QWidget(parent),
   // Setup the ui
   QDir::setCurrent(QCoreApplication::applicationDirPath());
   setWindowState(Qt::WindowMaximized);
-  setWindowTitle(QStringLiteral("Fast Track"));
+  setWindowTitle(QStringLiteral("FastTrack"));
 
   QIcon img = QIcon(":/assets/buttons/open.png");
   ui->openPath->setIcon(img);
@@ -340,7 +340,7 @@ void Batch::addPath(const QString &pathMovie, const QString &pathBackground, con
   ui->tablePath->insertRow(row);
   ui->tablePath->setItem(row, 0, new QTableWidgetItem(pathMovie));
   if (pathBackground.isEmpty()) {
-    QPushButton *button = new QPushButton(QStringLiteral("Select a background"));
+    QPushButton *button = new QPushButton(tr("Select a background"));
     ui->tablePath->setCellWidget(row, 1, button);
     connect(button, &QPushButton::clicked, this, [this, row]() {
       openPathBackground(row);
@@ -350,7 +350,7 @@ void Batch::addPath(const QString &pathMovie, const QString &pathBackground, con
     ui->tablePath->setItem(row, 1, new QTableWidgetItem(pathBackground));
   }
   if (pathParameter.isEmpty()) {
-    QPushButton *paramButton = new QPushButton(QStringLiteral("Select a parameter file"));
+    QPushButton *paramButton = new QPushButton(tr("Select a parameter file"));
     ui->tablePath->setCellWidget(row, 2, paramButton);
     connect(paramButton, &QPushButton::clicked, this, [this, row]() {
       openParameterFile(row);
@@ -361,7 +361,7 @@ void Batch::addPath(const QString &pathMovie, const QString &pathBackground, con
   }
   QProgressBar *progressBarPath = new QProgressBar(ui->tablePath);
   ui->tablePath->setCellWidget(row, 3, progressBarPath);
-  ui->tablePath->setItem(row, 4, new QTableWidgetItem(QStringLiteral("Waiting")));
+  ui->tablePath->setItem(row, 4, new QTableWidgetItem(tr("Waiting")));
   ui->tablePath->item(row, 4)->setTextAlignment(Qt::AlignCenter);
 
   process tmpProcess = {
@@ -467,7 +467,7 @@ void Batch::startTracking() {
     ui->startButton->setDisabled(false);
     ui->removePath->setDisabled(false);
     ui->clearPath->setDisabled(false);
-    emit status(QStringLiteral("Tracking finished"));
+    emit status(tr("Tracking finished"));
   }
 }
 
@@ -588,10 +588,10 @@ void Batch::updateParameterTable() {
  */
 void Batch::errors(int code) {
   QMessageBox errorBox(this);
-  errorBox.setText(QStringLiteral("An error occurs during the tracking\n"));
+  errorBox.setText(tr("An error occurs during the tracking\n"));
   switch (code) {
     case 0:
-      errorBox.setText(QStringLiteral("Error message: provided background image is not correct. New background image is calculated instead."));
+      errorBox.setText(tr("Error message: provided background image is not correct. New background image is calculated instead."));
   }
   errorBox.exec();
 }

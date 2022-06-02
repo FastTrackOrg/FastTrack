@@ -108,8 +108,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 void MainWindow::closeEvent(QCloseEvent *event) {
   QMessageBox msgBox(this);
   msgBox.setTextFormat(Qt::RichText);
-  msgBox.setWindowTitle(QStringLiteral("Confirmation"));
-  msgBox.setText(QStringLiteral("<b>Are you sure you want to quit?</b>"));
+  msgBox.setWindowTitle(tr("Confirmation"));
+  msgBox.setText(tr("<b>Are you sure you want to quit?</b>"));
   msgBox.setIcon(QMessageBox::Question);
   msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
   QPushButton *minimizeButton = msgBox.addButton(tr("Minimize"), QMessageBox::AcceptRole);

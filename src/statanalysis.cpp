@@ -49,14 +49,14 @@ StatAnalysis::StatAnalysis(QWidget* parent, bool isStandalone) : QMainWindow(par
   optionAction->setStatusTip(tr("Set scale"));
   connect(optionAction, &QAction::triggered, this, [this]() {
     bool ok;
-    double d = QInputDialog::getDouble(this, QStringLiteral("Get convertion factor"),
-                                       QStringLiteral("1px equal ? (in meters)"), ruler, -10000000, 1000000, 9, &ok,
+    double d = QInputDialog::getDouble(this, tr("Get convertion factor"),
+                                       tr("1px equal ? (in meters)"), ruler, -10000000, 1000000, 9, &ok,
                                        Qt::WindowFlags(), 1);
     if (ok) {
       ruler = d;
 
-      d = QInputDialog::getDouble(this, QStringLiteral("Get convertion factor"),
-                                  QStringLiteral("1 timestep equal ? (in seconds)"), timeScale, -10000000, 1000000, 9, &ok,
+      d = QInputDialog::getDouble(this, tr("Get convertion factor"),
+                                  tr("1 timestep equal ? (in seconds)"), timeScale, -10000000, 1000000, 9, &ok,
                                   Qt::WindowFlags(), 1);
       if (ok) {
         timeScale = d;
@@ -64,7 +64,7 @@ StatAnalysis::StatAnalysis(QWidget* parent, bool isStandalone) : QMainWindow(par
         QList<int> objects = trackingData->getId(0, trackingData->maxFrameIndex);
         initPlots(objects);
         emit ui->objectAll->clicked(true);
-        scale->setText(QStringLiteral("1px = %1m and 1 timestep = %2s").arg(QString::number(ruler), QString::number(timeScale)));
+        scale->setText(tr("1px = %1m and 1 timestep = %2s").arg(QString::number(ruler), QString::number(timeScale)));
       }
     }
   });
@@ -94,10 +94,10 @@ StatAnalysis::StatAnalysis(QWidget* parent, bool isStandalone) : QMainWindow(par
         object->setChecked(state);
       }
       if (state) {
-        ui->objectAll->setText(QStringLiteral("Unselect All"));
+        ui->objectAll->setText(tr("Unselect All"));
       }
       else {
-        ui->objectAll->setText(QStringLiteral("Select All"));
+        ui->objectAll->setText(tr("Select All"));
       }
     }
     refresh();
@@ -268,8 +268,8 @@ void StatAnalysis::initPlots(const QList<int>& objects) {
     }
   }
   time->createDefaultAxes();
-  time->axes(Qt::Vertical).at(0)->setTitleText(QStringLiteral("Velocity (m/s)"));
-  time->axes(Qt::Horizontal).at(0)->setTitleText(QStringLiteral("Time (s)"));
+  time->axes(Qt::Vertical).at(0)->setTitleText(tr("Velocity (m/s)"));
+  time->axes(Qt::Horizontal).at(0)->setTitleText(tr("Time (s)"));
 }
 
 void StatAnalysis::refreshPlots(const QList<int>& objects) {

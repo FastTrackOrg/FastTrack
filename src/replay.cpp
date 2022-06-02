@@ -452,7 +452,7 @@ void Replay::loadReplay(const QString& dir) {
     isReplayable = false;
     memoryDir.clear();
     QMessageBox msgBox;
-    msgBox.setText(QStringLiteral("No file found."));
+    msgBox.setText(tr("No file found."));
     msgBox.exec();
   }
   QApplication::restoreOverrideCursor();

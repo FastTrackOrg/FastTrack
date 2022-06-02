@@ -77,8 +77,8 @@ void Updater::checkForUpdate() {
     if (main != nullptr) {
       switch (status) {
         case updateStatus::HasUpdate: {
-          main->statusBar()->addWidget(new QLabel(QStringLiteral("FastTrack version %1 is available!").arg(lastVersion)));
-          QPushButton *button = new QPushButton(QStringLiteral("Download FastTrack %1").arg(lastVersion), this);
+          main->statusBar()->addWidget(new QLabel(tr("FastTrack version %1 is available!").arg(lastVersion)));
+          QPushButton *button = new QPushButton(tr("Download FastTrack %1").arg(lastVersion), this);
           connect(button, &QPushButton::clicked, this, [=, this]() {
             displayUpdate(lastVersion, message);
           });
@@ -86,19 +86,19 @@ void Updater::checkForUpdate() {
           break;
         }
         case updateStatus::NoUpdate: {
-          main->statusBar()->showMessage(QStringLiteral("FastTrack is up to date!"), 10000);
+          main->statusBar()->showMessage(tr("FastTrack is up to date!"), 10000);
           break;
         }
         case updateStatus::NotSupported: {
-          main->statusBar()->showMessage(QStringLiteral("Platform does not support updates!"), 10000);
+          main->statusBar()->showMessage(tr("Platform does not support updates!"), 10000);
           break;
         }
         case updateStatus::NoNetwork: {
-          main->statusBar()->showMessage(QStringLiteral("Connect to network to check for updates!"), 10000);
+          main->statusBar()->showMessage(tr("Connect to network to check for updates!"), 10000);
           break;
         }
         default: {
-          main->statusBar()->showMessage(QStringLiteral("Connect to network to check for updates!"), 10000);
+          main->statusBar()->showMessage(tr("Connect to network to check for updates!"), 10000);
         }
       }
     }
@@ -114,12 +114,12 @@ void Updater::checkForUpdate() {
  */
 void Updater::displayUpdate(const QByteArray &version, const QByteArray &message) {
   QMessageBox msgBox;
-  msgBox.setWindowTitle(QStringLiteral("FastTrack Version"));
+  msgBox.setWindowTitle(tr("FastTrack Version"));
   msgBox.setTextFormat(Qt::RichText);
   msgBox.setIcon(QMessageBox::Information);
-  msgBox.setText(QStringLiteral("<strong>FastTrack version %1 is available!</strong> <br> Please update. <br> <a href='http://www.fasttrack.sh/docs/installation/#update'>Need help to update?</a> <br> %2").arg(version, message));
+  msgBox.setText(tr("<strong>FastTrack version %1 is available!</strong> <br> Please update. <br> <a href='http://www.fasttrack.sh/docs/installation/#update'>Need help to update?</a> <br> %2").arg(version, message));
   msgBox.addButton(QMessageBox::Close);
-  QPushButton *downloadButton = msgBox.addButton(QStringLiteral("Download new version"), QMessageBox::ActionRole);
+  QPushButton *downloadButton = msgBox.addButton(tr("Download new version"), QMessageBox::ActionRole);
 #ifdef Q_OS_UNIX
   connect(downloadButton, &QPushButton::clicked, this, [this]() {
     QDesktopServices::openUrl(QUrl(QStringLiteral("https://www.fasttrack.sh/download/FastTrack-x86_64.AppImage"), QUrl::TolerantMode));
@@ -142,7 +142,7 @@ void Updater::displayUpdate(const QByteArray &version, const QByteArray &message
  */
 void Updater::displayWarning(const QByteArray &warning) {
   QMessageBox msgBox;
-  msgBox.setWindowTitle(QStringLiteral("Warning"));
+  msgBox.setWindowTitle(tr("Warning"));
   msgBox.setTextFormat(Qt::RichText);
   msgBox.setIcon(QMessageBox::Warning);
   msgBox.setText(warning);
