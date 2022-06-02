@@ -686,9 +686,9 @@ bool Replay::eventFilter(QObject* target, QEvent* event) {
     if (event->type() == QEvent::MouseMove) {
       QMouseEvent* moveEvent = dynamic_cast<QMouseEvent*>(event);
       if (moveEvent->buttons() == Qt::MiddleButton) {
-        ui->scrollArea->horizontalScrollBar()->setValue(static_cast<int>(ui->scrollArea->horizontalScrollBar()->value() + (panReferenceClick.x() - moveEvent->localPos().x())));
-        ui->scrollArea->verticalScrollBar()->setValue(static_cast<int>(ui->scrollArea->verticalScrollBar()->value() + (panReferenceClick.y() - moveEvent->localPos().y())));
-        panReferenceClick = moveEvent->localPos();
+        ui->scrollArea->horizontalScrollBar()->setValue(static_cast<int>(ui->scrollArea->horizontalScrollBar()->value() + (panReferenceClick.x() - moveEvent->position().x())));
+        ui->scrollArea->verticalScrollBar()->setValue(static_cast<int>(ui->scrollArea->verticalScrollBar()->value() + (panReferenceClick.y() - moveEvent->position().y())));
+        panReferenceClick = moveEvent->position();
       }
     }
     if (event->type() == QEvent::Wheel) {
@@ -711,7 +711,7 @@ bool Replay::eventFilter(QObject* target, QEvent* event) {
       QMouseEvent* mouseEvent = dynamic_cast<QMouseEvent*>(event);
       if (mouseEvent->buttons() == Qt::MiddleButton) {
         qApp->setOverrideCursor(Qt::ClosedHandCursor);
-        panReferenceClick = mouseEvent->localPos();
+        panReferenceClick = mouseEvent->position();
       }
     }
     if (event->type() == QEvent::MouseButtonRelease) {
