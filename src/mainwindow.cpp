@@ -113,6 +113,13 @@ void MainWindow::closeEvent(QCloseEvent *event) {
   msgBox.setDefaultButton(minimizeButton);
   int reply = msgBox.exec();
   if (reply == QMessageBox::Yes) {
+    QMessageBox msgSupport(this);
+    msgSupport.setTextFormat(Qt::RichText);
+    msgSupport.setWindowTitle(tr("Support"));
+    msgSupport.setText(tr("Don't forget that you can become a FastTrack supporter <a href='https://ko-fi.com/bgallois'>there</a>!"));
+    msgSupport.setIcon(QMessageBox::Information);
+    msgSupport.exec();
+    // msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
     settingsFile->setValue(QStringLiteral("geometry"), saveGeometry());
     event->accept();
   }
