@@ -41,7 +41,6 @@ This file is part of Fast Track.
 Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
                                             ui(new Ui::Interactive),
                                             video(new VideoReader()),
-                                            analysis(new StatAnalysis(this, false)),
                                             videoStatus(false),
                                             settingsFile(new QSettings(QStringLiteral("FastTrack"), QStringLiteral("FastTrackOrg"), this)) {
   ui->setupUi(this);
@@ -104,7 +103,13 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   connect(replayAction, &QAction::toggled, this, [this](bool isChecked) {
     if (isChecked) {
       ui->interactiveTab->addTab(replay, tr("Replay"));
-      ui->interactiveTab->addTab(analysis, tr("Analysis"));  // Preview feature. Will have a separate action latter if necessary.
+      QPushButton *ad = new QPushButton(this);
+      ad->setIcon(QIcon(":/assets/fastanalyzer.png"));
+      ad->setIconSize(QSize(640, 360));
+      connect(ad, &QPushButton::pressed, ad, []() {
+        QDesktopServices::openUrl(QUrl(QStringLiteral("https://www.fasttrack.sh/blog/2022/06/16/FastAnalyzerAlpha"), QUrl::TolerantMode));
+      });
+      ui->interactiveTab->addTab(ad, tr("Analysis"));
       ui->interactiveTab->setCurrentIndex(1);
     }
     else {
@@ -135,13 +140,11 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
       ui->imageOptions->setVisible(false);
       ui->trackingOptions->setVisible(false);
       ui->controlOptions->setVisible(true);
-      analysis->reload();
     }
     else if (index == 2) {  // Analysis tab
       ui->imageOptions->setVisible(false);
       ui->trackingOptions->setVisible(false);
       ui->controlOptions->setVisible(false);
-      analysis->reload();
     }
   });
 
@@ -506,7 +509,6 @@ void Interactive::openFolder() {
   ui->display->clear();
   video->release();
   replay->clear();
-  analysis->clear();
   ui->backgroundProgressBar->setValue(0);
   ui->isBin->setCheckable(false);
   ui->isSub->setCheckable(false);
@@ -557,7 +559,6 @@ void Interactive::openFolder() {
       // Load replay
       replay->loadReplay(dir);
       if (!replay->trackingData->isEmpty) {
-        analysis->openTrackingData(replay->trackingData, true);
         replayAction->setChecked(true);
       }
 
@@ -891,7 +892,6 @@ void Interactive::previewTracking() {
     ui->trackButton->setDisabled(true);
     replayAction->setChecked(false);
     replay->clear();  // Avoid mixing 2 subsequent analysy
-    analysis->clear();
 
     QThread *thread = new QThread;
     Tracking *tracking = new Tracking(memoryDir.toStdString(), background, ui->startImage->value(), ui->startImage->value() + ui->stopImage->value());
@@ -908,7 +908,6 @@ void Interactive::previewTracking() {
       ui->previewButton->setDisabled(false);
       ui->trackButton->setDisabled(false);
       replay->loadReplay(dir);
-      analysis->openTrackingData(replay->trackingData, true);
       replayAction->setChecked(true);
     });
     connect(tracking, &Tracking::forceFinished, this, [this](const QString &errorMessage) {
@@ -916,7 +915,6 @@ void Interactive::previewTracking() {
       ui->previewButton->setDisabled(false);
       ui->trackButton->setDisabled(false);
       replay->loadReplay(dir);
-      analysis->openTrackingData(replay->trackingData, true);
       replayAction->setChecked(true);
       emit message(errorMessage);
     });
@@ -944,7 +942,6 @@ void Interactive::track() {
     ui->trackButton->setDisabled(true);
     replayAction->setChecked(false);
     replay->clear();  // Avoid mixing 2 subsequent analysy
-    analysis->clear();
 
     QThread *thread = new QThread;
     Tracking *tracking = new Tracking(memoryDir.toStdString(), background);
@@ -965,7 +962,6 @@ void Interactive::track() {
       ui->previewButton->setDisabled(false);
       ui->trackButton->setDisabled(false);
       replay->loadReplay(dir);
-      analysis->openTrackingData(replay->trackingData, true);
       replayAction->setChecked(true);
       logMap->insert(QStringLiteral("status"), errorMessage);
       emit log(*logMap);
@@ -978,7 +974,6 @@ void Interactive::track() {
       ui->previewButton->setDisabled(false);
       ui->trackButton->setDisabled(false);
       replay->loadReplay(dir);
-      analysis->openTrackingData(replay->trackingData, true);
       replayAction->setChecked(true);
       logMap->insert(QStringLiteral("status"), QStringLiteral("Done"));
       emit log(*logMap);

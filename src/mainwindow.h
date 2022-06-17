@@ -33,7 +33,6 @@ This file is part of Fast Track.
 #include "batch.h"
 #include "interactive.h"
 #include "replay.h"
-#include "statanalysis.h"
 #include "trackingmanager.h"
 #include "ui_mainwindow.h"
 #include "updater.h"
@@ -63,7 +62,6 @@ class MainWindow : public QMainWindow {
   Interactive *interactive;
   Batch *batch;
   Replay *replay;
-  StatAnalysis *statAnalysis;
   TrackingManager *trackingManager;
   QSystemTrayIcon *trayIcon;
   QSettings *settingsFile;

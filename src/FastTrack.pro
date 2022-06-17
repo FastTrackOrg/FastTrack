@@ -82,7 +82,6 @@ unix:macx {
 }
 
 SOURCES += \
-        statanalysis.cpp \
         updater.cpp \
         main.cpp \
         mainwindow.cpp \
@@ -100,7 +99,6 @@ SOURCES += \
 
 
 HEADERS += \
-        statanalysis.h \
         updater.h \
         mainwindow.h\
         tracking.h \
@@ -119,7 +117,6 @@ HEADERS += \
 FORMS += \
         mainwindow.ui \
         replay.ui \
-        statanalysis.ui \
         trackingmanager.ui \
         batch.ui \
         interactive.ui \

@@ -60,7 +60,6 @@ This file is part of Fast Track.
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
 #include "replay.h"
-#include "statanalysis.h"
 #include "tracking.h"
 #include "videoreader.h"
 
@@ -132,7 +131,6 @@ class Interactive : public QMainWindow {
   double currentZoom;
   VideoReader *video;
   Replay *replay;
-  StatAnalysis *analysis;
   bool videoStatus;
 
   QString style;
