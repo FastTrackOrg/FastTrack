@@ -1,5 +1,27 @@
 # FastTrack changelog
 
+## 6.2.7
+
+### Added
+- Added donation support.
+- Translation capability.
+
+### Fixed
+- Fixed deprecated API.
+- String translation.
+- Fixed qApp calls.
+
+### Refactored
+- Refactored UI.
+- Refactored CI.
+- Tracking class.
+
+### Optimized
+- QMap to QHash.
+
+### Deprecated
+- Removed Stat Analysis class.
+
 ## 6.2.6
 
 ### Added
