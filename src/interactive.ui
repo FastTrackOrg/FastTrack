@@ -16,6 +16,9 @@
     <height>716</height>
    </size>
   </property>
+  <property name="acceptDrops">
+   <bool>true</bool>
+  </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
@@ -63,7 +66,7 @@
              <x>0</x>
              <y>0</y>
              <width>551</width>
-             <height>423</height>
+             <height>456</height>
             </rect>
            </property>
            <layout class="QGridLayout" name="gridLayout_2">

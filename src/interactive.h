@@ -37,6 +37,7 @@ This file is part of Fast Track.
 #include <QMainWindow>
 #include <QMessageBox>
 #include <QMetaType>
+#include <QMimeData>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
@@ -82,7 +83,7 @@ class Interactive : public QMainWindow {
   ~Interactive();
 
  private slots:
-  void openFolder();
+  void openFolder(QString path = QString());
 
   void display(int index, int scale = 0);
   void display(const QImage &image);
@@ -137,6 +138,10 @@ class Interactive : public QMainWindow {
   QString color;
   bool isExpert; /*!< Is FastTrack is in expert mode with advanced capabilities. */
   QSettings *settingsFile;
+
+ protected:
+  void dropEvent(QDropEvent *dropEvent) override;
+  void dragEnterEvent(QDragEnterEvent *event) override;
 
  signals:
   void message(QString message);

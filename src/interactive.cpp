@@ -92,7 +92,7 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   });
 
   // Menu bar
-  connect(ui->actionOpen, &QAction::triggered, this, &Interactive::openFolder);
+  connect(ui->actionOpen, &QAction::triggered, this, [this]() { this->openFolder(); });
   connect(ui->actionQuit, &QAction::triggered, qApp, &QApplication::quit);
   ui->menuView->addAction(ui->imageOptions->toggleViewAction());
   ui->menuView->addAction(ui->trackingOptions->toggleViewAction());
@@ -495,7 +495,7 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
 /**
  * @brief Asks the path to a folder where an image sequence is stored. Setups the ui and resets the class attributs for a new analysis. Triggered when the open button from the menu bar is clicked.
  */
-void Interactive::openFolder() {
+void Interactive::openFolder(QString path) {
   // Resets the class members
   replayAction->setChecked(false);
   isBackground = false;
@@ -516,7 +516,12 @@ void Interactive::openFolder() {
   ui->backgroundStatus->setText(tr("No background selected"));
   ui->backgroundStatus->setStyleSheet(QStringLiteral("background: red; color: white;"));
 
-  dir = QFileDialog::getOpenFileName(this, tr("Open File"), memoryDir);
+  if (path.isEmpty()) {
+    dir = QFileDialog::getOpenFileName(this, tr("Open File"), memoryDir);
+  }
+  else {
+    dir = path;
+  }
 
   QApplication::setOverrideCursor(Qt::WaitCursor);
   if (dir.length()) {
@@ -1266,4 +1271,22 @@ void Interactive::loadParameters(const QString &path) {
     ui->kernelType->setCurrentIndex(parameterList.value(QStringLiteral("morphType")).toInt());
   }
   parameterFile.close();
+}
+
+/**
+ * @brief Gets drop events that have url and try to open the file.
+ */
+void Interactive::dropEvent(QDropEvent *dropEvent) {
+  const QMimeData *mimeData = dropEvent->mimeData();
+  if (mimeData->hasUrls()) {
+    QUrl file = mimeData->urls().at(0);
+    this->openFolder(file.toLocalFile());
+  }
+}
+
+/**
+ * @brief Accepts all the drag enter event.
+ */
+void Interactive::dragEnterEvent(QDragEnterEvent *event) {
+  event->acceptProposedAction();
 }
