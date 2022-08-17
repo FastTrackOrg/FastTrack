@@ -5,7 +5,7 @@ on:
     branches: [master]
 
 env:
-  QT_VERSION: 6.3.0 # Need <6.3.0 for macdeployqt to work https://github.com/FastTrackOrg/FastTrack/issues/51
+  QT_VERSION: 6.3.0
   OPENCV_VERSION: 4.5.5
 
 jobs:
@@ -97,7 +97,7 @@ jobs:
           path: src/build/FastTrack
 
   build_mac:
-    runs-on: macos-10.15
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
@@ -128,7 +128,6 @@ jobs:
           macdeployqt FastTrack.app -always-overwrite
           wget https://raw.githubusercontent.com/arl/macdeployqtfix/master/macdeployqtfix.py
           cp *.qm FastTrack.app/Contents/Resources/
-          cp /usr/local/opt/gcc/lib/gcc/11/libgcc_s.1.1.dylib FastTrack.app/Contents/Frameworks/ ## See workaround header
           python2.7 macdeployqtfix.py FastTrack.app/Contents/MacOS/FastTrack ../../Qt/${{ env.QT_VERSION }}/
           hdiutil create -volname FastTrack -srcfolder FastTrack.app -ov -format UDZO FastTrack.dmg
       - name: upload_artefact
