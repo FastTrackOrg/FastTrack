@@ -5,7 +5,7 @@ on:
     branches: [master]
 
 env:
-  QT_VERSION: 6.3.0
+  QT_VERSION: 6.2.4
   OPENCV_VERSION: 4.5.5
 
 jobs:
@@ -79,7 +79,6 @@ jobs:
           cd build_cli/
           windeployqt FastTrack-Cli.exe --release
           cp ..\assets\icon.ico .
-          cp ${{ github.workspace }}/Qt/Tools/mingw*/bin/libgomp-1.dll .
           cp ${{ github.workspace }}/OpenCV_MinGW_64/bin/opencv_videoio_ffmpeg455_64.dll .
           cp ${{ github.workspace }}/OpenCV_MinGW_64/bin/libopencv_world455.dll .
       - name: upload_artefact
@@ -89,7 +88,7 @@ jobs:
           path: src/build_cli/
 
   build_mac:
-      runs-on: macos-latest
+      runs-on: macos-11
       steps:
         - uses: actions/checkout@v2
         - uses: actions/setup-python@v2
@@ -105,7 +104,6 @@ jobs:
               rm -rf /usr/local/bin/2to3
               brew update
               brew upgrade
-              brew install libomp
               brew install pkg-config
               brew install opencv
               brew install openssl

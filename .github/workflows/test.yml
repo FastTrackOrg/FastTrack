@@ -79,7 +79,7 @@ jobs:
           ./test.sh win
 
   test_mac:
-    runs-on: macos-latest
+    runs-on: macos-11
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2

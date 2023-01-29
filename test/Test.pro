@@ -17,15 +17,14 @@ DEFINES += QT_DEPRECATED_WARNINGS
 unix:!macx {
   INCLUDEPATH += /usr/include/opencv4/
   INCLUDEPATH += /usr/local/include/opencv4/ /usr/include/gtest
-  LIBS += -L /usr/local/lib64/  -lopencv_core -lopencv_imgproc -lopencv_highgui -lopencv_imgcodecs -lopencv_videoio  -lopencv_calib3d -lopencv_photo -lopencv_features2d -lopencv_photo -lopencv_video -fopenmp -lgtest -lgtest_main
+  LIBS += -L /usr/local/lib64/  -lopencv_core -lopencv_imgproc -lopencv_highgui -lopencv_imgcodecs -lopencv_videoio  -lopencv_calib3d -lopencv_photo -lopencv_features2d -lopencv_photo -lopencv_video -lgtest -lgtest_main
   QMAKE_LFLAGS_RELEASE += -O3
-  QMAKE_CXXFLAGS += -std=c++17 -O3 -fopenmp -g
+  QMAKE_CXXFLAGS += -std=c++17 -O3 -g
 }
 
 unix:macx {
   CONFIG += c++17
-  LIBS += -L/usr/local/lib -lomp
-  QMAKE_CXXFLAGS += -std=c++1z -stdlib=libc++ -mmacosx-version-min=10.15 -O3 -g -Xpreprocessor -fopenmp
+  QMAKE_CXXFLAGS += -std=c++1z -stdlib=libc++ -mmacosx-version-min=10.15 -O3 -g -Xpreprocessor
   QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.15
   QMAKE_LFLAGS_SONAME  = -Wl,-install_name,@executable_path/../Frameworks/
   QT_CONFIG -= no-pkg-config
@@ -36,7 +35,7 @@ unix:macx {
 
 win32 {
   CONFIG += c++2a
-  QMAKE_CXXFLAGS += -O3 -fopenmp -g
+  QMAKE_CXXFLAGS += -O3 -g
   LIBS += -L"$$PWD/../OpenCV_MinGW_64/bin" -lopencv_world455
   INCLUDEPATH += "$$PWD/../OpenCV_MinGW_64/include"
   LIBS += -L"$$PWD/../googletest/build/install/lib" -lgtest -lgtest_main

@@ -5,7 +5,7 @@ on:
     branches: [master]
 
 env:
-  QT_VERSION: 6.3.0
+  QT_VERSION: 6.2.4
   OPENCV_VERSION: 4.5.5
 
 jobs:
@@ -97,7 +97,7 @@ jobs:
           path: src/build/FastTrack
 
   build_mac:
-    runs-on: macos-latest
+    runs-on: macos-11
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
