@@ -89,9 +89,6 @@ class Interactive : public QMainWindow {
   void display(const QImage &image);
   void display(const cv::UMat &image, QImage::Format format = QImage::Format_RGB888);
 
-  void zoomIn();
-  void zoomOut();
-
   void getParameters();
 
   void previewTracking();
@@ -113,7 +110,6 @@ class Interactive : public QMainWindow {
   QLabel *counterLabel;
   QAction *replayAction;
   QString memoryDir;                  /*!< Saves the path to the last opened folder in dialog. */
-  QSize resizedFrame;                 /*!< Size of the resized image in the display QWidget. */
   QSize originalImageSize;            /*!< Size of the original image. */
   QSize cropedImageSize;              /*!< Size of the croped image. */
   QHash<QString, QString> parameters; /*!< Tracking parameters. */
@@ -123,13 +119,10 @@ class Interactive : public QMainWindow {
   Tracking *tracking;                 /*!< Tracking object. */
   UMat background;                    /*!< Background image. */
   bool isBackground;                  /*!< Is the background computed. */
-  QPair<QPoint, QPoint> clicks;
-  QPointF panReferenceClick;
-  QPointF zoomReferencePosition;
+  QPair<QPointF, QPointF> clicks;
   Rect roi;
   QPixmap resizedPix;
   vector<Point3i> colorMap;
-  double currentZoom;
   VideoReader *video;
   Replay *replay;
   bool videoStatus;

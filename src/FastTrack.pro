@@ -96,6 +96,7 @@ SOURCES += \
         videoreader.cpp \
         timeline.cpp \
         autolevel.cpp \
+        imageviewer.cpp \
 
 
 HEADERS += \
@@ -112,6 +113,7 @@ HEADERS += \
         videoreader.h \
         timeline.h \
         autolevel.h \
+        imageviewer.h \
 
 
 FORMS += \
