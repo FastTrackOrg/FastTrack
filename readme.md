@@ -12,7 +12,7 @@ Two main features are implemented in the software:
 * An automatic tracking algorithm that can detect and track objects (conserving the objects' identities across the video recording).
 * A manual review of the tracking where errors can be corrected rapidly and easily to achieve 100% accuracy.
 
-![alt text](docs/user/assets/readme.png)
+![alt text](docs/user/assets/readme.gif)
 
 ## Installation
 
