@@ -77,7 +77,7 @@ jobs:
           mingw32-make
           mingw32-make clean
           cd build_cli/
-          windeployqt FastTrack-Cli.exe --release
+          windeployqt FastTrack-Cli.exe #https://bugreports.qt.io/browse/QTBUG-62103?jql=status%20%3D%20Open%20AND%20text%20~%20%22windeployqt%20platform%22
           cp ..\assets\icon.ico .
           cp ${{ github.workspace }}/Qt/Tools/mingw*/bin/libgomp-1.dll .
           cp ${{ github.workspace }}/OpenCV_MinGW_64/bin/opencv_videoio_ffmpeg470_64.dll .
