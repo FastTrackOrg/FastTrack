@@ -1,5 +1,18 @@
 # FastTrack changelog
 
+## 6.3.0
+
+### Added
+- Added drag and drop for video opening.
+
+### Changed
+- Changed display to a QGraphicsView for better zoom and pan.
+- OpenCV upgrade to 4.7.0
+- Qt upgrade to 6.4.2.
+
+### Deprecated
+- Remove openmp dependency
+
 ## 6.2.7
 
 ### Added
