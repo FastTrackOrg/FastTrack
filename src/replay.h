@@ -109,9 +109,6 @@ class Replay : public QMainWindow {
   QSize resizedFrame;         /*!< Width and height of displayed QPixmap to accomodate window size changment. */
   QSize originalImageSize;    /*!< Width and height of the original image in the images sequence. */
   int currentIndex;           /*!< Current image index. */
-  double currentZoom;
-  QPointF panReferenceClick;
-  QPointF zoomReferencePosition;
   QList<int> ids;
   VideoReader *video;
 
@@ -122,8 +119,6 @@ class Replay : public QMainWindow {
   void loadReplay(const QString &dir);
   void loadTrackingDir(const QString &dir);
   void loadFrame(int frameIndex);
-  void zoomIn();
-  void zoomOut();
   bool eventFilter(QObject *target, QEvent *event) override;
   void updateInformation(int objectId, int imageIndex, QTableWidget *table);
   void correctTracking();
