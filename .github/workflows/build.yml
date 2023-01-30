@@ -5,7 +5,7 @@ on:
     branches: [master]
 
 env:
-  QT_VERSION: 6.2.4
+  QT_VERSION: 6.4.1 # 6.4.2 not macdeployqt not finding qt platforms
   OPENCV_VERSION: 4.7.0
 
 jobs:
@@ -86,7 +86,6 @@ jobs:
           cp FastTrack.exe FastTrack
           windeployqt FastTrack/FastTrack.exe --release
           cp ..\assets\icon.ico FastTrack
-          cp ${{ github.workspace }}/Qt/Tools/mingw*/bin/libgomp-1.dll FastTrack
           cp ${{ github.workspace }}/OpenCV_MinGW_64/bin/opencv_videoio_ffmpeg470_64.dll FastTrack
           cp ${{ github.workspace }}/OpenCV_MinGW_64/bin/libopencv_world470.dll FastTrack
           cp *.qm FastTrack
