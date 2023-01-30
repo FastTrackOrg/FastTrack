@@ -9,7 +9,7 @@ on:
     - master
 env:
   QT_VERSION: 6.2.4
-  OPENCV_VERSION: 4.5.5
+  OPENCV_VERSION: 4.7.0
 
 jobs:
   test_linux:

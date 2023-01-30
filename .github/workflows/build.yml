@@ -6,7 +6,7 @@ on:
 
 env:
   QT_VERSION: 6.2.4
-  OPENCV_VERSION: 4.5.5
+  OPENCV_VERSION: 4.7.0
 
 jobs:
   build_linux:
@@ -87,8 +87,8 @@ jobs:
           windeployqt FastTrack/FastTrack.exe --release
           cp ..\assets\icon.ico FastTrack
           cp ${{ github.workspace }}/Qt/Tools/mingw*/bin/libgomp-1.dll FastTrack
-          cp ${{ github.workspace }}/OpenCV_MinGW_64/bin/opencv_videoio_ffmpeg455_64.dll FastTrack
-          cp ${{ github.workspace }}/OpenCV_MinGW_64/bin/libopencv_world455.dll FastTrack
+          cp ${{ github.workspace }}/OpenCV_MinGW_64/bin/opencv_videoio_ffmpeg470_64.dll FastTrack
+          cp ${{ github.workspace }}/OpenCV_MinGW_64/bin/libopencv_world470.dll FastTrack
           cp *.qm FastTrack
       - name: upload_artefact
         uses: actions/upload-artifact@v1

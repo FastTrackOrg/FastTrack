@@ -59,7 +59,7 @@ win32 {
   CONFIG += c++2a
   QMAKE_CXXFLAGS += -O3
   CONFIG += console
-  LIBS += -L"$$PWD/../OpenCV_MinGW_64/lib" -lopencv_world455
+  LIBS += -L"$$PWD/../OpenCV_MinGW_64/lib" -lopencv_world470
   INCLUDEPATH += "$$PWD/../OpenCV_MinGW_64/include"
 }
 

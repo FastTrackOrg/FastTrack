@@ -36,7 +36,7 @@ unix:macx {
 win32 {
   CONFIG += c++2a
   QMAKE_CXXFLAGS += -O3 -g
-  LIBS += -L"$$PWD/../OpenCV_MinGW_64/bin" -lopencv_world455
+  LIBS += -L"$$PWD/../OpenCV_MinGW_64/bin" -lopencv_world470
   INCLUDEPATH += "$$PWD/../OpenCV_MinGW_64/include"
   LIBS += -L"$$PWD/../googletest/build/install/lib" -lgtest -lgtest_main
   INCLUDEPATH += "$$PWD/../googletest/build/install/include/"
