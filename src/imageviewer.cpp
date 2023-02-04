@@ -19,6 +19,7 @@ This file is part of Fast Track.
 
 ImageViewer::ImageViewer(QWidget *parent)
     : QGraphicsView(parent), scene(new QGraphicsScene(this)), image(new QGraphicsPixmapItem()), rectangle(new QGraphicsRectItem(image)), currentZoom(1), factor(1) {
+  this->setBackgroundBrush(QColor("#DEE4E7"));
   scene->addItem(image);
   rectangle->setVisible(false);
   rectangle->setPen(QPen(Qt::green, 5));
