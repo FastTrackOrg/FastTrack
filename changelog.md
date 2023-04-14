@@ -1,5 +1,14 @@
 # FastTrack changelog
 
+## 6.3.1
+
+### Added
+- Added fit to view at image loading.
+- Menus keyboard shortcuts.
+
+### Fixed
+- Fixed cfg.toml formatting.
+
 ## 6.3.0
 
 ### Added
