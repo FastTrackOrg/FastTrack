@@ -43,6 +43,10 @@ void ImageViewer::setImage(const QImage &image) {
   this->image->setPixmap(pixmap);
 }
 
+void ImageViewer::fitToView() {
+  this->fitInView(this->image, Qt::KeepAspectRatio);
+}
+
 void ImageViewer::clear() {
   this->image->setPixmap(QPixmap());
 }

@@ -562,6 +562,7 @@ void Interactive::openFolder(QString path) {
         videoStatus = true;
       }
       display(0);
+      ui->display->fitToView();
       crop();
     }
     // If an error occurs during the opening, resets the information table and warns the user

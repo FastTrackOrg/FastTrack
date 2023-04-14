@@ -40,6 +40,7 @@ class ImageViewer : public QGraphicsView {
   ImageViewer(ImageViewer &&T) = delete;
   ~ImageViewer() = default;
   void setImage(const QImage &image);
+  void fitToView();
   void clear();
   void setRectangle(const QRect &rect);
 

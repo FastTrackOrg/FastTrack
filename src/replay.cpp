@@ -422,6 +422,7 @@ void Replay::loadReplay(const QString& dir) {
     ui->annotation->blockSignals(true);
     ui->replaySlider->setValue(1);  // To force the change
     ui->replaySlider->setValue(0);
+    ui->replayDisplay->fitToView();
     ui->annotation->blockSignals(false);
     emit opened(isReplayable);
   }
