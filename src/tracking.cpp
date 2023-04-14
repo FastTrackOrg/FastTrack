@@ -914,7 +914,7 @@ void Tracking::startProcess() {
     else {
       outputDb.transaction();
       QTextStream out(&parameterFile);
-      out << "title = \"FastTrack cfg\"\"\n\n[parameters]\n";
+      out << "title = \"FastTrack cfg\"\n\n[parameters]\n";
       QList<QString> keyList = m_parameters.keys();
       for (const auto &a : keyList) {
         out << a << " = " << m_parameters.value(a) << Qt::endl;
