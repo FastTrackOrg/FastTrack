@@ -103,13 +103,6 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   connect(replayAction, &QAction::toggled, this, [this](bool isChecked) {
     if (isChecked) {
       ui->interactiveTab->addTab(replay, tr("Replay"));
-      QPushButton *ad = new QPushButton(this);
-      ad->setIcon(QIcon(":/assets/fastanalyzer.png"));
-      ad->setIconSize(QSize(640, 360));
-      connect(ad, &QPushButton::pressed, ad, []() {
-        QDesktopServices::openUrl(QUrl(QStringLiteral("https://www.fasttrack.sh/blog/2022/06/16/FastAnalyzerAlpha"), QUrl::TolerantMode));
-      });
-      ui->interactiveTab->addTab(ad, tr("Analysis"));
       ui->interactiveTab->setCurrentIndex(1);
     }
     else {
