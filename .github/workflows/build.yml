@@ -5,7 +5,7 @@ on:
     branches: [master]
 
 env:
-  QT_VERSION: 6.4.2
+  QT_VERSION: 6.5.0
   OPENCV_VERSION: 4.7.0
 
 jobs:
@@ -26,10 +26,10 @@ jobs:
             sudo apt-get install libavcodec-dev libavformat-dev libswscale-dev libnss3
             sudo apt-get install libgstreamer-plugins-base1.0-dev libgstreamer1.0-dev
             sudo apt-get install libopencv-dev
-      - name: install_qt
+      - name: install_qt6
         run: |
           pip install aqtinstall
-          python3 -m aqt install-qt -m qtcharts -O ${{ github.workspace }}/Qt/ linux desktop ${{ env.QT_VERSION }}
+          python3 -m aqt install-qt -O ${{ github.workspace }}/Qt/ linux desktop ${{ env.QT_VERSION }}
           echo ${{ github.workspace }}/Qt/${{ env.QT_VERSION }}/gcc_64/bin/ >> $GITHUB_PATH
       - name: build_ft
         run: |
@@ -84,7 +84,7 @@ jobs:
           cd build/
           mkdir FastTrack
           cp FastTrack.exe FastTrack
-          windeployqt FastTrack/FastTrack.exe #https://bugreports.qt.io/browse/QTBUG-62103?jql=status%20%3D%20Open%20AND%20text%20~%20%22windeployqt%20platform%22
+          windeployqt FastTrack/FastTrack.exe --no-translations  # https://bugreports.qt.io/browse/QTBUG-62103?jql=status%20%3D%20Open%20AND%20text%20~%20%22windeployqt%20platform%22 and https://bugreports.qt.io/browse/QTBUG-112204
           cp ..\assets\icon.ico FastTrack
           cp ${{ github.workspace }}/Qt/Tools/mingw*/bin/libgomp-1.dll FastTrack
           cp ${{ github.workspace }}/OpenCV_MinGW_64/bin/opencv_videoio_ffmpeg470_64.dll FastTrack

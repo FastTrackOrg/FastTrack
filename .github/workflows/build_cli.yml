@@ -5,7 +5,7 @@ on:
     branches: [master]
 
 env:
-  QT_VERSION: 6.4.2
+  QT_VERSION: 6.5.0
   OPENCV_VERSION: 4.7.0
 
 jobs:
@@ -76,8 +76,9 @@ jobs:
           qmake FastTrack-Cli.pro -spec win32-g++ CONFIG+=release
           mingw32-make
           mingw32-make clean
+          chmod -777 build_cli
           cd build_cli/
-          windeployqt FastTrack-Cli.exe #https://bugreports.qt.io/browse/QTBUG-62103?jql=status%20%3D%20Open%20AND%20text%20~%20%22windeployqt%20platform%22
+          windeployqt FastTrack-Cli.exe --no-translations  # https://bugreports.qt.io/browse/QTBUG-62103?jql=status%20%3D%20Open%20AND%20text%20~%20%22windeployqt%20platform%22 and https://bugreports.qt.io/browse/QTBUG-112204
           cp ..\assets\icon.ico .
           cp ${{ github.workspace }}/Qt/Tools/mingw*/bin/libgomp-1.dll .
           cp ${{ github.workspace }}/OpenCV_MinGW_64/bin/opencv_videoio_ffmpeg470_64.dll .

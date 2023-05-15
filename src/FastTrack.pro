@@ -1,4 +1,4 @@
-greaterThan(QT_MAJOR_VERSION, 5): QT += widgets core gui network svg sql charts
+greaterThan(QT_MAJOR_VERSION, 5): QT += widgets core gui network svg sql
 
 TEMPLATE = app
 include("../FastTrack.pri")
