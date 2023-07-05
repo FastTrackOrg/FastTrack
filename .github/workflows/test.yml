@@ -79,7 +79,7 @@ jobs:
           ./test.sh win
 
   test_mac:
-    runs-on: macos-11
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
@@ -90,11 +90,17 @@ jobs:
           pip install aqtinstall
           python3 -m aqt install-qt -m qtcharts -O ${{ github.workspace }}/Qt/ mac desktop ${{ env.QT_VERSION }}
           echo ${{ github.workspace }}/Qt/${{ env.QT_VERSION }}/macos/bin/ >> $GITHUB_PATH
+      - name: Set up Homebrew #https://github.com/Homebrew/homebrew-cask/issues/150323
+        id: set-up-homebrew
+        uses: Homebrew/actions/setup-homebrew@master
       - name: install_deps
         run: |
-          rm -rf /usr/local/bin/2to3
-          brew update
-          brew upgrade
+          rm -f /usr/local/bin/2to3*
+          rm -f /usr/local/bin/idle3*
+          rm -f /usr/local/bin/pydoc3*
+          rm -f /usr/local/bin/python3*
+          brew update -q -f
+          brew upgrade -q -f
           brew install pkg-config
           brew install libomp
           brew install opencv
