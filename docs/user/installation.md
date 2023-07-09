@@ -37,11 +37,16 @@ Stable versions of FastTrack are released for Linux (official AppImage, official
     * Fedora: `sudo dnf install fasttrack fasttrack-cli`
     * Arch Linux: `yay -S fasttrack fasttrack-cli`
     * From source : `qmake src/FastTrack.pro ; make ; sudo make install ; qmake src/FastTrack-Cli.pro ; make ; sudo make install`
-4.  For Mac:
-    - Minimal version required: 10.15.
+4.  For Mac (.app):
+    - Minimal version required based on Qt6 minimal version required.
     - Download the FastTrack dmg [file](https://fasttrack.sh/download/FastTrack.dmg).
     - Double click on the dmg file.
     - Drag the application from the dmg window into the Applications folder.
+5.  For Mac (brew):
+    - Install https://brew.sh/.
+    - `brew tap fasttrackorg/fasttrack`
+    - `brew install fasttrack`
+    - FastTrack-cli can be located at `/usr/local/bin/FastTrack-Cli` and directly used and FastTrack opened using `open /usr/local/Cellar/fasttrack/6.3.1_1/bin/FastTrack.app`.
 
 ## Update
 
@@ -54,4 +59,5 @@ FastTrack will display a message at the start-up and in the status bar when a ne
   The FastTrack AppImage does not currently support the automatic update. Replace the current AppImage with the latest AppImage released.
 
 3. For Mac:  
-  The FastTrack App does not currently support the automatic update. Replace the current App with the latest App released.
+    * The FastTrack App does not currently support the automatic update. Replace the current App with the latest App released.
+    * The brew package support upgrade using `brew upgrade`.
