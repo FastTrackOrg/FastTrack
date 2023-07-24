@@ -1,5 +1,18 @@
 # FastTrack changelog
 
+## 6.3.2
+
+### Added
+- Add brew package.
+
+### Changed
+- OpenCV upgrade to 4.8.0
+- Qt upgrade to 6.5.2.
+- Minimal macos version now aligned with Qt requirements.
+
+### Deprecated
+- Analysis tab.
+
 ## 6.3.1
 
 ### Added
