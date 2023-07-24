@@ -24,8 +24,7 @@ unix:!macx {
 
 unix:macx {
   CONFIG += c++17
-  QMAKE_CXXFLAGS += -std=c++1z -stdlib=libc++ -mmacosx-version-min=10.15 -O3 -g -Xpreprocessor
-  QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.15
+  QMAKE_CXXFLAGS += -std=c++1z -stdlib=libc++ -O3 -g -Xpreprocessor
   QMAKE_LFLAGS_SONAME  = -Wl,-install_name,@executable_path/../Frameworks/
   QT_CONFIG -= no-pkg-config
   CONFIG  += link_pkgconfig
@@ -36,7 +35,7 @@ unix:macx {
 win32 {
   CONFIG += c++2a
   QMAKE_CXXFLAGS += -O3 -g
-  LIBS += -L"$$PWD/../OpenCV_MinGW_64/bin" -lopencv_world470
+  LIBS += -L"$$PWD/../OpenCV_MinGW_64/bin" -lopencv_world480
   INCLUDEPATH += "$$PWD/../OpenCV_MinGW_64/include"
   LIBS += -L"$$PWD/../googletest/build/install/lib" -lgtest -lgtest_main
   INCLUDEPATH += "$$PWD/../googletest/build/install/include/"
