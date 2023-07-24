@@ -99,6 +99,8 @@ jobs:
           rm -f /usr/local/bin/idle3*
           rm -f /usr/local/bin/pydoc3*
           rm -f /usr/local/bin/python3*
+          rm -f /usr/local/opt/go/bin/go*
+          rm -f /usr/local/bin/go*
           brew update -q -f
           brew upgrade -q -f
           brew install pkg-config
