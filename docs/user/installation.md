@@ -4,11 +4,12 @@ title: Installation
 sidebar_label: Installation
 ---
 
+![installation](assets/installing.png)
 
 ---
 **NOTE**
 
-During the installation on Windows and Mac systems, security alerts are displayed because the FastTrack executable does not possess an EV code signing certificate. These alerts can be ignored. FastTrack executable can be verified easily (and freely) by comparing the MD5 checksum. See the [installation video](https://www.youtube.com/watch?v=EvfCIS7BmSM) for more details.
+During the installation on Windows and Mac systems, security alerts may be displayed due to the absence of an EV code signing certificate for the FastTrack executable. These alerts can be safely ignored. To verify the FastTrack executable, you can easily and freely compare the MD5 checksum. For more detailed instructions, you can refer to the [installation video](https://www.youtube.com/watch?v=EvfCIS7BmSM).
 
 ---
 

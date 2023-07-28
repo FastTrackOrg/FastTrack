@@ -4,6 +4,8 @@ title: A step by step example
 sidebar_label: Step by step example
 ---
 
+![step_by_step](assets/step_by_step.png)
+
 This section details step by step the process to test FastTrack using data from the [Two-Dimensional Tracking Dataset](http://data.ljp.upmc.fr/datasets/TD2/). Illustrations originate from v4.x.y and can differ from the current stable version.
 
  <video width="100%" muted autoplay controls loop>

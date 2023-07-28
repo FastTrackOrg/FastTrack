@@ -4,19 +4,22 @@ title: Getting Started
 sidebar_label: Getting Started
 ---
 
+![getting_started](assets/getting_started.png)
 
-Welcome to the FastTrack user manual. This manual will present the tracking software and how to use it. Please contact Benjamin Gallois by email at **benjamin.gallois@fasttrack.sh** if you need more information or to signal a bug. If you encounter any problem, please check at [FastTrack issues](https://github.com/FastTrackOrg/FastTrack/issues) to see if the error is already signaled and being addressed. For comments or suggestions, please open a [discussion](https://github.com/FastTrackOrg/FastTrack/discussions).
+Welcome to the FastTrack user manual. This manual will introduce you to the tracking software and provide instructions on how to use it. If you need further information or want to report a bug, please contact Benjamin Gallois via email at **benjamin.gallois@fasttrack.sh**. In case you encounter any issues, we recommend checking the  [FastTrack issues](https://github.com/FastTrackOrg/FastTrack/issues)  page to see if the problem has already been reported and is currently being addressed. For any comments or suggestions, please feel free to participate in the [discussion](https://github.com/FastTrackOrg/FastTrack/discussions). Your feedback is valuable to us!
 
-FastTrack is a cross-platform application designed to track multiple objects in video recording. Stable versions of the software are available for Linux, Mac, and Windows. The source code can be downloaded at https://github.com/FastTrackOrg/FastTrack.
+FastTrack is a versatile cross-platform application specifically designed for tracking multiple objects in video recordings. The software offers stable versions for Linux, Mac, and Windows operating systems. For those interested, the source code is available for download at https://github.com/FastTrackOrg/FastTrack.
 
-Two main features are implemented in the software:
+The software boasts two primary features:
 
--  An automatic tracking algorithm that can detect and track objects, conserving the objects' identities across the video recording.
--  An ergonomic tool allows the user to check, correct and annotate the tracking.
+1. An automatic tracking algorithm capable of detecting and tracking objects while preserving their identities throughout the video recording.
+2. An ergonomic tool that enables users to review, correct, and annotate the tracking results.
 
-The FastTrack user interface is implemented with Qt and the image analysis with the OpenCV library. This allows a performant and responsive software amenable to processing large video recordings. FastTrack uses SQLite database to store the data internally and tracking results are exported in a plain text file (as well as accessible through the database).
+With these features, FastTrack provides a comprehensive solution for efficient and accurate object tracking in videos.
 
-FastTrack was first a [Ph.D. thesis](https://hal.archives-ouvertes.fr/tel-03243224/document) side project started by [Benjamin Gallois](https://github.com/bgallois) in his spare time that has then taken dedicated time in his Ph.D. project. The software's core is still maintained in his spare time; therefore, new features implementation, bug fixes, and help can take some time.
+The FastTrack user interface is implemented with Qt, and image analysis is performed using the OpenCV library. This combination enables the software to deliver excellent performance and responsiveness, making it well-suited for processing large video recordings. To store data internally, FastTrack utilizes an SQLite database, while tracking results are exported in plain text format and are also accessible through the database.
+
+FastTrack originated as a side project during  [Benjamin Gallois](https://github.com/bgallois)' Ph.D. thesis, which you can find [here](https://hal.archives-ouvertes.fr/tel-03243224/document) . Over time, it evolved into a dedicated part of his Ph.D. project. Despite being a spare-time endeavor, Benjamin continues to maintain the software's core. As a result, the implementation of new features, bug fixes, and support may take some time to be addressed. We appreciate your understanding and patience in this regard.
 
 **Not sure if you want to use FastTrack? Check these five most common questions:**
 
@@ -34,3 +37,6 @@ FastTrack is a [free](https://www.gnu.org/philosophy/free-sw.en.html) software u
 
 **Do I need programming skills?**
 No.
+
+**I need more flexibility?**
+PyFastTrack is a Python library that integrates the tracking technology of FastTrack. With PyFastTrack, you can combine FastTrack with your own trained YOLO detector, allowing you to detect and track various objects with ease.

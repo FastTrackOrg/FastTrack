@@ -4,13 +4,13 @@
 
 ## About
 
-Tracking objects in video recording can be tedious. Existing software can be expensive, the learning curve can be steep, necessitate a powerful computer, and the workflow can not be easily adapted when the project evolved.
+Tracking objects in video recordings can be a tedious task, and existing software often comes with drawbacks like high cost, steep learning curves, hardware requirements, and inflexible workflows as the project evolves.
 
-**FastTrack** is a free (as freedom) desktop tracking software, easy to install, easy to use, and performant. The software can be downloaded for Linux, macOS, and Windows, and a public API is available to embed the core of the software in any C++/Qt project.
+**FastTrack** is a free and open-source desktop tracking software that aims to address these issues. It offers ease of installation, user-friendly interface, and high performance. The software is compatible with Linux, macOS, and Windows operating systems. Additionally, a public API is available, allowing users to embed the core tracking functionality into any C++/Qt project.
 
-Two main features are implemented in the software:
-* An automatic tracking algorithm that can detect and track objects (conserving the objects' identities across the video recording).
-* A manual review of the tracking where errors can be corrected rapidly and easily to achieve 100% accuracy.
+FastTrack offers two main features:
+1. Automatic tracking algorithm: This algorithm can efficiently detect and track objects while preserving their identities throughout the entire video recording.
+2. Manual review of tracking: Users have the option to review and correct tracking errors swiftly, ensuring 100% accuracy.
 
 ![alt text](docs/user/assets/readme.gif)
 
@@ -20,8 +20,7 @@ Stable builds of the software are available for Linux, Mac, and Windows on the [
 
 ## Documentation
 
-User documentation can be found [here](https://www.fasttrack.sh/docs/intro) with video tutorials, examples, and an extended description of the software.
-Developer documentation can be found [here](https://www.fasttrack.sh/API/index.html). It contains information to set up a development environment and the API of FastTrack.
+For user-oriented documentation, video tutorials, examples, and an in-depth description of the software, refer to the [FastTrack User Documentation](https://www.fasttrack.sh/docs/intro). On the other hand, if you're interested in developing with FastTrack, you can access the [Developer Documentation](https://www.fasttrack.sh/API/index.html), which provides information on setting up a development environment and utilizing the FastTrack API.
 
 ## Examples
 
@@ -29,12 +28,12 @@ Developer documentation can be found [here](https://www.fasttrack.sh/API/index.h
 
 ## Contributing
 
-If you want to contribute to FastTrack, please follow the [guidelines](contributing.md). Any contribution or idea is welcome.
+FastTrack welcomes contributions and ideas from the community. If you wish to contribute, please follow the guidelines outlined in the [contributing.md](contributing.md) file.
 
 ## Get help
 
-If you need help, please contact benjamin.gallois@fasttrack.sh or open an issue or a discussion on GitHub.
+If you require any assistance or have questions, you can contact benjamin.gallois@fasttrack.sh, open an issue, or start a discussion on GitHub.
 
 ## Citation
 
-You can cite FastTrack [Gallois, Benjamin, and Raphaël Candelier. "FastTrack: An open-source software for tracking varying numbers of deformable objects." PLoS computational biology 17.2 (2021): e1008697.](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1008697).
+If you use FastTrack in your research or project, kindly cite it using the following reference: [Gallois, Benjamin, and Raphaël Candelier. "FastTrack: An open-source software for tracking varying numbers of deformable objects." PLoS computational biology 17.2 (2021): e1008697.](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1008697).
