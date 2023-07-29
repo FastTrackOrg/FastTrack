@@ -291,18 +291,9 @@ void Tracking::registration(UMat imageReference, UMat &frame, const int method) 
       frame.convertTo(frame, CV_32FC1);
       imageReference.convertTo(imageReference, CV_32FC1);
 
-      // Downsamples the image to accelerate the registration
-      vector<UMat> framesDownSampled;
-      vector<UMat> imagesReferenceDownSampled;
-      buildPyramid(frame, framesDownSampled, 4);
-      buildPyramid(imageReference, imagesReferenceDownSampled, 4);
-
-      for (size_t i = framesDownSampled.size(); i > 0; i--) {
-        // Simple phase correlation registration
-        Point2d shift = phaseCorrelate(framesDownSampled[i - 1], imagesReferenceDownSampled[i - 1]);
-        Mat H = (Mat_<float>(2, 3) << 1.0, 0.0, shift.x, 0.0, 1.0, shift.y);
-        warpAffine(framesDownSampled[i - 1], framesDownSampled[i - 1], H, framesDownSampled[i - 1].size());
-      }
+      Point2d shift = phaseCorrelate(frame, imageReference);
+      Mat H = (Mat_<float>(2, 3) << 1.0, 0.0, shift.x, 0.0, 1.0, shift.y);
+      warpAffine(frame, frame, H, frame.size());
       frame.convertTo(frame, CV_8U);
       break;
     }
@@ -312,21 +303,11 @@ void Tracking::registration(UMat imageReference, UMat &frame, const int method) 
       frame.convertTo(frame, CV_32FC1);
       imageReference.convertTo(imageReference, CV_32FC1);
 
-      // Downsamples the image to accelerate the registration
-      vector<UMat> framesDownSampled;
-      vector<UMat> imagesReferenceDownSampled;
-      buildPyramid(frame, framesDownSampled, 4);
-      buildPyramid(imageReference, imagesReferenceDownSampled, 4);
-
-      for (size_t i = framesDownSampled.size(); i > 0; i--) {
-        // Simple phase correlation registration
-        const int warpMode = MOTION_EUCLIDEAN;
-        Mat warpMat = Mat::eye(2, 3, CV_32F);
-        TermCriteria criteria(TermCriteria::COUNT + TermCriteria::EPS, 5000, 1e-5);
-        findTransformECC(imagesReferenceDownSampled[i - 1], framesDownSampled[i - 1], warpMat, warpMode, criteria);
-        // Gets the transformation from downsampled images
-        warpAffine(framesDownSampled[i - 1], framesDownSampled[i - 1], warpMat, framesDownSampled[i - 1].size(), INTER_LINEAR + WARP_INVERSE_MAP);
-      }
+      const int warpMode = MOTION_EUCLIDEAN;
+      Mat warpMat = Mat::eye(2, 3, CV_32F);
+      TermCriteria criteria(TermCriteria::COUNT + TermCriteria::EPS, 5000, 1e-5);
+      findTransformECC(imageReference, frame, warpMat, warpMode, criteria);
+      warpAffine(frame, frame, warpMat, frame.size(), INTER_LINEAR + WARP_INVERSE_MAP);
       frame.convertTo(frame, CV_8U);
       break;
     }
