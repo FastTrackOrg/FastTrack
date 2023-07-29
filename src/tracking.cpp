@@ -293,8 +293,9 @@ void Tracking::registration(UMat imageReference, UMat &frame, const int method) 
 
       Point2d shift = phaseCorrelate(frame, imageReference);
       Mat H = (Mat_<float>(2, 3) << 1.0, 0.0, shift.x, 0.0, 1.0, shift.y);
-      warpAffine(frame, frame, H, frame.size());
-      frame.convertTo(frame, CV_8U);
+      UMat output;
+      warpAffine(frame, output, H, frame.size());
+      output.convertTo(frame, CV_8U);
       break;
     }
       // ECC images alignment
@@ -307,8 +308,9 @@ void Tracking::registration(UMat imageReference, UMat &frame, const int method) 
       Mat warpMat = Mat::eye(2, 3, CV_32F);
       TermCriteria criteria(TermCriteria::COUNT + TermCriteria::EPS, 5000, 1e-5);
       findTransformECC(imageReference, frame, warpMat, warpMode, criteria);
-      warpAffine(frame, frame, warpMat, frame.size(), INTER_LINEAR + WARP_INVERSE_MAP);
-      frame.convertTo(frame, CV_8U);
+      UMat output;
+      warpAffine(frame, output, warpMat, frame.size(), INTER_LINEAR + WARP_INVERSE_MAP);
+      output.convertTo(frame, CV_8U);
       break;
     }
     // Features based registration
@@ -338,9 +340,10 @@ void Tracking::registration(UMat imageReference, UMat &frame, const int method) 
       }
 
       Mat h = findHomography(pointsFrame, pointsRef, RANSAC);
-      warpPerspective(frame, frame, h, frame.size());
+      UMat output;
+      warpPerspective(frame, output, h, frame.size());
 
-      frame.convertTo(frame, CV_8U);
+      frame.convertTo(output, CV_8U);
       break;
     }
   }
