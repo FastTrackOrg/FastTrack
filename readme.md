@@ -34,6 +34,10 @@ FastTrack welcomes contributions and ideas from the community. If you wish to co
 
 If you require any assistance or have questions, you can contact benjamin.gallois@fasttrack.sh, open an issue, or start a discussion on GitHub.
 
+## Join Our Community Discord
+
+Are you passionate about our project and looking for a place to connect with like-minded individuals? Look no further! We're thrilled to invite you to our vibrant community Discord server at https://discord.gg/qxYMbCwZmf. Here, you'll find a supportive community ready to assist and collaborate on all aspects of our project. Backers will enjoy personalized help from the developer, ensuring an enriching experience. Stay ahead of the game with early announcements, and be part of engaging discussions on data analysis and post-tracking strategies. Get exclusive insights into project development updates straight from the source. Embrace the power of community synergy and come be a part of our growing family on Discord! See you there! 🚀🌟
+
 ## Citation
 
 If you use FastTrack in your research or project, kindly cite it using the following reference: [Gallois, Benjamin, and Raphaël Candelier. "FastTrack: An open-source software for tracking varying numbers of deformable objects." PLoS computational biology 17.2 (2021): e1008697.](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1008697).

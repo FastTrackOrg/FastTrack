@@ -21,6 +21,8 @@ The FastTrack user interface is implemented with Qt, and image analysis is perfo
 
 FastTrack originated as a side project during  [Benjamin Gallois](https://github.com/bgallois)' Ph.D. thesis, which you can find [here](https://hal.archives-ouvertes.fr/tel-03243224/document) . Over time, it evolved into a dedicated part of his Ph.D. project. Despite being a spare-time endeavor, Benjamin continues to maintain the software's core. As a result, the implementation of new features, bug fixes, and support may take some time to be addressed. We appreciate your understanding and patience in this regard.
 
+Are you passionate about our project and looking for a place to connect with like-minded individuals? Look no further! We're thrilled to invite you to our vibrant community Discord server at https://discord.gg/qxYMbCwZmf. Here, you'll find a supportive community ready to assist and collaborate on all aspects of our project. Backers will enjoy personalized help from the developer, ensuring an enriching experience. Stay ahead of the game with early announcements, and be part of engaging discussions on data analysis and post-tracking strategies. Get exclusive insights into project development updates straight from the source. Embrace the power of community synergy and come be a part of our growing family on Discord! See you there! 🚀🌟
+
 **Not sure if you want to use FastTrack? Check these five most common questions:**
 
 **What video quality is required?**
