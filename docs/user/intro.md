@@ -8,6 +8,8 @@ sidebar_label: Getting Started
 
 Welcome to the FastTrack user manual. This manual will introduce you to the tracking software and provide instructions on how to use it. If you need further information or want to report a bug, please contact Benjamin Gallois via email at **benjamin.gallois@fasttrack.sh**. In case you encounter any issues, we recommend checking the  [FastTrack issues](https://github.com/FastTrackOrg/FastTrack/issues)  page to see if the problem has already been reported and is currently being addressed. For any comments or suggestions, please feel free to participate in the [discussion](https://github.com/FastTrackOrg/FastTrack/discussions). Your feedback is valuable to us!
 
+<iframe width="560" height="315" src="https://www.youtube.com/embed/4Dz3uvrRJyc" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+
 FastTrack is a versatile cross-platform application specifically designed for tracking multiple objects in video recordings. The software offers stable versions for Linux, Mac, and Windows operating systems. For those interested, the source code is available for download at https://github.com/FastTrackOrg/FastTrack.
 
 The software boasts two primary features:
