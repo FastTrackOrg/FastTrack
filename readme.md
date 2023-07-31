@@ -12,7 +12,7 @@ FastTrack offers two main features:
 1. Automatic tracking algorithm: This algorithm can efficiently detect and track objects while preserving their identities throughout the entire video recording.
 2. Manual review of tracking: Users have the option to review and correct tracking errors swiftly, ensuring 100% accuracy.
 
-![alt text](docs/user/assets/readme.gif)
+[![sofware preview](docs/user/assets/readme.png)](https://youtu.be/4Dz3uvrRJyc)
 
 ## Installation
 
@@ -24,7 +24,7 @@ For user-oriented documentation, video tutorials, examples, and an in-depth desc
 
 ## Examples
 
-![alt text](docs/user/assets/example.gif)
+![video tracking preview](docs/user/assets/example.gif)
 
 ## Contributing
 
