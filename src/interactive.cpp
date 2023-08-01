@@ -98,7 +98,7 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   ui->menuView->addAction(ui->trackingOptions->toggleViewAction());
   ui->menuView->addAction(ui->controlOptions->toggleViewAction());
 
-  replayAction = new QAction(tr("Tracking replay"), this);
+  replayAction = ui->menuView->addAction(tr("Tracking replay"));
   replayAction->setCheckable(true);
   connect(replayAction, &QAction::toggled, this, [this](bool isChecked) {
     if (isChecked) {
@@ -110,7 +110,6 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
       ui->interactiveTab->removeTab(1);  // Remove Analysis tab
     }
   });
-  ui->menuView->addAction(replayAction);
 
   connect(ui->slider, &Timeline::valueChanged, this, [this](int newValue) {
     int index = ui->interactiveTab->currentIndex();
@@ -148,7 +147,7 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   ui->menuSettings->addMenu(menuStyle);
 
   for (auto const &a : styles) {
-    QAction *styleAction = new QAction(a, this);
+    QAction *styleAction = menuStyle->addAction(a);
     styleAction->setCheckable(true);
     connect(styleAction, &QAction::triggered, this, [this, styleAction, menuStyle]() {
       QApplication::setStyle(QStyleFactory::create(styleAction->text()));
@@ -158,7 +157,6 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
       }
       styleAction->setChecked(true);
     });
-    menuStyle->addAction(styleAction);
   }
 
   if (styles.contains(style)) {
@@ -173,18 +171,14 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   // Palette
   QMenu *menuPalette = new QMenu(tr("Theme"), this);
   ui->menuSettings->addMenu(menuPalette);
-  QAction *defaultColor = new QAction(tr("Default"), this);
+  QAction *defaultColor = menuPalette->addAction(tr("Default"));
   defaultColor->setCheckable(true);
-  menuPalette->addAction(defaultColor);
-  QAction *darkColor = new QAction(tr("Breeze Dark"), this);
+  QAction *darkColor = menuPalette->addAction(tr("Breeze Dark"));
   darkColor->setCheckable(true);
-  menuPalette->addAction(darkColor);
-  QAction *lightColor = new QAction(tr("Breeze Light"), this);
+  QAction *lightColor = menuPalette->addAction(tr("Breeze Light"));
   lightColor->setCheckable(true);
-  menuPalette->addAction(lightColor);
-  QAction *ftColor = new QAction(tr("FastTrack"), this);
+  QAction *ftColor = menuPalette->addAction(tr("FastTrack"));
   ftColor->setCheckable(true);
-  menuPalette->addAction(ftColor);
   connect(defaultColor, &QAction::triggered, this, [this, defaultColor, menuPalette]() {
     foreach (QAction *action, menuPalette->actions()) {
       action->setChecked(false);
@@ -307,7 +301,7 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
     addDockWidget(Qt::LeftDockWidgetArea, ui->controlOptions);
   });
 
-  QAction *actionMode = new QAction(tr("Expert Mode"), this);
+  QAction *actionMode = ui->menuSettings->addAction(tr("Expert Mode"));
   actionMode->setCheckable(true);
   isExpert = settingsFile->value(QStringLiteral("mode"), false).toBool();
   actionMode->setChecked(isExpert);
@@ -318,7 +312,6 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   QTimer::singleShot(500, actionMode, [this]() {
     emit modeChanged(isExpert);
   });  // Need to wait for the connection initialization
-  ui->menuSettings->addAction(actionMode);
 
   // Help menu
   connect(ui->actionDoc, &QAction::triggered, []() {
