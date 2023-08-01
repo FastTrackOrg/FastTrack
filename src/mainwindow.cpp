@@ -60,6 +60,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
   QAction *restore = trayMenu->addAction(tr("Restore"));
   connect(restore, &QAction::triggered, this, &MainWindow::showNormal);
   QAction *close = trayMenu->addAction(tr("Close"));
+  connect(close, &QAction::triggered, this, &MainWindow::showNormal);  // Needed for close to work when window is hidden
   connect(close, &QAction::triggered, this, &MainWindow::close);
   connect(trayIcon, &QSystemTrayIcon::activated, this, [this](QSystemTrayIcon::ActivationReason reason) {
     switch (reason) {
