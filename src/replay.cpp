@@ -64,34 +64,30 @@ Replay::Replay(QWidget* parent, bool standalone, Timeline* slider, VideoReader* 
   QIcon img;
   if (isStandalone) {
     img = QIcon(":/assets/buttons/openImage.png");
-    QAction* openAction = new QAction(img, tr("&Open"), this);
+    QAction* openAction = ui->toolBar->addAction(img, tr("&Open"));
     openAction->setShortcuts(QKeySequence::Open);
     openAction->setStatusTip(tr("Open a tracked movie"));
     connect(openAction, &QAction::triggered, this, &Replay::openReplay);
-    ui->toolBar->addAction(openAction);
   }
 
   img = QIcon(":/assets/buttons/open.png");
-  QAction* openTrackingDirAction = new QAction(img, tr("&Open Tracking_Result directory"), this);
+  QAction* openTrackingDirAction = ui->toolBar->addAction(img, tr("&Open Tracking_Result directory"));
   openTrackingDirAction->setStatusTip(tr("Open an analysis folder"));
   connect(openTrackingDirAction, &QAction::triggered, this, &Replay::openTrackingDir);
   connect(this, &Replay::opened, openTrackingDirAction, &QAction::setEnabled);
   openTrackingDirAction->setEnabled(false);
-  ui->toolBar->addAction(openTrackingDirAction);
 
   img = QIcon(":/assets/buttons/refresh.png");
-  QAction* refreshAction = new QAction(img, tr("&Refresh"), this);
+  QAction* refreshAction = ui->toolBar->addAction(img, tr("&Refresh"));
   refreshAction->setStatusTip(tr("Reload the latest tracking analysis"));
   connect(refreshAction, &QAction::triggered, this, [this]() {
     loadReplay(memoryDir);
   });
-  ui->toolBar->addAction(refreshAction);
 
   img = QIcon(":/assets/buttons/save.png");
-  QAction* exportAction = new QAction(img, tr("&Export"), this);
+  QAction* exportAction = ui->toolBar->addAction(img, tr("&Export"));
   exportAction->setStatusTip(tr("Export the tracked movie"));
   connect(exportAction, &QAction::triggered, this, &Replay::saveTrackedMovie);
-  ui->toolBar->addAction(exportAction);
 
   commandStack = new QUndoStack(this);
   img = QIcon(":/assets/buttons/undo.png");
@@ -142,10 +138,9 @@ Replay::Replay(QWidget* parent, bool standalone, Timeline* slider, VideoReader* 
   ui->toolBar->addWidget(object1Replay);
 
   img = QIcon(":/assets/buttons/replace.png");
-  QAction* swapAction = new QAction(img, tr("&Swap"), this);
+  QAction* swapAction = ui->toolBar->addAction(img, tr("&Swap"));
   swapAction->setStatusTip(tr("Swap the two objects"));
   connect(swapAction, &QAction::triggered, this, &Replay::correctTracking);
-  ui->toolBar->addAction(swapAction);
 
   object2Replay = new QComboBox(this);
   object2Replay->setEditable(true);
@@ -161,7 +156,7 @@ Replay::Replay(QWidget* parent, bool standalone, Timeline* slider, VideoReader* 
   ui->toolBar->addWidget(object2Replay);
 
   img = QIcon(":/assets/buttons/deleteOne.png");
-  QAction* deleteOneAction = new QAction(img, tr("&Delete"), this);
+  QAction* deleteOneAction = ui->toolBar->addAction(img, tr("&Delete"));
   deleteOneAction->setShortcut(QKeySequence(QStringLiteral("f")));
   deleteOneAction->setStatusTip(tr("Delete the object on this frame"));
   connect(deleteOneAction, &QAction::triggered, this, [this]() {
@@ -176,10 +171,9 @@ Replay::Replay(QWidget* parent, bool standalone, Timeline* slider, VideoReader* 
       loadFrame(currentIndex);
     }
   });
-  ui->toolBar->addAction(deleteOneAction);
 
   img = QIcon(":/assets/buttons/delete.png");
-  QAction* deleteAction = new QAction(img, tr("&Delete"), this);
+  QAction* deleteAction = ui->toolBar->addAction(img, tr("&Delete"));
   deleteAction->setShortcut(QKeySequence(tr("G")));
   deleteAction->setStatusTip(tr("Delete the object from this frame on the selected number of frames"));
   connect(deleteAction, &QAction::triggered, this, [this]() {
@@ -194,7 +188,6 @@ Replay::Replay(QWidget* parent, bool standalone, Timeline* slider, VideoReader* 
       loadFrame(currentIndex);
     }
   });
-  ui->toolBar->addAction(deleteAction);
 
   deletedFrameNumber = new QSpinBox(this);
   deletedFrameNumber->setStatusTip(tr("Number of frames where to delete the selected object"));
@@ -205,26 +198,23 @@ Replay::Replay(QWidget* parent, bool standalone, Timeline* slider, VideoReader* 
   ui->toolBar->addWidget(deletedFrameNumber);
 
   img = QIcon(":/assets/buttons/previous.png");
-  QAction* previousAction = new QAction(img, tr("&Previous"), this);
+  QAction* previousAction = ui->toolBar->addAction(img, tr("&Previous"));
   previousAction->setStatusTip(tr("Previous occlusion"));
   connect(previousAction, &QAction::triggered, this, &Replay::previousOcclusionEvent);
-  ui->toolBar->addAction(previousAction);
 
   img = QIcon(":/assets/buttons/next.png");
-  QAction* nextAction = new QAction(img, tr("&Next"), this);
+  QAction* nextAction = ui->toolBar->addAction(img, tr("&Next"));
   nextAction->setStatusTip(tr("Next occlusion"));
   connect(nextAction, &QAction::triggered, this, &Replay::nextOcclusionEvent);
-  ui->toolBar->addAction(nextAction);
 
   img = QIcon(":/assets/buttons/help.png");
-  QAction* helpAction = new QAction(img, tr("&Help"), this);
+  QAction* helpAction = ui->toolBar->addAction(img, tr("&Help"));
   helpAction->setStatusTip(tr("Help"));
   connect(helpAction, &QAction::triggered, this, [this]() {
     QMessageBox helpBox(this);
     helpBox.setIconPixmap(QPixmap(QStringLiteral(":/assets/buttons/helpImg.png")));
     helpBox.exec();
   });
-  ui->toolBar->addAction(helpAction);
 
   ui->toolBar->addSeparator();
 
