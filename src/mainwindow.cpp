@@ -57,12 +57,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
   // Tray icon
   trayIcon = new QSystemTrayIcon(QIcon(":/assets/icon.svg"), this);
   QMenu *trayMenu = new QMenu(this);
-  QAction *restore = new QAction(tr("Restore"), this);
+  QAction *restore = trayMenu->addAction(tr("Restore"));
   connect(restore, &QAction::triggered, this, &MainWindow::showNormal);
-  trayMenu->addAction(restore);
-  QAction *close = new QAction(tr("Close"), this);
+  QAction *close = trayMenu->addAction(tr("Close"));
   connect(close, &QAction::triggered, this, &MainWindow::close);
-  trayMenu->addAction(close);
   connect(trayIcon, &QSystemTrayIcon::activated, this, [this](QSystemTrayIcon::ActivationReason reason) {
     switch (reason) {
       case QSystemTrayIcon::Trigger: {
