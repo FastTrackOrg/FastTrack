@@ -135,9 +135,9 @@ jobs:
           make
           cd build/
           macdeployqt FastTrack.app -always-overwrite
-          wget https://raw.githubusercontent.com/arl/macdeployqtfix/master/macdeployqtfix.py
+          wget https://raw.githubusercontent.com/tamlok/macdeployqtfix/master/macdeployqtfix.py
           cp *.qm FastTrack.app/Contents/Resources/
-          python2.7 macdeployqtfix.py FastTrack.app/Contents/MacOS/FastTrack ../../Qt/${{ env.QT_VERSION }}/
+          python macdeployqtfix.py FastTrack.app/Contents/MacOS/FastTrack ../../Qt/${{ env.QT_VERSION }}/
           hdiutil create -volname FastTrack -srcfolder FastTrack.app -ov -format UDZO FastTrack.dmg
       - name: upload_artefact
         uses: actions/upload-artifact@v1

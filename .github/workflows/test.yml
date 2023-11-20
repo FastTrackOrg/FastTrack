@@ -105,7 +105,8 @@ jobs:
           brew upgrade -q -f
           brew install pkg-config
           brew install libomp
-          brew install opencv
+          brew tap FastTrackOrg/fasttrack
+          brew install --build-from-source FastTrackOrg/fasttrack/opencv
           brew install googletest
           export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig/
           python -m pip install --upgrade pip setuptools wheel

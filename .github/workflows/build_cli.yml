@@ -128,8 +128,8 @@ jobs:
               make
               cd build_cli/
               macdeployqt FastTrack-cli.app -always-overwrite
-              wget https://raw.githubusercontent.com/arl/macdeployqtfix/master/macdeployqtfix.py
-              python2.7 macdeployqtfix.py FastTrack-cli.app/Contents/MacOS/FastTrack-cli ../../Qt/${{ env.QT_VERSION }}/
+              wget https://raw.githubusercontent.com/tamlok/macdeployqtfix/master/macdeployqtfix.py
+              python macdeployqtfix.py FastTrack-cli.app/Contents/MacOS/FastTrack-cli ../../Qt/${{ env.QT_VERSION }}/
               hdiutil create -volname FastTrack-cli -srcfolder FastTrack-cli.app -ov -format UDZO FastTrack-cli.dmg
         - name: upload_artefact
           uses: actions/upload-artifact@v2
