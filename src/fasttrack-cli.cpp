@@ -19,6 +19,7 @@ This file is part of Fast Track.
 #include <stdio.h>
 #include <stdlib.h>
 #include <tracking.h>
+#include <QCoreApplication>
 #include <QHash>
 #include <QHashIterator>
 #include <QObject>
@@ -100,6 +101,7 @@ All arguments are mandatory except --backPath and --cfg. Loading a configuration
 }
 
 int main(int argc, char **argv) {
+  QCoreApplication app(argc, argv);
   char env[] = "OPENCV_OPENCL_DEVICE=disabled";
   putenv(env);  // disable OpenCL to fix windows memory leaks and increase performance
   static struct option long_options[] =
