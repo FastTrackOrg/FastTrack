@@ -128,6 +128,7 @@ jobs:
               make
               cd build_cli/
               macdeployqt FastTrack-cli.app -always-overwrite
+              cp /usr/local/lib/libsharp* FastTrack-cli.app/Contents/Frameworks
               wget https://raw.githubusercontent.com/tamlok/macdeployqtfix/master/macdeployqtfix.py
               python macdeployqtfix.py FastTrack-cli.app/Contents/MacOS/FastTrack-cli ../../Qt/${{ env.QT_VERSION }}/
               hdiutil create -volname FastTrack-cli -srcfolder FastTrack-cli.app -ov -format UDZO FastTrack-cli.dmg
