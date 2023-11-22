@@ -1,5 +1,20 @@
 # FastTrack changelog
 
+## 6.3.3
+
+### Added
+- Add community url.
+
+### Fix
+- Fix registration.
+- Fix closing when minimized.
+- Fix deployement CI.
+- Fix CLI for Windows.
+
+### Refactore
+- Refactore UI QActions.
+- Update readme and documentation.
+
 ## 6.3.2
 
 ### Added
