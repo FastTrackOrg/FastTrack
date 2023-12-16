@@ -2,6 +2,8 @@
 
  ![Test](https://github.com/bgallois/FastTrack/workflows/FastTrack_testing/badge.svg) ![Clang Format](https://github.com/bgallois/FastTrack/workflows/Clang%20Format/badge.svg) ![Continous Build](https://github.com/bgallois/FastTrack/workflows/FastTrack_build/badge.svg) [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0) [![Website](https://img.shields.io/website?style=plastic&url=https%3A%2F%2Fwww.fasttrack.sh%2F)](http://www.fasttrack.sh)
 
+FastTrack, an open source project designed for efficient object tracking in videos, greatly benefits from the financial support provided by [Analyzable](https://github.com/Analyzable-FR). With a monthly contribution covering one day of development, Analyzable supports bug-solving and version releases, ensuring the project's maintenance and stability. However, for the continuous enhancement and addition of new features to FastTrack, we rely on additional donations. Your contributions are crucial for the ongoing evolution of FastTrack, making it an even more valuable tool for the community. We appreciate your support and encourage you to consider contributing to help us achieve our goals.
+
 ## About
 
 Tracking objects in video recordings can be a tedious task, and existing software often comes with drawbacks like high cost, steep learning curves, hardware requirements, and inflexible workflows as the project evolves.
