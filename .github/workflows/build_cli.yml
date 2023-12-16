@@ -113,6 +113,7 @@ jobs:
               rm -f /usr/local/bin/python3*
               rm -f /usr/local/opt/go/bin/go*
               rm -f /usr/local/bin/go*
+              rm -rf /usr/local/lib/node*
               brew update -q -f
               brew upgrade -q -f
               brew install pkg-config
