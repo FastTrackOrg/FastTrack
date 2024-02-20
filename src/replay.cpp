@@ -671,17 +671,18 @@ void Replay::saveTrackedMovie() {
   // If tracking data are available, gets the display settings and saves the movie in the
   // selected folder
   if (isReplayable) {
-    QString savePath = QFileDialog::getSaveFileName(this, tr("Save File"), QStringLiteral("/home/save.avi"), tr("Videos (*.avi)"));
-    cv::VideoWriter outputVideo(savePath.toStdString(), cv::VideoWriter::fourcc('M', 'J', 'P', 'G'), ui->replayFps->value(), Size(originalImageSize.width(), originalImageSize.height()));
+    QString savePath = QFileDialog::getSaveFileName(this, tr("Save File"), QStringLiteral("/home/save.mp4"), tr("Videos (*.mp4)"));
+    cv::VideoWriter outputVideo(savePath.toStdString(), CAP_FFMPEG, cv::VideoWriter::fourcc('a', 'v', 'c', '1'), ui->replayFps->value(), Size(originalImageSize.width(), originalImageSize.height()));
     int scale = ui->replaySize->value();
 
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+    this->setEnabled(false);
     for (int frameIndex = 0; frameIndex < static_cast<int>(video->getImageCount()); frameIndex++) {
       Mat frame;
       video->getImage(frameIndex, frame);
       cvtColor(frame, frame, COLOR_GRAY2BGR);
       // Takes the tracking data corresponding to the replayed frame and parse data to display
       // arrows on tracked objects.
-      // Takes the tracking data corresponding to the replayed frame and parse data to display
       QList<int> idList = trackingData->getId(frameIndex);
       for (auto const& a : idList) {
         QHash<QString, double> coordinate = trackingData->getData(frameIndex, a);
@@ -753,5 +754,7 @@ void Replay::saveTrackedMovie() {
       ui->replaySlider->setValue(static_cast<int>(frameIndex));
     }
     outputVideo.release();
+    QApplication::restoreOverrideCursor();
+    this->setEnabled(true);
   }
 }
