@@ -5,9 +5,9 @@ on:
     branches: [master]
 
 env:
-  QT_VERSION: 6.5.2
-  OPENCV_VERSION: 4.8.0
-  OPENCV_VERSION_: 480
+  QT_VERSION: 6.7.2
+  OPENCV_VERSION: 4.10.0
+  OPENCV_VERSION_: 4100
 
 jobs:
   build_linux:
@@ -32,6 +32,7 @@ jobs:
             pip install aqtinstall
             python3 -m aqt install-qt -O ${{ github.workspace }}/Qt/ linux desktop ${{ env.QT_VERSION }}
             echo ${{ github.workspace }}/Qt/${{ env.QT_VERSION }}/gcc_64/bin/ >> $GITHUB_PATH
+            rm ${{ github.workspace }}/Qt/${{ env.QT_VERSION }}/gcc_64/plugins/sqldrivers/libqsqlmimer.so
         - name: build_ftcli
           run: |
               ./run.sh cli
@@ -43,7 +44,7 @@ jobs:
               cp sh.fasttrack.fasttrackcli.desktop build_cli/
               cp src/assets/fasttrack.png build_cli/
               export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${{ github.workspace }}/Qt/${{ env.QT_VERSION }}/gcc_64/lib/
-              ./deploy.AppImage build_cli/fasttrack-cli -appimage -no-translations -bundle-non-qt-libs -unsupported-allow-new-glibc -qmake=${{ github.workspace }}/Qt/${{ env.QT_VERSION }}/gcc_64/bin/qmake6 -extra-plugins=platforms/,sqldrivers/ -exclude-libs=libgmodule-2.0.so
+              ./deploy.AppImage build_cli/fasttrack-cli -appimage -no-translations -bundle-non-qt-libs -unsupported-allow-new-glibc -qmake=${{ github.workspace }}/Qt/${{ env.QT_VERSION }}/gcc_64/bin/qmake6 -extra-plugins=platforms/,sqldrivers/ -exclude-libs=libgmodule-2.0.so,libmimerapi.so
               mv FastTrack*.AppImage FastTrack-cli-x86_64.AppImage
         - name: upload_artefact
           uses: actions/upload-artifact@v2
@@ -63,9 +64,9 @@ jobs:
           choco uninstall mingw
           pip install aqtinstall
           python3 -m aqt install-qt -O ${{ github.workspace }}/Qt/ windows desktop ${{ env.QT_VERSION }} win64_mingw
-          python3 -m aqt install-tool -O ${{ github.workspace }}/Qt/ windows desktop tools_mingw90
+          python3 -m aqt install-tool -O ${{ github.workspace }}/Qt/ windows desktop tools_mingw1310
           echo "${{ github.workspace }}/Qt/${{ env.QT_VERSION }}/mingw_64/bin/" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-          echo "${{ github.workspace }}/Qt/Tools/mingw1120_64/bin/" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          echo "${{ github.workspace }}/Qt/Tools/mingw1310_64/bin/" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
       - name: install_opencv
         run: |
           choco install wget unzip
@@ -81,7 +82,7 @@ jobs:
           cd build_cli/
           windeployqt FastTrack-Cli.exe --no-translations  # https://bugreports.qt.io/browse/QTBUG-62103?jql=status%20%3D%20Open%20AND%20text%20~%20%22windeployqt%20platform%22 and https://bugreports.qt.io/browse/QTBUG-112204
           cp ..\assets\icon.ico .
-          cp ${{ github.workspace }}/Qt/Tools/mingw*/bin/libgomp-1.dll .
+          cp ${{ github.workspace }}/Qt/Tools/mingw*/bin/lib*.dll .
           cp ${{ github.workspace }}/OpenCV_MinGW_64/bin/opencv_videoio_ffmpeg${{ env.OPENCV_VERSION_ }}_64.dll .
           cp ${{ github.workspace }}/OpenCV_MinGW_64/bin/libopencv_world${{ env.OPENCV_VERSION_ }}.dll .
       - name: upload_artefact
@@ -102,6 +103,9 @@ jobs:
             pip install aqtinstall
             python3 -m aqt install-qt -O ${{ github.workspace }}/Qt/ mac desktop ${{ env.QT_VERSION }}
             echo ${{ github.workspace }}/Qt/${{ env.QT_VERSION }}/macos/bin/ >> $GITHUB_PATH
+            rm -r ${{ github.workspace }}/Qt/${{ env.QT_VERSION }}/macos/plugins/sqldrivers/libqsqlmimer.*
+            rm -r ${{ github.workspace }}/Qt/${{ env.QT_VERSION }}/macos/plugins/sqldrivers/libqsqlodbc.*
+            rm -r ${{ github.workspace }}/Qt/${{ env.QT_VERSION }}/macos/plugins/sqldrivers/libqsqlpsql.*
         - name: Set up Homebrew #https://github.com/Homebrew/homebrew-cask/issues/150323
           id: set-up-homebrew
           uses: Homebrew/actions/setup-homebrew@master
@@ -118,7 +122,6 @@ jobs:
               brew upgrade -q -f
               brew install pkg-config
               brew install openssl
-              brew unlink unixodbc
               brew install libiodbc
               brew tap FastTrackOrg/fasttrack
               brew install --build-from-source FastTrackOrg/fasttrack/opencv
@@ -129,7 +132,6 @@ jobs:
               make
               cd build_cli/
               macdeployqt FastTrack-cli.app -always-overwrite
-              cp /usr/local/lib/libsharp* FastTrack-cli.app/Contents/Frameworks
               wget https://raw.githubusercontent.com/tamlok/macdeployqtfix/master/macdeployqtfix.py
               python macdeployqtfix.py FastTrack-cli.app/Contents/MacOS/FastTrack-cli ../../Qt/${{ env.QT_VERSION }}/
               hdiutil create -volname FastTrack-cli -srcfolder FastTrack-cli.app -ov -format UDZO FastTrack-cli.dmg

@@ -12,8 +12,9 @@ if [ "$1" = "unix" ]; then
   python -m pytest test/accuracyTest.py
 fi
 if [ "$1" = "win" ]; then
-  qmake FastTrack.pro -spec win32-g++ CONFIG+="NO_WEB"
+  qmake6 FastTrack.pro -spec win32-g++ CONFIG+="NO_WEB"
   mingw32-make clean
+  mingw32-make
   mingw32-make check
   python -m pytest test/accuracyTest.py
 fi
