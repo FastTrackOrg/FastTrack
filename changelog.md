@@ -1,5 +1,18 @@
 # FastTrack changelog
 
+## 6.3.4
+
+### Changed
+- Upgraded OpenCV.
+- Upgraded Qt.
+- Documentation now hosted on IPFS.
+
+### Added
+- Added waiting cursor at video export.
+
+### Deprecated
+- Removed nightly build.
+
 ## 6.3.3
 
 ### Added
