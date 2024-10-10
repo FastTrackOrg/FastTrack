@@ -47,7 +47,7 @@ jobs:
               ./deploy.AppImage build_cli/fasttrack-cli -appimage -no-translations -bundle-non-qt-libs -unsupported-allow-new-glibc -qmake=${{ github.workspace }}/Qt/${{ env.QT_VERSION }}/gcc_64/bin/qmake6 -extra-plugins=platforms/,sqldrivers/ -exclude-libs=libgmodule-2.0.so,libmimerapi.so
               mv FastTrack*.AppImage FastTrack-cli-x86_64.AppImage
         - name: upload_artefact
-          uses: actions/upload-artifact@v2
+          uses: actions/upload-artifact@v4
           with:
             name: FastTrack-cli-x86_64.AppImage
             path: ./FastTrack-cli-x86_64.AppImage
@@ -55,7 +55,7 @@ jobs:
   build_win:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - uses: actions/setup-python@v2
         with:
           python-version: '3.8'
@@ -86,7 +86,7 @@ jobs:
           cp ${{ github.workspace }}/OpenCV_MinGW_64/bin/opencv_videoio_ffmpeg${{ env.OPENCV_VERSION_ }}_64.dll .
           cp ${{ github.workspace }}/OpenCV_MinGW_64/bin/libopencv_world${{ env.OPENCV_VERSION_ }}.dll .
       - name: upload_artefact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: FastTrack-Cli
           path: src/build_cli/
@@ -136,7 +136,7 @@ jobs:
               python macdeployqtfix.py FastTrack-cli.app/Contents/MacOS/FastTrack-cli ../../Qt/${{ env.QT_VERSION }}/
               hdiutil create -volname FastTrack-cli -srcfolder FastTrack-cli.app -ov -format UDZO FastTrack-cli.dmg
         - name: upload_artefact
-          uses: actions/upload-artifact@v2
+          uses: actions/upload-artifact@v4
           with:
             name: FastTrack-cli.dmg
             path: ./build_cli/FastTrack-cli.dmg

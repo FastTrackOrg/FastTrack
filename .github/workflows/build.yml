@@ -53,7 +53,7 @@ jobs:
           chmod +x tool.AppImage
           ./tool.AppImage appdir/
       - name: upload_artefact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: FastTrack-x86_64.AppImage
           path: ./build/FastTrack-x86_64.AppImage
@@ -93,7 +93,7 @@ jobs:
           cp ${{ github.workspace }}/OpenCV_MinGW_64/bin/libopencv_world${{ env.OPENCV_VERSION_ }}.dll FastTrack
           cp *.qm FastTrack
       - name: upload_artefact
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v4
         with:
           name: FastTrack
           path: src/build/FastTrack
@@ -144,7 +144,7 @@ jobs:
           python macdeployqtfix.py FastTrack.app/Contents/MacOS/FastTrack ../../Qt/${{ env.QT_VERSION }}/
           hdiutil create -volname FastTrack -srcfolder FastTrack.app -ov -format UDZO FastTrack.dmg
       - name: upload_artefact
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v4
         with:
           name: FastTrack.dmg
           path: ./build/FastTrack.dmg
@@ -157,7 +157,7 @@ jobs:
       - name: create_dir
         run: |
             mkdir ./tmp/
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v4
         with:
           path: ./tmp/
       - name: install_SSH_key
