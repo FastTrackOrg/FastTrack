@@ -14,7 +14,7 @@ The syntax to call FastTrack command line interface differs according to the pla
 
 ## Installing fasttrack-cli
 
-The command-line interface is available for macOS, Linux, and Windows. It can be downloaded on [the release page](https://github.com/FastTrackOrg/FastTrack/releases/latest), or on the [downloads page](https://fasttrack.sh/download/).
+The command-line interface is available for macOS, Linux, and Windows. It can be downloaded on [the release page](https://github.com/FastTrackOrg/FastTrack/releases/latest).
 
 The full list of parameters can be found by calling ```./fasttrack-cli --help```. 
 Parameters can be declared individually by calling ```./fasttrack-cli --path path/to/movie.webm --parameter1 value --parameter2 value``` or in batch with a parameters file ```./fasttrack-cli --path path/to/movie.webm --cfg path/cfg.toml```. Note that the path option need to be the first option.

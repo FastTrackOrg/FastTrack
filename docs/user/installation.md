@@ -15,19 +15,19 @@ During the installation on Windows and Mac systems, security alerts may be displ
 
 ## Download
 
-Stable versions of FastTrack are released for Linux (official AppImage, official AUR for ArchLinux, community Fedora package), Mac (as dmg), and Windows (installer, portable folder). The nightly versions are available on the [download page](https://www.fasttrack.sh/download/Continuous/).
+Stable versions of FastTrack are released for Linux (official AppImage, official AUR for ArchLinux, community Fedora package), Mac (as dmg), and Windows (installer, portable folder).
 
 ## Installation
 
 1.  For Windows:
     * Integrate into the system:
-        -   Download the FastTrack [installer](https://fasttrack.sh/download/FastTrackInstaller.exe).
+        -   Download the FastTrack [installer FastTrackInstaller.exe](https://github.com/FastTrackOrg/FastTrack/releases/latest).
         -   Execute the installer and follow the provided instructions.
     * Portable:
-        - Download the FastTrack [folder] (https://fasttrack.sh/download/FastTrack.zip).
+        - Download the FastTrack [folder FastTrack.zip] (https://github.com/FastTrackOrg/FastTrack/releases/latest).
         - Unzip the folder and execute FastTrack.exe.
 2. For Linux (all distributions) as AppImage:
-    * Download the AppImage [file](https://fasttrack.sh/download/FastTrack-x86_64.AppImage).
+    * Download the AppImage [file FastTrack-x86_64.AppImage](https://github.com/FastTrackOrg/FastTrack/releases/latest).
     * Allow FastTrack.AppImage to be executed:
         - Right-click on the AppImage file.
         - Click on Properties.
@@ -40,7 +40,7 @@ Stable versions of FastTrack are released for Linux (official AppImage, official
     * From source : `qmake src/FastTrack.pro ; make ; sudo make install ; qmake src/FastTrack-Cli.pro ; make ; sudo make install`
 4.  For Mac (.app):
     - Minimal version required based on Qt6 minimal version required.
-    - Download the FastTrack dmg [file](https://fasttrack.sh/download/FastTrack.dmg).
+    - Download the FastTrack dmg [FastTrack.dmg](https://github.com/FastTrackOrg/FastTrack/releases/latest).
     - Double click on the dmg file.
     - Drag the application from the dmg window into the Applications folder.
 5.  For Mac (brew):
