@@ -99,7 +99,7 @@ jobs:
           path: src/build/FastTrack
 
   build_mac:
-    runs-on: macos-latest
+    runs-on: macos-15
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
@@ -141,7 +141,8 @@ jobs:
           macdeployqt FastTrack.app -always-overwrite
           wget https://raw.githubusercontent.com/tamlok/macdeployqtfix/master/macdeployqtfix.py
           cp *.qm FastTrack.app/Contents/Resources/
-          python macdeployqtfix.py FastTrack.app/Contents/MacOS/FastTrack ../../Qt/${{ env.QT_VERSION }}/
+          sudo find / -name "libgcc_s*.dylib" -exec sudo cp {} FastTrack.app/Contents/Frameworks/ \; >/dev/null 2>&1 || true
+          python macdeployqtfix.py fasttrack.app/contents/macos/fasttrack ../../Qt/${{ env.QT_VERSION }}/
           hdiutil create -volname FastTrack -srcfolder FastTrack.app -ov -format UDZO FastTrack.dmg
       - name: upload_artefact
         uses: actions/upload-artifact@v4
