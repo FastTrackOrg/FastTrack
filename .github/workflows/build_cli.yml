@@ -92,7 +92,7 @@ jobs:
           path: src/build_cli/
 
   build_mac:
-      runs-on: macos-latest
+      runs-on: macos-14
       steps:
         - uses: actions/checkout@v2
         - uses: actions/setup-python@v2
@@ -132,7 +132,14 @@ jobs:
               make
               cd build_cli/
               macdeployqt FastTrack-cli.app -always-overwrite
-              wget https://raw.githubusercontent.com/tamlok/macdeployqtfix/master/macdeployqtfix.py
+              wget https://raw.githubusercontent.com/arl/macdeployqtfix/refs/heads/master/macdeployqtfix.py
+              find / -name "libgcc_s.1.1.dylib" -exec cp {} FastTrack-cli.app/Contents/Frameworks/ \; 2> >(tee /dev/stderr) || true
+              find / -name "libsharpyuv.0.dylib" -exec cp {} FastTrack-cli.app/Contents/Frameworks/ \; 2> >(tee /dev/stderr) || true
+              find / -name "libjxl_cms.0.11.dylib" -exec cp {} FastTrack-cli.app/Contents/Frameworks/ \; 2> >(tee /dev/stderr) || true
+              cp -v /opt/homebrew/Cellar/opencv/*/lib/lib*.dylib FastTrack-cli.app/Contents/Frameworks/ || true # Should (and was) be automatically done by macdeployqt!
+              cp -v /opt/homebrew/opt/little-cms2/lib/lib*.dylib FastTrack-cli.app/Contents/Frameworks/ || true # Should (and was) be automatically done by macdeployqt!
+              cp -v /opt/homebrew/opt/jpeg-xl/lib/lib*.dylib FastTrack-cli.app/Contents/Frameworks/ || true # Should (and was) be automatically done by macdeployqt!
+              cp /opt/homebrew/Cellar/opencv/*/lib/lib*.dylib FastTrack-cli.app/Contents/Frameworks/ || true # Should (and was) be automatically done by macdeployqt!
               python macdeployqtfix.py FastTrack-cli.app/Contents/MacOS/FastTrack-cli ../../Qt/${{ env.QT_VERSION }}/
               hdiutil create -volname FastTrack-cli -srcfolder FastTrack-cli.app -ov -format UDZO FastTrack-cli.dmg
         - name: upload_artefact

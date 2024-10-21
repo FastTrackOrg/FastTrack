@@ -48,6 +48,7 @@ unix:macx {
   QT_CONFIG -= no-pkg-config
   CONFIG  += link_pkgconfig
   PKGCONFIG += opencv4
+  PKGCONFIG += protobuf
 
   ICON=assets/icon.icns
 }
