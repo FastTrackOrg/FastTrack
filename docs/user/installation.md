@@ -49,6 +49,42 @@ Stable versions of FastTrack are released for Linux (official AppImage, official
     - `brew install fasttrack`
     - FastTrack-cli can be located at `/usr/local/bin/FastTrack-Cli` and directly used and FastTrack opened using `open /usr/local/Cellar/fasttrack/6.3.1_1/bin/FastTrack.app`.
 
+## macOS Troubleshooting for FastTrack Installation
+
+Follow these troubleshooting steps to ensure a seamless installation and optimal operation of FastTrack on macOS:
+
+### Application Authorization
+
+- **Unsigned Application Warning**: If you encounter a message stating that "FastTrack" is damaged and can't be opened, it's because the application is not signed and will not be signed ever.
+  - **Solution**:
+    1. Open the Terminal application.
+
+    2. Run the following command to remove the quarantine attribute:
+
+       - For macOS 15 or higher:
+
+         ```bash
+         xattr -d com.apple.quarantine /Applications/FastTrack.app
+         ```
+
+       - For macOS 14 or lower:
+
+         ```bash
+         xattr -dr com.apple.quarantine /Applications/FastTrack.app
+         ```
+
+    3. Navigate to `System Settings` > `Privacy and Security` > `Accessibility`.
+
+    4. If `FastTrack` is listed, ensure it is enabled.
+
+    5. If you see an entry named `fasttrack` (without the capital 'F'), enable it as well. If not present:
+
+       - Open Finder and go to `/Applications/FastTrack.app/Contents/MacOS/`.
+
+       - Drag and drop the `fasttrack` binary into the Accessibility settings window.
+
+       - Ensure both `FastTrack` and `fasttrack` are enabled.
+
 ## Update
 
 FastTrack will display a message at the start-up and in the status bar when a new release is available.
