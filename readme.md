@@ -2,10 +2,6 @@
 
  ![Test](https://github.com/bgallois/FastTrack/workflows/FastTrack_testing/badge.svg) ![Clang Format](https://github.com/bgallois/FastTrack/workflows/Clang%20Format/badge.svg) ![Continous Build](https://github.com/bgallois/FastTrack/workflows/FastTrack_build/badge.svg) [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0) [![Website](https://img.shields.io/website?style=plastic&url=https%3A%2F%2Fwww.fasttrack.sh%2F)](http://www.fasttrack.sh)
 
-## Support
-
-FastTrack, an open-source project developed for high-performance object tracking in videos, is created and maintained by Benjamin Gallois. To continue improving the project and adding new features, we rely on donations from the community. Your contributions are essential to FastTrack's ongoing development, helping to enhance its capabilities and make it an even more valuable tool. If you'd like to support our efforts, you can donate in DOT at 16FNQLaKS46Bd1JX1joxXqrCJ4Nco7uGG4yfWmHxwSr21CMs or ASTR at bBfhJHLMWTpQJKqYQD5RMBKXV66533sCmkKbBWUFipTQkhN. Thank you for your support!
-
 ## About
 
 Tracking objects in video recordings can be a tedious task, and existing software often comes with drawbacks like high cost, steep learning curves, hardware requirements, and inflexible workflows as the project evolves.
