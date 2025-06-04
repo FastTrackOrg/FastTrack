@@ -13,7 +13,7 @@ env:
 
 jobs:
   test_linux:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v2
     - uses: actions/setup-python@v2
@@ -76,7 +76,7 @@ jobs:
       - name: test_ft
         shell: bash
         run: |
-          #./test.sh win  # Not working with latest Qt and mingw, mixing path somehow
+          ./test.sh win
 
   test_mac:
     runs-on: macos-latest
@@ -105,8 +105,7 @@ jobs:
           brew upgrade -q -f
           brew install pkg-config
           brew install libomp
-          brew tap FastTrackOrg/fasttrack
-          brew install --build-from-source FastTrackOrg/fasttrack/opencv
+          brew install opencv
           brew install googletest
           export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig/
           python -m pip install --upgrade pip setuptools wheel

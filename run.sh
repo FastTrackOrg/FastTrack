@@ -12,43 +12,42 @@ fi
 if [ "$1" = "release" ]; then
   make distclean
   set -e
-  qmake6 CONFIG+=release FastTrack.pro
+  mkdir -p build
+  cd build
+  cmake -DCMAKE_BUILD_TYPE=Release ..
   make
   make check
   make clean
-  src/build/fasttrack
+  bin/fasttrack
 fi
 
 if [ "$1" = "debug" ]; then
   set -e
-  qmake6 CONFIG+=debug QMAKE_CXXFLAGS+="-Wall -Wextra -g -Wconversion" FastTrack.pro
+  mkdir -p build
+  cd build
+  cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="-Wall -Wextra -g -Wconversion" ..
   make
   make check
-  src/build/fasttrack
+  bin/fasttrack
 fi
 
 if [ "$1" = "profile" ]; then
   set -e
-  qmake6 QMAKE_CXXFLAGS+=-pg QMAKE_LFLAGS+=-pg CONFIG+=debug FastTrack.pro
+  mkdir -p build
+  cd build
+  cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="-pg" -DCMAKE_EXE_LINKER_FLAGS="-pg" ..
   make
   make check
-  src/build/fasttrack
-  gprof src/build/fasttrack src/build/gmon.out > profiling.txt
+  bin/fasttrack
+  gprof bin/fasttrack bin/gmon.out > profiling.txt
 fi
 
 if [ "$1" = "ci" ]; then
   make distclean
   set -e
-  qmake6 CONFIG+=release src/FastTrack.pro
+  mkdir -p build
+  cd build
+  cmake -DCMAKE_BUILD_TYPE=Release ../
   make
-fi
-
-if [ "$1" = "cli" ]; then
-  make distclean
-  set -e
-  qmake6 CONFIG+=release src/FastTrack-Cli.pro
-  make
-  make check
   make clean
-  cd build_cli
 fi

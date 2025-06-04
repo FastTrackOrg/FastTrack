@@ -3,9 +3,9 @@
 #include <QFile>
 #include <QHash>
 #include <string>
-#include "../src/autolevel.cpp"
-#include "../src/tracking.cpp"
-#include "../src/videoreader.cpp"
+#include "../src/autolevel.h"
+#include "../src/tracking.h"
+#include "../src/videoreader.h"
 #include "gtest/gtest.h"
 
 using namespace std;
@@ -77,7 +77,7 @@ TEST_F(TrackingTest, CurvatureCenter) {
 TEST_F(TrackingTest, RegistrationMethod0Lena) {
   UMat imageReference, registered, diff;
   Mat H;
-  imread("../dataSet/len_full.jpg", IMREAD_GRAYSCALE).copyTo(imageReference);
+  imread(std::string(DATASET_DIR) + "/len_full.jpg", IMREAD_GRAYSCALE).copyTo(imageReference);
   // Adds padding to avoid cropping
   UMat padded(imageReference.rows + 100, imageReference.cols + 100, imageReference.depth());
   copyMakeBorder(imageReference, padded, 50, 50, 50, 50, BORDER_CONSTANT);
@@ -104,7 +104,7 @@ TEST_F(TrackingTest, RegistrationMethod0Lena) {
 TEST_F(TrackingTest, RegistrationMethod1Lena) {
   UMat imageReference, registered, diff;
   Mat H;
-  imread("../dataSet/len_full.jpg", IMREAD_GRAYSCALE).copyTo(imageReference);
+  imread(std::string(DATASET_DIR) + "/len_full.jpg", IMREAD_GRAYSCALE).copyTo(imageReference);
   // Adds padding to avoid cropping
   UMat padded(imageReference.rows + 100, imageReference.cols + 100, imageReference.depth());
   copyMakeBorder(imageReference, padded, 50, 50, 50, 50, BORDER_CONSTANT);
@@ -131,7 +131,7 @@ TEST_F(TrackingTest, RegistrationMethod1Lena) {
 TEST_F(TrackingTest, RegistrationMethod2Lena) {
   UMat imageReference, registered, diff;
   Mat H;
-  imread("../dataSet/len_full.jpg", IMREAD_GRAYSCALE).copyTo(imageReference);
+  imread(std::string(DATASET_DIR) + "/len_full.jpg", IMREAD_GRAYSCALE).copyTo(imageReference);
   // Adds padding to avoid cropping
   UMat padded(imageReference.rows + 100, imageReference.cols + 100, imageReference.depth());
   copyMakeBorder(imageReference, padded, 50, 50, 50, 50, BORDER_CONSTANT);
@@ -161,7 +161,7 @@ TEST_F(TrackingTest, RegistrationMethod2Lena) {
 TEST_F(TrackingTest, RegistrationMethod0Dual) {
   UMat imageReference, registered, diff;
   Mat H;
-  imread("../dataSet/dual.pgm", IMREAD_GRAYSCALE).copyTo(imageReference);
+  imread(std::string(DATASET_DIR) + "/dual.pgm", IMREAD_GRAYSCALE).copyTo(imageReference);
   // Adds padding to avoid cropping
   UMat padded(imageReference.rows + 100, imageReference.cols + 100, imageReference.depth());
   copyMakeBorder(imageReference, padded, 50, 50, 50, 50, BORDER_CONSTANT);
@@ -188,7 +188,7 @@ TEST_F(TrackingTest, RegistrationMethod0Dual) {
 TEST_F(TrackingTest, RegistrationMethod1Dual) {
   UMat imageReference, registered, diff;
   Mat H;
-  imread("../dataSet/dual.pgm", IMREAD_GRAYSCALE).copyTo(imageReference);
+  imread(std::string(DATASET_DIR) + "/dual.pgm", IMREAD_GRAYSCALE).copyTo(imageReference);
   // Adds padding to avoid cropping
   UMat padded(imageReference.rows + 100, imageReference.cols + 100, imageReference.depth());
   copyMakeBorder(imageReference, padded, 50, 50, 50, 50, BORDER_CONSTANT);
@@ -216,7 +216,7 @@ TEST_F(TrackingTest, RegistrationMethod2Dual) {
 
   /*UMat imageReference, registered, diff;
   Mat H;
-  imread("../dataSet/dual.pgm", IMREAD_GRAYSCALE).copyTo(imageReference);
+  imread(std::string(DATASET_DIR) + "/dual.pgm", IMREAD_GRAYSCALE).copyTo(imageReference);
   // Adds padding to avoid cropping
   UMat padded(imageReference.rows + 100, imageReference.cols + 100, imageReference.depth());
   copyMakeBorder(imageReference, padded, 50, 50, 50, 50, BORDER_CONSTANT);
@@ -471,7 +471,7 @@ TEST_F(TrackingTest, Information) {
   Mat H;
   UMat imageReference, translate;
 
-  imread("../dataSet/rectangle_centered.png", IMREAD_GRAYSCALE).copyTo(imageReference);
+  imread(std::string(DATASET_DIR) + "/rectangle_centered.png", IMREAD_GRAYSCALE).copyTo(imageReference);
   test = tracking.objectInformation(imageReference);
   EXPECT_EQ(round(test.at(0)), 4166);
   EXPECT_EQ(round(test.at(1)), 4166);
@@ -490,7 +490,7 @@ TEST_F(TrackingTest, InformationOrientation) {
   vector<double> info, test;
   UMat imageReference, rotate;
 
-  imread("../dataSet/assymetric_left.png", IMREAD_GRAYSCALE).copyTo(imageReference);
+  imread(std::string(DATASET_DIR) + "/assymetric_left.png", IMREAD_GRAYSCALE).copyTo(imageReference);
   Point2d center(double(imageReference.cols) * .5, double(imageReference.rows) * .5);
   test = tracking.objectInformation(imageReference);
   tracking.objectDirection(imageReference, test);
@@ -681,46 +681,46 @@ TEST_F(TrackingTest, costFunction) {
 // VideoReader test
 TEST_F(VideoReaderTest, UMatSequence) {
   UMat diff, test, ref;
-  VideoReader video("../dataSet/images/frame_000001.pgm");
+  VideoReader video(std::string(DATASET_DIR) + "/images/frame_000001.pgm");
   if (!video.open()) {
     FAIL();
   }
   video.getImage(0, test);
-  imread("../dataSet/images/frame_000001.pgm", IMREAD_GRAYSCALE).copyTo(ref);
+  imread(std::string(DATASET_DIR) + "/images/frame_000001.pgm", IMREAD_GRAYSCALE).copyTo(ref);
   compare(test, ref, diff, cv::CMP_NE);
   EXPECT_EQ(countNonZero(diff), 0);
   video.getNext(test);
-  imread("../dataSet/images/frame_000002.pgm", IMREAD_GRAYSCALE).copyTo(ref);
+  imread(std::string(DATASET_DIR) + "/images/frame_000002.pgm", IMREAD_GRAYSCALE).copyTo(ref);
   compare(test, ref, diff, cv::CMP_NE);
   EXPECT_EQ(countNonZero(diff), 0);
   video.getImage(10, test);
-  imread("../dataSet/images/frame_000011.pgm", IMREAD_GRAYSCALE).copyTo(ref);
+  imread(std::string(DATASET_DIR) + "/images/frame_000011.pgm", IMREAD_GRAYSCALE).copyTo(ref);
   compare(test, ref, diff, cv::CMP_NE);
   EXPECT_EQ(countNonZero(diff), 0);
 }
 
 TEST_F(VideoReaderTest, MatSequence) {
   Mat diff, test, ref;
-  VideoReader video("../dataSet/images/frame_000001.pgm");
+  VideoReader video(std::string(DATASET_DIR) + "/images/frame_000001.pgm");
   if (!video.open()) {
     FAIL();
   }
   video.getImage(0, test);
-  imread("../dataSet/images/frame_000001.pgm", IMREAD_GRAYSCALE).copyTo(ref);
+  imread(std::string(DATASET_DIR) + "/images/frame_000001.pgm", IMREAD_GRAYSCALE).copyTo(ref);
   compare(test, ref, diff, cv::CMP_NE);
   EXPECT_EQ(countNonZero(diff), 0);
   video.getNext(test);
-  imread("../dataSet/images/frame_000002.pgm", IMREAD_GRAYSCALE).copyTo(ref);
+  imread(std::string(DATASET_DIR) + "/images/frame_000002.pgm", IMREAD_GRAYSCALE).copyTo(ref);
   compare(test, ref, diff, cv::CMP_NE);
   EXPECT_EQ(countNonZero(diff), 0);
   video.getImage(10, test);
-  imread("../dataSet/images/frame_000011.pgm", IMREAD_GRAYSCALE).copyTo(ref);
+  imread(std::string(DATASET_DIR) + "/images/frame_000011.pgm", IMREAD_GRAYSCALE).copyTo(ref);
   compare(test, ref, diff, cv::CMP_NE);
   EXPECT_EQ(countNonZero(diff), 0);
 }
 
 TEST_F(VideoReaderTest, CountSequence) {
-  VideoReader video("../dataSet/images/frame_000001.pgm");
+  VideoReader video(std::string(DATASET_DIR) + "/images/frame_000001.pgm");
   if (!video.open()) {
     FAIL();
   }
@@ -729,46 +729,46 @@ TEST_F(VideoReaderTest, CountSequence) {
 
 TEST_F(VideoReaderTest, UMatVideo) {
   UMat diff, test, ref;
-  VideoReader video("../dataSet/test.avi");
+  VideoReader video(std::string(DATASET_DIR) + "/test.avi");
   if (!video.open()) {
     FAIL();
   }
   video.getImage(0, test);
-  imread("../dataSet/images/frame_000001.pgm", IMREAD_GRAYSCALE).copyTo(ref);
+  imread(std::string(DATASET_DIR) + "/images/frame_000001.pgm", IMREAD_GRAYSCALE).copyTo(ref);
   compare(test, ref, diff, cv::CMP_NE);
   EXPECT_EQ(countNonZero(diff), 0);
   video.getNext(test);
-  imread("../dataSet/images/frame_000002.pgm", IMREAD_GRAYSCALE).copyTo(ref);
+  imread(std::string(DATASET_DIR) + "/images/frame_000002.pgm", IMREAD_GRAYSCALE).copyTo(ref);
   compare(test, ref, diff, cv::CMP_NE);
   EXPECT_EQ(countNonZero(diff), 0);
   video.getImage(10, test);
-  imread("../dataSet/images/frame_000011.pgm", IMREAD_GRAYSCALE).copyTo(ref);
+  imread(std::string(DATASET_DIR) + "/images/frame_000011.pgm", IMREAD_GRAYSCALE).copyTo(ref);
   compare(test, ref, diff, cv::CMP_NE);
   EXPECT_EQ(countNonZero(diff), 0);
 }
 
 TEST_F(VideoReaderTest, MatVideo) {
   Mat diff, test, ref;
-  VideoReader video("../dataSet/test.avi");
+  VideoReader video(std::string(DATASET_DIR) + "/test.avi");
   if (!video.open()) {
     FAIL();
   }
   video.getImage(0, test);
-  imread("../dataSet/images/frame_000001.pgm", IMREAD_GRAYSCALE).copyTo(ref);
+  imread(std::string(DATASET_DIR) + "/images/frame_000001.pgm", IMREAD_GRAYSCALE).copyTo(ref);
   compare(test, ref, diff, cv::CMP_NE);
   EXPECT_EQ(countNonZero(diff), 0);
   video.getNext(test);
-  imread("../dataSet/images/frame_000002.pgm", IMREAD_GRAYSCALE).copyTo(ref);
+  imread(std::string(DATASET_DIR) + "/images/frame_000002.pgm", IMREAD_GRAYSCALE).copyTo(ref);
   compare(test, ref, diff, cv::CMP_NE);
   EXPECT_EQ(countNonZero(diff), 0);
   video.getImage(10, test);
-  imread("../dataSet/images/frame_000011.pgm", IMREAD_GRAYSCALE).copyTo(ref);
+  imread(std::string(DATASET_DIR) + "/images/frame_000011.pgm", IMREAD_GRAYSCALE).copyTo(ref);
   compare(test, ref, diff, cv::CMP_NE);
   EXPECT_EQ(countNonZero(diff), 0);
 }
 
 TEST_F(VideoReaderTest, CountVideo) {
-  VideoReader video("../dataSet/test.avi");
+  VideoReader video(std::string(DATASET_DIR) + "/test.avi");
   if (!video.open()) {
     FAIL();
   }
@@ -778,7 +778,7 @@ TEST_F(VideoReaderTest, CountVideo) {
 // AutoSet test
 TEST_F(AutoLevelTest, AutoLevel) {
   UMat background;
-  imread("../dataSet/images/Groundtruth/Tracking_Result/background.pgm", IMREAD_GRAYSCALE).copyTo(background);
+  imread(std::string(DATASET_DIR) + "/images/Groundtruth/Tracking_Result/background.pgm", IMREAD_GRAYSCALE).copyTo(background);
   QHash<QString, QString> parameters;
   parameters.insert("methBack", "1");
   parameters.insert("regBack", "0");
@@ -803,7 +803,7 @@ TEST_F(AutoLevelTest, AutoLevel) {
   parameters.insert("normArea", "0");
   parameters.insert("normPerim", "0");
 
-  AutoLevel autolevel("../dataSet/images/frame_000001.pgm", background, parameters);
+  AutoLevel autolevel(std::string(DATASET_DIR) + "/images/frame_000001.pgm", background, parameters);
   QHash<QString, double> test = autolevel.level();
   EXPECT_EQ(std::lround(test.value("normArea")), 10);
   EXPECT_EQ(std::lround(test.value("normPerim")), 8);
@@ -818,9 +818,9 @@ TEST_F(AutoLevelTest, AutoLevelStd) {
 }
 
 TEST_F(DataTest, getDataIndexId) {
-  QDir().mkdir("../dataSet/images/Groundtruth/Tracking_Result_Copy/");
-  QFile::copy("../dataSet/images/Groundtruth/Tracking_Result/tracking.db", "../dataSet/images/Groundtruth/Tracking_Result_Copy/tracking.db");
-  Data data("../dataSet/images/Groundtruth/Tracking_Result_Copy/");
+  QDir().mkdir(QStringLiteral(DATASET_DIR) + "/images/Groundtruth/Tracking_Result_Copy/");
+  QFile::copy(QStringLiteral(DATASET_DIR) + "/images/Groundtruth/Tracking_Result/tracking.db", QStringLiteral(DATASET_DIR) + "/images/Groundtruth/Tracking_Result_Copy/tracking.db");
+  Data data(QStringLiteral(DATASET_DIR) + "/images/Groundtruth/Tracking_Result_Copy/");
   QHash<QString, double> test = data.getData(2, 12);
   EXPECT_EQ(test.value("xHead"), 506.779);
   test = data.getData(198, 3);
@@ -828,7 +828,7 @@ TEST_F(DataTest, getDataIndexId) {
 }
 
 TEST_F(DataTest, getDataRangeId) {
-  Data data("../dataSet/images/Groundtruth/Tracking_Result_Copy/");
+  Data data(QStringLiteral(DATASET_DIR) + "/images/Groundtruth/Tracking_Result_Copy/");
   QList<QHash<QString, double>> test = data.getData(1, 20, 12);
   QList<QHash<QString, double>> ref;
   for (int i = 1; i < 20; i++) {
@@ -838,7 +838,7 @@ TEST_F(DataTest, getDataRangeId) {
 }
 
 TEST_F(DataTest, getDataIndex) {
-  Data data("../dataSet/images/Groundtruth/Tracking_Result_Copy/");
+  Data data(QStringLiteral(DATASET_DIR) + "/images/Groundtruth/Tracking_Result_Copy/");
   QList<QHash<QString, double>> test = data.getData(2);
   for (const auto &a : test) {
     if (a.value("id") == 12) {
@@ -854,7 +854,7 @@ TEST_F(DataTest, getDataIndex) {
 }
 
 TEST_F(DataTest, getDataId) {
-  Data data("../dataSet/images/Groundtruth/Tracking_Result_Copy/");
+  Data data(QStringLiteral(DATASET_DIR) + "/images/Groundtruth/Tracking_Result_Copy/");
   QHash<QString, QList<double>> test = data.getDataId(12);
   EXPECT_EQ(test.value("xHead")[2], 506.779);
   EXPECT_EQ(test.value("xHead")[3], 512.988);
@@ -863,7 +863,7 @@ TEST_F(DataTest, getDataId) {
 }
 
 TEST_F(DataTest, swapData) {
-  Data data("../dataSet/images/Groundtruth/Tracking_Result_Copy/");
+  Data data(QStringLiteral(DATASET_DIR) + "/images/Groundtruth/Tracking_Result_Copy/");
   QHash<QString, double> a_prev = data.getData(2, 12);
   QHash<QString, double> b_prev = data.getData(2, 11);
   QHash<QString, double> a_next = data.getData(180, 12);
@@ -880,7 +880,7 @@ TEST_F(DataTest, swapData) {
 }
 
 TEST_F(DataTest, deleteInsertData) {
-  Data data("../dataSet/images/Groundtruth/Tracking_Result_Copy/");
+  Data data(QStringLiteral(DATASET_DIR) + "/images/Groundtruth/Tracking_Result_Copy/");
   QHash<QString, double> a_prev = data.getData(2, 12);
   QHash<QString, double> a_mid = data.getData(60, 12);
   QHash<QString, double> a_next = data.getData(100, 12);
@@ -900,16 +900,16 @@ TEST_F(DataTest, deleteInsertData) {
 }
 
 TEST_F(DataTest, id) {
-  Data data("../dataSet/images/Groundtruth/Tracking_Result_Copy/");
+  Data data(QStringLiteral(DATASET_DIR) + "/images/Groundtruth/Tracking_Result_Copy/");
   EXPECT_EQ(data.getId(0, 999), QList({0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13}));
   EXPECT_EQ(data.getId(29), QList({0, 2, 3, 5, 6, 7, 8, 9, 10, 11, 12, 13}));
 }
 
 TEST_F(DataTest, info) {
-  Data data("../dataSet/images/Groundtruth/Tracking_Result_Copy/");
+  Data data(QStringLiteral(DATASET_DIR) + "/images/Groundtruth/Tracking_Result_Copy/");
   data.deleteData(12, 0, 20);
   EXPECT_EQ(data.getObjectInformation(12), 21);
-  QDir("../dataSet/images/Groundtruth/Tracking_Result_Copy/").removeRecursively();
+  QDir(QStringLiteral(DATASET_DIR) + "/images/Groundtruth/Tracking_Result_Copy/").removeRecursively();
 }
 }  // namespace
 

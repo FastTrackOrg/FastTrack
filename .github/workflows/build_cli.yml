@@ -1,8 +1,7 @@
 name: FastTrack-Cli_build
 
 on:
-  push:
-    branches: [master]
+  workflow_dispatch:
 
 env:
   QT_VERSION: 6.7.2
