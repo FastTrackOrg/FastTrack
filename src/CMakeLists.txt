@@ -69,14 +69,27 @@ function(configure_target target_name)
             opencv_core opencv_imgproc opencv_highgui opencv_imgcodecs
             opencv_videoio opencv_video opencv_calib3d opencv_photo opencv_features2d)
     elseif(WIN32)
+        set(app_icon_win "${CMAKE_SOURCE_DIR}/src/assets/icon.rc")
+        target_sources(${target_name} PRIVATE ${app_icon_win})
         target_compile_options(${target_name} PRIVATE -O3)
+        set(MACOSX_BUNDLE_ICON_FILE "${CMAKE_SOURCE_DIR}/src/assets/icon.icns")
         target_include_directories(${target_name} PRIVATE "${CMAKE_SOURCE_DIR}/OpenCV_MinGW_64/include" ${CMAKE_CURRENT_SOURCE_DIR})
         target_link_libraries(${target_name} PRIVATE
           Qt6::Core Qt6::Gui Qt6::Widgets Qt6::Sql Qt6::Network
           "${CMAKE_SOURCE_DIR}/OpenCV_MinGW_64/lib/libopencv_world4100.dll.a"
         )
     elseif(APPLE)
-        set_target_properties(${target_name} PROPERTIES MACOSX_BUNDLE TRUE)
+        set_target_properties(${target_name} PROPERTIES
+            MACOSX_BUNDLE TRUE
+            MACOSX_BUNDLE_ICON_FILE "icon.icns"
+        )
+
+        set(app_icon_macos "${CMAKE_SOURCE_DIR}/src/assets/icon.icns")
+        set_source_files_properties(${app_icon_macos} PROPERTIES
+            MACOSX_PACKAGE_LOCATION "Resources"
+        )
+        target_sources(${target_name} PRIVATE ${app_icon_macos})
+
         target_compile_options(${target_name} PRIVATE -std=c++1z -stdlib=libc++ -O3)
         find_package(PkgConfig REQUIRED)
         pkg_check_modules(OPENCV REQUIRED opencv4)
