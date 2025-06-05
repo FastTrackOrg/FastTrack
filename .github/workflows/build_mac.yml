@@ -1,0 +1,83 @@
+name: Build Mac
+
+on:
+  workflow_dispatch:
+
+env:
+  QT_VERSION: 6.7.2
+
+jobs:
+  build_mac:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'
+      - name: install_qt
+        run: |
+          pip install aqtinstall
+          python3 -m aqt install-qt -m qtcharts -O ${{ github.workspace }}/Qt/ mac desktop ${{ env.QT_VERSION }}
+          echo ${{ github.workspace }}/Qt/${{ env.QT_VERSION }}/macos/bin/ >> $GITHUB_PATH
+          rm -r ${{ github.workspace }}/Qt/${{ env.QT_VERSION }}/macos/plugins/sqldrivers/libqsqlmimer.*
+          rm -r ${{ github.workspace }}/Qt/${{ env.QT_VERSION }}/macos/plugins/sqldrivers/libqsqlodbc.*
+          rm -r ${{ github.workspace }}/Qt/${{ env.QT_VERSION }}/macos/plugins/sqldrivers/libqsqlpsql.*
+      - name: Set up Homebrew #https://github.com/Homebrew/homebrew-cask/issues/150323
+        id: set-up-homebrew
+        uses: Homebrew/actions/setup-homebrew@master
+      - name: install_opencv
+        run: |
+          rm -f /usr/local/bin/2to3*
+          rm -f /usr/local/bin/idle3*
+          rm -f /usr/local/bin/pydoc3*
+          rm -f /usr/local/bin/python3*
+          rm -f /usr/local/opt/go/bin/go*
+          rm -f /usr/local/bin/go*
+          rm -rf /usr/local/lib/node*
+          brew update -q -f
+          brew upgrade -q -f
+          brew install pkg-config
+          brew install openssl
+          brew install libiodbc
+          brew install opencv
+          export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig/
+      - name: build_ft
+        run: |
+          ./run.sh ci
+          cd build/bin
+          mv fasttrack.app FastTrack.app
+          macdeployqt FastTrack.app -always-overwrite
+          wget https://raw.githubusercontent.com/arl/macdeployqtfix/refs/heads/master/macdeployqtfix.py
+          #cp *.qm FastTrack.app/Contents/Resources/
+          find / -name "libgcc_s.1.1.dylib" -exec cp {} FastTrack.app/Contents/Frameworks/ \; 2> >(tee /dev/stderr) || true
+          find / -name "libsharpyuv.0.dylib" -exec cp {} FastTrack.app/Contents/Frameworks/ \; 2> >(tee /dev/stderr) || true
+          find / -name "libjxl_cms.0.11.dylib" -exec cp {} FastTrack.app/Contents/Frameworks/ \; 2> >(tee /dev/stderr) || true
+          cp -v /opt/homebrew/Cellar/opencv/*/lib/lib*.dylib FastTrack.app/Contents/Frameworks/ || true # Should (and was) be automatically done by macdeployqt!
+          cp -v /opt/homebrew/opt/little-cms2/lib/lib*.dylib FastTrack.app/Contents/Frameworks/ || true # Should (and was) be automatically done by macdeployqt!
+          cp -v /opt/homebrew/opt/jpeg-xl/lib/lib*.dylib FastTrack.app/Contents/Frameworks/ || true # Should (and was) be automatically done by macdeployqt!
+          python macdeployqtfix.py fasttrack.app/contents/macos/fasttrack ../../Qt/${{ env.QT_VERSION }}/
+          hdiutil create -volname FastTrack -srcfolder FastTrack.app -ov -format UDZO FastTrack.dmg
+      - name: upload_artefact
+        uses: actions/upload-artifact@v4
+        with:
+          name: FastTrack.dmg
+          path: ./build/bin/FastTrack.dmg
+      - name: build_ft_cli
+        run: |
+          cd build/bin
+          mv fasttrack-cli.app FastTrack-Cli.app
+          macdeployqt FastTrack-Cli.app -always-overwrite
+          #cp *.qm FastTrack-Cli.app/Contents/Resources/
+          find / -name "libgcc_s.1.1.dylib" -exec cp {} FastTrack-Cli.app/Contents/Frameworks/ \; 2> >(tee /dev/stderr) || true
+          find / -name "libsharpyuv.0.dylib" -exec cp {} FastTrack-Cli.app/Contents/Frameworks/ \; 2> >(tee /dev/stderr) || true
+          find / -name "libjxl_cms.0.11.dylib" -exec cp {} FastTrack-Cli.app/Contents/Frameworks/ \; 2> >(tee /dev/stderr) || true
+          cp -v /opt/homebrew/Cellar/opencv/*/lib/lib*.dylib FastTrack-Cli.app/Contents/Frameworks/ || true # Should (and was) be automatically done by macdeployqt!
+          cp -v /opt/homebrew/opt/little-cms2/lib/lib*.dylib FastTrack-Cli.app/Contents/Frameworks/ || true # Should (and was) be automatically done by macdeployqt!
+          cp -v /opt/homebrew/opt/jpeg-xl/lib/lib*.dylib FastTrack-Cli.app/Contents/Frameworks/ || true # Should (and was) be automatically done by macdeployqt!
+          python macdeployqtfix.py fasttrack-cli.app/contents/macos/fasttrack-cli ../../Qt/${{ env.QT_VERSION }}/
+          hdiutil create -volname FastTrack-Cli -srcfolder FastTrack-Cli.app -ov -format UDZO FastTrack-Cli.dmg
+      - name: upload_artefact
+        uses: actions/upload-artifact@v4
+        with:
+          name: FastTrack-Cli.dmg
+          path: ./build/bin/FastTrack-Cli.dmg

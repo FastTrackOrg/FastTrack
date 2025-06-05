@@ -1,0 +1,59 @@
+name: Build Linux
+
+on:
+  workflow_dispatch:
+
+env:
+  QT_VERSION: 6.7.2
+
+jobs:
+  build_linux:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'
+      - name: install_opencv
+        run: |
+            sudo apt-get update
+            sudo apt-get install mesa-common-dev libgl1-mesa-dev libssl-dev libunwind-dev
+            sudo apt-get install libxcb-*
+            sudo apt-get install libxkb-*
+            sudo apt-get install libavcodec-dev libavformat-dev libswscale-dev libnss3
+            sudo apt-get install libgstreamer-plugins-base1.0-dev libgstreamer1.0-dev
+            sudo apt-get install libopencv-dev libfuse2 patchelf makeself
+      - name: install_qt6
+        run: |
+          pip install aqtinstall
+          python3 -m aqt install-qt -O ${{ github.workspace }}/Qt/ linux desktop ${{ env.QT_VERSION }}
+          echo ${{ github.workspace }}/Qt/${{ env.QT_VERSION }}/gcc_64/bin/ >> $GITHUB_PATH
+      - name: remove_MimerSQL_plugin
+        run: |
+          QT_DIR=${{ github.workspace }}/Qt/${{ env.QT_VERSION }}/gcc_64
+          rm -f $QT_DIR/plugins/sqldrivers/libqsqlmimer.so
+          rm -f $QT_DIR/lib/cmake/Qt6Sql/Qt6QMimerSQLDriverPlugin*.cmake
+          sed -i '/QMimerSQLDriverPlugin/d' $QT_DIR/lib/cmake/Qt6Sql/Qt6SqlPlugins.cmake || true
+      - name: build_ft
+        run: |
+          ./run.sh ci
+      - name: build_run
+        run: |
+          cd build
+          wget https://github.com/bgallois/SoBundle/releases/download/continuous/so_bundle
+          chmod +x so_bundle
+          ./so_bundle --exec ./bin/fasttrack --qt ${{ github.workspace }}/Qt/${{ env.QT_VERSION }}/gcc_64/ --bundle
+      - name: build_run_cli
+        run: |
+          cd build
+          ./so_bundle --exec ./bin/fasttrack-cli --qt ${{ github.workspace }}/Qt/${{ env.QT_VERSION }}/gcc_64/ --bundle
+      - name: upload_artefact
+        uses: actions/upload-artifact@v4
+        with:
+          name: FastTrack
+          path: ./build/bin/fasttrack.run
+      - name: upload_artefact
+        uses: actions/upload-artifact@v4
+        with:
+          name: FastTrack-Cli
+          path: ./build/bin/fasttrack-cli.run

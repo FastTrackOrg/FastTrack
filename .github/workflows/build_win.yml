@@ -1,0 +1,51 @@
+name: Build Win
+
+on:
+  workflow_dispatch:
+
+env:
+  QT_VERSION: 6.7.2
+  OPENCV_VERSION: 4.10.0
+  OPENCV_VERSION_: 4100
+
+jobs:
+  build_win:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'
+      - name: install_qt
+        run: |
+          choco uninstall mingw
+          pip install aqtinstall
+          python3 -m aqt install-qt -m qtcharts -O ${{ github.workspace }}/Qt/ windows desktop ${{ env.QT_VERSION }} win64_mingw
+          python3 -m aqt install-tool -O ${{ github.workspace }}/Qt/ windows desktop tools_mingw1310
+          echo "${{ github.workspace }}/Qt/${{ env.QT_VERSION }}/mingw_64/bin/" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          echo "${{ github.workspace }}/Qt/Tools/mingw1310_64/bin/" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+      - name: install_opencv
+        run: |
+          choco install wget unzip
+          wget https://github.com/FastTrackOrg/Windows_MinGW_64_OpenCV/releases/download/${{ env.OPENCV_VERSION }}/OpenCV_MinGW_64.zip
+          unzip OpenCV_MinGW_64.zip -d ${{ github.workspace }}
+      - name: build_ft
+        run: |
+          mkdir build
+          cd build
+          cmake -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DSKIP_TEST=ON ../
+          mingw32-make
+          mv bin FastTrack
+          mv bin/fasttrack.exe bin/FastTrack.exe
+          mv bin/fasttrack-cli.exe bin/FastTrack-Cli.exe
+          windeployqt FastTrack/FastTrack.exe --no-translations  # https://bugreports.qt.io/browse/QTBUG-62103?jql=status%20%3D%20Open%20AND%20text%20~%20%22windeployqt%20platform%22 and https://bugreports.qt.io/browse/QTBUG-112204
+          cp ${{ github.workspace }}/src/assets/icon.ico FastTrack
+          cp ${{ github.workspace }}/Qt/Tools/mingw*/bin/lib*.dll FastTrack
+          cp ${{ github.workspace }}/OpenCV_MinGW_64/bin/opencv_videoio_ffmpeg${{ env.OPENCV_VERSION_ }}_64.dll FastTrack
+          cp ${{ github.workspace }}/OpenCV_MinGW_64/bin/libopencv_world${{ env.OPENCV_VERSION_ }}.dll FastTrack
+          cp *.qm FastTrack
+      - name: upload_artefact
+        uses: actions/upload-artifact@v4
+        with:
+          name: FastTrack
+          path: build/FastTrack

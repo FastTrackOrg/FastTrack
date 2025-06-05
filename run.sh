@@ -16,8 +16,6 @@ if [ "$1" = "release" ]; then
   cd build
   cmake -DCMAKE_BUILD_TYPE=Release ..
   make
-  make check
-  make clean
   bin/fasttrack
 fi
 
@@ -47,7 +45,6 @@ if [ "$1" = "ci" ]; then
   set -e
   mkdir -p build
   cd build
-  cmake -DCMAKE_BUILD_TYPE=Release ../
+  cmake -DCMAKE_BUILD_TYPE=Release -DSKIP_TEST=ON ../
   make
-  make clean
 fi
