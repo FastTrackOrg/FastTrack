@@ -48,3 +48,12 @@ if [ "$1" = "ci" ]; then
   cmake -DCMAKE_BUILD_TYPE=Release -DSKIP_TEST=ON ../
   make
 fi
+
+if [ "$1" = "ci_clang" ]; then
+  make distclean
+  set -e
+  mkdir -p build
+  cd build
+  cmake -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_BUILD_TYPE=Release -DSKIP_TEST=ON ../
+  make
+fi

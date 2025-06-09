@@ -1,7 +1,11 @@
 cmake_minimum_required(VERSION 3.16)
 project(FastTrackApp VERSION 6.3.4)
 
-find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets Network Svg Sql)
+find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets Network Svg Sql LinguistTools)
+
+set(TS_FILES
+    ../translations/fasttrack_en.ts
+)
 
 add_executable(fasttrack
     updater.cpp
@@ -44,7 +48,13 @@ add_executable(fasttrack
 
     resources.qrc
     assets/theme.qrc
+    ${TS_FILES}
 )
+
+qt_add_lrelease(TS_FILES fasttrack_en.ts
+    QM_OUTPUT_DIRECTORY translations
+)
+add_custom_target(translations ALL DEPENDS ${QM_FILES})
 
 target_compile_definitions(fasttrack PRIVATE APP_VERSION="${PROJECT_VERSION}")
 

@@ -35,17 +35,32 @@ jobs:
           cd build
           cmake -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DSKIP_TEST=ON ../
           mingw32-make
-          mv bin FastTrack
           mv bin/fasttrack.exe bin/FastTrack.exe
           mv bin/fasttrack-cli.exe bin/FastTrack-Cli.exe
+          mv bin FastTrack
           windeployqt FastTrack/FastTrack.exe --no-translations  # https://bugreports.qt.io/browse/QTBUG-62103?jql=status%20%3D%20Open%20AND%20text%20~%20%22windeployqt%20platform%22 and https://bugreports.qt.io/browse/QTBUG-112204
           cp ${{ github.workspace }}/src/assets/icon.ico FastTrack
           cp ${{ github.workspace }}/Qt/Tools/mingw*/bin/lib*.dll FastTrack
           cp ${{ github.workspace }}/OpenCV_MinGW_64/bin/opencv_videoio_ffmpeg${{ env.OPENCV_VERSION_ }}_64.dll FastTrack
           cp ${{ github.workspace }}/OpenCV_MinGW_64/bin/libopencv_world${{ env.OPENCV_VERSION_ }}.dll FastTrack
-          cp *.qm FastTrack
+          #cp *.qm FastTrack
       - name: upload_artefact
         uses: actions/upload-artifact@v4
         with:
           name: FastTrack
           path: build/FastTrack
+
+  test_bundle:
+    runs-on: windows-latest
+    needs: build_win
+    steps:
+      - name: download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: FastTrack
+          path: FastTrack
+
+      - name: Run FastTrack executable
+        run: |
+          cd FastTrack
+          ./FastTrack-Cli.exe --help

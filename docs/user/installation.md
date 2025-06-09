@@ -15,7 +15,7 @@ During the installation on Windows and Mac systems, security alerts may be displ
 
 ## Download
 
-Stable versions of FastTrack are released for Linux (official AppImage, official AUR for ArchLinux, community Fedora package), Mac (as dmg), and Windows (installer, portable folder).
+Stable versions of FastTrack are released for Linux (official makeself, official AUR for ArchLinux), Mac (as app and homebrew), and Windows (installer, portable folder).
 
 ## Installation
 
@@ -26,18 +26,16 @@ Stable versions of FastTrack are released for Linux (official AppImage, official
     * Portable:
         - Download the FastTrack [folder FastTrack.zip] (https://github.com/FastTrackOrg/FastTrack/releases/latest).
         - Unzip the folder and execute FastTrack.exe.
-2. For Linux (all distributions) as AppImage:
-    * Download the AppImage [file FastTrack-x86_64.AppImage](https://github.com/FastTrackOrg/FastTrack/releases/latest).
-    * Allow FastTrack.AppImage to be executed:
+2. For Linux (all distributions) as makeself:
+    * Download the AppImage [file FastTrack-x86_64.run](https://github.com/FastTrackOrg/FastTrack/releases/latest).
+    * Allow FastTrack.run to be executed:
         - Right-click on the AppImage file.
         - Click on Properties.
         - Click on Permissions.
         - Tick “Allow executing file as program”.
-    * Check the [AppImage](https://appimage.org/) Launcher to integrate AppImage into the system.
 3. For Linux natively:
-    * Fedora: `sudo dnf install fasttrack fasttrack-cli`
     * Arch Linux: `yay -S fasttrack fasttrack-cli`
-    * From source : `qmake src/FastTrack.pro ; make ; sudo make install ; qmake src/FastTrack-Cli.pro ; make ; sudo make install`
+    * From source : `mkdir build ; cd build ; cmake ../ ; make ; sudo make install`
 4.  For Mac (.app):
     - Minimal version required based on Qt6 minimal version required.
     - Download the FastTrack dmg [FastTrack.dmg](https://github.com/FastTrackOrg/FastTrack/releases/latest).

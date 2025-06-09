@@ -57,3 +57,19 @@ jobs:
         with:
           name: FastTrack-Cli
           path: ./build/bin/fasttrack-cli.run
+
+  test_bundle:
+    runs-on: ubuntu-latest
+    needs: build_linux
+    steps:
+      - name: download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: FastTrack-Cli
+          path: FastTrack-Cli
+
+      - name: Run FastTrack executable
+        run: |
+          cd FastTrack-Cli
+          chmod +x fasttrack-cli.run
+          ./fasttrack-cli.run -- --help
