@@ -83,6 +83,8 @@ Follow these troubleshooting steps to ensure a seamless installation and optimal
 
        - Ensure both `FastTrack` and `fasttrack` are enabled.
 
+  - **Or** use `codesign --force --deep --sign - FastTrack.app`
+
 ## Update
 
 FastTrack will display a message at the start-up and in the status bar when a new release is available.

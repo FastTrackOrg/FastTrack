@@ -1,6 +1,6 @@
 # FastTrack
 
- ![Test](https://github.com/bgallois/FastTrack/workflows/FastTrack_testing/badge.svg) ![Clang Format](https://github.com/bgallois/FastTrack/workflows/Clang%20Format/badge.svg) ![Continous Build](https://github.com/bgallois/FastTrack/workflows/FastTrack_build/badge.svg) [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0) [![Website](https://img.shields.io/website?style=plastic&url=https%3A%2F%2Fwww.fasttrack.sh%2F)](http://www.fasttrack.sh)
+ ![Test](https://github.com/bgallois/FastTrack/workflows/FastTrack_testing/badge.svg) ![Clang Format](https://github.com/bgallois/FastTrack/workflows/Clang%20Format/badge.svg) [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0) [![Website](https://img.shields.io/website?style=plastic&url=https%3A%2F%2Fwww.fasttrack.sh%2F)](http://www.fasttrack.sh)
 
 ## About
 
@@ -16,7 +16,7 @@ FastTrack offers two main features:
 
 ## Installation
 
-Stable builds of the software are available for Linux, Mac, and Windows on the [download page](https://www.fasttrack.sh/docs/installation/) and the [GitHub repository](https://github.com/FastTrackOrg/FastTrack/releases). Continuous builds triggered after each modification are available on the [continuous download page](https://www.fasttrack.sh/download/Continuous/).
+Stable builds of the software are available for Linux, Mac, and Windows on the [download page](https://www.fasttrack.sh/docs/installation/) and the [GitHub repository](https://github.com/FastTrackOrg/FastTrack/releases).
 
 ## Documentation
 
