@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(FastTrackApp VERSION 6.3.4)
+project(FastTrackApp VERSION 6.4.0)
 
 find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets Network Svg Sql LinguistTools)
 

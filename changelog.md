@@ -1,5 +1,20 @@
 # FastTrack changelog
 
+
+## 6.4.0
+
+### Changed
+
+- Switched build system from `qmake` to `CMake`.
+- Replaced AppImage with custom MakeSelf installer for Linux.
+- FastTrack-CLI now included in the main FastTrack installation.
+- Separate CI workflows for each operating system.
+
+### Added
+
+- CI pipeline updated to trigger builds only on demand.
+- Test builds integrated for Linux, macOS, and Windows.
+
 ## 6.3.4
 
 ### Changed
