@@ -93,7 +93,7 @@ function(configure_target target_name)
             MACOSX_BUNDLE TRUE
             MACOSX_BUNDLE_ICON_FILE "icon.icns"
         )
-
+        set(CMAKE_OSX_DEPLOYMENT_TARGET "12.0" CACHE STRING "Minimum macOS deployment target")
         set(app_icon_macos "${CMAKE_SOURCE_DIR}/src/assets/icon.icns")
         set_source_files_properties(${app_icon_macos} PROPERTIES
             MACOSX_PACKAGE_LOCATION "Resources"
