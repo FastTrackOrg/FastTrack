@@ -24,12 +24,12 @@ Stable versions of FastTrack are released for Linux (official makeself, official
         -   Download the FastTrack [installer FastTrackInstaller.exe](https://github.com/FastTrackOrg/FastTrack/releases/latest).
         -   Execute the installer and follow the provided instructions.
     * Portable:
-        - Download the FastTrack [folder FastTrack.zip] (https://github.com/FastTrackOrg/FastTrack/releases/latest).
+        - Download the FastTrack [folder FastTrack.zip](https://github.com/FastTrackOrg/FastTrack/releases/latest).
         - Unzip the folder and execute FastTrack.exe.
-2. For Linux (all distributions) as makeself:
-    * Download the AppImage [file FastTrack-x86_64.run](https://github.com/FastTrackOrg/FastTrack/releases/latest).
+2. For Linux (all distributions) as Makeself:
+    * Download the Makeself archive [FastTrack-x86_64.run](https://github.com/FastTrackOrg/FastTrack/releases/latest).
     * Allow FastTrack.run to be executed:
-        - Right-click on the AppImage file.
+        - Right-click on the run file.
         - Click on Properties.
         - Click on Permissions.
         - Tick “Allow executing file as program”.
@@ -37,7 +37,7 @@ Stable versions of FastTrack are released for Linux (official makeself, official
     * Arch Linux: `yay -S fasttrack fasttrack-cli`
     * From source : `mkdir build ; cd build ; cmake ../ ; make ; sudo make install`
 4.  For Mac (.app):
-    - Minimal version required based on Qt6 minimal version required.
+    - Minimal version required based on Qt6 supported minimal version.
     - Download the FastTrack dmg [FastTrack.dmg](https://github.com/FastTrackOrg/FastTrack/releases/latest).
     - Double click on the dmg file.
     - Drag the application from the dmg window into the Applications folder.
@@ -53,7 +53,7 @@ Follow these troubleshooting steps to ensure a seamless installation and optimal
 
 ### Application Authorization
 
-- **Unsigned Application Warning**: If you encounter a message stating that "FastTrack" is damaged and can't be opened, it's because the application is not signed and will not be signed ever.
+- **Unsigned Application Warning**: If you encounter a message stating that "FastTrack" is damaged and can't be opened, it's because the application is not signed with a valid Apple Developer ID.
   - **Solution**:
     1. Open the Terminal application.
 
@@ -93,7 +93,7 @@ FastTrack will display a message at the start-up and in the status bar when a ne
   Search the *FastTrackUpdater* in the *Windows Start Menu* or execute the *MaintenanceTool.exe* in the installation folder directly and follow the provided instructions.
 
 2. For Linux:  
-  The FastTrack AppImage does not currently support the automatic update. Replace the current AppImage with the latest AppImage released.
+  The FastTrack Makeself does not currently support the automatic update. Replace the current Makeself with the latest AppImage released.
 
 3. For Mac:  
     * The FastTrack App does not currently support the automatic update. Replace the current App with the latest App released.
