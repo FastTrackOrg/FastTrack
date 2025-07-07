@@ -159,16 +159,16 @@ def tracking(path, imagePath, normDist=None, normAngle=None, maxDist=None, maxTi
   morphType = str(int(groundParameter.loc["morphType"][1]))
 
   if platform.system() == "Windows":
-    executable = "FastTrack-Cli.exe"
+    executable = "FastTrack.exe"
     prefix = ""
   elif platform.system() == "Linux":
-    executable = "fasttrack-cli"
+    executable = "fasttrack"
     prefix = ""
   elif platform.system() == "Darwin":
-    executable = "fasttrack-cli.app --args"
+    executable = "fasttrack.app --args"
     prefix = "open -W "
 
-  cmd = prefix + os.path.abspath("../build/bin/" + executable) + " --maxArea " + maxArea + " --minArea " + minArea + " --lightBack "+ lightBack + " --thresh "+ thresh + " --reg " + reg + " --spot "+ spot + " --nBack "+ nBack + " --regBack "+ regBack + " --methBack " + methBack+ " --xTop "+ xTop + " --yTop "+ yTop + " --xBottom " + xBottom + " --yBottom " + yBottom+ " --morph " + morph + " --morphSize " + morphSize+ " --morphType " + morphType +" --normArea " +str(normArea) + " --normPerim "+ str(normPerim) + " --normDist " + str(normDist) + " --normAngle " + str(normAngle) + " --maxDist " + str(maxDist) + " --maxTime " + str(maxTime) + " --path "+ os.path.abspath(path + imagePath) + " --backPath " + os.path.abspath("dataSet/images/Groundtruth/Tracking_Result/background.pgm") #+ " > /dev/null 2>&1" 
+  cmd = prefix + os.path.abspath("../build/bin/" + executable) + " --cli" + " --maxArea " + maxArea + " --minArea " + minArea + " --lightBack "+ lightBack + " --thresh "+ thresh + " --reg " + reg + " --spot "+ spot + " --nBack "+ nBack + " --regBack "+ regBack + " --methBack " + methBack+ " --xTop "+ xTop + " --yTop "+ yTop + " --xBottom " + xBottom + " --yBottom " + yBottom+ " --morph " + morph + " --morphSize " + morphSize+ " --morphType " + morphType +" --normArea " +str(normArea) + " --normPerim "+ str(normPerim) + " --normDist " + str(normDist) + " --normAngle " + str(normAngle) + " --maxDist " + str(maxDist) + " --maxTime " + str(maxTime) + " --path "+ os.path.abspath(path + imagePath) + " --backPath " + os.path.abspath("dataSet/images/Groundtruth/Tracking_Result/background.pgm") #+ " > /dev/null 2>&1" 
   print(cmd)
   out = os.system(cmd)
 

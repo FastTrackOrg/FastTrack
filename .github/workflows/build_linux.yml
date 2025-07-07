@@ -43,20 +43,11 @@ jobs:
           wget https://github.com/bgallois/SoBundle/releases/download/continuous/so_bundle
           chmod +x so_bundle
           ./so_bundle --exec ./bin/fasttrack --qt ${{ github.workspace }}/Qt/${{ env.QT_VERSION }}/gcc_64/ --bundle
-      - name: build_run_cli
-        run: |
-          cd build
-          ./so_bundle --exec ./bin/fasttrack-cli --qt ${{ github.workspace }}/Qt/${{ env.QT_VERSION }}/gcc_64/ --bundle
       - name: upload_artefact
         uses: actions/upload-artifact@v4
         with:
           name: FastTrack
           path: ./build/bin/fasttrack.run
-      - name: upload_artefact
-        uses: actions/upload-artifact@v4
-        with:
-          name: FastTrack-Cli
-          path: ./build/bin/fasttrack-cli.run
 
   test_bundle:
     runs-on: ubuntu-latest
@@ -65,11 +56,11 @@ jobs:
       - name: download artifact
         uses: actions/download-artifact@v4
         with:
-          name: FastTrack-Cli
-          path: FastTrack-Cli
+          name: FastTrack
+          path: FastTrack
 
       - name: Run FastTrack executable
         run: |
-          cd FastTrack-Cli
-          chmod +x fasttrack-cli.run
-          ./fasttrack-cli.run -- --help
+          cd FastTrack
+          chmod +x fasttrack.run
+          ./fasttrack.run -- --cli --help

@@ -24,6 +24,7 @@ This file is part of Fast Track.
 #include <QScopedPointer>
 #include <QSplashScreen>
 #include <QString>
+#include "cli.h"
 #include "mainwindow.h"
 
 QScopedPointer<QFile> logFile;
@@ -35,27 +36,36 @@ void messageHandler(QtMsgType type, const QMessageLogContext &context, const QSt
 }
 
 int main(int argc, char *argv[]) {
-  char env[] = "OPENCV_OPENCL_DEVICE=disabled";
-  putenv(env);  // disable OpenCL to fix windows memory leaks and increase performance
-  QApplication a(argc, argv);
-  QPixmap pixmap(QStringLiteral(":/assets/icon.png"));
-  QSplashScreen splash(pixmap);
-  splash.show();
-  a.setApplicationName(QStringLiteral("FastTrack"));
-  a.setApplicationVersion(APP_VERSION);  // clazy:exclude=qstring-allocations
-  a.setOrganizationName(QStringLiteral("FastTrackOrg"));
-  a.setOrganizationDomain(QStringLiteral("www.fasttrack.sh"));
-  logFile.reset(new QFile(QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) + "/fasttrack.log"));
-  QDir().mkpath(QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation));
-  logFile.data()->open(QFile::Append | QFile::Text);
+  qputenv("OPENCV_OPENCL_DEVICE", "disabled");  // disable OpenCL to fix windows memory leaks and increase performance
+  if (qstrcmp(argv[1], "--cli")) {
+    QApplication a(argc, argv);
+    QPixmap pixmap(QStringLiteral(":/assets/icon.png"));
+    QSplashScreen splash(pixmap);
+    splash.show();
+    a.setApplicationName(QStringLiteral("FastTrack"));
+    a.setApplicationVersion(APP_VERSION);  // clazy:exclude=qstring-allocations
+    a.setOrganizationName(QStringLiteral("FastTrackOrg"));
+    a.setOrganizationDomain(QStringLiteral("www.fasttrack.sh"));
+    logFile.reset(new QFile(QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) + "/fasttrack.log"));
+    QDir().mkpath(QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation));
+    logFile.data()->open(QFile::Append | QFile::Text);
 #ifdef QT_NO_DEBUG
-  qInstallMessageHandler(messageHandler);
+    qInstallMessageHandler(messageHandler);
 #endif
-  MainWindow w;
-  w.setWindowIcon(QIcon(":/assets/icon.png"));
-  QFontDatabase::addApplicationFont(QStringLiteral(":/assets/Font.ttf"));
-  w.setStyleSheet(QStringLiteral("QWidget {font-family: 'Lato', sans-serif;}"));
-  w.show();
-  splash.finish(&w);
-  a.exec();
+    MainWindow w;
+    w.setWindowIcon(QIcon(":/assets/icon.png"));
+    QFontDatabase::addApplicationFont(QStringLiteral(":/assets/Font.ttf"));
+    w.setStyleSheet(QStringLiteral("QWidget {font-family: 'Lato', sans-serif;}"));
+    w.show();
+    splash.finish(&w);
+    a.exec();
+  }
+  else {
+    std::vector<char *> args(argv, argv + argc);
+    args.erase(args.begin() + 1);
+    argc = static_cast<int>(args.size());
+    argv = args.data();
+    QCoreApplication a(argc, argv);
+    return cli(argc, argv);
+  }
 }

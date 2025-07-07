@@ -15,19 +15,7 @@ This file is part of Fast Track.
     along with FastTrack.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include <getopt.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <tracking.h>
-#include <QCoreApplication>
-#include <QHash>
-#include <QHashIterator>
-#include <QObject>
-#include <QString>
-#include <QStringList>
-#include <QTextStream>
-
-using namespace std;
+#include "cli.h"
 
 void loadConfig(const QString &path, QHash<QString, QString> &parameters) {
   QFile parameterFile(path);
@@ -100,10 +88,7 @@ All arguments are mandatory except --backPath and --cfg. Loading a configuration
         stdout);
 }
 
-int main(int argc, char **argv) {
-  QCoreApplication app(argc, argv);
-  char env[] = "OPENCV_OPENCL_DEVICE=disabled";
-  putenv(env);  // disable OpenCL to fix windows memory leaks and increase performance
+int cli(int argc, char **argv) {
   static struct option long_options[] =
       {
           {"maxArea", required_argument, 0, 'a'},

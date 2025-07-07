@@ -118,33 +118,6 @@ jobs:
         with:
           name: FastTrack.dmg
           path: ./build/bin/FastTrack.dmg
-      - name: build_ft_cli
-        run: |
-          cd build/bin
-          APP=FastTrack-Cli.app
-          APP_BINARY=$APP/Contents/MacOS/FastTrack-Cli
-          mv fasttrack-cli.app "$APP"
-          macdeployqt "$APP" \
-            -always-overwrite \
-            -verbose=2
-          find / -name "libutf8_validity.dylib" -exec cp {} $APP/Contents/Frameworks/ \; 2> >(tee /dev/stderr) || true
-          find / -name "libgcc_s.1.1.dylib" -exec cp {} $APP/Contents/Frameworks/ \; 2> >(tee /dev/stderr) || true
-          find / -name "libsharpyuv.0.dylib" -exec cp {} $APP/Contents/Frameworks/ \; 2> >(tee /dev/stderr) || true
-          find / -name "libjxl_cms.0.11.dylib" -exec cp {} $APP/Contents/Frameworks/ \; 2> >(tee /dev/stderr) || true
-          find / -name "libvtk*.dylib" -exec cp {} $APP/Contents/Frameworks/ \; 2> >(tee /dev/stderr) || true
-          find / -name "libsqlite3*.dylib" -exec cp {} $APP/Contents/Frameworks/ \; 2> >(tee /dev/stderr) || true
-          find / -name "libhpdf*.dylib" -exec cp {} $APP/Contents/Frameworks/ \; 2> >(tee /dev/stderr) || true
-          cp -v /opt/homebrew/opt/little-cms2/lib/lib*.dylib $APP/Contents/Frameworks/ || true
-          cp -v /opt/homebrew/opt/jpeg-xl/lib/lib*.dylib $APP/Contents/Frameworks/ || true
-          find "$APP/Contents/Frameworks" -type f -name "*.dylib" -exec codesign --remove-signature {} \; 2>/dev/null || true
-          find "$APP/Contents/Frameworks" -type f -name "*.dylib" -exec codesign --force --sign - {} \;
-          python macdeployqtfix.py fasttrack-cli.app/contents/macos/fasttrack-cli ../../Qt/${{ env.QT_VERSION }}/
-          hdiutil create -volname FastTrack-Cli -srcfolder $APP -ov -format UDZO FastTrack-Cli.dmg
-      - name: upload_artefact_cli
-        uses: actions/upload-artifact@v4
-        with:
-          name: FastTrack-Cli.dmg
-          path: ./build/bin/FastTrack-Cli.dmg
 
   test_bundle:
     runs-on: macos-latest
@@ -153,11 +126,11 @@ jobs:
       - name: download artifact
         uses: actions/download-artifact@v4
         with:
-          name: FastTrack-Cli.dmg
-          path: FastTrack-Cli
+          name: FastTrack.dmg
+          path: FastTrack
 
       - name: Run FastTrack executable
         run: |
-          cd FastTrack-Cli
-          hdiutil attach FastTrack-Cli.dmg -mountpoint /Volumes/FastTrackApp
-          /Volumes/FastTrackApp/FastTrack-Cli.app/Contents/MacOS/FastTrack-Cli --help
+          cd FastTrack
+          hdiutil attach FastTrack.dmg -mountpoint /Volumes/FastTrackApp
+          /Volumes/FastTrackApp/FastTrack.app/Contents/MacOS/FastTrack --cli --help

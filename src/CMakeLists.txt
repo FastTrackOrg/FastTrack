@@ -23,6 +23,7 @@ add_executable(fasttrack
     timeline.cpp
     autolevel.cpp
     imageviewer.cpp
+    cli.cpp
 
     updater.h
     mainwindow.h
@@ -38,6 +39,7 @@ add_executable(fasttrack
     timeline.h
     autolevel.h
     imageviewer.h
+    cli.h
 
     mainwindow.ui
     replay.ui
@@ -57,19 +59,6 @@ qt_add_lrelease(TS_FILES fasttrack_en.ts
 add_custom_target(translations ALL DEPENDS ${QM_FILES})
 
 target_compile_definitions(fasttrack PRIVATE APP_VERSION="${PROJECT_VERSION}")
-
-add_executable(fasttrack-cli
-    fasttrack-cli.cpp
-    tracking.cpp
-    videoreader.cpp
-    Hungarian.cpp
-
-    tracking.h
-    videoreader.h
-    Hungarian.h
-)
-
-target_compile_definitions(fasttrack-cli PRIVATE APP_VERSION="${PROJECT_VERSION}")
 
 function(configure_target target_name)
     if(UNIX AND NOT APPLE)
@@ -116,7 +105,6 @@ function(configure_target target_name)
 endfunction()
 
 configure_target(fasttrack)
-configure_target(fasttrack-cli)
 
 if(UNIX AND NOT APPLE)
     install(TARGETS fasttrack DESTINATION /usr/bin)
@@ -132,5 +120,4 @@ if(UNIX AND NOT APPLE)
             DESTINATION share/licenses/fasttrack)
 endif()
 
-install(TARGETS fasttrack-cli DESTINATION /usr/bin)
 install(FILES ${CMAKE_SOURCE_DIR}/LICENSE DESTINATION /usr/share/licenses/fasttrack)
