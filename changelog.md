@@ -1,5 +1,10 @@
 # FastTrack changelog
 
+## 6.5.0
+
+### Changed
+
+- CLI and UI integrated in one executable.
 
 ## 6.4.0
 
