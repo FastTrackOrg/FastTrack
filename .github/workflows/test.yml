@@ -8,7 +8,7 @@ on:
     branches:
     - master
 env:
-  QT_VERSION: 6.11.1
+  QT_VERSION: 6.10.3
   OPENCV_VERSION: 4.10.0
 
 jobs:
@@ -18,7 +18,7 @@ jobs:
     - uses: actions/checkout@v2
     - uses: actions/setup-python@v2
       with:
-        python-version: '3.11'
+        python-version: '3.13'
     - name: install_qt6
       run: |
         sudo apt-get update
@@ -43,13 +43,13 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
         with:
-          python-version: '3.11'
+          python-version: '3.13'
       - name: install_qt6
         run: |
           choco uninstall mingw
-          pip install aqtinstall
-          python3 -m aqt install-qt -m qtcharts -O ${{ github.workspace }}/Qt/ windows desktop ${{ env.QT_VERSION }} win64_mingw
-          python3 -m aqt install-tool -O ${{ github.workspace }}/Qt/ windows desktop tools_mingw1310
+          python -m pip install aqtinstall
+          python -m aqt install-qt -m qtcharts -O ${{ github.workspace }}/Qt/ windows desktop ${{ env.QT_VERSION }} win64_mingw
+          python -m aqt install-tool -O ${{ github.workspace }}/Qt/ windows desktop tools_mingw1310
           echo "${{ github.workspace }}/Qt/${{ env.QT_VERSION }}/mingw_64/bin/" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
           echo "${{ github.workspace }}/Qt/Tools/mingw1310_64/bin/" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
           echo "CMAKE_PREFIX_PATH=${{ github.workspace }}/Qt/${{ env.QT_VERSION }}/mingw_64" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
@@ -78,6 +78,8 @@ jobs:
       - name: test_ft
         shell: bash
         run: |
+          export CMAKE_PREFIX_PATH="${{ github.workspace }}/Qt/${{ env.QT_VERSION }}/mingw_64"
+          export Qt6_DIR="$CMAKE_PREFIX_PATH/lib/cmake/Qt6"
           ./test.sh win
 
   test_mac:
@@ -85,7 +87,7 @@ jobs:
     steps:
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: '3.13'
       - uses: actions/checkout@v2
       - name: Set up Homebrew #https://github.com/Homebrew/homebrew-cask/issues/150323
         id: set-up-homebrew
