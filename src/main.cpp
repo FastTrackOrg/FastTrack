@@ -38,6 +38,9 @@ void messageHandler(QtMsgType type, const QMessageLogContext &context, const QSt
 int main(int argc, char *argv[]) {
   qputenv("OPENCV_OPENCL_DEVICE", "disabled");  // disable OpenCL to fix windows memory leaks and increase performance
   if (qstrcmp(argv[1], "--cli")) {
+#ifdef Q_OS_MACOS
+    QApplication::setAttribute(Qt::AA_DontUseNativeDialogs, true);
+#endif
     QApplication a(argc, argv);
     QPixmap pixmap(QStringLiteral(":/assets/icon.png"));
     QSplashScreen splash(pixmap);
