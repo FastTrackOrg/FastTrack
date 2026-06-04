@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 env:
-  QT_VERSION: 6.9.1
+  QT_VERSION: 6.11.1
 
 jobs:
   build_mac:
@@ -89,6 +89,7 @@ jobs:
           export PKG_CONFIG_PATH="$HOME/opencv-install/lib/pkgconfig:$PKG_CONFIG_PATH"
           export CMAKE_PREFIX_PATH="$HOME/opencv-install:$CMAKE_PREFIX_PATH"
           export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig/
+          export CMAKE_PREFIX_PATH="${{ github.workspace }}/Qt/${{ env.QT_VERSION }}/macos:$CMAKE_PREFIX_PATH"
           ./run.sh ci_clang
       - name: build_ft
         run: |
@@ -120,7 +121,7 @@ jobs:
           path: ./build/bin/FastTrack.dmg
 
   test_bundle:
-    runs-on: macos-latest
+    runs-on: macos-26
     needs: build_mac
     steps:
       - name: download artifact
@@ -134,3 +135,25 @@ jobs:
           cd FastTrack
           hdiutil attach FastTrack.dmg -mountpoint /Volumes/FastTrackApp
           /Volumes/FastTrackApp/FastTrack.app/Contents/MacOS/FastTrack --cli --help
+
+      - name: GUI startup smoke test
+        run: |
+          brew install coreutils
+
+          cd FastTrack
+          hdiutil attach FastTrack.dmg -mountpoint /Volumes/FastTrackApp
+
+          BIN=/Volumes/FastTrackApp/FastTrack.app/Contents/MacOS/FastTrack
+
+          set +e
+          gtimeout 20s "$BIN"
+          status=$?
+          set -e
+
+          if [ "$status" -eq 124 ]; then
+            echo "GUI startup test passed: app stayed alive for 20 seconds."
+            exit 0
+          fi
+
+          echo "GUI startup test failed: app exited with status $status."
+          exit "$status"

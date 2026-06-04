@@ -61,7 +61,7 @@ def invertId(operations, dataframe, startTime = 0):
    # errors -= len(n)
         
     for i, j in enumerate(indexes):    
-        dataframe["id"].loc[j] = operations[i][1]
+        dataframe.loc[j, "id"] = operations[i][1]
     return errors
 
 def errorsCounter(reference, tracking):

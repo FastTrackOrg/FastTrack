@@ -63,3 +63,22 @@ jobs:
         run: |
           cd FastTrack
           ./FastTrack.exe --cli --help
+
+      - name: GUI startup smoke test
+        shell: pwsh
+        run: |
+          cd FastTrack
+
+          $p = Start-Process -FilePath ".\FastTrack.exe" -PassThru -WindowStyle Hidden
+
+          Start-Sleep -Seconds 10
+
+          if ($p.HasExited) {
+            Write-Host "GUI startup test failed: app exited early with code $($p.ExitCode)."
+            exit $p.ExitCode
+          }
+
+          Write-Host "GUI startup test passed: app stayed alive for 10 seconds."
+
+          Stop-Process -Id $p.Id -Force
+          exit 0

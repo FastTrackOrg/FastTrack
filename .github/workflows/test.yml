@@ -8,7 +8,7 @@ on:
     branches:
     - master
 env:
-  QT_VERSION: 6.7.2
+  QT_VERSION: 6.11.1
   OPENCV_VERSION: 4.10.0
 
 jobs:
@@ -18,7 +18,7 @@ jobs:
     - uses: actions/checkout@v2
     - uses: actions/setup-python@v2
       with:
-        python-version: '3.8'
+        python-version: '3.11'
     - name: install_qt6
       run: |
         sudo apt-get update
@@ -43,7 +43,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
         with:
-          python-version: '3.8'
+          python-version: '3.11'
       - name: install_qt6
         run: |
           choco uninstall mingw
@@ -52,6 +52,8 @@ jobs:
           python3 -m aqt install-tool -O ${{ github.workspace }}/Qt/ windows desktop tools_mingw1310
           echo "${{ github.workspace }}/Qt/${{ env.QT_VERSION }}/mingw_64/bin/" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
           echo "${{ github.workspace }}/Qt/Tools/mingw1310_64/bin/" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          echo "CMAKE_PREFIX_PATH=${{ github.workspace }}/Qt/${{ env.QT_VERSION }}/mingw_64" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          echo "Qt6_DIR=${{ github.workspace }}/Qt/${{ env.QT_VERSION }}/mingw_64/lib/cmake/Qt6" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
       - name: install_opencv
         run: |
           choco install wget unzip cmake git
@@ -81,15 +83,10 @@ jobs:
   test_mac:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
+      - uses: actions/setup-python@v5
         with:
-          python-version: '3.8'
-      - name: install_qt6
-        run: |
-          pip install aqtinstall
-          python3 -m aqt install-qt -m qtcharts -O ${{ github.workspace }}/Qt/ mac desktop ${{ env.QT_VERSION }}
-          echo ${{ github.workspace }}/Qt/${{ env.QT_VERSION }}/macos/bin/ >> $GITHUB_PATH
+          python-version: '3.11'
+      - uses: actions/checkout@v2
       - name: Set up Homebrew #https://github.com/Homebrew/homebrew-cask/issues/150323
         id: set-up-homebrew
         uses: Homebrew/actions/setup-homebrew@master
@@ -101,6 +98,7 @@ jobs:
           rm -f /usr/local/bin/python3*
           rm -f /usr/local/opt/go/bin/go*
           rm -f /usr/local/bin/go*
+          brew uninstall --ignore-dependencies qt@6 || true
           brew update -q -f
           brew upgrade -q -f
           brew install pkg-config
@@ -110,6 +108,12 @@ jobs:
           export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig/
           python -m pip install --upgrade pip setuptools wheel
           python -m pip install numpy pandas pytest
+      - name: install_qt6
+        run: |
+          python -m pip install aqtinstall
+          python -m aqt install-qt -m qtcharts -O ${{ github.workspace }}/Qt/ mac desktop ${{ env.QT_VERSION }}
+          echo ${{ github.workspace }}/Qt/${{ env.QT_VERSION }}/macos/bin/ >> $GITHUB_PATH
       - name: test_ft
         run: |
+          export CMAKE_PREFIX_PATH="${{ github.workspace }}/Qt/${{ env.QT_VERSION }}/macos:$CMAKE_PREFIX_PATH"
           ./test.sh unix

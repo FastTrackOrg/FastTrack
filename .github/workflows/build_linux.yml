@@ -64,3 +64,21 @@ jobs:
           cd FastTrack
           chmod +x fasttrack.run
           ./fasttrack.run -- --cli --help
+
+      - name: GUI startup smoke test
+        run: |
+          cd FastTrack
+          chmod +x fasttrack.run
+
+          set +e
+          timeout 10s ./fasttrack.run -- -platform offscreen
+          status=$?
+          set -e
+
+          if [ "$status" -eq 124 ]; then
+            echo "GUI startup test passed: app stayed alive for 10 seconds."
+            exit 0
+          fi
+
+          echo "GUI startup test failed: app exited with status $status."
+          exit "$status"
