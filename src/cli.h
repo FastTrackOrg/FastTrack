@@ -20,8 +20,8 @@ This file is part of Fast Track.
 #include <stdio.h>
 #include <stdlib.h>
 #include <tracking.h>
-#include <QCoreApplication>
 #include <QCommandLineParser>
+#include <QCoreApplication>
 #include <QHash>
 #include <QHashIterator>
 #include <QObject>

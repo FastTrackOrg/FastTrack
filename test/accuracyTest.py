@@ -2,6 +2,7 @@ import pytest
 import platform
 import os
 import shutil
+import subprocess
 import time
 import pandas
 import numpy  as np
@@ -158,19 +159,28 @@ def tracking(path, imagePath, normDist=None, normAngle=None, maxDist=None, maxTi
   morphSize = str(int(groundParameter.loc["morphSize"][1]))
   morphType = str(int(groundParameter.loc["morphType"][1]))
 
-  if platform.system() == "Windows":
-    executable = "FastTrack.exe"
-    prefix = ""
-  elif platform.system() == "Linux":
-    executable = "fasttrack"
-    prefix = ""
-  elif platform.system() == "Darwin":
-    executable = "fasttrack.app --args"
-    prefix = "open -W "
+  executableName = "FastTrack.exe" if platform.system() == "Windows" else "fasttrack"
+  executable = os.path.abspath("../build/bin/" + executableName)
+  command = [
+    executable, "--cli",
+    "--maxArea", maxArea, "--minArea", minArea,
+    "--lightBack", lightBack, "--thresh", thresh,
+    "--reg", reg, "--spot", spot,
+    "--nBack", nBack, "--regBack", regBack, "--methBack", methBack,
+    "--xTop", xTop, "--yTop", yTop,
+    "--xBottom", xBottom, "--yBottom", yBottom,
+    "--morph", morph, "--morphSize", morphSize, "--morphType", morphType,
+    "--normArea", str(normArea), "--normPerim", str(normPerim),
+    "--normDist", str(normDist), "--normAngle", str(normAngle),
+    "--maxDist", str(maxDist), "--maxTime", str(maxTime),
+    "--path", os.path.abspath(path + imagePath),
+    "--backPath", os.path.abspath("dataSet/images/Groundtruth/Tracking_Result/background.pgm"),
+  ]
+  if platform.system() == "Darwin":
+    command = ["open", "-W", os.path.abspath("../build/bin/fasttrack.app"), "--args"] + command[1:]
 
-  cmd = prefix + os.path.abspath("../build/bin/" + executable) + " --cli" + " --maxArea " + maxArea + " --minArea " + minArea + " --lightBack "+ lightBack + " --thresh "+ thresh + " --reg " + reg + " --spot "+ spot + " --nBack "+ nBack + " --regBack "+ regBack + " --methBack " + methBack+ " --xTop "+ xTop + " --yTop "+ yTop + " --xBottom " + xBottom + " --yBottom " + yBottom+ " --morph " + morph + " --morphSize " + morphSize+ " --morphType " + morphType +" --normArea " +str(normArea) + " --normPerim "+ str(normPerim) + " --normDist " + str(normDist) + " --normAngle " + str(normAngle) + " --maxDist " + str(maxDist) + " --maxTime " + str(maxTime) + " --path "+ os.path.abspath(path + imagePath) + " --backPath " + os.path.abspath("dataSet/images/Groundtruth/Tracking_Result/background.pgm") #+ " > /dev/null 2>&1" 
-  print(cmd)
-  out = os.system(cmd)
+  print(subprocess.list2cmdline(command))
+  subprocess.run(command, check=True)
 
 
 def test_accuracy():

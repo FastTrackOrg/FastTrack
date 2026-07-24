@@ -104,16 +104,14 @@ function(configure_target target_name)
         target_sources(${target_name} PRIVATE ${app_icon_macos})
 
         target_compile_options(${target_name} PRIVATE -std=c++1z -stdlib=libc++ -O3)
-        find_package(PkgConfig REQUIRED)
-        pkg_check_modules(OPENCV REQUIRED opencv4)
         find_package(OpenCV REQUIRED COMPONENTS
             core imgproc highgui imgcodecs
             videoio video calib3d photo features2d
         )
-        target_include_directories(${target_name} PRIVATE ${OPENCV_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR})
+        target_include_directories(${target_name} PRIVATE ${OpenCV_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR})
         target_link_libraries(${target_name} PRIVATE
             Qt6::Core Qt6::Gui Qt6::Widgets Qt6::Sql Qt6::Network
-            ${OPENCV_LIBRARIES}
+            ${OpenCV_LIBS}
         )
     endif()
 endfunction()

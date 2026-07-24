@@ -44,7 +44,7 @@ class AutoLevel : public QObject {
   double computeStdPerimeter(const Data &data);
 
  public:
-  explicit AutoLevel(QWidget *parent = nullptr) : QObject(parent){};
+  explicit AutoLevel(QWidget *parent = nullptr) : QObject(parent) {};
   ~AutoLevel();
   AutoLevel(const string &path, const UMat &background, const QHash<QString, QString> &parameters);
   AutoLevel(const AutoLevel &T) = delete;

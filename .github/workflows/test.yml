@@ -103,11 +103,10 @@ jobs:
           brew uninstall --ignore-dependencies qt@6 || true
           brew update -q -f
           brew upgrade -q -f
-          brew install pkg-config
           brew install libomp
-          brew install opencv
+          brew install opencv@4
           brew install googletest
-          export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig/
+          echo "OpenCV_DIR=$(brew --prefix opencv@4)/lib/cmake/opencv4" >> "$GITHUB_ENV"
           python -m pip install --upgrade pip setuptools wheel
           python -m pip install numpy pandas pytest
       - name: install_qt6

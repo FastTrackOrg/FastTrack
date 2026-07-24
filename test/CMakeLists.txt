@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.18)
 project(FastTrackTest)
 
 find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets Sql Test)
@@ -20,7 +20,6 @@ add_executable(test-fasttrack
 )
 
 include(GoogleTest)
-gtest_discover_tests(test-fasttrack)
 
 add_compile_definitions(
     DATASET_DIR="${CMAKE_CURRENT_SOURCE_DIR}/dataSet"
@@ -41,15 +40,27 @@ elseif(WIN32)
     target_include_directories(test-fasttrack PRIVATE "${CMAKE_SOURCE_DIR}/OpenCV_MinGW_64/include" "${CMAKE_SOURCE_DIR}/googletest/build/install/include")
     link_directories("${CMAKE_SOURCE_DIR}/OpenCV_MinGW_64/lib" "${CMAKE_SOURCE_DIR}/googletest/build/install/lib")
     target_link_libraries(test-fasttrack PRIVATE Qt6::Core Qt6::Gui Qt6::Widgets Qt6::Sql "${CMAKE_SOURCE_DIR}/OpenCV_MinGW_64/lib/libopencv_world4100.dll.a" "${CMAKE_SOURCE_DIR}/googletest/build/install/lib/libgtest.a" "${CMAKE_SOURCE_DIR}/googletest/build/install/lib/libgtest_main.a")
+
+    find_program(WINDEPLOYQT_EXECUTABLE windeployqt HINTS "${Qt6_DIR}/../../../bin" REQUIRED)
+    add_custom_command(TARGET test-fasttrack POST_BUILD
+        COMMAND "${WINDEPLOYQT_EXECUTABLE}"
+                --no-translations
+                --compiler-runtime
+                "$<TARGET_FILE:test-fasttrack>"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "${CMAKE_SOURCE_DIR}/OpenCV_MinGW_64/bin/libopencv_world4100.dll"
+                "$<TARGET_FILE_DIR:test-fasttrack>"
+        VERBATIM
+    )
 elseif(APPLE)
     target_compile_options(test-fasttrack PRIVATE -std=c++1z -stdlib=libc++ -O3 -g)
     find_package(GTest REQUIRED)
-    find_package(PkgConfig REQUIRED)
-    pkg_check_modules(OPENCV REQUIRED opencv4)
     find_package(OpenCV REQUIRED COMPONENTS
         core imgproc highgui imgcodecs
         videoio video calib3d photo features2d
     )
-    target_include_directories(test-fasttrack PRIVATE ${OPENCV_INCLUDE_DIRS} ${GTEST_INCLUDE_DIRS})
-    target_link_libraries(test-fasttrack PRIVATE Qt6::Core Qt6::Gui Qt6::Widgets Qt6::Sql ${OPENCV_LIBRARIES} ${GTEST_LIBRARIES})
+    target_include_directories(test-fasttrack PRIVATE ${OpenCV_INCLUDE_DIRS} ${GTEST_INCLUDE_DIRS})
+    target_link_libraries(test-fasttrack PRIVATE Qt6::Core Qt6::Gui Qt6::Widgets Qt6::Sql ${OpenCV_LIBS} ${GTEST_LIBRARIES})
 endif()
+
+gtest_discover_tests(test-fasttrack DISCOVERY_MODE PRE_TEST)

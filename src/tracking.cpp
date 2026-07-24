@@ -433,7 +433,8 @@ vector<vector<Point3d>> Tracking::objectPosition(const UMat &frame, int minSize,
         parameter[2] = 0;
       }
 
-      struct ProjectedMoments {
+      struct ProjectedMoments
+      {
         double count = 0;
         double x = 0;
         double y = 0;

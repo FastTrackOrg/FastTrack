@@ -21,6 +21,8 @@ if [ "$1" = "win" ]; then
   cmake -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release ../
   mingw32-make
   mingw32-make check
+  windeployqt bin/fasttrack.exe --no-translations --compiler-runtime
+  cp ../OpenCV_MinGW_64/bin/libopencv_world4100.dll bin/
   cd ..
   python -m pytest test/accuracyTest.py
 fi

@@ -43,9 +43,9 @@ This file is part of Fast Track.
 #include <QNetworkRequest>
 #include <QPainter>
 #include <QResizeEvent>
+#include <QScopedValueRollback>
 #include <QScrollArea>
 #include <QScrollBar>
-#include <QScopedValueRollback>
 #include <QSettings>
 #include <QSharedPointer>
 #include <QStandardPaths>

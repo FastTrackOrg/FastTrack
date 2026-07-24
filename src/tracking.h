@@ -88,7 +88,7 @@ class Tracking : public QObject {
   QHash<QString, QString> m_parameters; /*!< map of all the parameters for the tracking. */
 
  public:
-  explicit Tracking(QWidget *parent = nullptr) : QObject(parent){};
+  explicit Tracking(QWidget *parent = nullptr) : QObject(parent) {};
   Tracking(const string &path, const string &background, int startImage = 0, int stopImage = -1);
   Tracking(const string &path, const UMat &background, int startImage = 0, int stopImage = -1);
   Tracking(const Tracking &) = delete;
