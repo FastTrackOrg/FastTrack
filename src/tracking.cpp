@@ -693,6 +693,11 @@ vector<Point3d> Tracking::prevision(vector<Point3d> past, vector<Point3d> presen
  */
 void Tracking::imageProcessing() {
   QSqlDatabase outputDb = QSqlDatabase::database(connectionName);
+  QSqlQuery insertQuery(outputDb);
+  insertQuery.prepare(
+      "INSERT INTO tracking (xHead, yHead, tHead, xTail, yTail, tTail, xBody, yBody, tBody, curvature, areaBody, perimeterBody, headMajorAxisLength, headMinorAxisLength, headExcentricity, tailMajorAxisLength, tailMinorAxisLength, tailExcentricity, bodyMajorAxisLength, bodyMinorAxisLength, bodyExcentricity, imageNumber, id) "
+      "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+
   while (m_im < m_stopImage) {
     try {
       // Reads the next image in the image sequence and applies the image processing workflow
@@ -744,21 +749,18 @@ void Tracking::imageProcessing() {
         outputDb.commit();
         outputDb.transaction();
       }
-      QSqlQuery query(outputDb);
       for (size_t l = 0; l < m_out[0].size(); l++) {
         // Tracking data are available
-        if (find(occluded.begin(), occluded.end(), int(l)) == occluded.end()) {
-          query.prepare(
-              "INSERT INTO tracking (xHead, yHead, tHead, xTail, yTail, tTail, xBody, yBody, tBody, curvature, areaBody, perimeterBody, headMajorAxisLength, headMinorAxisLength, headExcentricity, tailMajorAxisLength, tailMinorAxisLength, tailExcentricity, bodyMajorAxisLength, bodyMinorAxisLength, bodyExcentricity, imageNumber, id) "
-              "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        if (l >= identity.size() || identity[l] != -1) {
+          int bindIndex = 0;
           for (auto const &a : m_out) {
-            query.addBindValue(a[l].x);
-            query.addBindValue(a[l].y);
-            query.addBindValue(a[l].z);
+            insertQuery.bindValue(bindIndex++, a[l].x);
+            insertQuery.bindValue(bindIndex++, a[l].y);
+            insertQuery.bindValue(bindIndex++, a[l].z);
           }
-          query.addBindValue(m_im);
-          query.addBindValue(m_id[l]);
-          query.exec();
+          insertQuery.bindValue(bindIndex++, m_im);
+          insertQuery.bindValue(bindIndex, m_id[l]);
+          insertQuery.exec();
         }
       }
 
