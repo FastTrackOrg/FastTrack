@@ -85,14 +85,18 @@ QHash<QString, double> AutoLevel::level() {
       m_parameters.insert(QStringLiteral("normDist"), QString::number(stdDist));
       m_parameters.insert(QStringLiteral("normArea"), QString::number(stdArea));
       m_parameters.insert(QStringLiteral("normPerim"), QString::number(stdPerimeter));
-      Tracking tracking = Tracking(m_path, m_background, 0, m_endImage);
-      tracking.updatingParameters(m_parameters);
-      tracking.startProcess();
-      Data data(m_savedPath + QDir::separator());
-      stdAngle = 180 * computeStdAngle(data) / M_PI;
-      stdDist = computeStdDistance(data);
-      stdArea = computeStdArea(data);
-      stdPerimeter = computeStdPerimeter(data);
+      {
+        Tracking tracking(m_path, m_background, 0, m_endImage);
+        tracking.updatingParameters(m_parameters);
+        tracking.startProcess();
+      }
+      {
+        Data data(m_savedPath + QDir::separator());
+        stdAngle = 180 * computeStdAngle(data) / M_PI;
+        stdDist = computeStdDistance(data);
+        stdArea = computeStdArea(data);
+        stdPerimeter = computeStdPerimeter(data);
+      }
       // This construction only work because tracking data are not changed
       // therefore no call to Data.save() are triggered at destruction
       // at out of scope on a non-existing tracking.txt already deleted.

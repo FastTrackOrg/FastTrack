@@ -19,5 +19,5 @@ jobs:
       with:
         source: 'src/'
         extensions: 'h,cpp'
-        clangFormatVersion: 9
+        clangFormatVersion: 20
         style: file
