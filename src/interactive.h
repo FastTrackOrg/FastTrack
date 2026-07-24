@@ -45,6 +45,7 @@ This file is part of Fast Track.
 #include <QResizeEvent>
 #include <QScrollArea>
 #include <QScrollBar>
+#include <QScopedValueRollback>
 #include <QSettings>
 #include <QSharedPointer>
 #include <QStandardPaths>
@@ -126,6 +127,9 @@ class Interactive : public QMainWindow {
   VideoReader *video;
   Replay *replay;
   bool videoStatus;
+  bool displayInProgress = false;
+  bool contourWarningOpen = false;
+  int largeContourDisplayDecision = -1;
 
   QString style;
   QString color;

@@ -574,9 +574,10 @@ void Interactive::openFolder(QString path) {
  * @param[in] scale Optional scale to display.
  */
 void Interactive::display(int index, int scale) {
-  if (!videoStatus) {
+  if (!videoStatus || displayInProgress) {
     return;
   }
+  QScopedValueRollback<bool> displayGuard(displayInProgress, true);
 
   UMat frame;
   if (!video->getImage(index, frame)) {
@@ -606,11 +607,33 @@ void Interactive::display(int index, int scale) {
 
       // If too many contours are detected to be displayed without slowdowns, ask the user what to do
       if (contours.size() > 10000) {
-        QMessageBox::StandardButton reply;
-        reply = QMessageBox::question(this, tr("Confirmation"), tr("Too many objects detected to be displayed. \n Do you want to display them anyway (the program can be slow)? "), QMessageBox::No | QMessageBox::Yes);
-        if (reply == QMessageBox::No) {
+        if (largeContourDisplayDecision == 0 || contourWarningOpen) {
           return;
         }
+        if (largeContourDisplayDecision < 0) {
+          contourWarningOpen = true;
+          auto *warning = new QMessageBox(
+              QMessageBox::Question,
+              tr("Confirmation"),
+              tr("Too many objects detected to be displayed.\nDo you want to display them anyway (the program can be slow)?"),
+              QMessageBox::No | QMessageBox::Yes,
+              this);
+          warning->setAttribute(Qt::WA_DeleteOnClose);
+          connect(warning, &QMessageBox::finished, this, [this, index, scale](int result) {
+            contourWarningOpen = false;
+            largeContourDisplayDecision = (result == QMessageBox::Yes) ? 1 : 0;
+            if (largeContourDisplayDecision == 1) {
+              display(index, scale);
+            }
+          });
+          warning->open();
+          return;
+        }
+      }
+      else {
+        // Ask again after the contour count has dropped below the warning
+        // threshold and subsequently crosses it again.
+        largeContourDisplayDecision = -1;
       }
 
       vector<vector<Point>> displayContours;
