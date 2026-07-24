@@ -5,6 +5,7 @@ find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets Sql Test)
 
 add_executable(test-fasttrack
     trackingTest.cpp
+    HungarianTest.cpp
     ../src/tracking.cpp
     ../src/videoreader.cpp
     ../src/Hungarian.cpp

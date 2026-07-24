@@ -18,6 +18,8 @@ This file is part of Fast Track.
 #include "tracking.h"
 #include "Hungarian.h"
 
+#include <limits>
+
 using namespace cv;
 using namespace std;
 
@@ -521,40 +523,50 @@ vector<int> Tracking::costFunc(const vector<vector<Point3d>> &prevPos, const vec
     assignment = {};
   }
   else {
-    vector<vector<double>> costMatrix(n, vector<double>(m));
-    vector<pair<int, int>> distances;
+    vector<double> costMatrix(static_cast<size_t>(n) * static_cast<size_t>(m));
+    vector<unsigned char> validAssignment(costMatrix.size(), 0);
+    double maximumValidCost = 0.0;
+    const int spot = m_parameters.value(QStringLiteral("spot")).toInt();
 
     for (int i = 0; i < n; ++i) {  // Loop on previous objects
-      Point3d prevCoord = prevPos[m_parameters.value(QStringLiteral("spot")).toInt()][i];
-      Point3d prevData = prevPos[3][i];
+      const Point3d &prevCoord = prevPos[spot][i];
+      const Point3d &prevData = prevPos[3][i];
       for (int j = 0; j < m; ++j) {  // Loop on current objects
-        Point3d coord = pos[m_parameters.value(QStringLiteral("spot")).toInt()][j];
-        Point3d data = pos[3][j];
-        double distanceDiff = pow(pow(prevCoord.x - coord.x, 2) + pow(prevCoord.y - coord.y, 2), 0.5);
-        double angleDiff = abs(angleDifference(prevCoord.z, coord.z));
-        double areaDiff = abs(prevData.y - data.y);
-        double perimeterDiff = abs(prevData.z - data.z);
-        double c = -1;
+        const Point3d &coord = pos[spot][j];
+        const Point3d &data = pos[3][j];
+        const double distanceDiff = hypot(prevCoord.x - coord.x, prevCoord.y - coord.y);
+        const size_t index = static_cast<size_t>(i) * static_cast<size_t>(m) + static_cast<size_t>(j);
         if (distanceDiff < LO) {
-          c = divide(distanceDiff, LENGTH) + divide(angleDiff, ANGLE) + divide(areaDiff, AREA) + divide(perimeterDiff, PERIMETER);
-          costMatrix[i][j] = c;
-          distances.push_back({i, j});
+          const double cost = divide(distanceDiff, LENGTH) +
+                              divide(abs(angleDifference(prevCoord.z, coord.z)), ANGLE) +
+                              divide(abs(prevData.y - data.y), AREA) +
+                              divide(abs(prevData.z - data.z), PERIMETER);
+          costMatrix[index] = cost;
+          validAssignment[index] = 1;
+          maximumValidCost = max(maximumValidCost, cost);
         }
-        else {
-          costMatrix[i][j] = 2e307;
-        }
+      }
+    }
+
+    // A finite penalty avoids overflow during optimization. It is larger than
+    // the total cost of any assignment containing only valid edges.
+    const double dimension = static_cast<double>(min(n, m) + 1);
+    const double safeMaximum = numeric_limits<double>::max() / dimension;
+    const double forbiddenCost = min(safeMaximum, (maximumValidCost + 1.0) * dimension);
+    for (size_t index = 0; index < costMatrix.size(); ++index) {
+      if (!validAssignment[index]) {
+        costMatrix[index] = forbiddenCost;
       }
     }
 
     // Hungarian algorithm to solve the assignment problem O(n**3)
     HungarianAlgorithm HungAlgo;
-    HungAlgo.Solve(costMatrix, assignment);
+    HungAlgo.Solve(costMatrix, static_cast<size_t>(n), static_cast<size_t>(m), assignment);
 
-    // Finds object that are above the LO limit (+inf columns in the cost matrix
-    // Puts the assignment number at -1 to signal new objects
+    // Mark assignments outside the maximum displacement as missing objects.
     for (size_t i = 0; i < assignment.size(); i++) {
-      pair<int, int> p = make_pair(i, assignment[i]);
-      if (find(distances.begin(), distances.end(), p) == distances.end()) {
+      if (assignment[i] < 0 ||
+          !validAssignment[i * static_cast<size_t>(m) + static_cast<size_t>(assignment[i])]) {
         assignment[i] = -1;
       }
     }
