@@ -17,11 +17,11 @@ This file is part of Fast Track.
 
 #ifndef CLI_H
 #define CLI_H
-#include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <tracking.h>
 #include <QCoreApplication>
+#include <QCommandLineParser>
 #include <QHash>
 #include <QHashIterator>
 #include <QObject>

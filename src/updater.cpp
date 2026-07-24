@@ -79,7 +79,7 @@ void Updater::checkForUpdate() {
         case updateStatus::HasUpdate: {
           main->statusBar()->addWidget(new QLabel(tr("FastTrack version %1 is available!").arg(lastVersion)));
           QPushButton *button = new QPushButton(tr("Download FastTrack %1").arg(lastVersion), this);
-          connect(button, &QPushButton::clicked, this, [=, this]() {
+          connect(button, &QPushButton::clicked, this, [this, lastVersion, message]() {
             displayUpdate(lastVersion, message);
           });
           main->statusBar()->addPermanentWidget(button);

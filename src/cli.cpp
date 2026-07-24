@@ -88,136 +88,64 @@ All arguments are mandatory except --backPath and --cfg. Loading a configuration
         stdout);
 }
 
-int cli(int argc, char **argv) {
-  static struct option long_options[] =
-      {
-          {"maxArea", required_argument, 0, 'a'},
-          {"minArea", required_argument, 0, 'b'},
-          {"spot", required_argument, 0, 'c'},
-          {"normDist", required_argument, 0, 'd'},
-          {"normAngle", required_argument, 0, 'e'},
-          {"normArea", required_argument, 0, 'y'},
-          {"normPerim", required_argument, 0, 'z'},
-          {"maxDist", required_argument, 0, 'g'},
-          {"maxTime", required_argument, 0, 'h'},
-          {"thresh", required_argument, 0, 'i'},
-          {"nBack", required_argument, 0, 'j'},
-          {"methBack", required_argument, 0, 'k'},
-          {"regBack", required_argument, 0, 'l'},
-          {"xTop", required_argument, 0, 'm'},
-          {"yTop", required_argument, 0, 'n'},
-          {"xBottom", required_argument, 0, 'o'},
-          {"yBottom", required_argument, 0, 'p'},
-          {"reg", required_argument, 0, 'q'},
-          {"lightBack", required_argument, 0, 'r'},
-          {"morph", required_argument, 0, 's'},
-          {"morphSize", required_argument, 0, 't'},
-          {"morphType", required_argument, 0, 'u'},
-          {"path", required_argument, 0, 'v'},
-          {"backPath", required_argument, 0, 'w'},
-          {"cfg", required_argument, 0, 'A'},
-          {"help", no_argument, 0, 'x'},
-          {"version", no_argument, 0, 'V'},
-          {0, 0, 0, 0}};
+int cli(int, char **) {
+  QCommandLineParser parser;
+  const QStringList parameterNames = {
+      QStringLiteral("maxArea"),
+      QStringLiteral("minArea"),
+      QStringLiteral("spot"),
+      QStringLiteral("normDist"),
+      QStringLiteral("normAngle"),
+      QStringLiteral("normArea"),
+      QStringLiteral("normPerim"),
+      QStringLiteral("maxDist"),
+      QStringLiteral("maxTime"),
+      QStringLiteral("thresh"),
+      QStringLiteral("nBack"),
+      QStringLiteral("methBack"),
+      QStringLiteral("regBack"),
+      QStringLiteral("xTop"),
+      QStringLiteral("yTop"),
+      QStringLiteral("xBottom"),
+      QStringLiteral("yBottom"),
+      QStringLiteral("reg"),
+      QStringLiteral("lightBack"),
+      QStringLiteral("morph"),
+      QStringLiteral("morphSize"),
+      QStringLiteral("morphType"),
+      QStringLiteral("path"),
+      QStringLiteral("backPath")};
 
-  int option_index = 0;
-  int c;
+  for (const QString &name : parameterNames) {
+    parser.addOption(QCommandLineOption(name, QString(), QStringLiteral("value")));
+  }
+  parser.addOption(QCommandLineOption(QStringLiteral("cfg"), QString(), QStringLiteral("path")));
+  parser.addOption(QCommandLineOption(QStringLiteral("help")));
+  parser.addOption(QCommandLineOption(QStringLiteral("version")));
+
+  if (!parser.parse(QCoreApplication::arguments())) {
+    fprintf(stderr, "%s\n", parser.errorText().toLocal8Bit().constData());
+    return 1;
+  }
+  if (parser.isSet(QStringLiteral("help"))) {
+    help();
+    return 0;
+  }
+  if (parser.isSet(QStringLiteral("version"))) {
+    printf("FastTrack ");
+    printf(APP_VERSION);
+    printf("\nLicense GPLv3+: GNU GPL version 3\nThis is free software: you are free to change and redistribute it.\nThere is NO WARRANTY, to the extent permitted by law.\nWritten by Benjamin Gallois\n");
+    return 0;
+  }
+
   QHash<QString, QString> parameters;
-  while (1) {
-    c = getopt_long(argc, argv, "a:b:c:d:e:f:g:h:i:j:k:l:m:n:o:p:q:r:s:t:u:v:w:x:y:z:A", long_options, &option_index);
-
-    if (c == -1) {
-      break;
+  for (const QString &name : parameterNames) {
+    if (parser.isSet(name)) {
+      parameters.insert(name, parser.value(name));
     }
-    else if (c == 'A') {
-      loadConfig(QString::fromStdString(optarg), parameters);
-      break;
-    }
-    else if (c == 'V') {
-      printf("FastTrack ");
-      printf(APP_VERSION);
-      printf("\nLicense GPLv3+: GNU GPL version 3\nThis is free software: you are free to change and redistribute it.\nThere is NO WARRANTY, to the extent permitted by law.\nWritten by Benjamin Gallois\n");
-      return 0;
-    }
-    else if (c == 'x') {
-      help();
-      return 0;
-    }
-
-    switch (c) {
-      case 'a':
-        parameters.insert(QStringLiteral("maxArea"), QString::QString::fromStdString(optarg));
-        break;
-      case 'b':
-        parameters.insert(QStringLiteral("minArea"), QString::fromStdString(optarg));
-        break;
-      case 'c':
-        parameters.insert(QStringLiteral("spot"), QString::fromStdString(optarg));
-        break;
-      case 'd':
-        parameters.insert(QStringLiteral("normDist"), QString::fromStdString(optarg));
-        break;
-      case 'e':
-        parameters.insert(QStringLiteral("normAngle"), QString::fromStdString(optarg));
-        break;
-      case 'g':
-        parameters.insert(QStringLiteral("maxDist"), QString::fromStdString(optarg));
-        break;
-      case 'h':
-        parameters.insert(QStringLiteral("maxTime"), QString::fromStdString(optarg));
-        break;
-      case 'i':
-        parameters.insert(QStringLiteral("thresh"), QString::fromStdString(optarg));
-        break;
-      case 'j':
-        parameters.insert(QStringLiteral("nBack"), QString::fromStdString(optarg));
-        break;
-      case 'k':
-        parameters.insert(QStringLiteral("methBack"), QString::fromStdString(optarg));
-        break;
-      case 'l':
-        parameters.insert(QStringLiteral("regBack"), QString::fromStdString(optarg));
-        break;
-      case 'm':
-        parameters.insert(QStringLiteral("xTop"), QString::fromStdString(optarg));
-        break;
-      case 'n':
-        parameters.insert(QStringLiteral("yTop"), QString::fromStdString(optarg));
-        break;
-      case 'o':
-        parameters.insert(QStringLiteral("xBottom"), QString::fromStdString(optarg));
-        break;
-      case 'p':
-        parameters.insert(QStringLiteral("yBottom"), QString::fromStdString(optarg));
-        break;
-      case 'q':
-        parameters.insert(QStringLiteral("reg"), QString::fromStdString(optarg));
-        break;
-      case 'r':
-        parameters.insert(QStringLiteral("lightBack"), QString::fromStdString(optarg));
-        break;
-      case 's':
-        parameters.insert(QStringLiteral("morph"), QString::fromStdString(optarg));
-        break;
-      case 't':
-        parameters.insert(QStringLiteral("morphSize"), QString::fromStdString(optarg));
-        break;
-      case 'u':
-        parameters.insert(QStringLiteral("morphType"), QString::fromStdString(optarg));
-        break;
-      case 'v':
-        parameters.insert(QStringLiteral("path"), QString::fromStdString(optarg));
-        break;
-      case 'w':
-        parameters.insert(QStringLiteral("backPath"), QString::fromStdString(optarg));
-        break;
-      case 'y':
-        parameters.insert(QStringLiteral("normArea"), QString::fromStdString(optarg));
-        break;
-      case 'z':
-        parameters.insert(QStringLiteral("normPerim"), QString::fromStdString(optarg));
-        break;
-    }
+  }
+  if (parser.isSet(QStringLiteral("cfg"))) {
+    loadConfig(parser.value(QStringLiteral("cfg")), parameters);
   }
 
   QHashIterator<QString, QString> i(parameters);

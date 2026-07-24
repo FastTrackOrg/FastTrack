@@ -364,10 +364,7 @@ void Batch::addPath(const QString &pathMovie, const QString &pathBackground, con
   ui->tablePath->setItem(row, 4, new QTableWidgetItem(tr("Waiting")));
   ui->tablePath->item(row, 4)->setTextAlignment(Qt::AlignCenter);
 
-  process tmpProcess = {
-      .path = pathMovie,
-      .backgroundPath = pathBackground,
-      .trackingParameters = parameterList};
+  process tmpProcess{pathMovie, pathBackground, parameterList};
   processList.append(tmpProcess);
 }
 
