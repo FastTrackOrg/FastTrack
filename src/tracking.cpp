@@ -90,17 +90,23 @@ Point2d Tracking::curvatureCenter(const Point3d &tail, const Point3d &head) cons
  * @return Radius of curvature.
  */
 double Tracking::curvature(Point2d center, const Mat &image) const {
-  double d = 0;
-  double count = 0;
+  double distanceSum = 0.0;
+  size_t pixelCount = 0;
 
-  image.forEach<uchar>(
-      [&d, &count, center](uchar &pixel, const int position[]) -> void {
-        if (pixel == 255) {  // if inside object
-          d += pow(pow(center.x - float(position[0]), 2) + pow(center.y - float(position[1]), 2), 0.5);
-          count += 1;
-        }
-      });
-  return count / d;
+  for (int row = 0; row < image.rows; ++row) {
+    const uchar *pixels = image.ptr<uchar>(row);
+    for (int column = 0; column < image.cols; ++column) {
+      if (pixels[column] != 0) {
+        distanceSum += hypot(center.x - column, center.y - row);
+        ++pixelCount;
+      }
+    }
+  }
+
+  if (pixelCount == 0 || distanceSum <= numeric_limits<double>::epsilon()) {
+    return 0.0;
+  }
+  return static_cast<double>(pixelCount) / distanceSum;
 }
 
 /**
@@ -484,7 +490,7 @@ vector<vector<Point3d>> Tracking::objectPosition(const UMat &frame, int minSize,
       // Computes the curvature of the object
       double curv = 1. / 1e-16;
       radiusCurv = curvatureCenter(Point3d(xTail, yTail, angleTail), Point3d(xHead, yHead, angleHead));
-      if (radiusCurv.x != NAN) {  //
+      if (!isnan(radiusCurv.x)) {
         curv = curvature(radiusCurv, RoiFull.getMat(ACCESS_READ));
       }
 

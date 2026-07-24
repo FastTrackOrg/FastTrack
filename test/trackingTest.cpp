@@ -73,6 +73,19 @@ TEST_F(TrackingTest, CurvatureCenter) {
   EXPECT_NEAR(test.y, 2, 0.005);
 }
 
+TEST_F(TrackingTest, CurvatureIsDeterministicAndUsesCartesianCoordinates) {
+  Tracking tracking("", "");
+  Mat object = Mat::zeros(3, 5, CV_8U);
+  object.at<uchar>(1, 3) = 255;
+
+  const double expected = 1.0 / sqrt(2.0);
+  for (int iteration = 0; iteration < 100; ++iteration) {
+    EXPECT_NEAR(tracking.curvature(Point2d(4, 0), object), expected, 1e-12);
+  }
+
+  EXPECT_DOUBLE_EQ(tracking.curvature(Point2d(0, 0), Mat::zeros(3, 3, CV_8U)), 0.0);
+}
+
 // Registration test
 TEST_F(TrackingTest, RegistrationMethod0Lena) {
   UMat imageReference, registered, diff;
