@@ -1,86 +1,153 @@
-name: Build Win
+name: 🪟 Build Windows
 
 on:
   workflow_dispatch:
 
 env:
   QT_VERSION: 6.10.3
-  OPENCV_VERSION: 4.10.0
-  OPENCV_VERSION_: 4100
 
 jobs:
   build_win:
-    runs-on: windows-latest
+    name: 🔨 Build (${{ matrix.arch }}, ${{ matrix.compiler }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x86-64
+            runner: windows-2025
+            compiler: mingw
+            qt_host: windows
+            qt_arch: win64_mingw
+            qt_dir: mingw_64
+          - arch: aarch64
+            runner: windows-11-arm
+            compiler: msvc
+            qt_host: windows_arm64
+            qt_arch: win64_msvc2022_arm64
+            qt_dir: msvc2022_arm64
+            vcpkg_triplet: arm64-windows
+            cmake_arch: ARM64
+    runs-on: ${{ matrix.runner }}
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
+      - name: 📥 Check out repository
+        uses: actions/checkout@v4
+      - name: 🐍 Set up Python
+        uses: actions/setup-python@v5
         with:
           python-version: '3.13'
-      - name: install_qt
+      - name: 📦 Install Qt
+        shell: pwsh
         run: |
-          choco uninstall mingw
           pip install aqtinstall
-          python3 -m aqt install-qt -m qtcharts -O ${{ github.workspace }}/Qt/ windows desktop ${{ env.QT_VERSION }} win64_mingw
-          python3 -m aqt install-tool -O ${{ github.workspace }}/Qt/ windows desktop tools_mingw1310
-          echo "${{ github.workspace }}/Qt/${{ env.QT_VERSION }}/mingw_64/bin/" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-          echo "${{ github.workspace }}/Qt/Tools/mingw1310_64/bin/" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-      - name: install_opencv
+          python -m aqt install-qt -O "${{ github.workspace }}/Qt" ${{ matrix.qt_host }} desktop ${{ env.QT_VERSION }} ${{ matrix.qt_arch }}
+          "${{ github.workspace }}/Qt/${{ env.QT_VERSION }}/${{ matrix.qt_dir }}/bin" |
+            Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+      - name: 📦 Install MinGW
+        if: matrix.compiler == 'mingw'
+        shell: pwsh
         run: |
-          choco install wget unzip
-          wget https://github.com/FastTrackOrg/Windows_MinGW_64_OpenCV/releases/download/${{ env.OPENCV_VERSION }}/OpenCV_MinGW_64.zip
-          unzip OpenCV_MinGW_64.zip -d ${{ github.workspace }}
-      - name: build_ft
+          python -m aqt install-tool -O "${{ github.workspace }}/Qt" windows desktop tools_mingw1310
+          "${{ github.workspace }}/Qt/Tools/mingw1310_64/bin" |
+            Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+      - name: 📦 Install OpenCV (MinGW)
+        if: matrix.compiler == 'mingw'
+        shell: pwsh
         run: |
-          mkdir build
-          cd build
-          set CMAKE_PREFIX_PATH=${{ github.workspace }}\Qt\${{ env.QT_VERSION }}\mingw_64
-          set Qt6_DIR=%CMAKE_PREFIX_PATH%\lib\cmake\Qt6
-          cmake -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DSKIP_TEST=ON ../
-          mingw32-make
-          mv bin/fasttrack.exe bin/FastTrack.exe
-          mv bin FastTrack
-          windeployqt FastTrack/FastTrack.exe --no-translations  # https://bugreports.qt.io/browse/QTBUG-62103?jql=status%20%3D%20Open%20AND%20text%20~%20%22windeployqt%20platform%22 and https://bugreports.qt.io/browse/QTBUG-112204
-          cp ${{ github.workspace }}/src/assets/icon.ico FastTrack
-          cp ${{ github.workspace }}/Qt/Tools/mingw*/bin/lib*.dll FastTrack
-          cp ${{ github.workspace }}/OpenCV_MinGW_64/bin/opencv_videoio_ffmpeg${{ env.OPENCV_VERSION_ }}_64.dll FastTrack
-          cp ${{ github.workspace }}/OpenCV_MinGW_64/bin/libopencv_world${{ env.OPENCV_VERSION_ }}.dll FastTrack
-          #cp *.qm FastTrack
-      - name: upload_artefact
+          Invoke-WebRequest `
+            -Uri "https://github.com/FastTrackOrg/Windows_MinGW_64_OpenCV/releases/download/4.10.0/OpenCV_MinGW_64.zip" `
+            -OutFile OpenCV_MinGW_64.zip
+          Expand-Archive OpenCV_MinGW_64.zip -DestinationPath "${{ github.workspace }}"
+      - name: 📦 Install OpenCV (MSVC)
+        if: matrix.compiler == 'msvc'
+        shell: pwsh
+        run: |
+          vcpkg install "opencv4[ffmpeg]:${{ matrix.vcpkg_triplet }}"
+      - name: 🔨 Build FastTrack (MinGW)
+        if: matrix.compiler == 'mingw'
+        shell: pwsh
+        run: |
+          $qtRoot = "${{ github.workspace }}/Qt/${{ env.QT_VERSION }}/${{ matrix.qt_dir }}"
+          cmake -S . -B build -G "MinGW Makefiles" `
+            -DCMAKE_BUILD_TYPE=Release `
+            -DCMAKE_PREFIX_PATH="$qtRoot" `
+            -DSKIP_TEST=ON
+          cmake --build build
+
+          New-Item -ItemType Directory -Force build/FastTrack
+          Copy-Item build/bin/fasttrack.exe build/FastTrack/FastTrack.exe
+          Copy-Item src/assets/icon.ico build/FastTrack
+          & "$qtRoot/bin/windeployqt.exe" build/FastTrack/FastTrack.exe --no-translations
+          Get-ChildItem "${{ github.workspace }}/Qt/Tools/mingw1310_64/bin" -Filter "lib*.dll" |
+            Copy-Item -Destination build/FastTrack
+          Copy-Item OpenCV_MinGW_64/bin/opencv_videoio_ffmpeg4100_64.dll build/FastTrack
+          Copy-Item OpenCV_MinGW_64/bin/libopencv_world4100.dll build/FastTrack
+      - name: 🔨 Build FastTrack (MSVC)
+        if: matrix.compiler == 'msvc'
+        shell: pwsh
+        run: |
+          $qtRoot = "${{ github.workspace }}/Qt/${{ env.QT_VERSION }}/${{ matrix.qt_dir }}"
+          $toolchain = "$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake"
+          cmake -S . -B build -G "Visual Studio 17 2022" -A "${{ matrix.cmake_arch }}" `
+            -DCMAKE_PREFIX_PATH="$qtRoot" `
+            -DCMAKE_TOOLCHAIN_FILE="$toolchain" `
+            -DVCPKG_TARGET_TRIPLET="${{ matrix.vcpkg_triplet }}" `
+            -DSKIP_TEST=ON
+          cmake --build build --config Release
+
+          New-Item -ItemType Directory -Force build/FastTrack
+          Copy-Item build/bin/Release/fasttrack.exe build/FastTrack/FastTrack.exe
+          Copy-Item src/assets/icon.ico build/FastTrack
+          & "$qtRoot/bin/windeployqt.exe" build/FastTrack/FastTrack.exe --no-translations
+
+          $vcpkgBin = "$env:VCPKG_INSTALLATION_ROOT/installed/${{ matrix.vcpkg_triplet }}/bin"
+          Get-ChildItem $vcpkgBin -Filter *.dll | Copy-Item -Destination build/FastTrack
+          $opencvTools = "$env:VCPKG_INSTALLATION_ROOT/installed/${{ matrix.vcpkg_triplet }}/tools/opencv4"
+          if (Test-Path $opencvTools) {
+            Get-ChildItem $opencvTools -Recurse -Filter *.dll |
+              Copy-Item -Destination build/FastTrack
+          }
+      - name: ⬆️ Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: FastTrack
+          name: FastTrack-windows-${{ matrix.arch }}
           path: build/FastTrack
 
   test_bundle:
-    runs-on: windows-latest
+    name: 🧪 Test bundle (${{ matrix.arch }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x86-64
+            runner: windows-2025
+          - arch: aarch64
+            runner: windows-11-arm
+    runs-on: ${{ matrix.runner }}
     needs: build_win
     steps:
-      - name: download artifact
+      - name: ⬇️ Download artifact
         uses: actions/download-artifact@v4
         with:
-          name: FastTrack
+          name: FastTrack-windows-${{ matrix.arch }}
           path: FastTrack
 
-      - name: Run FastTrack executable
+      - name: 🧪 Run CLI smoke test
         run: |
           cd FastTrack
           ./FastTrack.exe --cli --help
 
-      - name: GUI startup smoke test
+      - name: 🖥️ Run GUI smoke test
         shell: pwsh
         run: |
           cd FastTrack
 
           $p = Start-Process -FilePath ".\FastTrack.exe" -PassThru -WindowStyle Hidden
-
           Start-Sleep -Seconds 10
 
           if ($p.HasExited) {
-            Write-Host "GUI startup test failed: app exited early with code $($p.ExitCode)."
+            Write-Host "GUI startup smoke test failed: app exited early with code $($p.ExitCode)."
             exit $p.ExitCode
           }
 
-          Write-Host "GUI startup test passed: app stayed alive for 10 seconds."
-
+          Write-Host "GUI startup smoke test passed: app stayed alive for 10 seconds."
           Stop-Process -Id $p.Id -Force
-          exit 0

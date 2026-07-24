@@ -41,7 +41,6 @@ if [ "$1" = "profile" ]; then
 fi
 
 if [ "$1" = "ci" ]; then
-  make distclean
   set -e
   mkdir -p build
   cd build

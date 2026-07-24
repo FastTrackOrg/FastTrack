@@ -1,41 +1,42 @@
-name: Build Mac
+name: 🍎 Build macOS
 
 on:
   workflow_dispatch:
 
 env:
   QT_VERSION: 6.11.1
+  HOMEBREW_NO_AUTO_UPDATE: 1
+  HOMEBREW_NO_INSTALL_CLEANUP: 1
 
 jobs:
   build_mac:
-    runs-on: macos-14
+    name: 🔨 Build (${{ matrix.arch }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x86-64
+            runner: macos-15-intel
+          - arch: aarch64
+            runner: macos-15
+    runs-on: ${{ matrix.runner }}
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
+      - name: 📥 Check out repository
+        uses: actions/checkout@v4
+      - name: 🐍 Set up Python
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: Set up Homebrew #https://github.com/Homebrew/homebrew-cask/issues/150323
-        id: set-up-homebrew
-        uses: Homebrew/actions/setup-homebrew@master
-      - name: install_opencv
+      - name: 📦 Build and install OpenCV
         run: |
-          rm -f /usr/local/bin/2to3*
-          rm -f /usr/local/bin/idle3*
-          rm -f /usr/local/bin/pydoc3*
-          rm -f /usr/local/bin/python3*
-          rm -f /usr/local/opt/go/bin/go*
-          rm -f /usr/local/bin/go*
-          rm -rf /usr/local/lib/node*
-          brew update -q -f
-          brew upgrade -q -f
-          brew install pkg-config
-          brew install openssl
-          brew install ninja cmake jpeg-turbo libpng libtiff webp
+          brew install pkg-config openssl ninja cmake jpeg-turbo libpng libtiff webp
           git clone https://github.com/opencv/opencv.git
           cd opencv
           mkdir -p build_cv
           cd build_cv
-          sudo mv /Library/Frameworks/Mono.framework/Headers /Library/Frameworks/Mono.framework/Headers.bak
+          if [ -d /Library/Frameworks/Mono.framework/Headers ]; then
+            sudo mv /Library/Frameworks/Mono.framework/Headers /Library/Frameworks/Mono.framework/Headers.bak
+          fi
           cmake .. \
             -GNinja \
             -DCMAKE_BUILD_TYPE=Release \
@@ -57,12 +58,12 @@ jobs:
             -DBUILD_opencv_java_bindings_generator=OFF \
           ninja
           ninja install
-      - name: install_qt
+      - name: 📦 Install Qt
         run: |
-          brew install aqtinstall
-          aqt install-qt -O ${{ github.workspace }}/Qt/ mac desktop ${{ env.QT_VERSION }}
+          python -m pip install aqtinstall
+          python -m aqt install-qt -O ${{ github.workspace }}/Qt/ mac desktop ${{ env.QT_VERSION }}
           echo ${{ github.workspace }}/Qt/${{ env.QT_VERSION }}/macos/bin/ >> $GITHUB_PATH
-      - name: remove_MimerSQL_plugin
+      - name: 🧹 Remove Mimer SQL plugin
         run: |
           QT_DIR=${{ github.workspace }}/Qt/${{ env.QT_VERSION }}/macos
           rm -f $QT_DIR/plugins/sqldrivers/libqsqlmimer.so
@@ -71,32 +72,31 @@ jobs:
           rm -r ${{ github.workspace }}/Qt/${{ env.QT_VERSION }}/macos/plugins/sqldrivers/libqsqlmimer.*
           rm -r ${{ github.workspace }}/Qt/${{ env.QT_VERSION }}/macos/plugins/sqldrivers/libqsqlodbc.*
           rm -r ${{ github.workspace }}/Qt/${{ env.QT_VERSION }}/macos/plugins/sqldrivers/libqsqlpsql.*
-      - name: remove_ODBCSQL_plugin
+      - name: 🧹 Remove ODBC SQL plugin
         run: |
           QT_DIR=${{ github.workspace }}/Qt/${{ env.QT_VERSION }}/macos
           rm -f $QT_DIR/plugins/sqldrivers/libqsqlodbc.so
           rm -f $QT_DIR/lib/cmake/Qt6Sql/Qt6QODBCDriverPlugin*.cmake
           sed -i '/Qt6QODBCDriverPlugin/d' $QT_DIR/lib/cmake/Qt6Sql/Qt6SqlPlugins.cmake || true
-      - name: remove_QPSQL_plugin
+      - name: 🧹 Remove PostgreSQL plugin
         run: |
           QT_DIR=${{ github.workspace }}/Qt/${{ env.QT_VERSION }}/macos
           rm -f $QT_DIR/plugins/sqldrivers/libqsqlpsql.so
           rm -f $QT_DIR/lib/cmake/Qt6Sql/Qt6QPSQLDriverPlugin*.cmake
           sed -i '/Qt6QPSQLDriverPlugin/d' $QT_DIR/lib/cmake/Qt6Sql/Qt6SqlPlugins.cmake || true
-      - name: build_ft
+      - name: 🔨 Build FastTrack
         run: |
           export DYLD_LIBRARY_PATH=$HOME/opencv-install/lib:$DYLD_LIBRARY_PATH
           export PKG_CONFIG_PATH="$HOME/opencv-install/lib/pkgconfig:$PKG_CONFIG_PATH"
           export CMAKE_PREFIX_PATH="$HOME/opencv-install:$CMAKE_PREFIX_PATH"
-          export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig/
           export CMAKE_PREFIX_PATH="${{ github.workspace }}/Qt/${{ env.QT_VERSION }}/macos:$CMAKE_PREFIX_PATH"
           ./run.sh ci_clang
-      - name: build_ft
+      - name: 📦 Create application bundle
         run: |
           cd build/bin
           wget https://raw.githubusercontent.com/arl/macdeployqtfix/refs/heads/master/macdeployqtfix.py
           APP=FastTrack.app
-          APP_BINARY=$APP/Contents/MacOS/FastTrack
+          APP_BINARY=$APP/Contents/MacOS/fasttrack
           mv fasttrack.app "$APP"
           macdeployqt "$APP" \
             -always-overwrite \
@@ -108,52 +108,66 @@ jobs:
           find / -name "libvtk*.dylib" -exec cp {} $APP/Contents/Frameworks/ \; 2> >(tee /dev/stderr) || true
           find / -name "libsqlite3*.dylib" -exec cp {} $APP/Contents/Frameworks/ \; 2> >(tee /dev/stderr) || true
           find / -name "libhpdf*.dylib" -exec cp {} $APP/Contents/Frameworks/ \; 2> >(tee /dev/stderr) || true
-          cp -v /opt/homebrew/opt/little-cms2/lib/lib*.dylib $APP/Contents/Frameworks/ || true
-          cp -v /opt/homebrew/opt/jpeg-xl/lib/lib*.dylib $APP/Contents/Frameworks/ || true
+          for formula in little-cms2 jpeg-xl; do
+            FORMULA_PREFIX=$(brew --prefix "$formula")
+            cp -v "$FORMULA_PREFIX"/lib/lib*.dylib "$APP/Contents/Frameworks/" || true
+          done
           find "$APP/Contents/Frameworks" -type f -name "*.dylib" -exec codesign --remove-signature {} \; 2>/dev/null || true
           find "$APP/Contents/Frameworks" -type f -name "*.dylib" -exec codesign --force --sign - {} \;
-          python macdeployqtfix.py fasttrack.app/contents/macos/fasttrack ../../Qt/${{ env.QT_VERSION }}/
+          python macdeployqtfix.py "$APP_BINARY" ${{ github.workspace }}/Qt/${{ env.QT_VERSION }}/
           hdiutil create -volname FastTrack -srcfolder $APP -ov -format UDZO FastTrack.dmg
-      - name: upload_artefact
+      - name: ⬆️ Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: FastTrack.dmg
+          name: FastTrack-mac-${{ matrix.arch }}
           path: ./build/bin/FastTrack.dmg
 
   test_bundle:
-    runs-on: macos-26
+    name: 🧪 Test bundle (${{ matrix.arch }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x86-64
+            runner: macos-15-intel
+          - arch: aarch64
+            runner: macos-15
+    runs-on: ${{ matrix.runner }}
     needs: build_mac
     steps:
-      - name: download artifact
+      - name: ⬇️ Download artifact
         uses: actions/download-artifact@v4
         with:
-          name: FastTrack.dmg
+          name: FastTrack-mac-${{ matrix.arch }}
           path: FastTrack
 
-      - name: Run FastTrack executable
+      - name: 🧪 Run CLI smoke test
         run: |
           cd FastTrack
           hdiutil attach FastTrack.dmg -mountpoint /Volumes/FastTrackApp
-          /Volumes/FastTrackApp/FastTrack.app/Contents/MacOS/FastTrack --cli --help
+          /Volumes/FastTrackApp/FastTrack.app/Contents/MacOS/fasttrack --cli --help
+          hdiutil detach /Volumes/FastTrackApp
 
-      - name: GUI startup smoke test
+      - name: 🖥️ Run GUI smoke test
         run: |
-          brew install coreutils
-
           cd FastTrack
           hdiutil attach FastTrack.dmg -mountpoint /Volumes/FastTrackApp
 
-          BIN=/Volumes/FastTrackApp/FastTrack.app/Contents/MacOS/FastTrack
+          BIN=/Volumes/FastTrackApp/FastTrack.app/Contents/MacOS/fasttrack
+          "$BIN" &
+          pid=$!
+          sleep 20
 
-          set +e
-          gtimeout 20s "$BIN"
-          status=$?
-          set -e
-
-          if [ "$status" -eq 124 ]; then
+          if kill -0 "$pid" 2>/dev/null; then
+            kill "$pid"
+            wait "$pid" || true
             echo "GUI startup test passed: app stayed alive for 20 seconds."
             exit 0
           fi
 
+          set +e
+          wait "$pid"
+          status=$?
+          set -e
           echo "GUI startup test failed: app exited with status $status."
-          exit "$status"
+          exit 1
