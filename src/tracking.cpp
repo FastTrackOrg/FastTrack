@@ -95,9 +95,12 @@ double Tracking::curvature(Point2d center, const Mat &image) const {
 
   for (int row = 0; row < image.rows; ++row) {
     const uchar *pixels = image.ptr<uchar>(row);
+    const double rowDistance = center.y - row;
+    const double rowDistanceSquared = rowDistance * rowDistance;
     for (int column = 0; column < image.cols; ++column) {
       if (pixels[column] != 0) {
-        distanceSum += hypot(center.x - column, center.y - row);
+        const double columnDistance = center.x - column;
+        distanceSum += sqrt(columnDistance * columnDistance + rowDistanceSquared);
         ++pixelCount;
       }
     }
@@ -392,9 +395,8 @@ vector<vector<Point3d>> Tracking::objectPosition(const UMat &frame, int minSize,
   vector<Point3d> ellipseBody;
   vector<Point3d> globalParam;
   UMat dst;
-  Rect roiFull, bbox;
-  UMat RoiFull, RoiHead, RoiTail, rotate;
-  Mat rotMatrix, p, pp;
+  Rect roiFull;
+  UMat RoiFull;
   vector<double> parameter;
   vector<double> parameterHead;
   vector<double> parameterTail;
@@ -431,59 +433,99 @@ vector<vector<Point3d>> Tracking::objectPosition(const UMat &frame, int minSize,
         parameter[2] = 0;
       }
 
-      // Rotates the image without cropping to have the object orientation as the x axis
-      Point2d center = Point2d(0.5 * RoiFull.cols, 0.5 * RoiFull.rows);
-      rotMatrix = getRotationMatrix2D(center, -(parameter[2] * 180) / M_PI, 1);
-      bbox = RotatedRect(center, RoiFull.size(), static_cast<float>(-(parameter[2] * 180) / M_PI)).boundingRect();
-      rotMatrix.at<double>(0, 2) += bbox.width * 0.5 - center.x;
-      rotMatrix.at<double>(1, 2) += bbox.height * 0.5 - center.y;
-      warpAffine(RoiFull, rotate, rotMatrix, bbox.size());
+      struct ProjectedMoments {
+        double count = 0;
+        double x = 0;
+        double y = 0;
+        double xx = 0;
+        double xy = 0;
+        double yy = 0;
 
-      // Computes the coordinate of the center of mass of the object in the rotated
-      // image frame of reference.
-      p = (Mat_<double>(3, 1) << parameter[0], parameter[1], 1);
-      pp = rotMatrix * p;
+        void add(double px, double py) {
+          count += 1;
+          x += px;
+          y += py;
+          xx += px * px;
+          xy += px * py;
+          yy += py * py;
+        }
+      };
 
-      // Computes the direction of the object. If objectDirection return true, the
-      // head is at the left and the tail at the right.
-      Rect roiHead, roiTail;
-      if (objectDirection(rotate, parameter)) {
-        // Head ellipse. Parameters in the frame of reference of the RoiHead image.
-        roiHead = Rect(0, 0, static_cast<int>(pp.at<double>(0, 0)), rotate.rows);
-        RoiHead = rotate(roiHead);
-        parameterHead = objectInformation(RoiHead);
+      const Mat object = RoiFull.getMat(ACCESS_READ);
+      const double cosine = cos(parameter[2]);
+      const double sine = sin(parameter[2]);
+      const double centerX = parameter[0];
+      const double centerY = parameter[1];
+      double projectionSum = 0;
+      double projectionSquaredSum = 0;
+      double projectionCubedSum = 0;
+      size_t foregroundCount = 0;
 
-        // Tail ellipse. Parameters in the frame of reference of ROITail image.
-        roiTail = Rect(static_cast<int>(pp.at<double>(0, 0)), 0, static_cast<int>(rotate.cols - pp.at<double>(0, 0)), rotate.rows);
-        RoiTail = rotate(roiTail);
-        parameterTail = objectInformation(RoiTail);
+      for (int row = 0; row < object.rows; ++row) {
+        const uchar *pixels = object.ptr<uchar>(row);
+        for (int column = 0; column < object.cols; ++column) {
+          if (pixels[column] != 0) {
+            const double projectedX = cosine * (column - centerX) - sine * (row - centerY);
+            projectionSum += projectedX;
+            projectionSquaredSum += projectedX * projectedX;
+            projectionCubedSum += projectedX * projectedX * projectedX;
+            ++foregroundCount;
+          }
+        }
       }
-      else {
-        // Head ellipse. Parameters in the frame of reference of the RoiHead image.
-        roiHead = Rect(static_cast<int>(pp.at<double>(0, 0)), 0, static_cast<int>(rotate.cols - pp.at<double>(0, 0)), rotate.rows);
-        RoiHead = rotate(roiHead);
-        parameterHead = objectInformation(RoiHead);
 
-        // Tail ellipse. Parameters in the frame of reference of RoiTail image.
-        roiTail = Rect(0, 0, static_cast<int>(pp.at<double>(0, 0)), rotate.rows);
-        RoiTail = rotate(roiTail);
-        parameterTail = objectInformation(RoiTail);
+      const double inverseCount = 1.0 / static_cast<double>(foregroundCount);
+      const double projectionMean = projectionSum * inverseCount;
+      const double projectionThirdCentralMoment =
+          projectionCubedSum * inverseCount -
+          3 * projectionMean * projectionSquaredSum * inverseCount +
+          2 * projectionMean * projectionMean * projectionMean;
+      const bool headIsLeft = projectionThirdCentralMoment > 0;
+      if (headIsLeft) {
+        parameter[2] = modul(parameter[2] - M_PI);
       }
 
-      // Gets all the parameters in the frame of reference of RoiFull image.
-      invertAffineTransform(rotMatrix, rotMatrix);
-      p = (Mat_<double>(3, 1) << parameterHead[0] + roiHead.tl().x, parameterHead[1] + roiHead.tl().y, 1);
-      pp = rotMatrix * p;
+      ProjectedMoments leftMoments;
+      ProjectedMoments rightMoments;
+      for (int row = 0; row < object.rows; ++row) {
+        const uchar *pixels = object.ptr<uchar>(row);
+        for (int column = 0; column < object.cols; ++column) {
+          if (pixels[column] != 0) {
+            const double projectedX = cosine * (column - centerX) - sine * (row - centerY);
+            const double projectedY = sine * (column - centerX) + cosine * (row - centerY);
+            ((projectedX < projectionMean) ? leftMoments : rightMoments).add(projectedX, projectedY);
+          }
+        }
+      }
 
-      double xHead = pp.at<double>(0, 0) + roiFull.tl().x;
-      double yHead = pp.at<double>(1, 0) + roiFull.tl().y;
+      const auto informationFromMoments = [](const ProjectedMoments &moments) {
+        const double x = moments.x / moments.count;
+        const double y = moments.y / moments.count;
+        const double i = moments.xx - moments.x * x;
+        const double j = moments.xy - moments.x * y;
+        const double k = moments.yy - moments.y * y;
+        double orientation = 0;
+        if (i + j - k != 0) {
+          orientation = 0.5 * atan((2 * j) / (i - k)) + (i < k) * (M_PI * 0.5);
+          orientation += 2 * M_PI * (orientation < 0);
+          orientation = 2 * M_PI - orientation;
+        }
+        const double root = sqrt((i - k) * (i - k) + 4 * j * j);
+        const double majorAxis = 2 * sqrt(((i + k + root) * 0.5) / moments.count);
+        const double minorAxis = 2 * sqrt(((i + k - root) * 0.5) / moments.count);
+        return vector<double>{x, y, orientation, majorAxis, minorAxis};
+      };
+
+      parameterHead = informationFromMoments(headIsLeft ? leftMoments : rightMoments);
+      parameterTail = informationFromMoments(headIsLeft ? rightMoments : leftMoments);
+
+      const double xHead = centerX + cosine * parameterHead[0] + sine * parameterHead[1] + roiFull.tl().x;
+      const double yHead = centerY - sine * parameterHead[0] + cosine * parameterHead[1] + roiFull.tl().y;
       double angleHead = parameterHead[2] - M_PI * (parameterHead[2] > M_PI);
       angleHead = modul(angleHead + parameter[2] + M_PI * (abs(angleHead) > 0.5 * M_PI));  // Computes the direction
 
-      p = (Mat_<double>(3, 1) << parameterTail[0] + roiTail.tl().x, parameterTail[1] + roiTail.tl().y, 1);
-      pp = rotMatrix * p;
-      double xTail = pp.at<double>(0, 0) + roiFull.tl().x;
-      double yTail = pp.at<double>(1, 0) + roiFull.tl().y;
+      const double xTail = centerX + cosine * parameterTail[0] + sine * parameterTail[1] + roiFull.tl().x;
+      const double yTail = centerY - sine * parameterTail[0] + cosine * parameterTail[1] + roiFull.tl().y;
       double angleTail = parameterTail[2] - M_PI * (parameterTail[2] > M_PI);
       angleTail = modul(angleTail + parameter[2] + M_PI * (abs(angleTail) > 0.5 * M_PI));  // Computes the direction
 
