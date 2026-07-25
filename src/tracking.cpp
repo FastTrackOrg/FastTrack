@@ -27,6 +27,11 @@ using namespace std;
 #define M_PI 3.14159265358979323846
 #endif
 
+namespace {
+constexpr int parallelContourThreshold = 32;
+constexpr long long parallelCostEntryThreshold = 4096;
+}  // namespace
+
 /**
  * @class Tracking
  *
@@ -413,7 +418,7 @@ vector<vector<Point3d>> Tracking::objectPosition(const UMat &frame, int minSize,
   globalParam.reserve(reserve);
 
   const int contourCount = static_cast<int>(contours.size());
-#pragma omp parallel for schedule(dynamic, 4) if (contourCount >= 8)
+#pragma omp parallel for schedule(dynamic, 2) if (contourCount >= parallelContourThreshold)
   for (int i = 0; i < contourCount; i++) {
     double a = contourArea(contours[i]);
     if (a > minSize && a < maxSize) {  // Only selects objects minArea << objectArea <<maxArea
@@ -589,7 +594,8 @@ vector<int> Tracking::costFunc(const vector<vector<Point3d>> &prevPos, const vec
 
     // Matrix rows are independent. Avoid the OpenMP scheduling overhead for
     // the small object sets commonly found in sparse recordings.
-#pragma omp parallel for reduction(max : maximumValidCost) if (static_cast<long long>(n) * static_cast<long long>(m) >= 4096)
+    const long long costEntryCount = static_cast<long long>(n) * static_cast<long long>(m);
+#pragma omp parallel for reduction(max : maximumValidCost) if (costEntryCount >= parallelCostEntryThreshold)
     for (int i = 0; i < n; ++i) {  // Loop on previous objects
       const Point3d &prevCoord = prevPos[spot][i];
       const Point3d &prevData = prevPos[3][i];
