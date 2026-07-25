@@ -387,7 +387,6 @@ vector<vector<Point3d>> Tracking::objectPosition(const UMat &frame, int minSize,
   vector<Point3d> ellipseTail;
   vector<Point3d> ellipseBody;
   vector<Point3d> globalParam;
-  UMat dst;
   Rect roiFull;
   UMat RoiFull;
   vector<double> parameter;
@@ -410,15 +409,13 @@ vector<vector<Point3d>> Tracking::objectPosition(const UMat &frame, int minSize,
     double a = contourArea(contours[i]);
     if (a > minSize && a < maxSize) {  // Only selects objects minArea << objectArea <<maxArea
 
-      // Draws the object in a temporary black image to avoid selecting a
-      // part of another object if two objects are very close.
-      dst = UMat::zeros(frame.size(), CV_8U);
-      drawContours(dst, contours, static_cast<int>(i), Scalar(255, 255, 255), FILLED, 8);
+      roiFull = boundingRect(contours[i]);
+      RoiFull = UMat::zeros(roiFull.size(), CV_8U);
+      drawContours(RoiFull, contours, static_cast<int>(i), Scalar(255), FILLED, 8,
+                   noArray(), INT_MAX, Point(-roiFull.x, -roiFull.y));
 
       // Computes the x, y and orientation of the object, in the
       // frame of reference of ROIFull image.
-      roiFull = boundingRect(contours[i]);
-      RoiFull = dst(roiFull);
       parameter = objectInformation(RoiFull);
 
       // Checks if the direction is defined. In the case of a perfect circle the direction can be computed and arbitrary set to 0
