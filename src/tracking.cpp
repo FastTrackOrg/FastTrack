@@ -387,16 +387,23 @@ vector<vector<Point3d>> Tracking::objectPosition(const UMat &frame, int minSize,
   vector<Point3d> ellipseTail;
   vector<Point3d> ellipseBody;
   vector<Point3d> globalParam;
-  Rect roiFull;
-  UMat RoiFull;
-  vector<double> parameter;
-  vector<double> parameterHead;
-  vector<double> parameterTail;
-  Point2d radiusCurv;
 
   findContours(frame, contours, RETR_EXTERNAL, CHAIN_APPROX_NONE);
 
+  struct ContourResult
+  {
+    bool valid = false;
+    Point3d positionHead;
+    Point3d positionTail;
+    Point3d positionFull;
+    Point3d globalParam;
+    Point3d ellipseHead;
+    Point3d ellipseTail;
+    Point3d ellipseBody;
+  };
+
   size_t reserve = contours.size();
+  vector<ContourResult> results(reserve);
   positionHead.reserve(reserve);
   positionTail.reserve(reserve);
   positionFull.reserve(reserve);
@@ -405,18 +412,20 @@ vector<vector<Point3d>> Tracking::objectPosition(const UMat &frame, int minSize,
   ellipseBody.reserve(reserve);
   globalParam.reserve(reserve);
 
-  for (size_t i = 0; i < contours.size(); i++) {
+  const int contourCount = static_cast<int>(contours.size());
+#pragma omp parallel for schedule(dynamic, 4) if (contourCount >= 8)
+  for (int i = 0; i < contourCount; i++) {
     double a = contourArea(contours[i]);
     if (a > minSize && a < maxSize) {  // Only selects objects minArea << objectArea <<maxArea
 
-      roiFull = boundingRect(contours[i]);
-      RoiFull = UMat::zeros(roiFull.size(), CV_8U);
-      drawContours(RoiFull, contours, static_cast<int>(i), Scalar(255), FILLED, 8,
+      const Rect roiFull = boundingRect(contours[i]);
+      UMat RoiFull = UMat::zeros(roiFull.size(), CV_8U);
+      drawContours(RoiFull, contours, i, Scalar(255), FILLED, 8,
                    noArray(), INT_MAX, Point(-roiFull.x, -roiFull.y));
 
       // Computes the x, y and orientation of the object, in the
       // frame of reference of ROIFull image.
-      parameter = objectInformation(RoiFull);
+      vector<double> parameter = objectInformation(RoiFull);
 
       // Checks if the direction is defined. In the case of a perfect circle the direction can be computed and arbitrary set to 0
       if (parameter[2] != parameter[2]) {
@@ -507,8 +516,8 @@ vector<vector<Point3d>> Tracking::objectPosition(const UMat &frame, int minSize,
         return vector<double>{x, y, orientation, majorAxis, minorAxis};
       };
 
-      parameterHead = informationFromMoments(headIsLeft ? leftMoments : rightMoments);
-      parameterTail = informationFromMoments(headIsLeft ? rightMoments : leftMoments);
+      const vector<double> parameterHead = informationFromMoments(headIsLeft ? leftMoments : rightMoments);
+      const vector<double> parameterTail = informationFromMoments(headIsLeft ? rightMoments : leftMoments);
 
       const double xHead = centerX + cosine * parameterHead[0] + sine * parameterHead[1] + roiFull.tl().x;
       const double yHead = centerY - sine * parameterHead[0] + cosine * parameterHead[1] + roiFull.tl().y;
@@ -522,22 +531,33 @@ vector<vector<Point3d>> Tracking::objectPosition(const UMat &frame, int minSize,
 
       // Computes the curvature of the object
       double curv = 1. / 1e-16;
-      radiusCurv = curvatureCenter(Point3d(xTail, yTail, angleTail), Point3d(xHead, yHead, angleHead));
+      const Point2d radiusCurv = curvatureCenter(Point3d(xTail, yTail, angleTail), Point3d(xHead, yHead, angleHead));
       if (!isnan(radiusCurv.x)) {
         curv = curvature(radiusCurv, RoiFull.getMat(ACCESS_READ));
       }
 
-      positionHead.push_back(Point3d(xHead + m_ROI.tl().x, yHead + m_ROI.tl().y, angleHead));
-      positionTail.push_back(Point3d(xTail + m_ROI.tl().x, yTail + m_ROI.tl().y, angleTail));
-      positionFull.push_back(Point3d(parameter[0] + roiFull.tl().x + m_ROI.tl().x, parameter[1] + roiFull.tl().y + m_ROI.tl().y, parameter[2]));
-      ellipseHead.push_back(Point3d(parameterHead[3], parameterHead[4], pow(1 - (parameterHead[4] * parameterHead[4]) / (parameterHead[3] * parameterHead[3]), 0.5)));
-      ellipseTail.push_back(Point3d(parameterTail[3], parameterTail[4], pow(1 - (parameterTail[4] * parameterTail[4]) / (parameterTail[3] * parameterTail[3]), 0.5)));
-      ellipseBody.push_back(Point3d(parameter[3], parameter[4], pow(1 - (parameter[4] * parameter[4]) / (parameter[3] * parameter[3]), 0.5)));
-
-      globalParam.push_back(Point3d(curv, a, arcLength(contours[i], true)));
+      ContourResult &result = results[i];
+      result.valid = true;
+      result.positionHead = Point3d(xHead + m_ROI.tl().x, yHead + m_ROI.tl().y, angleHead);
+      result.positionTail = Point3d(xTail + m_ROI.tl().x, yTail + m_ROI.tl().y, angleTail);
+      result.positionFull = Point3d(parameter[0] + roiFull.tl().x + m_ROI.tl().x, parameter[1] + roiFull.tl().y + m_ROI.tl().y, parameter[2]);
+      result.ellipseHead = Point3d(parameterHead[3], parameterHead[4], pow(1 - (parameterHead[4] * parameterHead[4]) / (parameterHead[3] * parameterHead[3]), 0.5));
+      result.ellipseTail = Point3d(parameterTail[3], parameterTail[4], pow(1 - (parameterTail[4] * parameterTail[4]) / (parameterTail[3] * parameterTail[3]), 0.5));
+      result.ellipseBody = Point3d(parameter[3], parameter[4], pow(1 - (parameter[4] * parameter[4]) / (parameter[3] * parameter[3]), 0.5));
+      result.globalParam = Point3d(curv, a, arcLength(contours[i], true));
     }
+  }
 
-    else if (contourArea(contours[i]) >= maxSize && contourArea(contours[i]) < 3 * maxSize) {
+  // Preserve the contour order so tracking output remains deterministic.
+  for (const ContourResult &result : results) {
+    if (result.valid) {
+      positionHead.push_back(result.positionHead);
+      positionTail.push_back(result.positionTail);
+      positionFull.push_back(result.positionFull);
+      globalParam.push_back(result.globalParam);
+      ellipseHead.push_back(result.ellipseHead);
+      ellipseTail.push_back(result.ellipseTail);
+      ellipseBody.push_back(result.ellipseBody);
     }
   }
 
