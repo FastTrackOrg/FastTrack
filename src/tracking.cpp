@@ -224,6 +224,9 @@ bool Tracking::objectDirection(const UMat &image, vector<double> &information) c
 */
 UMat Tracking::backgroundExtraction(VideoReader &video, int n, const int method, const int registrationMethod) {
   int imageCount = video.getImageCount();
+  if (n <= 0 || imageCount <= 0) {
+    throw std::runtime_error("Background computation error: no image can be read.");
+  }
   if (n > imageCount) {
     n = imageCount;
   }
@@ -240,45 +243,35 @@ UMat Tracking::backgroundExtraction(VideoReader &video, int n, const int method,
   img0.convertTo(img0, CV_32FC1);
 
   UMat cameraFrameReg;
-  video.getImage(0, cameraFrameReg);
   Mat H;
-  int step = imageCount / n;
   int count = 1;
-  int i = 1;
 
-  while (i < imageCount) {
-    if (i % step == 0) {
-      if (!video.getNext(cameraFrameReg)) {
-        throw std::runtime_error("Background computation error: image" + std::to_string(i) + " can not be read. The background was computed ignoring them.");
-        i++;
-        continue;
-      }
-      if (registrationMethod != 0) registration(img0, cameraFrameReg, registrationMethod - 1);
-      if (cameraFrameReg.channels() >= 3) {
-        cvtColor(cameraFrameReg, cameraFrameReg, COLOR_BGR2GRAY);
-      }
-      cameraFrameReg.convertTo(cameraFrameReg, CV_32FC1);
-      switch (method) {
-        case 0:
-          cv::min(background, cameraFrameReg, background);
-          break;
-
-        case 1:
-          cv::max(background, cameraFrameReg, background);
-          break;
-
-        case 2:
-          accumulate(cameraFrameReg, background);
-          break;
-        default:
-          cv::max(background, cameraFrameReg, background);
-      }
-      count++;
+  for (int sample = 1; sample < n; ++sample) {
+    const int imageIndex = sample * (imageCount - 1) / (n - 1);
+    if (!video.getImage(imageIndex, cameraFrameReg)) {
+      throw std::runtime_error("Background computation error: image" + std::to_string(imageIndex) + " can not be read.");
     }
-    else {
-      video.grab();
+    if (registrationMethod != 0) registration(img0, cameraFrameReg, registrationMethod - 1);
+    if (cameraFrameReg.channels() >= 3) {
+      cvtColor(cameraFrameReg, cameraFrameReg, COLOR_BGR2GRAY);
     }
-    i++;
+    cameraFrameReg.convertTo(cameraFrameReg, CV_32FC1);
+    switch (method) {
+      case 0:
+        cv::min(background, cameraFrameReg, background);
+        break;
+
+      case 1:
+        cv::max(background, cameraFrameReg, background);
+        break;
+
+      case 2:
+        accumulate(cameraFrameReg, background);
+        break;
+      default:
+        cv::max(background, cameraFrameReg, background);
+    }
+    count++;
   }
   if (method == 2) {
     background.convertTo(background, CV_8U, 1. / count);

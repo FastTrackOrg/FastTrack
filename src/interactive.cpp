@@ -707,6 +707,7 @@ void Interactive::computeBackground() {
     int nBack = ui->nBack->value();
     int method = ui->back->currentIndex();
     int registrationMethod = ui->registrationBack->currentIndex();
+    const string videoPath = memoryDir.toStdString();
     ui->backgroundProgressBar->setValue(0);
     ui->backgroundProgressBar->setMaximum(0);
     ui->backgroundComputeButton->setEnabled(false);
@@ -758,7 +759,11 @@ void Interactive::computeBackground() {
     QFuture<UMat> future = QtConcurrent::run([=]() {
       UMat background;
       try {
-        background = Tracking::backgroundExtraction(*video, nBack, method, registrationMethod);
+        VideoReader backgroundVideo(videoPath);
+        if (!backgroundVideo.open()) {
+          throw std::runtime_error("Background computation error: the video can not be opened.");
+        }
+        background = Tracking::backgroundExtraction(backgroundVideo, nBack, method, registrationMethod);
       }
       catch (const std::runtime_error &e) {
         qWarning() << QString::fromStdString(e.what()) << "occurs during background computation";
