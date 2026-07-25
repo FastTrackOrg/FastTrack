@@ -106,6 +106,64 @@ jobs:
             Get-ChildItem $opencvTools -Recurse -Filter *.dll |
               Copy-Item -Destination build/FastTrack
           }
+          # /openmp:llvm uses Visual Studio's LLVM OpenMP runtime, which is
+          # not part of the vcpkg or Qt deployment sets.
+          $archFolder = if ("${{ matrix.cmake_arch }}" -eq "ARM64") {
+            "arm64"
+          } else {
+            "x64"
+          }
+          $ompNames = if ("${{ matrix.cmake_arch }}" -eq "ARM64") {
+            @("libomp140.aarch64.dll", "libomp.aarch64.dll", "libomp.dll", "libomp140.dll")
+          } else {
+            @("libomp140.x86_64.dll", "libomp.x86_64.dll", "libomp.dll", "libomp140.dll")
+          }
+          $searchRoots = @()
+          if ($env:VCINSTALLDIR) {
+            $searchRoots += Split-Path (Split-Path $env:VCINSTALLDIR -Parent) -Parent
+          }
+          if ($env:VCToolsInstallDir) {
+            $searchRoots += Split-Path (Split-Path (Split-Path $env:VCToolsInstallDir -Parent) -Parent) -Parent
+          }
+          $vsBase = Join-Path $env:ProgramFiles "Microsoft Visual Studio"
+          if (Test-Path $vsBase) {
+            $searchRoots += Get-ChildItem $vsBase -Directory -Recurse -Depth 2 -ErrorAction SilentlyContinue |
+              Select-Object -ExpandProperty FullName
+          }
+          $searchRoots = $searchRoots | Where-Object { $_ -and (Test-Path $_) } | Select-Object -Unique
+
+          $ompRuntime = $null
+          foreach ($root in $searchRoots) {
+            $preferredDirs = @(
+              (Join-Path $root "VC\Redist\MSVC"),
+              (Join-Path $root "VC\Tools\Llvm"),
+              (Join-Path $root "VC\Tools\MSVC")
+            )
+            foreach ($dir in $preferredDirs) {
+              if (-not (Test-Path $dir)) {
+                continue
+              }
+              $candidate = Get-ChildItem $dir -Recurse -File -ErrorAction SilentlyContinue |
+                Where-Object {
+                  $_.Name -in $ompNames -and (
+                    $_.FullName -match [regex]::Escape("\$archFolder\") -or
+                    $_.FullName -match "OpenMP\.LLVM"
+                  )
+                } |
+                Select-Object -First 1
+              if ($candidate) {
+                $ompRuntime = $candidate
+                break
+              }
+            }
+            if ($ompRuntime) {
+              break
+            }
+          }
+          if (-not $ompRuntime) {
+            throw "Could not locate the LLVM OpenMP runtime (libomp*.dll)."
+          }
+          Copy-Item $ompRuntime.FullName -Destination build/FastTrack
       - name: ⬆️ Upload artifact
         uses: actions/upload-artifact@v4
         with:
