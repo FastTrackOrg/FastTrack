@@ -1,5 +1,33 @@
 # FastTrack changelog
 
+## 6.6.0
+
+### Added
+
+- Added AArch64 builds.
+
+### Changed
+
+- Removed the CLI dependency on `getopt`.
+
+### Fixed
+
+- Fixed a tracking data race.
+- Fixed SQLite locking during automatic level detection on Windows.
+- Fixed a crash when an interactive tracking warning is displayed.
+- Fixed dialog rendering on recent macOS versions.
+- Fixed CI builds and tests.
+
+### Optimized
+
+- Optimized the tracking assignment algorithm.
+- Optimized background computation for subsets.
+- Optimized database insertion during tracking.
+- Optimized image rotation during tracking.
+- Optimized object feature extraction with bounding-box masks.
+- Parallelized tracking assignment cost computation with OpenMP.
+- Parallelized contour feature extraction with OpenMP.
+
 ## 6.5.0
 
 ### Changed
@@ -562,4 +590,3 @@
 
 ### Changed
 - Maximal distance in Tracking.
-
