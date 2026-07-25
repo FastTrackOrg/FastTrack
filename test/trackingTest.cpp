@@ -691,6 +691,34 @@ TEST_F(TrackingTest, costFunction) {
   EXPECT_EQ(order, test);
 }
 
+TEST_F(TrackingTest, ParallelCostFunction) {
+  Tracking tracking("", "");
+  QHash<QString, QString> params;
+  params["Spot to track"] = "0";
+  tracking.updatingParameters(params);
+
+  constexpr int objectCount = 80;
+  vector<vector<Point3d>> past(4);
+  vector<vector<Point3d>> current(4);
+  vector<int> expected;
+  expected.reserve(objectCount);
+
+  for (int index = 0; index < objectCount; ++index) {
+    const Point3d point(2 * index, index, 0);
+    past[0].push_back(point);
+    past[3].push_back(Point3d(0, 100 + index, 50 + index));
+  }
+  for (int index = objectCount - 1; index >= 0; --index) {
+    current[0].push_back(past[0][index]);
+    current[3].push_back(past[3][index]);
+  }
+  for (int index = 0; index < objectCount; ++index) {
+    expected.push_back(objectCount - index - 1);
+  }
+
+  EXPECT_EQ(tracking.costFunc(past, current, 1, 1, 1, 1, 1), expected);
+}
+
 // VideoReader test
 TEST_F(VideoReaderTest, UMatSequence) {
   UMat diff, test, ref;

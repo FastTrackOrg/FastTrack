@@ -28,6 +28,10 @@ add_compile_definitions(
 target_compile_definitions(test-fasttrack PRIVATE QT_DEPRECATED_WARNINGS)
 set_target_properties(test-fasttrack PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/build)
 
+if(OpenMP_CXX_FOUND)
+    target_link_libraries(test-fasttrack PRIVATE OpenMP::OpenMP_CXX)
+endif()
+
 if(UNIX AND NOT APPLE)
     target_compile_options(test-fasttrack PRIVATE -O3 -std=c++17 -g)
     target_include_directories(test-fasttrack PRIVATE /usr/include/opencv4 /usr/local/include/opencv4 /usr/include/gtest)

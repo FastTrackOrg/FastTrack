@@ -567,6 +567,9 @@ vector<int> Tracking::costFunc(const vector<vector<Point3d>> &prevPos, const vec
     double maximumValidCost = 0.0;
     const int spot = m_parameters.value(QStringLiteral("spot")).toInt();
 
+    // Matrix rows are independent. Avoid the OpenMP scheduling overhead for
+    // the small object sets commonly found in sparse recordings.
+#pragma omp parallel for reduction(max : maximumValidCost) if (static_cast<long long>(n) * static_cast<long long>(m) >= 4096)
     for (int i = 0; i < n; ++i) {  // Loop on previous objects
       const Point3d &prevCoord = prevPos[spot][i];
       const Point3d &prevData = prevPos[3][i];

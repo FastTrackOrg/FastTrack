@@ -60,6 +60,10 @@ qt_add_lrelease(fasttrack
 target_compile_definitions(fasttrack PRIVATE APP_VERSION="${PROJECT_VERSION}")
 
 function(configure_target target_name)
+    if(OpenMP_CXX_FOUND)
+        target_link_libraries(${target_name} PRIVATE OpenMP::OpenMP_CXX)
+    endif()
+
     if(UNIX AND NOT APPLE)
         target_compile_options(${target_name} PRIVATE -O3)
         target_include_directories(${target_name} PRIVATE /usr/include/opencv4 /usr/local/include/opencv4 ${CMAKE_CURRENT_SOURCE_DIR})
