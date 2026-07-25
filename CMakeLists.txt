@@ -4,7 +4,18 @@ project(FastTrack)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+if(MSVC)
+    # The cost-matrix reduction requires newer OpenMP support than MSVC's
+    # legacy /openmp mode provides.
+    set(OpenMP_RUNTIME_MSVC llvm)
+    if(CMAKE_VERSION VERSION_LESS 3.30)
+        set(OpenMP_CXX_FLAGS "/openmp:llvm" CACHE STRING "MSVC OpenMP flags")
+    endif()
+endif()
 find_package(OpenMP QUIET COMPONENTS CXX)
+if(MSVC AND NOT OpenMP_CXX_FOUND)
+    message(FATAL_ERROR "MSVC LLVM OpenMP support (/openmp:llvm) is required")
+endif()
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
