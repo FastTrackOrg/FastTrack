@@ -1,7 +1,13 @@
 name: 🪟 Build Windows
 
 on:
+  push:
+    branches:
+      - master
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 env:
   QT_VERSION: 6.10.3
@@ -209,3 +215,31 @@ jobs:
 
           Write-Host "GUI startup smoke test passed: app stayed alive for 10 seconds."
           Stop-Process -Id $p.Id -Force
+
+      - name: 🚀 Publish continuous release asset
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          Set-Location FastTrack
+          $assetName = "FastTrack-windows-${{ matrix.arch }}.zip"
+          Compress-Archive -Path .\* -DestinationPath $assetName -Force
+
+          gh release view continuous -R $env:GH_REPO *> $null
+          if ($LASTEXITCODE -ne 0) {
+            gh release create continuous `
+              -R $env:GH_REPO `
+              --title "continuous" `
+              --notes "Rolling build artifacts." `
+              --prerelease `
+              --latest=false
+            if ($LASTEXITCODE -ne 0) {
+              gh release view continuous -R $env:GH_REPO *> $null
+              if ($LASTEXITCODE -ne 0) {
+                throw "Unable to create or access release 'continuous'."
+              }
+            }
+          }
+
+          gh release upload continuous $assetName --clobber -R $env:GH_REPO

@@ -1,7 +1,13 @@
 name: 🐧 Build Linux
 
 on:
+  push:
+    branches:
+      - master
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   build_linux:
@@ -13,9 +19,11 @@ jobs:
           - arch: x86-64
             runner: ubuntu-22.04
             so_bundle: so_bundle_x86-64
+            bundle_name: fasttrack_x86_64.run
           - arch: aarch64
             runner: ubuntu-22.04-arm
             so_bundle: so_bundle_aarch64
+            bundle_name: fasttrack_aarch64.run
     runs-on: ${{ matrix.runner }}
     steps:
       - name: 📥 Check out repository
@@ -40,11 +48,12 @@ jobs:
           chmod +x so_bundle
           QT_ROOT=/usr/lib/$(dpkg-architecture -qDEB_HOST_MULTIARCH)/qt6
           ./so_bundle --exec ./bin/fasttrack --qt "$QT_ROOT" --bundle
+          mv ./bin/fasttrack.run ./bin/${{ matrix.bundle_name }}
       - name: ⬆️ Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: FastTrack-linux-${{ matrix.arch }}
-          path: ./build/bin/fasttrack.run
+          path: ./build/bin/${{ matrix.bundle_name }}
 
   test_bundle:
     name: 🧪 Test bundle (${{ matrix.arch }})
@@ -54,8 +63,10 @@ jobs:
         include:
           - arch: x86-64
             runner: ubuntu-22.04
+            bundle_name: fasttrack_x86_64.run
           - arch: aarch64
             runner: ubuntu-22.04-arm
+            bundle_name: fasttrack_aarch64.run
     runs-on: ${{ matrix.runner }}
     needs: build_linux
     steps:
@@ -68,16 +79,16 @@ jobs:
       - name: 🧪 Run CLI smoke test
         run: |
           cd FastTrack
-          chmod +x fasttrack.run
-          ./fasttrack.run -- --cli --help
+          chmod +x ${{ matrix.bundle_name }}
+          ./${{ matrix.bundle_name }} -- --cli --help
 
       - name: 🖥️ Run GUI smoke test
         run: |
           cd FastTrack
-          chmod +x fasttrack.run
+          chmod +x ${{ matrix.bundle_name }}
 
           set +e
-          timeout 10s ./fasttrack.run -- -platform offscreen
+          timeout 10s ./${{ matrix.bundle_name }} -- -platform offscreen
           status=$?
           set -e
 
@@ -88,3 +99,22 @@ jobs:
 
           echo "GUI startup test failed: app exited with status $status."
           exit "$status"
+
+      - name: 🚀 Publish continuous release asset
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          cd FastTrack
+          asset_name=${{ matrix.bundle_name }}
+
+          if ! gh release view continuous -R "$GH_REPO" >/dev/null 2>&1; then
+            gh release create continuous \
+              -R "$GH_REPO" \
+              --title "continuous" \
+              --notes "Rolling build artifacts." \
+              --prerelease \
+              --latest=false || gh release view continuous -R "$GH_REPO" >/dev/null
+          fi
+
+          gh release upload continuous "$asset_name" --clobber -R "$GH_REPO"

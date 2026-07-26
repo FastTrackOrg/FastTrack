@@ -1,7 +1,13 @@
 name: 🍎 Build macOS
 
 on:
+  push:
+    branches:
+      - master
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 env:
   QT_VERSION: 6.11.1
@@ -171,3 +177,23 @@ jobs:
           set -e
           echo "GUI startup test failed: app exited with status $status."
           exit 1
+
+      - name: 🚀 Publish continuous release asset
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          cd FastTrack
+          asset_name=FastTrack-mac-${{ matrix.arch }}.dmg
+          cp FastTrack.dmg "$asset_name"
+
+          if ! gh release view continuous -R "$GH_REPO" >/dev/null 2>&1; then
+            gh release create continuous \
+              -R "$GH_REPO" \
+              --title "continuous" \
+              --notes "Rolling build artifacts." \
+              --prerelease \
+              --latest=false || gh release view continuous -R "$GH_REPO" >/dev/null
+          fi
+
+          gh release upload continuous "$asset_name" --clobber -R "$GH_REPO"
