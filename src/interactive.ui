@@ -1191,7 +1191,6 @@ p, li { white-space: pre-wrap; }
     <addaction name="actionTuto"/>
     <addaction name="separator"/>
     <addaction name="actionAsk"/>
-    <addaction name="actionDiscord"/>
     <addaction name="actionGenerateLog"/>
     <addaction name="actionIssue"/>
     <addaction name="actionContact"/>
@@ -1735,19 +1734,6 @@ p, li { white-space: pre-wrap; }
   <action name="actionGenerateLog">
    <property name="text">
     <string>Generate a log</string>
-   </property>
-  </action>
-  <action name="actionSupport">
-   <property name="text">
-    <string>Support FastTrack</string>
-   </property>
-   <property name="toolTip">
-    <string>Donate to support FastTrack development</string>
-   </property>
-  </action>
-  <action name="actionDiscord">
-   <property name="text">
-    <string>Join the Discord</string>
    </property>
   </action>
  </widget>

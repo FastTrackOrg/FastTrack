@@ -775,16 +775,6 @@ hr { height: 1px; border-width: 0; }
         <translation></translation>
     </message>
     <message>
-        <location filename="../src/interactive.ui" line="1775"/>
-        <source>Support FastTrack</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/interactive.ui" line="1778"/>
-        <source>Donate to support FastTrack development</source>
-        <translation></translation>
-    </message>
-    <message>
         <location filename="../src/interactive.cpp" line="102"/>
         <source>Tracking replay</source>
         <translation></translation>

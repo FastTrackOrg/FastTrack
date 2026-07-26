@@ -323,9 +323,6 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   connect(ui->actionAsk, &QAction::triggered, []() {
     QDesktopServices::openUrl(QUrl(QStringLiteral("https://github.com/FastTrackOrg/FastTrack/discussions"), QUrl::TolerantMode));
   });
-  connect(ui->actionDiscord, &QAction::triggered, []() {
-    QDesktopServices::openUrl(QUrl(QStringLiteral("https://discord.gg/qxYMbCwZmf"), QUrl::TolerantMode));
-  });
   connect(ui->actionIssue, &QAction::triggered, []() {
     QDesktopServices::openUrl(QUrl(QStringLiteral("https://github.com/FastTrackOrg/FastTrack/issues"), QUrl::TolerantMode));
   });
@@ -336,9 +333,6 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save Log File"), QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation), tr("Logs (*.log)"));
     QFile::remove(fileName);
     QFile::copy(QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) + "/fasttrack.log", fileName);
-  });
-  connect(ui->actionSupport, &QAction::triggered, []() {
-    QDesktopServices::openUrl(QUrl(QStringLiteral("https://ko-fi.com/bgallois"), QUrl::TolerantMode));
   });
   connect(ui->actionAbout, &QAction::triggered, this, []() {
     QMessageBox aboutBox;
