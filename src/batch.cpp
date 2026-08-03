@@ -46,6 +46,13 @@ Batch::Batch(QWidget *parent) : QWidget(parent),
                                 currentPathCount(0) {
   ui->setupUi(this);
 
+  auto setParameterTooltip = [](QTableWidgetItem *item, QWidget *editor, const QString &tooltip) {
+    item->setToolTip(tooltip);
+    if (editor) {
+      editor->setToolTip(tooltip);
+    }
+  };
+
   // Setup the ui
   QDir::setCurrent(QCoreApplication::applicationDirPath());
   setWindowState(Qt::WindowMaximized);
@@ -71,13 +78,16 @@ Batch::Batch(QWidget *parent) : QWidget(parent),
   QComboBox *backMethod = new QComboBox(ui->tableParameters);
   backMethod->addItems({"Minimum", "Maximum", "Average"});
   ui->tableParameters->setCellWidget(0, 1, backMethod);
+  setParameterTooltip(ui->tableParameters->item(0, 0), backMethod, tr("Background aggregation method used to compute the reference image."));
   connect(backMethod, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &Batch::updateParameters);
 
   ui->tableParameters->insertRow(1);
   ui->tableParameters->setItem(1, 0, new QTableWidgetItem(QStringLiteral("nBack")));
   QSpinBox *backNumber = new QSpinBox(ui->tableParameters);
   backNumber->setRange(0, 9999999);
+  backNumber->setSuffix(QStringLiteral(" frames"));
   ui->tableParameters->setCellWidget(1, 1, backNumber);
+  setParameterTooltip(ui->tableParameters->item(1, 0), backNumber, tr("Number of frames used to compute the background."));
   connect(backNumber, QOverload<int>::of(&QSpinBox::valueChanged), this, &Batch::updateParameters);
 
   ui->tableParameters->insertRow(2);
@@ -85,6 +95,7 @@ Batch::Batch(QWidget *parent) : QWidget(parent),
   QSpinBox *binThresh = new QSpinBox(ui->tableParameters);
   binThresh->setRange(0, 255);
   ui->tableParameters->setCellWidget(2, 1, binThresh);
+  setParameterTooltip(ui->tableParameters->item(2, 0), binThresh, tr("Binary threshold applied after background subtraction."));
   connect(binThresh, QOverload<int>::of(&QSpinBox::valueChanged), this, &Batch::updateParameters);
 
   ui->tableParameters->insertRow(3);
@@ -92,34 +103,43 @@ Batch::Batch(QWidget *parent) : QWidget(parent),
   QComboBox *backType = new QComboBox(ui->tableParameters);
   backType->addItems({"Yes", "No"});
   ui->tableParameters->setCellWidget(3, 1, backType);
+  setParameterTooltip(ui->tableParameters->item(3, 0), backType, tr("Choose whether tracked objects are darker or lighter than the background."));
   connect(backType, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &Batch::updateParameters);
 
   ui->tableParameters->insertRow(4);
   ui->tableParameters->setItem(4, 0, new QTableWidgetItem(QStringLiteral("xTop")));
   QSpinBox *xTop = new QSpinBox(ui->tableParameters);
   xTop->setRange(0, 9999999);
+  xTop->setSuffix(QStringLiteral(" px"));
   ui->tableParameters->setCellWidget(4, 1, xTop);
+  setParameterTooltip(ui->tableParameters->item(4, 0), xTop, tr("Horizontal coordinate of the ROI top corner."));
   connect(xTop, QOverload<int>::of(&QSpinBox::valueChanged), this, &Batch::updateParameters);
 
   ui->tableParameters->insertRow(5);
   ui->tableParameters->setItem(5, 0, new QTableWidgetItem(QStringLiteral("yTop")));
   QSpinBox *yTop = new QSpinBox(ui->tableParameters);
   yTop->setRange(0, 9999999);
+  yTop->setSuffix(QStringLiteral(" px"));
   ui->tableParameters->setCellWidget(5, 1, yTop);
+  setParameterTooltip(ui->tableParameters->item(5, 0), yTop, tr("Vertical coordinate of the ROI top corner."));
   connect(yTop, QOverload<int>::of(&QSpinBox::valueChanged), this, &Batch::updateParameters);
 
   ui->tableParameters->insertRow(6);
   ui->tableParameters->setItem(6, 0, new QTableWidgetItem(QStringLiteral("xBottom")));
   QSpinBox *xBottom = new QSpinBox(ui->tableParameters);
   xBottom->setRange(0, 9999999);
+  xBottom->setSuffix(QStringLiteral(" px"));
   ui->tableParameters->setCellWidget(6, 1, xBottom);
+  setParameterTooltip(ui->tableParameters->item(6, 0), xBottom, tr("Horizontal coordinate of the ROI bottom corner."));
   connect(xBottom, QOverload<int>::of(&QSpinBox::valueChanged), this, &Batch::updateParameters);
 
   ui->tableParameters->insertRow(7);
   ui->tableParameters->setItem(7, 0, new QTableWidgetItem(QStringLiteral("yBottom")));
   QSpinBox *yBottom = new QSpinBox(ui->tableParameters);
   yBottom->setRange(0, 9999999);
+  yBottom->setSuffix(QStringLiteral(" px"));
   ui->tableParameters->setCellWidget(7, 1, yBottom);
+  setParameterTooltip(ui->tableParameters->item(7, 0), yBottom, tr("Vertical coordinate of the ROI bottom corner."));
   connect(yBottom, QOverload<int>::of(&QSpinBox::valueChanged), this, &Batch::updateParameters);
 
   ui->tableParameters->insertRow(8);
@@ -127,6 +147,7 @@ Batch::Batch(QWidget *parent) : QWidget(parent),
   QComboBox *registration = new QComboBox(ui->tableParameters);
   registration->addItems({"None", "Simple", "ECC", "Features"});
   ui->tableParameters->setCellWidget(8, 1, registration);
+  setParameterTooltip(ui->tableParameters->item(8, 0), registration, tr("Registration method applied between frames during tracking."));
   connect(registration, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &Batch::updateParameters);
 
   ui->tableParameters->insertRow(9);
@@ -135,6 +156,7 @@ Batch::Batch(QWidget *parent) : QWidget(parent),
   morphType->addItems({"Erosion", "Dilatation", "Opening", "Closing", "Gradient", "Top hat", "Black hat", "Hit miss", "None"});
   morphType->setCurrentIndex(8);
   ui->tableParameters->setCellWidget(9, 1, morphType);
+  setParameterTooltip(ui->tableParameters->item(9, 0), morphType, tr("Morphological operation applied to the binary image."));
   connect(morphType, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &Batch::updateParameters);
 
   ui->tableParameters->insertRow(10);
@@ -142,55 +164,70 @@ Batch::Batch(QWidget *parent) : QWidget(parent),
   QComboBox *kernelType = new QComboBox(ui->tableParameters);
   kernelType->addItems({"Rectangle", "Cross", "Ellipse"});
   ui->tableParameters->setCellWidget(10, 1, kernelType);
+  setParameterTooltip(ui->tableParameters->item(10, 0), kernelType, tr("Shape of the kernel used for the morphological operation."));
   connect(kernelType, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &Batch::updateParameters);
 
   ui->tableParameters->insertRow(11);
   ui->tableParameters->setItem(11, 0, new QTableWidgetItem(QStringLiteral("morphSize")));
   QSpinBox *kernelSize = new QSpinBox(ui->tableParameters);
   kernelSize->setRange(0, 9999999);
+  kernelSize->setSuffix(QStringLiteral(" px"));
   ui->tableParameters->setCellWidget(11, 1, kernelSize);
+  setParameterTooltip(ui->tableParameters->item(11, 0), kernelSize, tr("Kernel size used for the morphological operation."));
   connect(kernelSize, QOverload<int>::of(&QSpinBox::valueChanged), this, &Batch::updateParameters);
 
   ui->tableParameters->insertRow(12);
   ui->tableParameters->setItem(12, 0, new QTableWidgetItem(QStringLiteral("minArea")));
   QSpinBox *minSize = new QSpinBox(ui->tableParameters);
   minSize->setRange(0, 9999999);
+  minSize->setSuffix(QStringLiteral(" px²"));
   ui->tableParameters->setCellWidget(12, 1, minSize);
+  setParameterTooltip(ui->tableParameters->item(12, 0), minSize, tr("Ignore detected objects smaller than this area."));
   connect(minSize, QOverload<int>::of(&QSpinBox::valueChanged), this, &Batch::updateParameters);
 
   ui->tableParameters->insertRow(13);
   ui->tableParameters->setItem(13, 0, new QTableWidgetItem(QStringLiteral("maxArea")));
   QSpinBox *maxSize = new QSpinBox(ui->tableParameters);
   maxSize->setRange(0, 9999999);
+  maxSize->setSuffix(QStringLiteral(" px²"));
   ui->tableParameters->setCellWidget(13, 1, maxSize);
+  setParameterTooltip(ui->tableParameters->item(13, 0), maxSize, tr("Ignore detected objects larger than this area."));
   connect(maxSize, QOverload<int>::of(&QSpinBox::valueChanged), this, &Batch::updateParameters);
 
   ui->tableParameters->insertRow(14);
   ui->tableParameters->setItem(14, 0, new QTableWidgetItem(QStringLiteral("normDist")));
   QDoubleSpinBox *maxLength = new QDoubleSpinBox(ui->tableParameters);
   maxLength->setRange(0, 9999999);
+  maxLength->setSuffix(QStringLiteral(" px"));
   ui->tableParameters->setCellWidget(14, 1, maxLength);
+  setParameterTooltip(ui->tableParameters->item(14, 0), maxLength, tr("Distance normalization factor used in the assignment cost."));
   connect(maxLength, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &Batch::updateParameters);
 
   ui->tableParameters->insertRow(15);
   ui->tableParameters->setItem(15, 0, new QTableWidgetItem(QStringLiteral("normAngle")));
   QDoubleSpinBox *maxAngle = new QDoubleSpinBox(ui->tableParameters);
   maxAngle->setRange(0, 360);
+  maxAngle->setSuffix(QStringLiteral(" °"));
   ui->tableParameters->setCellWidget(15, 1, maxAngle);
+  setParameterTooltip(ui->tableParameters->item(15, 0), maxAngle, tr("Angle normalization factor used in the assignment cost."));
   connect(maxAngle, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &Batch::updateParameters);
 
   ui->tableParameters->insertRow(16);
   ui->tableParameters->setItem(16, 0, new QTableWidgetItem(QStringLiteral("maxTime")));
   QSpinBox *maxTime = new QSpinBox(ui->tableParameters);
   maxTime->setRange(0, 9999999);
+  maxTime->setSuffix(QStringLiteral(" frames"));
   ui->tableParameters->setCellWidget(16, 1, maxTime);
+  setParameterTooltip(ui->tableParameters->item(16, 0), maxTime, tr("Maximum number of consecutive frames an object can be missing before a new ID is created."));
   connect(maxTime, QOverload<int>::of(&QSpinBox::valueChanged), this, &Batch::updateParameters);
 
   ui->tableParameters->insertRow(17);
   ui->tableParameters->setItem(17, 0, new QTableWidgetItem(QStringLiteral("maxDist")));
   QSpinBox *maxOccl = new QSpinBox(ui->tableParameters);
   maxOccl->setRange(0, 9999999);
+  maxOccl->setSuffix(QStringLiteral(" px"));
   ui->tableParameters->setCellWidget(17, 1, maxOccl);
+  setParameterTooltip(ui->tableParameters->item(17, 0), maxOccl, tr("Maximum allowed travel distance between two consecutive frames before a new ID is created."));
   connect(maxOccl, QOverload<int>::of(&QSpinBox::valueChanged), this, &Batch::updateParameters);
 
   ui->tableParameters->insertRow(18);
@@ -199,6 +236,7 @@ Batch::Batch(QWidget *parent) : QWidget(parent),
   spotType->addItems({"Head", "Tail", "Body"});
   spotType->setCurrentIndex(2);
   ui->tableParameters->setCellWidget(18, 1, spotType);
+  setParameterTooltip(ui->tableParameters->item(18, 0), spotType, tr("Body point used to compute distance and angle during tracking."));
   connect(spotType, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &Batch::updateParameters);
 
   ui->tableParameters->insertRow(19);
@@ -206,6 +244,7 @@ Batch::Batch(QWidget *parent) : QWidget(parent),
   QComboBox *backRegistrationMethod = new QComboBox(ui->tableParameters);
   backRegistrationMethod->addItems({"None", "Simple", "ECC", "Features"});
   ui->tableParameters->setCellWidget(19, 1, backRegistrationMethod);
+  setParameterTooltip(ui->tableParameters->item(19, 0), backRegistrationMethod, tr("Registration method applied before combining frames for the background."));
   connect(backRegistrationMethod, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &Batch::updateParameters);
 
   ui->tableParameters->insertRow(20);
@@ -214,7 +253,9 @@ Batch::Batch(QWidget *parent) : QWidget(parent),
   area->setRange(0, 999);
   area->setValue(0.0);
   area->setSingleStep(0.1);
+  area->setSuffix(QStringLiteral(" px²"));
   ui->tableParameters->setCellWidget(20, 1, area);
+  setParameterTooltip(ui->tableParameters->item(20, 0), area, tr("Area normalization factor used in the assignment cost. Set to 0 to disable area weighting."));
   connect(area, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &Batch::updateParameters);
 
   ui->tableParameters->insertRow(21);
@@ -223,7 +264,9 @@ Batch::Batch(QWidget *parent) : QWidget(parent),
   perim->setRange(0, 999);
   perim->setValue(0.0);
   perim->setSingleStep(0.1);
+  perim->setSuffix(QStringLiteral(" px"));
   ui->tableParameters->setCellWidget(21, 1, perim);
+  setParameterTooltip(ui->tableParameters->item(21, 0), perim, tr("Perimeter normalization factor used in the assignment cost. Set to 0 to disable perimeter weighting."));
   connect(perim, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &Batch::updateParameters);
 
   loadSettings();
@@ -257,6 +300,17 @@ Batch::Batch(QWidget *parent) : QWidget(parent),
   connect(ui->backgroundClear, &QPushButton::clicked, this, [this]() {
     ui->lineBackground->clear();
   });
+
+  QWidget::setTabOrder(ui->openPath, ui->suffix);
+  QWidget::setTabOrder(ui->suffix, ui->isAuto);
+  QWidget::setTabOrder(ui->isAuto, ui->backgroundButton);
+  QWidget::setTabOrder(ui->backgroundButton, ui->lineBackground);
+  QWidget::setTabOrder(ui->lineBackground, ui->backgroundClear);
+  QWidget::setTabOrder(ui->backgroundClear, ui->tablePath);
+  QWidget::setTabOrder(ui->tablePath, ui->tableParameters);
+  QWidget::setTabOrder(ui->tableParameters, ui->startButton);
+  QWidget::setTabOrder(ui->startButton, ui->clearPath);
+  QWidget::setTabOrder(ui->clearPath, ui->removePath);
 }
 
 /**

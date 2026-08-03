@@ -105,6 +105,9 @@ class Interactive : public QMainWindow {
   void saveSettings();
   void loadParameters(const QString &path);
   void level();
+  void setupParameterTabOrder();
+  void setupParameterWidgets();
+  void setupParameterTooltips();
 
  private:
   Ui::Interactive *ui;

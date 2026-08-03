@@ -93,7 +93,7 @@
            <item row="0" column="0">
             <widget class="QLabel" name="label_16">
              <property name="text">
-              <string>Maximal time (T)</string>
+              <string>Maximal time</string>
              </property>
             </widget>
            </item>
@@ -119,7 +119,7 @@
            <item row="1" column="0">
             <widget class="QLabel" name="label_15">
              <property name="text">
-              <string>Maximal distance (L)</string>
+              <string>Maximal distance</string>
              </property>
             </widget>
            </item>
@@ -246,7 +246,7 @@ p, li { white-space: pre-wrap; }
            <item row="1" column="0">
             <widget class="QLabel" name="label_13">
              <property name="text">
-              <string>Normalization distance (D)</string>
+              <string>Normalization distance</string>
              </property>
             </widget>
            </item>
@@ -269,7 +269,7 @@ p, li { white-space: pre-wrap; }
            <item row="2" column="0">
             <widget class="QLabel" name="label_14">
              <property name="text">
-              <string>Normalization angle (A)</string>
+              <string>Normalization angle</string>
              </property>
             </widget>
            </item>
@@ -292,7 +292,7 @@ p, li { white-space: pre-wrap; }
            <item row="3" column="0">
             <widget class="QLabel" name="label_19">
              <property name="text">
-              <string>Normalization area (AR)</string>
+              <string>Normalization area</string>
              </property>
             </widget>
            </item>
@@ -312,7 +312,7 @@ p, li { white-space: pre-wrap; }
            <item row="4" column="0">
             <widget class="QLabel" name="label_28">
              <property name="text">
-              <string>Normalization perimeter (P)</string>
+              <string>Normalization perimeter</string>
              </property>
             </widget>
            </item>

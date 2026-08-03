@@ -45,6 +45,9 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
                                             settingsFile(new QSettings(QStringLiteral("FastTrack"), QStringLiteral("FastTrackOrg"), this)) {
   ui->setupUi(this);
   ui->menuBar->setNativeMenuBar(false);
+  setupParameterWidgets();
+  setupParameterTooltips();
+  setupParameterTabOrder();
 
   // Loads settings
   settingsFile->beginGroup(QStringLiteral("interactive"));
@@ -452,6 +455,94 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   // Sets the object counter on top of the display
   counterLabel = new QLabel(ui->display);  // TODO put as QGraphicsItem
   counterLabel->move(20, 20);
+}
+
+void Interactive::setupParameterTabOrder() {
+  QWidget::setTabOrder(ui->back, ui->nBack);
+  QWidget::setTabOrder(ui->nBack, ui->registrationBack);
+  QWidget::setTabOrder(ui->registrationBack, ui->backgroundComputeButton);
+  QWidget::setTabOrder(ui->backgroundComputeButton, ui->backgroundSelectButton);
+  QWidget::setTabOrder(ui->backgroundSelectButton, ui->backColor);
+  QWidget::setTabOrder(ui->backColor, ui->threshSlider);
+  QWidget::setTabOrder(ui->threshSlider, ui->threshBox);
+  QWidget::setTabOrder(ui->threshBox, ui->maxSize);
+  QWidget::setTabOrder(ui->maxSize, ui->minSize);
+  QWidget::setTabOrder(ui->minSize, ui->x1);
+  QWidget::setTabOrder(ui->x1, ui->y1);
+  QWidget::setTabOrder(ui->y1, ui->x2);
+  QWidget::setTabOrder(ui->x2, ui->y2);
+  QWidget::setTabOrder(ui->y2, ui->cropButton);
+  QWidget::setTabOrder(ui->cropButton, ui->resetButton);
+  QWidget::setTabOrder(ui->resetButton, ui->reg);
+  QWidget::setTabOrder(ui->reg, ui->kernelSize);
+  QWidget::setTabOrder(ui->kernelSize, ui->morphOperation);
+  QWidget::setTabOrder(ui->morphOperation, ui->kernelType);
+  QWidget::setTabOrder(ui->kernelType, ui->to);
+  QWidget::setTabOrder(ui->to, ui->lo);
+  QWidget::setTabOrder(ui->lo, ui->spot);
+  QWidget::setTabOrder(ui->spot, ui->levelButton);
+  QWidget::setTabOrder(ui->levelButton, ui->maxL);
+  QWidget::setTabOrder(ui->maxL, ui->maxT);
+  QWidget::setTabOrder(ui->maxT, ui->normArea);
+  QWidget::setTabOrder(ui->normArea, ui->normPerim);
+  QWidget::setTabOrder(ui->normPerim, ui->startImage);
+  QWidget::setTabOrder(ui->startImage, ui->stopImage);
+  QWidget::setTabOrder(ui->stopImage, ui->previewButton);
+  QWidget::setTabOrder(ui->previewButton, ui->trackButton);
+}
+
+void Interactive::setupParameterWidgets() {
+  ui->nBack->setSuffix(QStringLiteral(" frames"));
+  ui->to->setSuffix(QStringLiteral(" frames"));
+  ui->lo->setSuffix(QStringLiteral(" px"));
+  ui->maxL->setSuffix(QStringLiteral(" px"));
+  ui->maxT->setSuffix(QStringLiteral(" °"));
+  ui->normArea->setSuffix(QStringLiteral(" px²"));
+  ui->normPerim->setSuffix(QStringLiteral(" px"));
+  ui->maxSize->setSuffix(QStringLiteral(" px²"));
+  ui->minSize->setSuffix(QStringLiteral(" px²"));
+  ui->x1->setSuffix(QStringLiteral(" px"));
+  ui->y1->setSuffix(QStringLiteral(" px"));
+  ui->x2->setSuffix(QStringLiteral(" px"));
+  ui->y2->setSuffix(QStringLiteral(" px"));
+  ui->kernelSize->setSuffix(QStringLiteral(" px"));
+  ui->startImage->setSuffix(QStringLiteral(" frame"));
+  ui->stopImage->setSuffix(QStringLiteral(" frames"));
+}
+
+void Interactive::setupParameterTooltips() {
+  ui->back->setToolTip(tr("Background aggregation method used to compute the reference image."));
+  ui->nBack->setToolTip(tr("Number of frames used to compute the background."));
+  ui->registrationBack->setToolTip(tr("Registration method applied before combining frames for the background."));
+  ui->backgroundComputeButton->setToolTip(tr("Compute a background image from the current sequence."));
+  ui->backgroundSelectButton->setToolTip(tr("Load an existing background image from disk."));
+  ui->backColor->setToolTip(tr("Choose whether tracked objects are darker or lighter than the background."));
+  ui->threshSlider->setToolTip(tr("Binary threshold applied after background subtraction."));
+  ui->threshBox->setToolTip(tr("Binary threshold applied after background subtraction."));
+  ui->maxSize->setToolTip(tr("Ignore detected objects larger than this area."));
+  ui->minSize->setToolTip(tr("Ignore detected objects smaller than this area."));
+  ui->x1->setToolTip(tr("Horizontal coordinate of the ROI top corner."));
+  ui->y1->setToolTip(tr("Vertical coordinate of the ROI top corner."));
+  ui->x2->setToolTip(tr("Horizontal coordinate of the ROI bottom corner."));
+  ui->y2->setToolTip(tr("Vertical coordinate of the ROI bottom corner."));
+  ui->cropButton->setToolTip(tr("Apply the region of interest to the current sequence."));
+  ui->resetButton->setToolTip(tr("Reset the region of interest to the full image."));
+  ui->reg->setToolTip(tr("Registration method applied between frames during tracking."));
+  ui->kernelSize->setToolTip(tr("Kernel size used for the morphological operation."));
+  ui->morphOperation->setToolTip(tr("Morphological operation applied to the binary image."));
+  ui->kernelType->setToolTip(tr("Shape of the kernel used for the morphological operation."));
+  ui->to->setToolTip(tr("Maximum number of consecutive frames an object can be missing before a new ID is created."));
+  ui->lo->setToolTip(tr("Maximum allowed travel distance between two consecutive frames before a new ID is created."));
+  ui->spot->setToolTip(tr("Body point used to compute distance and angle during tracking."));
+  ui->levelButton->setToolTip(tr("Set neutral normalization values as a starting point for manual tuning."));
+  ui->maxL->setToolTip(tr("Distance normalization factor used in the assignment cost."));
+  ui->maxT->setToolTip(tr("Angle normalization factor used in the assignment cost."));
+  ui->normArea->setToolTip(tr("Area normalization factor used in the assignment cost. Set to 0 to disable area weighting."));
+  ui->normPerim->setToolTip(tr("Perimeter normalization factor used in the assignment cost. Set to 0 to disable perimeter weighting."));
+  ui->startImage->setToolTip(tr("First frame included in the preview tracking run."));
+  ui->stopImage->setToolTip(tr("Number of frames included in the preview tracking run."));
+  ui->previewButton->setToolTip(tr("Run tracking only on the selected preview range."));
+  ui->trackButton->setToolTip(tr("Run the full tracking analysis on the whole sequence."));
 }
 
 /**
