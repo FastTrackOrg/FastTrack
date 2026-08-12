@@ -27,6 +27,8 @@ This file is part of Fast Track.
 #include "cli.h"
 #include "mainwindow.h"
 
+#include <QStandardPaths>
+
 QScopedPointer<QFile> logFile;
 
 void messageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg) {

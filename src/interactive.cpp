@@ -44,7 +44,6 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
                                             videoStatus(false),
                                             settingsFile(new QSettings(QStringLiteral("FastTrack"), QStringLiteral("FastTrackOrg"), this)) {
   ui->setupUi(this);
-  ui->menuBar->setNativeMenuBar(false);
   setupParameterWidgets();
   setupParameterTooltips();
   setupParameterTabOrder();
@@ -94,26 +93,6 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
     }
   });
 
-  // Menu bar
-  connect(ui->actionOpen, &QAction::triggered, this, [this]() { this->openFolder(); });
-  connect(ui->actionQuit, &QAction::triggered, qApp, &QApplication::quit);
-  ui->menuView->addAction(ui->imageOptions->toggleViewAction());
-  ui->menuView->addAction(ui->trackingOptions->toggleViewAction());
-  ui->menuView->addAction(ui->controlOptions->toggleViewAction());
-
-  replayAction = ui->menuView->addAction(tr("Tracking replay"));
-  replayAction->setCheckable(true);
-  connect(replayAction, &QAction::toggled, this, [this](bool isChecked) {
-    if (isChecked) {
-      ui->interactiveTab->addTab(replay, tr("Replay"));
-      ui->interactiveTab->setCurrentIndex(1);
-    }
-    else {
-      ui->interactiveTab->removeTab(1);  // Remove Replay tab
-      ui->interactiveTab->removeTab(1);  // Remove Analysis tab
-    }
-  });
-
   connect(ui->slider, &Timeline::valueChanged, this, [this](int newValue) {
     int index = ui->interactiveTab->currentIndex();
     if (index == 0) {
@@ -143,207 +122,6 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
     }
   });
 
-  // Loads prefered style
-  QStringList styles = QStyleFactory::keys();
-  style = settingsFile->value(QStringLiteral("window/style"), "Fusion").toString();
-  QMenu *menuStyle = new QMenu(tr("Appearance"), this);
-  ui->menuSettings->addMenu(menuStyle);
-
-  for (auto const &a : styles) {
-    QAction *styleAction = menuStyle->addAction(a);
-    styleAction->setCheckable(true);
-    connect(styleAction, &QAction::triggered, this, [this, styleAction, menuStyle]() {
-      QApplication::setStyle(QStyleFactory::create(styleAction->text()));
-      style = styleAction->text();
-      foreach (QAction *action, menuStyle->actions()) {
-        action->setChecked(false);
-      }
-      styleAction->setChecked(true);
-    });
-  }
-
-  if (styles.contains(style)) {
-    QApplication::setStyle(QStyleFactory::create(style));
-    foreach (QAction *action, menuStyle->actions()) {
-      if (action->text() == style) {
-        action->setChecked(true);
-      }
-    }
-  }
-
-  // Palette
-  QMenu *menuPalette = new QMenu(tr("Theme"), this);
-  ui->menuSettings->addMenu(menuPalette);
-  QAction *defaultColor = menuPalette->addAction(tr("Default"));
-  defaultColor->setCheckable(true);
-  QAction *darkColor = menuPalette->addAction(tr("Breeze Dark"));
-  darkColor->setCheckable(true);
-  QAction *lightColor = menuPalette->addAction(tr("Breeze Light"));
-  lightColor->setCheckable(true);
-  QAction *ftColor = menuPalette->addAction(tr("FastTrack"));
-  ftColor->setCheckable(true);
-  connect(defaultColor, &QAction::triggered, this, [this, defaultColor, menuPalette]() {
-    foreach (QAction *action, menuPalette->actions()) {
-      action->setChecked(false);
-    }
-    defaultColor->setChecked(false);
-    qApp->setStyleSheet(QLatin1String(""));
-    color = QStringLiteral("default");
-  });
-  connect(darkColor, &QAction::triggered, this, [this, darkColor, menuPalette]() {
-    foreach (QAction *action, menuPalette->actions()) {
-      action->setChecked(false);
-    }
-    darkColor->setChecked(true);
-    QFile file(QStringLiteral(":/dark.qss"));
-    file.open(QFile::ReadOnly | QFile::Text);
-    QTextStream stream(&file);
-    qApp->setStyleSheet(stream.readAll());
-    color = QStringLiteral("dark");
-  });
-  connect(lightColor, &QAction::triggered, this, [this, lightColor, menuPalette]() {
-    foreach (QAction *action, menuPalette->actions()) {
-      action->setChecked(false);
-    }
-    lightColor->setChecked(true);
-    QFile file(QStringLiteral(":/light.qss"));
-    file.open(QFile::ReadOnly | QFile::Text);
-    QTextStream stream(&file);
-    qApp->setStyleSheet(stream.readAll());
-    color = QStringLiteral("light");
-  });
-  connect(ftColor, &QAction::triggered, this, [this, ftColor, menuPalette]() {
-    foreach (QAction *action, menuPalette->actions()) {
-      action->setChecked(false);
-    }
-    ftColor->setChecked(true);
-    QFile file(QStringLiteral(":/theme.qss"));
-    file.open(QFile::ReadOnly | QFile::Text);
-    QTextStream stream(&file);
-    qApp->setStyleSheet(stream.readAll());
-    color = QStringLiteral("ft");
-  });
-
-  color = settingsFile->value(QStringLiteral("color"), "ft").toString();
-  if (color == QLatin1String("light")) {
-    lightColor->trigger();
-  }
-  else if (color == QLatin1String("dark")) {
-    darkColor->trigger();
-  }
-  else if (color == QLatin1String("ft")) {
-    ftColor->trigger();
-  }
-  else {
-    ftColor->trigger();
-  }
-
-  // Layout option serves as a template of QDock placement.
-  // At closing, the customized layout is saved and restored.
-  // This, no action is check by default of the layoutGroup.
-  QActionGroup *layoutGroup = new QActionGroup(this);
-  ui->menuBar->removeAction(ui->menuLayout->menuAction());
-  ui->menuSettings->addMenu(ui->menuLayout);
-  layoutGroup->addAction(ui->actionLayout1);
-  connect(ui->actionLayout1, &QAction::triggered, this, [this]() {
-    ui->controlOptions->setVisible(true);
-    ui->imageOptions->setVisible(true);
-    ui->trackingOptions->setVisible(true);
-
-    ui->controlOptions->setFloating(false);
-    ui->imageOptions->setFloating(false);
-    ui->trackingOptions->setFloating(false);
-
-    addDockWidget(Qt::LeftDockWidgetArea, ui->imageOptions);
-    tabifyDockWidget(ui->imageOptions, ui->trackingOptions);
-    ui->imageOptions->raise();
-    addDockWidget(Qt::BottomDockWidgetArea, ui->controlOptions);
-  });
-  layoutGroup->addAction(ui->actionLayout2);
-  connect(ui->actionLayout2, &QAction::triggered, this, [this]() {
-    ui->controlOptions->setVisible(true);
-    ui->imageOptions->setVisible(true);
-    ui->trackingOptions->setVisible(true);
-
-    ui->controlOptions->setFloating(false);
-    ui->imageOptions->setFloating(false);
-    ui->trackingOptions->setFloating(false);
-
-    addDockWidget(Qt::RightDockWidgetArea, ui->imageOptions);
-    tabifyDockWidget(ui->imageOptions, ui->trackingOptions);
-    ui->imageOptions->raise();
-    addDockWidget(Qt::BottomDockWidgetArea, ui->controlOptions);
-  });
-  layoutGroup->addAction(ui->actionLayout3);
-  connect(ui->actionLayout3, &QAction::triggered, this, [this]() {
-    ui->controlOptions->setVisible(true);
-    ui->imageOptions->setVisible(true);
-    ui->trackingOptions->setVisible(true);
-
-    ui->controlOptions->setFloating(false);
-    ui->imageOptions->setFloating(false);
-    ui->trackingOptions->setFloating(false);
-
-    addDockWidget(Qt::LeftDockWidgetArea, ui->imageOptions);
-    addDockWidget(Qt::RightDockWidgetArea, ui->trackingOptions);
-    addDockWidget(Qt::BottomDockWidgetArea, ui->controlOptions);
-  });
-  layoutGroup->addAction(ui->actionLayout4);
-  connect(ui->actionLayout4, &QAction::triggered, this, [this]() {
-    ui->controlOptions->setVisible(true);
-    ui->imageOptions->setVisible(true);
-    ui->trackingOptions->setVisible(true);
-
-    ui->controlOptions->setFloating(false);
-    ui->imageOptions->setFloating(false);
-    ui->trackingOptions->setFloating(false);
-
-    addDockWidget(Qt::LeftDockWidgetArea, ui->imageOptions);
-    tabifyDockWidget(ui->imageOptions, ui->trackingOptions);
-    ui->imageOptions->raise();
-    addDockWidget(Qt::LeftDockWidgetArea, ui->controlOptions);
-  });
-
-  QAction *actionMode = ui->menuSettings->addAction(tr("Expert Mode"));
-  actionMode->setCheckable(true);
-  isExpert = settingsFile->value(QStringLiteral("mode"), false).toBool();
-  actionMode->setChecked(isExpert);
-  connect(actionMode, &QAction::toggled, this, [this](bool isChecked) {
-    emit modeChanged(isChecked);
-    isExpert = isChecked;
-  });
-  QTimer::singleShot(500, actionMode, [this]() {
-    emit modeChanged(isExpert);
-  });  // Need to wait for the connection initialization
-
-  // Help menu
-  connect(ui->actionDoc, &QAction::triggered, []() {
-    QDesktopServices::openUrl(QUrl(QStringLiteral("https://www.fasttrack.sh/docs/intro"), QUrl::TolerantMode));
-  });
-  connect(ui->actionTuto, &QAction::triggered, []() {
-    QDesktopServices::openUrl(QUrl(QStringLiteral("https://www.youtube.com/watch?v=RzzmcZs04E4&list=PLGjsUpRojSmO4RHrd-TbpbNpJrfjNYlIm"), QUrl::TolerantMode));
-  });
-  connect(ui->actionAsk, &QAction::triggered, []() {
-    QDesktopServices::openUrl(QUrl(QStringLiteral("https://github.com/FastTrackOrg/FastTrack/discussions"), QUrl::TolerantMode));
-  });
-  connect(ui->actionIssue, &QAction::triggered, []() {
-    QDesktopServices::openUrl(QUrl(QStringLiteral("https://github.com/FastTrackOrg/FastTrack/issues"), QUrl::TolerantMode));
-  });
-  connect(ui->actionContact, &QAction::triggered, []() {
-    QDesktopServices::openUrl(QUrl(QStringLiteral("mailto:benjamin.gallois@fasttrack.sh?subject=[fasttrack]"), QUrl::TolerantMode));
-  });
-  connect(ui->actionGenerateLog, &QAction::triggered, this, [this]() {
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Save Log File"), QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation), tr("Logs (*.log)"));
-    QFile::remove(fileName);
-    QFile::copy(QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) + "/fasttrack.log", fileName);
-  });
-  connect(ui->actionAbout, &QAction::triggered, this, []() {
-    QMessageBox aboutBox;
-    aboutBox.setText(tr("FastTrack version %1 is a desktop tracking software, easy to install, easy to use, and performant.<br>Created and maintained by Benjamin Gallois.<br>Distributed under the terms of the <a href='https://www.gnu.org/licenses/gpl-3.0'>GPL3.0 license</a>.<br>").arg(QApplication::applicationVersion()));
-    aboutBox.exec();
-  });
-  connect(ui->actionAboutQt, &QAction::triggered, qApp, &QApplication::aboutQt);
-
   connect(this, &Interactive::message, this, [](const QString &msg) {
     QMessageBox msgBox;
     msgBox.setIcon(QMessageBox::Critical);
@@ -370,10 +148,10 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   });
 
   // Replay tab
-  replay = new Replay(this, false, ui->slider, video);
+  replay = new Replay(this, ui->slider, video);
   connect(ui->interactiveTab, &QTabWidget::tabCloseRequested, this, [this](int index) {
     if (index != 0) {
-      replayAction->setChecked(false);  // The replayAction takes care of the tabs removing
+      setReplayVisible(false);
     }
   });
 
@@ -455,6 +233,51 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
   // Sets the object counter on top of the display
   counterLabel = new QLabel(ui->display);  // TODO put as QGraphicsItem
   counterLabel->move(20, 20);
+}
+
+void Interactive::setReplayVisible(bool visible) {
+  if (replayVisible == visible) {
+    return;
+  }
+  replayVisible = visible;
+  if (visible) {
+    ui->interactiveTab->addTab(replay, tr("Replay"));
+    ui->interactiveTab->setCurrentIndex(1);
+  }
+  else {
+    while (ui->interactiveTab->count() > 1) {
+      ui->interactiveTab->removeTab(1);
+    }
+  }
+  emit replayVisibleChanged(visible);
+}
+
+bool Interactive::isReplayVisible() const {
+  return replayVisible;
+}
+
+void Interactive::setImageOptionsVisible(bool visible) {
+  ui->imageOptions->setVisible(visible);
+}
+
+bool Interactive::imageOptionsVisible() const {
+  return ui->imageOptions->isVisible();
+}
+
+void Interactive::setTrackingOptionsVisible(bool visible) {
+  ui->trackingOptions->setVisible(visible);
+}
+
+bool Interactive::trackingOptionsVisible() const {
+  return ui->trackingOptions->isVisible();
+}
+
+void Interactive::setControlOptionsVisible(bool visible) {
+  ui->controlOptions->setVisible(visible);
+}
+
+bool Interactive::controlOptionsVisible() const {
+  return ui->controlOptions->isVisible();
 }
 
 void Interactive::setupParameterTabOrder() {
@@ -550,7 +373,7 @@ void Interactive::setupParameterTooltips() {
  */
 void Interactive::openFolder(QString path) {
   // Resets the class members
-  replayAction->setChecked(false);
+  setReplayVisible(false);
   isBackground = false;
   ui->interactiveTab->removeTab(1);
   memoryDir.clear();
@@ -616,7 +439,7 @@ void Interactive::openFolder(QString path) {
       // Load replay
       replay->loadReplay(dir);
       if (!replay->trackingData->isEmpty) {
-        replayAction->setChecked(true);
+        setReplayVisible(true);
       }
 
       // Load parameters
@@ -940,7 +763,7 @@ void Interactive::previewTracking() {
     ui->progressBar->setValue(0);
     ui->previewButton->setDisabled(true);
     ui->trackButton->setDisabled(true);
-    replayAction->setChecked(false);
+    setReplayVisible(false);
     replay->clear();  // Avoid mixing 2 subsequent analysy
 
     QThread *thread = new QThread;
@@ -958,14 +781,14 @@ void Interactive::previewTracking() {
       ui->previewButton->setDisabled(false);
       ui->trackButton->setDisabled(false);
       replay->loadReplay(dir);
-      replayAction->setChecked(true);
+      setReplayVisible(true);
     });
     connect(tracking, &Tracking::forceFinished, this, [this](const QString &errorMessage) {
       ui->slider->setDisabled(false);
       ui->previewButton->setDisabled(false);
       ui->trackButton->setDisabled(false);
       replay->loadReplay(dir);
-      replayAction->setChecked(true);
+      setReplayVisible(true);
       emit message(errorMessage);
     });
     connect(tracking, &Tracking::forceFinished, thread, &QThread::quit);
@@ -990,7 +813,7 @@ void Interactive::track() {
     ui->progressBar->setValue(0);
     ui->previewButton->setDisabled(true);
     ui->trackButton->setDisabled(true);
-    replayAction->setChecked(false);
+    setReplayVisible(false);
     replay->clear();  // Avoid mixing 2 subsequent analysy
 
     QThread *thread = new QThread;
@@ -1012,7 +835,7 @@ void Interactive::track() {
       ui->previewButton->setDisabled(false);
       ui->trackButton->setDisabled(false);
       replay->loadReplay(dir);
-      replayAction->setChecked(true);
+      setReplayVisible(true);
       logMap->insert(QStringLiteral("status"), errorMessage);
       emit log(*logMap);
       emit status(tr("Tracking failed"));
@@ -1024,7 +847,7 @@ void Interactive::track() {
       ui->previewButton->setDisabled(false);
       ui->trackButton->setDisabled(false);
       replay->loadReplay(dir);
-      replayAction->setChecked(true);
+      setReplayVisible(true);
       logMap->insert(QStringLiteral("status"), QStringLiteral("Done"));
       emit log(*logMap);
       emit status(tr("Tracking succeeded"));
@@ -1178,9 +1001,6 @@ Interactive::~Interactive() {
  * @brief Saves the settings.
  */
 void Interactive::saveSettings() {
-  settingsFile->setValue(QStringLiteral("style"), style);
-  settingsFile->setValue(QStringLiteral("color"), color);
-  settingsFile->setValue(QStringLiteral("mode"), isExpert);
   settingsFile->setValue(QStringLiteral("windowState"), saveState());
 }
 
@@ -1268,22 +1088,4 @@ void Interactive::loadParameters(const QString &path) {
     ui->kernelType->setCurrentIndex(parameterList.value(QStringLiteral("morphType")).toInt());
   }
   parameterFile.close();
-}
-
-/**
- * @brief Gets drop events that have url and try to open the file.
- */
-void Interactive::dropEvent(QDropEvent *dropEvent) {
-  const QMimeData *mimeData = dropEvent->mimeData();
-  if (mimeData->hasUrls()) {
-    QUrl file = mimeData->urls().at(0);
-    this->openFolder(file.toLocalFile());
-  }
-}
-
-/**
- * @brief Accepts all the drag enter event.
- */
-void Interactive::dragEnterEvent(QDragEnterEvent *event) {
-  event->acceptProposedAction();
 }

@@ -21,19 +21,20 @@ This file is part of Fast Track.
 #include <QAction>
 #include <QByteArray>
 #include <QCloseEvent>
+#include <QDragEnterEvent>
+#include <QDropEvent>
 #include <QFile>
 #include <QIcon>
 #include <QMainWindow>
 #include <QMenu>
 #include <QMessageBox>
+#include <QMdiSubWindow>
 #include <QSettings>
 #include <QSysInfo>
 #include <QSystemTrayIcon>
 #include <QUrl>
 #include "batch.h"
 #include "interactive.h"
-#include "replay.h"
-#include "trackingmanager.h"
 #include "ui_mainwindow.h"
 #include "updater.h"
 
@@ -53,16 +54,23 @@ class MainWindow : public QMainWindow {
   MainWindow &operator=(MainWindow &&T) = delete;
   MainWindow(MainWindow &&T) = delete;
   ~MainWindow();
-  void setMode(bool isExpert);
-
  private:
   Ui::MainWindow *ui; /*!< ui file from Qt designer. */
   void closeEvent(QCloseEvent *event) override;
+  void dragEnterEvent(QDragEnterEvent *event) override;
+  void dropEvent(QDropEvent *event) override;
+  void openInteractive();
+  QMdiSubWindow *newInteractiveWindow();
+  QMdiSubWindow *newBatchWindow();
+  void applyTheme(const QString &theme);
+  void refreshContextMenus(QMdiSubWindow *subWindow);
   Updater *updater;
-  Interactive *interactive;
-  Batch *batch;
-  Replay *replay;
-  TrackingManager *trackingManager;
+  QMenu *fileMenu;
+  QMenu *viewMenu;
+  QMenu *settingsMenu;
+  QMenu *helpMenu;
+  QMenu *mdiModeMenu;
+  QMenu *mdiArrangeMenu;
   QSystemTrayIcon *trayIcon;
   QSettings *settingsFile;
 };

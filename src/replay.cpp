@@ -38,9 +38,8 @@ using namespace std;
  *
  */
 
-Replay::Replay(QWidget* parent, bool standalone, Timeline* slider, VideoReader* videoReader) : QMainWindow(parent),
-                                                                                               ui(new Ui::Replay),
-                                                                                               isStandalone(standalone),
+Replay::Replay(QWidget* parent, Timeline* slider, VideoReader* videoReader) : QMainWindow(parent),
+                                                                               ui(new Ui::Replay),
                                                                                                settingsFile(new QSettings(QStringLiteral("FastTrack"), QStringLiteral("FastTrackOrg"), this)) {
   ui->setupUi(this);
   ui->replayDisplay->setAttribute(Qt::WA_Hover);
@@ -61,16 +60,7 @@ Replay::Replay(QWidget* parent, bool standalone, Timeline* slider, VideoReader* 
 
   currentIndex = 0;
 
-  QIcon img;
-  if (isStandalone) {
-    img = QIcon(":/assets/buttons/openImage.png");
-    QAction* openAction = ui->toolBar->addAction(img, tr("&Open"));
-    openAction->setShortcuts(QKeySequence::Open);
-    openAction->setStatusTip(tr("Open a tracked movie"));
-    connect(openAction, &QAction::triggered, this, &Replay::openReplay);
-  }
-
-  img = QIcon(":/assets/buttons/open.png");
+  QIcon img = QIcon(":/assets/buttons/open.png");
   QAction* openTrackingDirAction = ui->toolBar->addAction(img, tr("&Open Tracking_Result directory"));
   openTrackingDirAction->setStatusTip(tr("Open an analysis folder"));
   connect(openTrackingDirAction, &QAction::triggered, this, &Replay::openTrackingDir);
@@ -293,18 +283,10 @@ Replay::Replay(QWidget* parent, bool standalone, Timeline* slider, VideoReader* 
 
   trackingData = new Data();
 
-  // In not standalone mode, the user need to manually connect the slider to the loadFrame
-  // signal to avoid double connections and increase performance.
-  if (!standalone) {
-    delete ui->controls;
-    ui->replaySlider = slider;
-    video = videoReader;
-  }
-  // If standalone create video reader and timeline connections
-  else {
-    video = new VideoReader();
-    connect(ui->replaySlider, &Timeline::valueChanged, this, &Replay::sliderConnection);
-  }
+  // Interactive owns the timeline and video reader, preventing duplicate playback state.
+  delete ui->controls;
+  ui->replaySlider = slider;
+  video = videoReader;
 }
 
 void Replay::sliderConnection(const int index) {
@@ -323,19 +305,6 @@ Replay::~Replay() {
   delete ui;
   delete trackingData;
   delete annotation;
-  if (isStandalone) {
-    delete video;
-  }
-}
-
-/**
- * @brief Opens a dialogue to select a folder.
- */
-void Replay::openReplay() {
-  QString dir = QFileDialog::getOpenFileName(this, tr("Open video file or image from an image sequence"), memoryDir);
-  QApplication::setOverrideCursor(Qt::WaitCursor);
-  loadReplay(dir);
-  QApplication::restoreOverrideCursor();
 }
 
 /**
@@ -387,9 +356,6 @@ void Replay::loadReplay(const QString& dir) {
   try {
     // Gets the paths to all the frames in the folder and puts it in a vector.
     // Setups the ui by setting maximum and minimum of the slider bar.
-    if (isStandalone) {
-      video->open(dir.toStdString());
-    }
     ui->replaySlider->setMinimum(0);
     ui->replaySlider->setMaximum(static_cast<int>(video->getImageCount()) - 1);
     maxIndex = static_cast<int>(video->getImageCount());

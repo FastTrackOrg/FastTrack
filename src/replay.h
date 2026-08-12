@@ -73,7 +73,7 @@ class Replay : public QMainWindow {
   Q_OBJECT
 
  public:
-  explicit Replay(QWidget *parent = nullptr, bool standalone = true, Timeline *slider = nullptr, VideoReader *videoReader = nullptr);
+  explicit Replay(QWidget *parent, Timeline *slider, VideoReader *videoReader);
   Replay(const Replay &T) = delete;
   Replay &operator=(const Replay &T) = delete;
   Replay &operator=(Replay &&T) = delete;
@@ -85,7 +85,6 @@ class Replay : public QMainWindow {
  private:
   Ui::Replay *ui;
   QShortcut *deletedFrameFocus; /*!< Keyboard shortcut to next frame. */
-  bool isStandalone;
   QSettings *settingsFile;
 
   QUndoStack *commandStack;
@@ -114,7 +113,6 @@ class Replay : public QMainWindow {
 
  public slots:
 
-  void openReplay();
   void openTrackingDir();
   void loadReplay(const QString &dir);
   void loadTrackingDir(const QString &dir);

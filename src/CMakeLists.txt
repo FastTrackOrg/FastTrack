@@ -18,7 +18,6 @@ add_executable(fasttrack
     interactive.cpp
     data.cpp
     annotation.cpp
-    trackingmanager.cpp
     videoreader.cpp
     timeline.cpp
     autolevel.cpp
@@ -34,7 +33,6 @@ add_executable(fasttrack
     interactive.h
     data.h
     annotation.h
-    trackingmanager.h
     videoreader.h
     timeline.h
     autolevel.h
@@ -43,7 +41,6 @@ add_executable(fasttrack
 
     mainwindow.ui
     replay.ui
-    trackingmanager.ui
     batch.ui
     interactive.ui
     timeline.ui

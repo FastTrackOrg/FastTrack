@@ -22,9 +22,7 @@ This file is part of Fast Track.
 #include <stdlib.h>
 #include <time.h>
 #include <QAction>
-#include <QActionGroup>
 #include <QDateTime>
-#include <QDesktopServices>
 #include <QDir>
 #include <QDirIterator>
 #include <QElapsedTimer>
@@ -37,7 +35,6 @@ This file is part of Fast Track.
 #include <QMainWindow>
 #include <QMessageBox>
 #include <QMetaType>
-#include <QMimeData>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
@@ -48,12 +45,9 @@ This file is part of Fast Track.
 #include <QScrollBar>
 #include <QSettings>
 #include <QSharedPointer>
-#include <QStandardPaths>
 #include <QString>
-#include <QStyleFactory>
 #include <QTableWidget>
 #include <QTableWidgetItem>
-#include <QTimer>
 #include <QUrl>
 #include <QWidget>
 #include <QtConcurrent/QtConcurrentRun>
@@ -82,10 +76,17 @@ class Interactive : public QMainWindow {
   Interactive &operator=(Interactive &&T) = delete;
   Interactive(Interactive &&T) = delete;
   ~Interactive();
+  void openFolder(QString path = QString());
+  void setReplayVisible(bool visible);
+  bool isReplayVisible() const;
+  void setImageOptionsVisible(bool visible);
+  bool imageOptionsVisible() const;
+  void setTrackingOptionsVisible(bool visible);
+  bool trackingOptionsVisible() const;
+  void setControlOptionsVisible(bool visible);
+  bool controlOptionsVisible() const;
 
  private slots:
-  void openFolder(QString path = QString());
-
   void display(int index, int scale = 0);
   void display(const QImage &image);
   void display(const cv::UMat &image, QImage::Format format = QImage::Format_RGB888);
@@ -112,7 +113,7 @@ class Interactive : public QMainWindow {
  private:
   Ui::Interactive *ui;
   QLabel *counterLabel;
-  QAction *replayAction;
+  bool replayVisible = false;
   QString memoryDir;                  /*!< Saves the path to the last opened folder in dialog. */
   QSize originalImageSize;            /*!< Size of the original image. */
   QSize cropedImageSize;              /*!< Size of the croped image. */
@@ -134,19 +135,12 @@ class Interactive : public QMainWindow {
   bool contourWarningOpen = false;
   int largeContourDisplayDecision = -1;
 
-  QString style;
-  QString color;
-  bool isExpert; /*!< Is FastTrack is in expert mode with advanced capabilities. */
   QSettings *settingsFile;
-
- protected:
-  void dropEvent(QDropEvent *dropEvent) override;
-  void dragEnterEvent(QDragEnterEvent *event) override;
 
  signals:
   void message(QString message);
   void log(QHash<QString, QString> log);
   void status(QString messsage);
-  void modeChanged(bool isSimple);
+  void replayVisibleChanged(bool visible);
 };
 #endif  // INTERACTIVE_H

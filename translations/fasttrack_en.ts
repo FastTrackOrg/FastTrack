@@ -1411,39 +1411,6 @@ hr { height: 1px; border-width: 0; }
     </message>
 </context>
 <context>
-    <name>TrackingManager</name>
-    <message>
-        <location filename="../src/trackingmanager.ui" line="14"/>
-        <source>Form</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/trackingmanager.ui" line="23"/>
-        <source>Log Location</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/trackingmanager.ui" line="31"/>
-        <source>Date</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/trackingmanager.ui" line="36"/>
-        <source>File</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/trackingmanager.ui" line="41"/>
-        <source>Status</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../src/trackingmanager.ui" line="46"/>
-        <source>Elapsed time</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
     <name>Updater</name>
     <message>
         <location filename="../src/updater.cpp" line="80"/>
