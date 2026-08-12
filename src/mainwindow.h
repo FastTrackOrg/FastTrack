@@ -20,19 +20,28 @@ This file is part of Fast Track.
 
 #include <QAction>
 #include <QByteArray>
+#include <QCheckBox>
 #include <QCloseEvent>
+#include <QComboBox>
+#include <QDockWidget>
 #include <QDragEnterEvent>
 #include <QDropEvent>
 #include <QFile>
+#include <QHash>
 #include <QIcon>
+#include <QList>
 #include <QMainWindow>
+#include <QMdiSubWindow>
 #include <QMenu>
 #include <QMessageBox>
-#include <QMdiSubWindow>
 #include <QSettings>
-#include <QSysInfo>
+#include <QSpinBox>
 #include <QSystemTrayIcon>
+#include <QTableWidget>
+#include <QTextEdit>
+#include <QToolBar>
 #include <QUrl>
+#include <QVariant>
 #include "batch.h"
 #include "interactive.h"
 #include "ui_mainwindow.h"
@@ -54,6 +63,7 @@ class MainWindow : public QMainWindow {
   MainWindow &operator=(MainWindow &&T) = delete;
   MainWindow(MainWindow &&T) = delete;
   ~MainWindow();
+
  private:
   Ui::MainWindow *ui; /*!< ui file from Qt designer. */
   void closeEvent(QCloseEvent *event) override;
@@ -62,6 +72,16 @@ class MainWindow : public QMainWindow {
   void openInteractive();
   QMdiSubWindow *newInteractiveWindow();
   QMdiSubWindow *newBatchWindow();
+  void showInteractiveDocks(Interactive *interactive);
+  void saveWorkspaceState(Interactive *interactive);
+  void loadParameterControls(const QHash<QString, QVariant> &state);
+  void applyParameterControls();
+  void showReplayDocks(Interactive *interactive);
+  void loadReplayDisplayControls(Replay *replay);
+  void applyReplayDisplayControls();
+  void updateInformationTable(QTableWidget *table, const QList<QString> &values);
+  Interactive *activeInteractive() const;
+  void updateWorkspaceActions();
   void applyTheme(const QString &theme);
   void refreshContextMenus(QMdiSubWindow *subWindow);
   Updater *updater;
@@ -71,6 +91,29 @@ class MainWindow : public QMainWindow {
   QMenu *helpMenu;
   QMenu *mdiModeMenu;
   QMenu *mdiArrangeMenu;
+  QAction *previewAction;
+  QAction *trackAction;
+  QDockWidget *imageOptionsDock;
+  QDockWidget *trackingOptionsDock;
+  QDockWidget *controlOptionsDock;
+  QHash<QString, QWidget *> parameterControls;
+  QDockWidget *replayDisplayDock;
+  QDockWidget *annotationDock;
+  QDockWidget *informationDock;
+  QComboBox *replayEllipseBox;
+  QComboBox *replayArrowBox;
+  QCheckBox *replayTraceBox;
+  QSpinBox *replayTraceLengthBox;
+  QCheckBox *replayNumbersBox;
+  QSpinBox *replaySizeBox;
+  QSpinBox *replayFpsBox;
+  QLineEdit *annotationFindLine;
+  QTextEdit *annotationEdit;
+  QTableWidget *informationTable1;
+  QTableWidget *informationTable2;
+  QHash<Interactive *, QHash<QString, QVariant>> workspaceStates;
+  QByteArray savedDockState;
+  bool shuttingDown = false;
   QSystemTrayIcon *trayIcon;
   QSettings *settingsFile;
 };

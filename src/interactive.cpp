@@ -41,85 +41,18 @@ This file is part of Fast Track.
 Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
                                             ui(new Ui::Interactive),
                                             video(new VideoReader()),
-                                            videoStatus(false),
-                                            settingsFile(new QSettings(QStringLiteral("FastTrack"), QStringLiteral("FastTrackOrg"), this)) {
+                                            videoStatus(false) {
   ui->setupUi(this);
-  setupParameterWidgets();
-  setupParameterTooltips();
-  setupParameterTabOrder();
-
-  // Loads settings
-  settingsFile->beginGroup(QStringLiteral("interactive"));
-  restoreState(settingsFile->value(QStringLiteral("windowState")).toByteArray());
+  controls = new RuntimeControls;
+  controls->progressBar = ui->trackingProgressBar;
+  parameterValues = {{QStringLiteral("maxArea"), 0}, {QStringLiteral("minArea"), 0}, {QStringLiteral("spot"), 0}, {QStringLiteral("normDist"), 100.0}, {QStringLiteral("normAngle"), 180.0}, {QStringLiteral("maxDist"), 0}, {QStringLiteral("maxTime"), 10}, {QStringLiteral("normArea"), 0.0}, {QStringLiteral("normPerim"), 0.0}, {QStringLiteral("thresh"), 127}, {QStringLiteral("nBack"), 1}, {QStringLiteral("methBack"), 0}, {QStringLiteral("regBack"), 0}, {QStringLiteral("reg"), 0}, {QStringLiteral("morph"), 8}, {QStringLiteral("morphSize"), 0}, {QStringLiteral("morphType"), 2}, {QStringLiteral("lightBack"), 0}, {QStringLiteral("xTop"), 0}, {QStringLiteral("yTop"), 0}, {QStringLiteral("xBottom"), 0}, {QStringLiteral("yBottom"), 0}, {QStringLiteral("startImage"), 0}, {QStringLiteral("stopImage"), 0}, {QStringLiteral("frame"), 0}, {QStringLiteral("displayMode"), 0}};
+  ui->interactiveTab->setFocusPolicy(Qt::NoFocus);
 
   // MetaType
   qRegisterMetaType<QHash<QString, double>>("QHash<QString, double>");
 
-  // DockWidget
-  connect(ui->imageOptions, &QDockWidget::dockLocationChanged, this, [this](Qt::DockWidgetArea area) {
-    switch (area) {
-      case Qt::LeftDockWidgetArea:
-        ui->optionsTab->setTabPosition(QTabWidget::West);
-        break;
-      case Qt::RightDockWidgetArea:
-        ui->optionsTab->setTabPosition(QTabWidget::East);
-        break;
-      case Qt::TopDockWidgetArea:
-        ui->optionsTab->setTabPosition(QTabWidget::South);
-        break;
-      case Qt::BottomDockWidgetArea:
-        ui->optionsTab->setTabPosition(QTabWidget::North);
-        break;
-      default:
-        ui->optionsTab->setTabPosition(QTabWidget::West);
-    }
-  });
-  connect(ui->trackingOptions, &QDockWidget::dockLocationChanged, this, [this](Qt::DockWidgetArea area) {
-    switch (area) {
-      case Qt::LeftDockWidgetArea:
-        ui->trackingTab->setTabPosition(QTabWidget::West);
-        break;
-      case Qt::RightDockWidgetArea:
-        ui->trackingTab->setTabPosition(QTabWidget::East);
-        break;
-      case Qt::TopDockWidgetArea:
-        ui->trackingTab->setTabPosition(QTabWidget::South);
-        break;
-      case Qt::BottomDockWidgetArea:
-        ui->trackingTab->setTabPosition(QTabWidget::North);
-        break;
-      default:
-        ui->optionsTab->setTabPosition(QTabWidget::West);
-    }
-  });
-
-  connect(ui->slider, &Timeline::valueChanged, this, [this](int newValue) {
-    int index = ui->interactiveTab->currentIndex();
-    if (index == 0) {
-      display(newValue);
-    }
-    else if (index == 1) {
-      replay->sliderConnection(newValue);
-    }
-  });
-
   connect(ui->interactiveTab, &QTabWidget::currentChanged, this, [this](int index) {
-    ui->slider->setValue(ui->slider->value());  // Stay on the same frame when changing tab
-    if (index == 0) {                           // Interactive tracking
-      ui->imageOptions->setVisible(true);
-      ui->trackingOptions->setVisible(true);
-      ui->controlOptions->setVisible(true);
-    }
-    else if (index == 1) {  // Replay tab
-      ui->imageOptions->setVisible(false);
-      ui->trackingOptions->setVisible(false);
-      ui->controlOptions->setVisible(true);
-    }
-    else if (index == 2) {  // Analysis tab
-      ui->imageOptions->setVisible(false);
-      ui->trackingOptions->setVisible(false);
-      ui->controlOptions->setVisible(false);
-    }
+    emit activeViewChanged(index == 1 && replayVisible);
   });
 
   connect(this, &Interactive::message, this, [](const QString &msg) {
@@ -130,92 +63,15 @@ Interactive::Interactive(QWidget *parent) : QMainWindow(parent),
     msgBox.exec();
   });
 
-  // Threshold slider and combobox
-  connect(ui->threshSlider, &QSlider::valueChanged, ui->threshBox, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::setValue));
-  connect(ui->threshBox, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), ui->threshSlider, &QSlider::setValue);
-  connect(ui->threshBox, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, [this]() {
-    ui->isBin->setChecked(true);
-    ui->interactiveTab->setCurrentIndex(0);
-    display(ui->slider->value());
-  });
-
-  // Draws scale
-  connect(ui->lo, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, [this](int scale) {
-    display(ui->slider->value(), scale);
-  });
-  connect(ui->maxL, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, [this](int scale) {
-    display(ui->slider->value(), static_cast<int>(scale));
-  });
-
-  // Replay tab
-  replay = new Replay(this, ui->slider, video);
+  replay = new Replay(this, video);
   connect(ui->interactiveTab, &QTabWidget::tabCloseRequested, this, [this](int index) {
     if (index != 0) {
       setReplayVisible(false);
     }
   });
 
-  // Updates the display after each operation
-  connect(ui->morphOperation, static_cast<void (QComboBox::*)(int)>(&QComboBox::activated), this, [this]() {
-    display(ui->slider->value());
-  });
-  connect(ui->kernelSize, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, [this]() {
-    ui->isBin->setChecked(true);
-    display(ui->slider->value());
-  });
-  connect(ui->kernelType, static_cast<void (QComboBox::*)(int)>(&QComboBox::activated), this, [this]() {
-    ui->isBin->setChecked(true);
-    display(ui->slider->value());
-  });
-  connect(ui->minSize, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, [this]() {
-    ui->isBin->setChecked(true);
-    display(ui->slider->value());
-  });
-  connect(ui->maxSize, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, [this]() {
-    ui->isBin->setChecked(true);
-    display(ui->slider->value());
-  });
-  connect(ui->backColor, static_cast<void (QComboBox::*)(int)>(&QComboBox::activated), this, [this]() {
-    ui->isBin->setChecked(true);
-    display(ui->slider->value());
-  });
-  connect(ui->isBin, &QRadioButton::clicked, this, [this]() {
-    display(ui->slider->value());
-  });
-  connect(ui->isOriginal, &QRadioButton::clicked, this, [this]() {
-    display(ui->slider->value());
-  });
-  connect(ui->isSub, &QRadioButton::clicked, this, [this]() {
-    display(ui->slider->value());
-  });
-
-  // Set the image preview limits
-  connect(ui->startImage, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, [this](int startImage) {
-    ui->stopImage->setRange(0, static_cast<int>(video->getImageCount()) - startImage);
-  });
-
   // Events filter to select ROI
   ui->display->installEventFilter(this);
-
-  // Buttons connects
-  ui->previewButton->setDisabled(true);
-  ui->trackButton->setDisabled(true);
-  connect(ui->backgroundSelectButton, &QPushButton::clicked, this, &Interactive::selectBackground);
-  connect(ui->backgroundComputeButton, &QPushButton::clicked, this, &Interactive::computeBackground);
-  connect(ui->previewButton, &QPushButton::clicked, this, &Interactive::previewTracking);
-  connect(ui->trackButton, &QPushButton::clicked, this, [this]() {
-    QMessageBox::StandardButton reply;
-    reply = QMessageBox::question(this, tr("Confirmation"), tr("You are going to start a full tracking analysis. That can take some time, are you sure?"), QMessageBox::Yes | QMessageBox::No);
-    if (reply == QMessageBox::Yes) {
-      track();
-    }
-  });
-  connect(ui->cropButton, &QPushButton::clicked, this, &Interactive::crop);
-  connect(ui->resetButton, &QPushButton::clicked, this, &Interactive::reset);
-  connect(ui->levelButton, &QPushButton::clicked, this, &Interactive::level);
-
-  // Sets information table
-  ui->informationTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
   isBackground = false;
 
@@ -252,120 +108,127 @@ void Interactive::setReplayVisible(bool visible) {
   emit replayVisibleChanged(visible);
 }
 
+QHash<QString, QVariant> Interactive::parameterState() const {
+  return parameterValues;
+}
+
+void Interactive::setParameterState(const QHash<QString, QVariant> &state) {
+  if (state.isEmpty()) {
+    return;
+  }
+
+  QScopedValueRollback<bool> applying(applyingParameterState, true);
+  for (auto it = state.cbegin(); it != state.cend(); ++it) {
+    parameterValues.insert(it.key(), it.value());
+  }
+  display(parameterInt(QStringLiteral("frame")));
+}
+
+Replay *Interactive::replayWidget() const {
+  return replay;
+}
+
+void Interactive::preview() {
+  previewTracking();
+}
+
+void Interactive::startTracking() {
+  if (QMessageBox::question(this,
+                            tr("Confirmation"),
+                            tr("You are going to start a full tracking analysis. That can take some time, are you sure?"),
+                            QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
+    track();
+  }
+}
+
+void Interactive::computeWorkspaceBackground() {
+  computeBackground();
+}
+
+void Interactive::selectWorkspaceBackground() {
+  selectBackground();
+}
+
+void Interactive::cropWorkspace() {
+  crop();
+}
+
+void Interactive::resetWorkspaceCrop() {
+  reset();
+}
+
+void Interactive::levelWorkspaceParameters() {
+  level();
+}
+
+bool Interactive::canPreview() const {
+  return trackingAvailable;
+}
+
+bool Interactive::canTrack() const {
+  return trackingAvailable;
+}
+
 bool Interactive::isReplayVisible() const {
   return replayVisible;
 }
 
-void Interactive::setImageOptionsVisible(bool visible) {
-  ui->imageOptions->setVisible(visible);
+bool Interactive::isReplayActive() const {
+  return replayVisible && ui->interactiveTab->currentIndex() == 1;
 }
 
-bool Interactive::imageOptionsVisible() const {
-  return ui->imageOptions->isVisible();
+int Interactive::frameCount() const {
+  return video->isOpened() ? static_cast<int>(video->getImageCount()) : 0;
 }
 
-void Interactive::setTrackingOptionsVisible(bool visible) {
-  ui->trackingOptions->setVisible(visible);
+QList<QString> Interactive::informationValues() const {
+  return informationValuesState;
 }
 
-bool Interactive::trackingOptionsVisible() const {
-  return ui->trackingOptions->isVisible();
+QString Interactive::trackingStatusText() const {
+  return trackingStatusState;
 }
 
-void Interactive::setControlOptionsVisible(bool visible) {
-  ui->controlOptions->setVisible(visible);
+void Interactive::setTrackingAvailable(bool available) {
+  trackingAvailable = available;
+  emit trackingAvailabilityChanged();
 }
 
-bool Interactive::controlOptionsVisible() const {
-  return ui->controlOptions->isVisible();
+int Interactive::parameterInt(const QString &name) const {
+  return parameterValues.value(name).toInt();
 }
 
-void Interactive::setupParameterTabOrder() {
-  QWidget::setTabOrder(ui->back, ui->nBack);
-  QWidget::setTabOrder(ui->nBack, ui->registrationBack);
-  QWidget::setTabOrder(ui->registrationBack, ui->backgroundComputeButton);
-  QWidget::setTabOrder(ui->backgroundComputeButton, ui->backgroundSelectButton);
-  QWidget::setTabOrder(ui->backgroundSelectButton, ui->backColor);
-  QWidget::setTabOrder(ui->backColor, ui->threshSlider);
-  QWidget::setTabOrder(ui->threshSlider, ui->threshBox);
-  QWidget::setTabOrder(ui->threshBox, ui->maxSize);
-  QWidget::setTabOrder(ui->maxSize, ui->minSize);
-  QWidget::setTabOrder(ui->minSize, ui->x1);
-  QWidget::setTabOrder(ui->x1, ui->y1);
-  QWidget::setTabOrder(ui->y1, ui->x2);
-  QWidget::setTabOrder(ui->x2, ui->y2);
-  QWidget::setTabOrder(ui->y2, ui->cropButton);
-  QWidget::setTabOrder(ui->cropButton, ui->resetButton);
-  QWidget::setTabOrder(ui->resetButton, ui->reg);
-  QWidget::setTabOrder(ui->reg, ui->kernelSize);
-  QWidget::setTabOrder(ui->kernelSize, ui->morphOperation);
-  QWidget::setTabOrder(ui->morphOperation, ui->kernelType);
-  QWidget::setTabOrder(ui->kernelType, ui->to);
-  QWidget::setTabOrder(ui->to, ui->lo);
-  QWidget::setTabOrder(ui->lo, ui->spot);
-  QWidget::setTabOrder(ui->spot, ui->levelButton);
-  QWidget::setTabOrder(ui->levelButton, ui->maxL);
-  QWidget::setTabOrder(ui->maxL, ui->maxT);
-  QWidget::setTabOrder(ui->maxT, ui->normArea);
-  QWidget::setTabOrder(ui->normArea, ui->normPerim);
-  QWidget::setTabOrder(ui->normPerim, ui->startImage);
-  QWidget::setTabOrder(ui->startImage, ui->stopImage);
-  QWidget::setTabOrder(ui->stopImage, ui->previewButton);
-  QWidget::setTabOrder(ui->previewButton, ui->trackButton);
+double Interactive::parameterDouble(const QString &name) const {
+  return parameterValues.value(name).toDouble();
 }
 
-void Interactive::setupParameterWidgets() {
-  ui->nBack->setSuffix(QStringLiteral(" frames"));
-  ui->to->setSuffix(QStringLiteral(" frames"));
-  ui->lo->setSuffix(QStringLiteral(" px"));
-  ui->maxL->setSuffix(QStringLiteral(" px"));
-  ui->maxT->setSuffix(QStringLiteral(" °"));
-  ui->normArea->setSuffix(QStringLiteral(" px²"));
-  ui->normPerim->setSuffix(QStringLiteral(" px"));
-  ui->maxSize->setSuffix(QStringLiteral(" px²"));
-  ui->minSize->setSuffix(QStringLiteral(" px²"));
-  ui->x1->setSuffix(QStringLiteral(" px"));
-  ui->y1->setSuffix(QStringLiteral(" px"));
-  ui->x2->setSuffix(QStringLiteral(" px"));
-  ui->y2->setSuffix(QStringLiteral(" px"));
-  ui->kernelSize->setSuffix(QStringLiteral(" px"));
-  ui->startImage->setSuffix(QStringLiteral(" frame"));
-  ui->stopImage->setSuffix(QStringLiteral(" frames"));
+void Interactive::setParameter(const QString &name, const QVariant &value) {
+  if (parameterValues.value(name) == value) {
+    return;
+  }
+  parameterValues.insert(name, value);
+  notifyParameterStateChanged();
 }
 
-void Interactive::setupParameterTooltips() {
-  ui->back->setToolTip(tr("Background aggregation method used to compute the reference image."));
-  ui->nBack->setToolTip(tr("Number of frames used to compute the background."));
-  ui->registrationBack->setToolTip(tr("Registration method applied before combining frames for the background."));
-  ui->backgroundComputeButton->setToolTip(tr("Compute a background image from the current sequence."));
-  ui->backgroundSelectButton->setToolTip(tr("Load an existing background image from disk."));
-  ui->backColor->setToolTip(tr("Choose whether tracked objects are darker or lighter than the background."));
-  ui->threshSlider->setToolTip(tr("Binary threshold applied after background subtraction."));
-  ui->threshBox->setToolTip(tr("Binary threshold applied after background subtraction."));
-  ui->maxSize->setToolTip(tr("Ignore detected objects larger than this area."));
-  ui->minSize->setToolTip(tr("Ignore detected objects smaller than this area."));
-  ui->x1->setToolTip(tr("Horizontal coordinate of the ROI top corner."));
-  ui->y1->setToolTip(tr("Vertical coordinate of the ROI top corner."));
-  ui->x2->setToolTip(tr("Horizontal coordinate of the ROI bottom corner."));
-  ui->y2->setToolTip(tr("Vertical coordinate of the ROI bottom corner."));
-  ui->cropButton->setToolTip(tr("Apply the region of interest to the current sequence."));
-  ui->resetButton->setToolTip(tr("Reset the region of interest to the full image."));
-  ui->reg->setToolTip(tr("Registration method applied between frames during tracking."));
-  ui->kernelSize->setToolTip(tr("Kernel size used for the morphological operation."));
-  ui->morphOperation->setToolTip(tr("Morphological operation applied to the binary image."));
-  ui->kernelType->setToolTip(tr("Shape of the kernel used for the morphological operation."));
-  ui->to->setToolTip(tr("Maximum number of consecutive frames an object can be missing before a new ID is created."));
-  ui->lo->setToolTip(tr("Maximum allowed travel distance between two consecutive frames before a new ID is created."));
-  ui->spot->setToolTip(tr("Body point used to compute distance and angle during tracking."));
-  ui->levelButton->setToolTip(tr("Set neutral normalization values as a starting point for manual tuning."));
-  ui->maxL->setToolTip(tr("Distance normalization factor used in the assignment cost."));
-  ui->maxT->setToolTip(tr("Angle normalization factor used in the assignment cost."));
-  ui->normArea->setToolTip(tr("Area normalization factor used in the assignment cost. Set to 0 to disable area weighting."));
-  ui->normPerim->setToolTip(tr("Perimeter normalization factor used in the assignment cost. Set to 0 to disable perimeter weighting."));
-  ui->startImage->setToolTip(tr("First frame included in the preview tracking run."));
-  ui->stopImage->setToolTip(tr("Number of frames included in the preview tracking run."));
-  ui->previewButton->setToolTip(tr("Run tracking only on the selected preview range."));
-  ui->trackButton->setToolTip(tr("Run the full tracking analysis on the whole sequence."));
+void Interactive::notifyParameterStateChanged() {
+  if (!applyingParameterState) {
+    emit parameterStateChanged(parameterState());
+  }
+}
+
+void Interactive::updateProgressEstimate(int value) {
+  controls->progressBar->setValue(value);
+  const int completed = value - controls->progressBar->minimum() + 1;
+  const int total = controls->progressBar->maximum() - controls->progressBar->minimum() + 1;
+  if (completed <= 0 || total <= 0 || !trackingElapsed.isValid()) {
+    return;
+  }
+  const qint64 remainingMs = trackingElapsed.elapsed() * (total - completed) / completed;
+  const qint64 remainingSeconds = qMax<qint64>(0, remainingMs / 1000);
+  const QString remaining = QStringLiteral("%1:%2")
+                                .arg(remainingSeconds / 60, 2, 10, QLatin1Char('0'))
+                                .arg(remainingSeconds % 60, 2, 10, QLatin1Char('0'));
+  controls->progressBar->setFormat(tr("%p% - %1 remaining").arg(remaining));
 }
 
 /**
@@ -374,8 +237,8 @@ void Interactive::setupParameterTooltips() {
 void Interactive::openFolder(QString path) {
   // Resets the class members
   setReplayVisible(false);
+  videoStatus = false;
   isBackground = false;
-  ui->interactiveTab->removeTab(1);
   memoryDir.clear();
   backgroundPath.clear();
   background.release();
@@ -384,12 +247,7 @@ void Interactive::openFolder(QString path) {
   ui->display->clear();
   video->release();
   replay->clear();
-  ui->backgroundProgressBar->setValue(0);
-  ui->isBin->setCheckable(false);
-  ui->isSub->setCheckable(false);
-  ui->isOriginal->setChecked(true);
-  ui->backgroundStatus->setText(tr("No background selected"));
-  ui->backgroundStatus->setStyleSheet(QStringLiteral("background: red; color: white;"));
+  parameterValues.insert(QStringLiteral("displayMode"), 0);
 
   if (path.isEmpty()) {
     dir = QFileDialog::getOpenFileName(this, tr("Open File"), memoryDir);
@@ -405,15 +263,11 @@ void Interactive::openFolder(QString path) {
     try {
       memoryDir = dir;
       video->open(dir.toStdString());
-      ui->slider->setMinimum(0);
-      ui->slider->setMaximum(static_cast<int>(video->getImageCount()) - 1);
-      ui->previewButton->setDisabled(true);
-      ui->trackButton->setDisabled(true);
-      ui->trackingStatus->setText(tr("Compute the background to continue"));
-      ui->nBack->setMaximum(static_cast<int>(video->getImageCount()));
-      ui->nBack->setValue(static_cast<int>(video->getImageCount()));
-      ui->startImage->setRange(0, static_cast<int>(video->getImageCount()) - 1);
-      ui->startImage->setValue(0);
+      setTrackingAvailable(false);
+      trackingStatusState = tr("Compute the background to continue");
+      parameterValues.insert(QStringLiteral("nBack"), static_cast<int>(video->getImageCount()));
+      parameterValues.insert(QStringLiteral("startImage"), 0);
+      parameterValues.insert(QStringLiteral("stopImage"), static_cast<int>(video->getImageCount()));
 
       Mat frame;
       video->getImage(0, frame);
@@ -422,16 +276,11 @@ void Interactive::openFolder(QString path) {
       originalImageSize.setHeight(frame.rows);
       cropedImageSize.setWidth(originalImageSize.width());
       cropedImageSize.setHeight(originalImageSize.height());
-      ui->x1->setMaximum(originalImageSize.width());
-      ui->y1->setMaximum(originalImageSize.height());
-      ui->x2->setMaximum(originalImageSize.width());
-      ui->y2->setMaximum(originalImageSize.height());
 
-      // Need to be changed for traduction
-      ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems(QStringLiteral("Path"), Qt::MatchExactly).at(0)), 1)->setText(dir);
-      ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems(QStringLiteral("Image number"), Qt::MatchExactly).at(0)), 1)->setText(QString::number(video->getImageCount()));
-      ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems(QStringLiteral("Image width"), Qt::MatchExactly).at(0)), 1)->setText(QString::number(frame.cols));
-      ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems(QStringLiteral("Image height"), Qt::MatchExactly).at(0)), 1)->setText(QString::number(frame.rows));
+      informationValuesState[0] = dir;
+      informationValuesState[1] = QString::number(video->getImageCount());
+      informationValuesState[2] = QString::number(frame.cols);
+      informationValuesState[3] = QString::number(frame.rows);
 
       isBackground = false;
       reset();
@@ -454,9 +303,19 @@ void Interactive::openFolder(QString path) {
       }
       if (QFileInfo::exists(cfgFile)) {
         loadParameters(cfgFile);
+
+        const QString savedBackground = QFileInfo(cfgFile).absoluteDir().filePath(QStringLiteral("background.pgm"));
+        imread(savedBackground.toStdString(), IMREAD_GRAYSCALE | IMREAD_ANYDEPTH).copyTo(background);
+        if (!background.empty() && background.cols == originalImageSize.width() && background.rows == originalImageSize.height()) {
+          backgroundPath = savedBackground;
+          isBackground = true;
+          setTrackingAvailable(true);
+          trackingStatusState.clear();
+        }
       }
       if (video->isOpened()) {
         videoStatus = true;
+        emit inputOpened(QFileInfo(dir).absoluteFilePath());
       }
       display(0);
       ui->display->fitToView();
@@ -464,11 +323,7 @@ void Interactive::openFolder(QString path) {
     }
     // If an error occurs during the opening, resets the information table and warns the user
     catch (exception &e) {
-      // Need to be changed for traduction
-      ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems(QStringLiteral("Path"), Qt::MatchExactly).at(0)), 1)->setText(QLatin1String(""));
-      ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems(QStringLiteral("Image number"), Qt::MatchExactly).at(0)), 1)->setText(QStringLiteral("0"));
-      ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems(QStringLiteral("Image width"), Qt::MatchExactly).at(0)), 1)->setText(QStringLiteral("0"));
-      ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems(QStringLiteral("Image height"), Qt::MatchExactly).at(0)), 1)->setText(QStringLiteral("0"));
+      informationValuesState = {QString(), QStringLiteral("0"), QStringLiteral("0"), QStringLiteral("0"), QStringLiteral("0")};
       qWarning() << QString::fromStdString(e.what()) << "occurs during opening of " << dir;
       emit message(tr("No image found."));
     }
@@ -494,24 +349,25 @@ void Interactive::display(int index, int scale) {
 
   try {
     // Computes the image with the background subtracted
-    if (ui->isSub->isChecked() && isBackground) {
-      (ui->backColor->currentText() == QLatin1String("Light background")) ? (subtract(background, frame, frame)) : (subtract(frame, background, frame));
+    if (parameterInt(QStringLiteral("displayMode")) == 1 && isBackground) {
+      (parameterInt(QStringLiteral("lightBack")) == 0) ? (subtract(background, frame, frame)) : (subtract(frame, background, frame));
       cvtColor(frame, frame, COLOR_GRAY2RGB);
     }
     // Computes the binary image an applies morphological operations
-    else if (ui->isBin->isChecked() && isBackground) {
-      (ui->backColor->currentText() == QLatin1String("Light background")) ? (subtract(background, frame, frame)) : (subtract(frame, background, frame));
-      Tracking::binarisation(frame, 'b', ui->threshBox->value());
-      if (ui->morphOperation->currentIndex() != 8) {
-        Mat element = getStructuringElement(ui->kernelType->currentIndex(), Size(2 * ui->kernelSize->value() + 1, 2 * ui->kernelSize->value() + 1), Point(ui->kernelSize->value(), ui->kernelSize->value()));
-        morphologyEx(frame, frame, ui->morphOperation->currentIndex(), element);  // MorphTypes enum and QComboBox indexes have to match
+    else if (parameterInt(QStringLiteral("displayMode")) == 2 && isBackground) {
+      (parameterInt(QStringLiteral("lightBack")) == 0) ? (subtract(background, frame, frame)) : (subtract(frame, background, frame));
+      Tracking::binarisation(frame, 'b', parameterInt(QStringLiteral("thresh")));
+      if (parameterInt(QStringLiteral("morph")) != 8) {
+        const int morphSize = parameterInt(QStringLiteral("morphSize"));
+        Mat element = getStructuringElement(parameterInt(QStringLiteral("morphType")), Size(2 * morphSize + 1, 2 * morphSize + 1), Point(morphSize, morphSize));
+        morphologyEx(frame, frame, parameterInt(QStringLiteral("morph")), element);
       }
 
       vector<vector<Point>> contours;
       findContours(frame, contours, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
 
-      double min = ui->minSize->value();
-      double max = ui->maxSize->value();
+      double min = parameterDouble(QStringLiteral("minArea"));
+      double max = parameterDouble(QStringLiteral("maxArea"));
 
       // If too many contours are detected to be displayed without slowdowns, ask the user what to do
       if (contours.size() > 10000) {
@@ -607,18 +463,15 @@ void Interactive::display(const UMat &image, QImage::Format format) {
 }
 
 /**
- * @brief Computes and displays the background image in the display. Triggered when the backgroundComputeButton is clicked.
+ * @brief Computes and displays the background image in the display.
  */
 void Interactive::computeBackground() {
   if (videoStatus) {
     // Before compute background process
-    int nBack = ui->nBack->value();
-    int method = ui->back->currentIndex();
-    int registrationMethod = ui->registrationBack->currentIndex();
+    int nBack = parameterInt(QStringLiteral("nBack"));
+    int method = parameterInt(QStringLiteral("methBack"));
+    int registrationMethod = parameterInt(QStringLiteral("regBack"));
     const string videoPath = memoryDir.toStdString();
-    ui->backgroundProgressBar->setValue(0);
-    ui->backgroundProgressBar->setMaximum(0);
-    ui->backgroundComputeButton->setEnabled(false);
     QApplication::setOverrideCursor(Qt::WaitCursor);
     this->setEnabled(false);
 
@@ -628,36 +481,20 @@ void Interactive::computeBackground() {
       background = watcher->result().clone();  // Clone needed for Windows otherwise no initial display and ui buggued afterward, why if UMat is a smartpointer?
       if (!background.empty()) {
         isBackground = true;
-        ui->isBin->setCheckable(true);
-        ui->isSub->setCheckable(true);
-
         // Automatic background type selection based on the image mean
         int meanValue = int(mean(background)[0]);
-        if (meanValue > 128) {
-          ui->backColor->setCurrentIndex(0);
-        }
-        else {
-          ui->backColor->setCurrentIndex(1);
-        }
+        parameterValues.insert(QStringLiteral("lightBack"), meanValue > 128 ? 0 : 1);
 
         ui->interactiveTab->setCurrentIndex(0);
-        ui->previewButton->setDisabled(false);
-        ui->trackButton->setDisabled(false);
-        ui->backgroundStatus->setText(tr("Using COMPUTED background"));
-        ui->backgroundStatus->setStyleSheet(QStringLiteral("background: green; color: white;"));
-        ui->trackingStatus->setText(QStringLiteral());
+        setTrackingAvailable(true);
+        trackingStatusState.clear();
         display(background, QImage::Format_Grayscale8);
       }
       else {
         isBackground = false;
-        ui->isBin->setCheckable(false);
-        ui->isSub->setCheckable(false);
-        ui->previewButton->setDisabled(true);
-        ui->trackButton->setDisabled(true);
+        parameterValues.insert(QStringLiteral("displayMode"), 0);
+        setTrackingAvailable(false);
       }
-      ui->backgroundProgressBar->setMaximum(1);
-      ui->backgroundProgressBar->setValue(1);
-      ui->backgroundComputeButton->setDisabled(false);
       this->setEnabled(true);
       QApplication::restoreOverrideCursor();
       watcher->deleteLater();
@@ -688,7 +525,7 @@ void Interactive::computeBackground() {
 }
 
 /**
- * @brief Opens a dialogue to select a background image. Triggered when ui->backgroundSelectButton is pressed.
+ * @brief Opens a dialogue to select a background image.
  */
 void Interactive::selectBackground() {
   QString dir = QFileDialog::getOpenFileName(this, tr("Open Background Image"), memoryDir);
@@ -699,22 +536,12 @@ void Interactive::selectBackground() {
     if (background.cols == originalImageSize.width() && background.rows == originalImageSize.height()) {
       isBackground = true;
 
-      ui->isBin->setCheckable(true);
-      ui->isSub->setCheckable(true);
-      ui->previewButton->setDisabled(false);
-      ui->trackButton->setDisabled(false);
-      ui->backgroundStatus->setText(tr("Using %1 as background").arg(dir));
-      ui->backgroundStatus->setStyleSheet(QStringLiteral("background: green; color: white;"));
-      ui->trackingStatus->setText(QStringLiteral());
+      setTrackingAvailable(true);
+      trackingStatusState.clear();
 
       // Automatic background type selection based on image mean
       int meanValue = int(mean(background)[0]);
-      if (meanValue > 128) {
-        ui->backColor->setCurrentIndex(0);
-      }
-      else {
-        ui->backColor->setCurrentIndex(1);
-      }
+      parameterValues.insert(QStringLiteral("lightBack"), meanValue > 128 ? 0 : 1);
 
       display(background, QImage::Format_Grayscale8);
     }
@@ -729,64 +556,51 @@ void Interactive::selectBackground() {
  * @brief Gets all the tracking parameters from the ui and updates the parameter map that will be passed to the tracking object.
  */
 void Interactive::getParameters() {
-  parameters.insert(QStringLiteral("maxArea"), QString::number(ui->maxSize->value()));
-  parameters.insert(QStringLiteral("minArea"), QString::number(ui->minSize->value()));
-  parameters.insert(QStringLiteral("spot"), QString::number(ui->spot->currentIndex()));
-  parameters.insert(QStringLiteral("normDist"), QString::number(ui->maxL->value()));
-  parameters.insert(QStringLiteral("normAngle"), QString::number(ui->maxT->value()));
-  parameters.insert(QStringLiteral("maxDist"), QString::number(ui->lo->value()));
-  parameters.insert(QStringLiteral("maxTime"), QString::number(ui->to->value()));
-  parameters.insert(QStringLiteral("normArea"), QString::number(ui->normArea->value()));
-  parameters.insert(QStringLiteral("normPerim"), QString::number(ui->normPerim->value()));
-
-  parameters.insert(QStringLiteral("thresh"), QString::number(ui->threshBox->value()));
-  parameters.insert(QStringLiteral("nBack"), QString::number(ui->nBack->value()));
-  parameters.insert(QStringLiteral("methBack"), QString::number(ui->back->currentIndex()));
-  parameters.insert(QStringLiteral("regBack"), QString::number(ui->registrationBack->currentIndex()));
+  for (auto it = parameterValues.cbegin(); it != parameterValues.cend(); ++it) {
+    parameters.insert(it.key(), it.value().toString());
+  }
   parameters.insert(QStringLiteral("xTop"), QString::number(roi.tl().x));
   parameters.insert(QStringLiteral("yTop"), QString::number(roi.tl().y));
   parameters.insert(QStringLiteral("xBottom"), QString::number(roi.br().x));
   parameters.insert(QStringLiteral("yBottom"), QString::number(roi.br().y));
-  parameters.insert(QStringLiteral("reg"), QString::number(ui->reg->currentIndex()));
-  parameters.insert(QStringLiteral("morph"), QString::number(ui->morphOperation->currentIndex()));
-  parameters.insert(QStringLiteral("morphSize"), QString::number(ui->kernelSize->value()));
-  parameters.insert(QStringLiteral("morphType"), QString::number(ui->kernelType->currentIndex()));
-  parameters.insert(QStringLiteral("lightBack"), QString::number(ui->backColor->currentIndex()));
 }
 
 /**
- * @brief Does a tracking analysis on a sub-part of the image sequence defined by the user. Triggered when previewButton is clicked.
+ * @brief Does a tracking analysis on a sub-part of the image sequence.
  */
 void Interactive::previewTracking() {
   if (videoStatus) {
-    ui->progressBar->setRange(ui->startImage->value(), ui->stopImage->value() + ui->startImage->value() - 1);
-    ui->progressBar->setValue(0);
-    ui->previewButton->setDisabled(true);
-    ui->trackButton->setDisabled(true);
+    const int startImage = parameterInt(QStringLiteral("startImage"));
+    const int stopImage = parameterInt(QStringLiteral("stopImage"));
+    controls->progressBar->setRange(startImage, startImage + stopImage - 1);
+    controls->progressBar->setValue(0);
+    controls->progressBar->setFormat(tr("%p% - estimating..."));
+    trackingElapsed.start();
+    setTrackingAvailable(false);
     setReplayVisible(false);
     replay->clear();  // Avoid mixing 2 subsequent analysy
 
     QThread *thread = new QThread;
-    Tracking *tracking = new Tracking(memoryDir.toStdString(), background, ui->startImage->value(), ui->startImage->value() + ui->stopImage->value());
+    Tracking *tracking = new Tracking(memoryDir.toStdString(), background, startImage, startImage + stopImage);
     tracking->moveToThread(thread);
 
     connect(thread, &QThread::started, tracking, &Tracking::startProcess);
-    connect(tracking, &Tracking::progress, ui->progressBar, &QProgressBar::setValue);
-    connect(tracking, &Tracking::statistic, this, [this](int time) {
-      // Need to be changed for traduction
-      ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems(QStringLiteral("Analysis rate"), Qt::MatchExactly).at(0)), 1)->setText(QString::number(double(ui->stopImage->value() * 1000) / double(time)));
+    connect(tracking, &Tracking::progress, this, &Interactive::updateProgressEstimate);
+    connect(tracking, &Tracking::statistic, this, [this, stopImage](int time) {
+      informationValuesState[4] = QString::number(double(stopImage * 1000) / double(time));
     });
     connect(tracking, &Tracking::finished, this, [this]() {
-      ui->slider->setDisabled(false);
-      ui->previewButton->setDisabled(false);
-      ui->trackButton->setDisabled(false);
+      controls->progressBar->setValue(controls->progressBar->maximum());
+      controls->progressBar->setFormat(tr("Done"));
+      emit timelineEnabledChanged(true);
+      setTrackingAvailable(true);
       replay->loadReplay(dir);
       setReplayVisible(true);
     });
     connect(tracking, &Tracking::forceFinished, this, [this](const QString &errorMessage) {
-      ui->slider->setDisabled(false);
-      ui->previewButton->setDisabled(false);
-      ui->trackButton->setDisabled(false);
+      controls->progressBar->setFormat(tr("Stopped"));
+      emit timelineEnabledChanged(true);
+      setTrackingAvailable(true);
       replay->loadReplay(dir);
       setReplayVisible(true);
       emit message(errorMessage);
@@ -800,19 +614,20 @@ void Interactive::previewTracking() {
     tracking->updatingParameters(parameters);
     thread->start();
 
-    ui->slider->setDisabled(true);
+    emit timelineEnabledChanged(false);
   }
 }
 
 /**
- * @brief Does a tracking analysis. Triggered when the trackButton is clicked.
+ * @brief Does a full tracking analysis.
  */
 void Interactive::track() {
   if (videoStatus) {
-    ui->progressBar->setRange(0, static_cast<int>(video->getImageCount()) - 1);
-    ui->progressBar->setValue(0);
-    ui->previewButton->setDisabled(true);
-    ui->trackButton->setDisabled(true);
+    controls->progressBar->setRange(0, static_cast<int>(video->getImageCount()) - 1);
+    controls->progressBar->setValue(0);
+    controls->progressBar->setFormat(tr("%p% - estimating..."));
+    trackingElapsed.start();
+    setTrackingAvailable(false);
     setReplayVisible(false);
     replay->clear();  // Avoid mixing 2 subsequent analysy
 
@@ -824,16 +639,15 @@ void Interactive::track() {
     tracking->moveToThread(thread);
 
     connect(thread, &QThread::started, tracking, &Tracking::startProcess);
-    connect(tracking, &Tracking::progress, ui->progressBar, &QProgressBar::setValue);
+    connect(tracking, &Tracking::progress, this, &Interactive::updateProgressEstimate);
     connect(tracking, &Tracking::statistic, this, [this, logMap](int time) {
-      // Need to be changed for traduction
-      ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems(QStringLiteral("Analysis rate"), Qt::MatchExactly).at(0)), 1)->setText(QString::number(double(video->getImageCount() * 1000) / double(time)));
+      informationValuesState[4] = QString::number(double(video->getImageCount() * 1000) / double(time));
       logMap->insert(QStringLiteral("time"), QString::number(time));
     });
     connect(tracking, &Tracking::forceFinished, this, [this, logMap](const QString &errorMessage) {
-      ui->slider->setDisabled(false);
-      ui->previewButton->setDisabled(false);
-      ui->trackButton->setDisabled(false);
+      controls->progressBar->setFormat(tr("Stopped"));
+      emit timelineEnabledChanged(true);
+      setTrackingAvailable(true);
       replay->loadReplay(dir);
       setReplayVisible(true);
       logMap->insert(QStringLiteral("status"), errorMessage);
@@ -843,9 +657,10 @@ void Interactive::track() {
     });
     connect(tracking, &Tracking::finished, thread, &QThread::quit);
     connect(tracking, &Tracking::finished, this, [this, logMap]() {
-      ui->slider->setDisabled(false);
-      ui->previewButton->setDisabled(false);
-      ui->trackButton->setDisabled(false);
+      controls->progressBar->setValue(controls->progressBar->maximum());
+      controls->progressBar->setFormat(tr("Done"));
+      emit timelineEnabledChanged(true);
+      setTrackingAvailable(true);
       replay->loadReplay(dir);
       setReplayVisible(true);
       logMap->insert(QStringLiteral("status"), QStringLiteral("Done"));
@@ -861,7 +676,7 @@ void Interactive::track() {
     tracking->updatingParameters(parameters);
     thread->start();
 
-    ui->slider->setDisabled(true);
+    emit timelineEnabledChanged(false);
   }
 }
 
@@ -913,10 +728,11 @@ bool Interactive::eventFilter(QObject *target, QEvent *event) {
           xBottom -= width;
         }
         // Converts clicks from display widget frame of reference to original image frame of reference
-        ui->x1->setValue(xTop + roi.tl().x);
-        ui->y1->setValue(yTop + roi.tl().y);
-        ui->x2->setValue(xBottom + roi.tl().x);
-        ui->y2->setValue(yBottom + roi.tl().y);
+        parameterValues.insert(QStringLiteral("xTop"), xTop + roi.tl().x);
+        parameterValues.insert(QStringLiteral("yTop"), yTop + roi.tl().y);
+        parameterValues.insert(QStringLiteral("xBottom"), xBottom + roi.tl().x);
+        parameterValues.insert(QStringLiteral("yBottom"), yBottom + roi.tl().y);
+        notifyParameterStateChanged();
       }
     }
   }
@@ -927,10 +743,10 @@ bool Interactive::eventFilter(QObject *target, QEvent *event) {
  * @brief Crops the image from a rectangle drawed by the user with the mouse on the display. Triggered when the QPushButton ui->crop is clicked.
  */
 void Interactive::crop() {
-  int xTop = ui->x1->value();
-  int yTop = ui->y1->value();
-  int xBottom = ui->x2->value();
-  int yBottom = ui->y2->value();
+  int xTop = parameterInt(QStringLiteral("xTop"));
+  int yTop = parameterInt(QStringLiteral("yTop"));
+  int xBottom = parameterInt(QStringLiteral("xBottom"));
+  int yBottom = parameterInt(QStringLiteral("yBottom"));
 
   // Checks for wrong values
   int width = xBottom - xTop;
@@ -943,20 +759,15 @@ void Interactive::crop() {
   roi = Rect(xTop, yTop, width, height);
   cropedImageSize.setWidth(roi.width);
   cropedImageSize.setHeight(roi.height);
-  // Need to be changed for traduction
-  ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems(QStringLiteral("Image width"), Qt::MatchExactly).at(0)), 1)->setText(QString::number(roi.width));
-  ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems(QStringLiteral("Image height"), Qt::MatchExactly).at(0)), 1)->setText(QString::number(roi.height));
-  display(ui->slider->value());
+  informationValuesState[2] = QString::number(roi.width);
+  informationValuesState[3] = QString::number(roi.height);
+  display(parameterInt(QStringLiteral("frame")));
 
-  // Sets the roi limits
-  ui->x1->setMaximum(roi.tl().x + roi.width);
-  ui->y1->setMaximum(roi.tl().y + roi.height);
-  ui->x2->setMaximum(roi.tl().x + roi.width);
-  ui->y2->setMaximum(roi.tl().y + roi.height);
-  ui->x1->setMinimum(roi.tl().x);
-  ui->y1->setMinimum(roi.tl().y);
-  ui->x2->setMinimum(roi.tl().x);
-  ui->y2->setMinimum(roi.tl().y);
+  parameterValues.insert(QStringLiteral("xTop"), roi.tl().x);
+  parameterValues.insert(QStringLiteral("yTop"), roi.tl().y);
+  parameterValues.insert(QStringLiteral("xBottom"), roi.br().x);
+  parameterValues.insert(QStringLiteral("yBottom"), roi.br().y);
+  notifyParameterStateChanged();
 
   ui->display->setRectangle(QRect());
 }
@@ -967,24 +778,16 @@ void Interactive::crop() {
 void Interactive::reset() {
   cropedImageSize.setWidth(originalImageSize.width());
   cropedImageSize.setHeight(originalImageSize.height());
-  ui->x1->setMaximum(originalImageSize.width());
-  ui->y1->setMaximum(originalImageSize.height());
-  ui->x2->setMaximum(originalImageSize.width());
-  ui->y2->setMaximum(originalImageSize.height());
-  ui->x1->setMinimum(0);
-  ui->y1->setMinimum(0);
-  ui->x2->setMinimum(0);
-  ui->y2->setMinimum(0);
-  ui->x1->setValue(0);
-  ui->y1->setValue(0);
-  ui->x2->setValue(originalImageSize.width());
-  ui->y2->setValue(originalImageSize.height());
-  // Need to be changed for traduction
-  ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems(QStringLiteral("Image width"), Qt::MatchExactly).at(0)), 1)->setText(QString::number(originalImageSize.width()));
-  ui->informationTable->item(ui->informationTable->row(ui->informationTable->findItems(QStringLiteral("Image height"), Qt::MatchExactly).at(0)), 1)->setText(QString::number(originalImageSize.height()));
+  parameterValues.insert(QStringLiteral("xTop"), 0);
+  parameterValues.insert(QStringLiteral("yTop"), 0);
+  parameterValues.insert(QStringLiteral("xBottom"), originalImageSize.width());
+  parameterValues.insert(QStringLiteral("yBottom"), originalImageSize.height());
+  informationValuesState[2] = QString::number(originalImageSize.width());
+  informationValuesState[3] = QString::number(originalImageSize.height());
   roi = Rect(0, 0, 0, 0);
   ui->display->setRectangle(QRect());
-  display(ui->slider->value());
+  display(parameterInt(QStringLiteral("frame")));
+  notifyParameterStateChanged();
 }
 
 /**
@@ -992,16 +795,9 @@ void Interactive::reset() {
  */
 Interactive::~Interactive() {
   ui->interactiveTab->setCurrentIndex(0);
-  saveSettings();
   delete video;
+  delete controls;
   delete ui;
-}
-
-/**
- * @brief Saves the settings.
- */
-void Interactive::saveSettings() {
-  settingsFile->setValue(QStringLiteral("windowState"), saveState());
 }
 
 /**
@@ -1024,10 +820,11 @@ void Interactive::level() {
         this->setEnabled(true);
       });
       connect(autolevel, &AutoLevel::levelParametersChanged, this, [this](const QHash<QString, double> &levelParameters) {
-        ui->maxT->setValue(levelParameters.value(QStringLiteral("normAngle")));
-        ui->maxL->setValue(levelParameters.value(QStringLiteral("normDist")));
-        ui->normArea->setValue(levelParameters.value(QStringLiteral("normArea")));
-        ui->normPerim->setValue(levelParameters.value(QStringLiteral("normPerim")));
+        parameterValues.insert(QStringLiteral("normAngle"), levelParameters.value(QStringLiteral("normAngle")));
+        parameterValues.insert(QStringLiteral("normDist"), levelParameters.value(QStringLiteral("normDist")));
+        parameterValues.insert(QStringLiteral("normArea"), levelParameters.value(QStringLiteral("normArea")));
+        parameterValues.insert(QStringLiteral("normPerim"), levelParameters.value(QStringLiteral("normPerim")));
+        notifyParameterStateChanged();
         QApplication::restoreOverrideCursor();
       });
       connect(autolevel, &AutoLevel::finished, thread, &QThread::quit);
@@ -1063,29 +860,16 @@ void Interactive::loadParameters(const QString &path) {
         parameterList.insert(parameters[0].trimmed(), parameters[1].trimmed());
       }
     }
-    ui->maxSize->setValue(parameterList.value(QStringLiteral("maxArea")).toInt());
-    ui->minSize->setValue(parameterList.value(QStringLiteral("minArea")).toInt());
-    ui->spot->setCurrentIndex(parameterList.value(QStringLiteral("spot")).toInt());
-    ui->maxL->setValue(parameterList.value(QStringLiteral("normDist")).toDouble());
-    ui->maxT->setValue(parameterList.value(QStringLiteral("normAngle")).toDouble());
-    ui->lo->setValue(parameterList.value(QStringLiteral("maxDist")).toInt());
-    ui->to->setValue(parameterList.value(QStringLiteral("maxTime")).toInt());
-    ui->normArea->setValue(parameterList.value(QStringLiteral("normArea")).toDouble());
-    ui->normPerim->setValue(parameterList.value(QStringLiteral("normPerim")).toDouble());
-
-    ui->threshBox->setValue(parameterList.value(QStringLiteral("thresh")).toInt());
-    ui->nBack->setValue(parameterList.value(QStringLiteral("nBack")).toInt());
-    ui->back->setCurrentIndex(parameterList.value(QStringLiteral("methBack")).toInt());
-    ui->registrationBack->setCurrentIndex(parameterList.value(QStringLiteral("regBack")).toInt());
-    ui->x1->setValue(parameterList.value(QStringLiteral("xTop")).toInt());
-    ui->y1->setValue(parameterList.value(QStringLiteral("yTop")).toInt());
-    (parameterList.value(QStringLiteral("xBottom")).toInt() == 0) ? ui->x2->setValue(originalImageSize.width()) : ui->x2->setValue(parameterList.value(QStringLiteral("xBottom")).toInt());
-    (parameterList.value(QStringLiteral("yBottom")).toInt() == 0) ? ui->y2->setValue(originalImageSize.height()) : ui->y2->setValue(parameterList.value(QStringLiteral("yBottom")).toInt());
-    ui->reg->setCurrentIndex(parameterList.value(QStringLiteral("reg")).toInt());
-    ui->backColor->setCurrentIndex(parameterList.value(QStringLiteral("lightBack")).toInt());
-    ui->morphOperation->setCurrentIndex(parameterList.value(QStringLiteral("morph")).toInt());
-    ui->kernelSize->setValue(parameterList.value(QStringLiteral("morphSize")).toInt());
-    ui->kernelType->setCurrentIndex(parameterList.value(QStringLiteral("morphType")).toInt());
+    for (auto it = parameterList.cbegin(); it != parameterList.cend(); ++it) {
+      parameterValues.insert(it.key(), it.value());
+    }
+    if (parameterInt(QStringLiteral("xBottom")) == 0) {
+      parameterValues.insert(QStringLiteral("xBottom"), originalImageSize.width());
+    }
+    if (parameterInt(QStringLiteral("yBottom")) == 0) {
+      parameterValues.insert(QStringLiteral("yBottom"), originalImageSize.height());
+    }
+    notifyParameterStateChanged();
   }
   parameterFile.close();
 }

@@ -7,12 +7,12 @@
 #include <QHash>
 #include <QHashIterator>
 #include <QMessageBox>
+#include <QObject>
 #include <QString>
 #include <QTextStream>
 #include <QUndoCommand>
-#include <QWidget>
 
-class Annotation : public QWidget {
+class Annotation : public QObject {
   Q_OBJECT
 
  private:
@@ -38,7 +38,7 @@ class Annotation : public QWidget {
   void annotationText(const QString &text);
 
  public:
-  explicit Annotation(QWidget *parent = nullptr);
+  explicit Annotation(QObject *parent = nullptr);
   Annotation(const QString &annotationFile);
   Annotation(const Annotation &T) = delete;
   Annotation &operator=(const Annotation &T) = delete;

@@ -1652,3 +1652,62 @@ QPushButton:pressed
     color: #31363B;
 }
 
+/* Main workspace */
+QMdiArea
+{
+    background: qradialgradient(cx: 0.5, cy: 0.15, radius: 1.1,
+        stop: 0 #F9FBFC, stop: 0.58 #E7ECEF, stop: 1 #D3DCE1);
+}
+
+QMdiSubWindow
+{
+    background-color: #EFF0F1;
+    border: 0.1ex solid #AAB4BA;
+    border-radius: 0.5ex;
+}
+
+QMdiSubWindow:focus
+{
+    border: 0.2ex solid #33A4DF;
+}
+
+QMdiArea QTabBar
+{
+    background-color: #DCE4E8;
+    qproperty-drawBase: 0;
+}
+
+QMdiArea QTabBar::tab
+{
+    background-color: #D4DEE3;
+    color: #31363B;
+    border: 0.1ex solid #B8C5CB;
+    border-bottom: 0;
+    border-top-left-radius: 0.5ex;
+    border-top-right-radius: 0.5ex;
+    margin: 0.5ex 0.2ex 0 0.2ex;
+    padding: 0.7ex 1.6ex;
+}
+
+QMdiArea QTabBar::tab:selected
+{
+    background-color: #EFF0F1;
+    border-color: #7AA7BC;
+}
+
+QMdiArea QTabBar::tab:hover:!selected
+{
+    background-color: #EAF1F4;
+}
+
+QMdiArea QTabBar::close-button:hover
+{
+    background-color: #D65A50;
+    border-radius: 0.7ex;
+}
+
+QDockWidget::title
+{
+    padding: 0.7ex 1ex;
+    font-weight: 600;
+}

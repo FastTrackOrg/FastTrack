@@ -79,6 +79,7 @@ Timeline::Timeline(QWidget *parent)
   QIcon img = QIcon(":/assets/buttons/play.png");
   ui->playButton->setIcon(img);
   ui->playButton->setIconSize(QSize(ui->playButton->width(), ui->playButton->height()));
+  ui->playButton->setToolTip(tr("Play/Pause (Space)"));
   connect(ui->playButton, &QPushButton::clicked, this, &Timeline::togglePlay);
 }
 
@@ -279,7 +280,10 @@ int Timeline::currentValue() {
  * @param[in] max Maximum value.
  */
 void Timeline::setMaximum(const int max) {
-  m_imageNumber = max;
+  m_imageNumber = qMax(0, max);
+  m_currentIndexLeft = qBound(m_imageMin, m_currentIndexLeft, m_imageNumber);
+  m_currentIndex = qBound(m_imageMin, m_currentIndex, m_imageNumber);
+  update(m_currentIndexLeft);
 }
 
 /**

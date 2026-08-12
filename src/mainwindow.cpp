@@ -19,11 +19,16 @@ This file is part of Fast Track.
 
 #include <QActionGroup>
 #include <QDesktopServices>
+#include <QDoubleSpinBox>
 #include <QFileDialog>
+#include <QHeaderView>
 #include <QMenuBar>
 #include <QMimeData>
+#include <QPushButton>
+#include <QSignalBlocker>
 #include <QStandardPaths>
 #include <QStyleFactory>
+#include <QTabWidget>
 #include <QTextStream>
 
 #ifndef M_PI
@@ -59,6 +64,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
 
   settingsFile->beginGroup(QStringLiteral("main"));
   restoreGeometry(settingsFile->value(QStringLiteral("geometry")).toByteArray());
+  savedDockState = settingsFile->value(QStringLiteral("dockState")).toByteArray();
   const QString style = settingsFile->value(QStringLiteral("style"), QStringLiteral("Fusion")).toString();
   if (QStyleFactory::keys().contains(style)) {
     QApplication::setStyle(QStyleFactory::create(style));
@@ -94,6 +100,167 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
   viewMenu = menuBar()->addMenu(tr("&View"));
   settingsMenu = menuBar()->addMenu(tr("&Settings"));
   helpMenu = menuBar()->addMenu(tr("&Help"));
+  imageOptionsDock = ui->imageOptionsDock;
+  trackingOptionsDock = ui->trackingOptionsDock;
+  controlOptionsDock = ui->controlOptionsDock;
+  replayDisplayDock = ui->replayDisplayDock;
+  annotationDock = ui->annotationDock;
+  informationDock = ui->informationDock;
+  imageOptionsDock->hide();
+  trackingOptionsDock->hide();
+  controlOptionsDock->hide();
+  replayDisplayDock->hide();
+  annotationDock->hide();
+  informationDock->hide();
+
+  parameterControls = {{QStringLiteral("methBack"), ui->back},
+                       {QStringLiteral("nBack"), ui->nBack},
+                       {QStringLiteral("regBack"), ui->registrationBack},
+                       {QStringLiteral("lightBack"), ui->backColor},
+                       {QStringLiteral("thresh"), ui->threshBox},
+                       {QStringLiteral("maxArea"), ui->maxSize},
+                       {QStringLiteral("minArea"), ui->minSize},
+                       {QStringLiteral("xTop"), ui->x1},
+                       {QStringLiteral("yTop"), ui->y1},
+                       {QStringLiteral("xBottom"), ui->x2},
+                       {QStringLiteral("yBottom"), ui->y2},
+                       {QStringLiteral("maxTime"), ui->to},
+                       {QStringLiteral("maxDist"), ui->lo},
+                       {QStringLiteral("spot"), ui->spot},
+                       {QStringLiteral("normDist"), ui->maxL},
+                       {QStringLiteral("normAngle"), ui->maxT},
+                       {QStringLiteral("normArea"), ui->normArea},
+                       {QStringLiteral("normPerim"), ui->normPerim},
+                       {QStringLiteral("reg"), ui->reg},
+                       {QStringLiteral("morphSize"), ui->kernelSize},
+                       {QStringLiteral("morph"), ui->morphOperation},
+                       {QStringLiteral("morphType"), ui->kernelType},
+                       {QStringLiteral("startImage"), ui->startImage},
+                       {QStringLiteral("stopImage"), ui->stopImage}};
+  const auto applyParameters = [this]() { applyParameterControls(); };
+  for (QWidget *control : parameterControls) {
+    if (QSpinBox *box = qobject_cast<QSpinBox *>(control)) {
+      connect(box, QOverload<int>::of(&QSpinBox::valueChanged), this, applyParameters);
+    }
+    else if (QDoubleSpinBox *box = qobject_cast<QDoubleSpinBox *>(control)) {
+      connect(box, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, applyParameters);
+    }
+    else if (QComboBox *box = qobject_cast<QComboBox *>(control)) {
+      connect(box, QOverload<int>::of(&QComboBox::currentIndexChanged), this, applyParameters);
+    }
+  }
+  connect(ui->backgroundComputeButton, &QPushButton::clicked, this, [this]() { if (Interactive *interactive = activeInteractive()) interactive->computeWorkspaceBackground(); });
+  connect(ui->backgroundSelectButton, &QPushButton::clicked, this, [this]() { if (Interactive *interactive = activeInteractive()) interactive->selectWorkspaceBackground(); });
+  connect(ui->cropButton, &QPushButton::clicked, this, [this]() { if (Interactive *interactive = activeInteractive()) interactive->cropWorkspace(); });
+  connect(ui->resetButton, &QPushButton::clicked, this, [this]() { if (Interactive *interactive = activeInteractive()) interactive->resetWorkspaceCrop(); });
+  connect(ui->levelButton, &QPushButton::clicked, this, [this]() { if (Interactive *interactive = activeInteractive()) interactive->levelWorkspaceParameters(); });
+  connect(ui->threshSlider, &QSlider::valueChanged, ui->threshBox, QOverload<int>::of(&QSpinBox::setValue));
+  connect(ui->threshBox, QOverload<int>::of(&QSpinBox::valueChanged), ui->threshSlider, &QSlider::setValue);
+  const auto selectBinaryDisplay = [this]() {
+    if (Interactive *interactive = activeInteractive()) {
+      QHash<QString, QVariant> state = workspaceStates.value(interactive, interactive->parameterState());
+      state.insert(QStringLiteral("displayMode"), 2);
+      workspaceStates.insert(interactive, state);
+      ui->isBin->setChecked(true);
+      interactive->setParameterState(state);
+    }
+  };
+  for (QWidget *control : {static_cast<QWidget *>(ui->threshBox),
+                           static_cast<QWidget *>(ui->maxSize),
+                           static_cast<QWidget *>(ui->minSize),
+                           static_cast<QWidget *>(ui->backColor),
+                           static_cast<QWidget *>(ui->kernelSize),
+                           static_cast<QWidget *>(ui->morphOperation),
+                           static_cast<QWidget *>(ui->kernelType)}) {
+    if (QSpinBox *box = qobject_cast<QSpinBox *>(control)) {
+      connect(box, QOverload<int>::of(&QSpinBox::valueChanged), this, selectBinaryDisplay);
+    }
+    else if (QComboBox *box = qobject_cast<QComboBox *>(control)) {
+      connect(box, QOverload<int>::of(&QComboBox::currentIndexChanged), this, selectBinaryDisplay);
+    }
+  }
+  connect(ui->slider, &Timeline::valueChanged, this, [this](int frame) {
+    if (Interactive *interactive = activeInteractive()) {
+      QHash<QString, QVariant> state = workspaceStates.value(interactive, interactive->parameterState());
+      state.insert(QStringLiteral("frame"), frame);
+      workspaceStates.insert(interactive, state);
+      if (interactive->isReplayActive()) {
+        interactive->replayWidget()->sliderConnection(frame);
+      }
+      else {
+        interactive->setParameterState(state);
+      }
+    }
+  });
+  const auto applyDisplayMode = [this](int mode) {
+    if (Interactive *interactive = activeInteractive()) {
+      QHash<QString, QVariant> state = workspaceStates.value(interactive, interactive->parameterState());
+      state.insert(QStringLiteral("displayMode"), mode);
+      workspaceStates.insert(interactive, state);
+      interactive->setParameterState(state);
+    }
+  };
+  connect(ui->isOriginal, &QRadioButton::clicked, this, [applyDisplayMode]() { applyDisplayMode(0); });
+  connect(ui->isSub, &QRadioButton::clicked, this, [applyDisplayMode]() { applyDisplayMode(1); });
+  connect(ui->isBin, &QRadioButton::clicked, this, [applyDisplayMode]() { applyDisplayMode(2); });
+
+  replayEllipseBox = ui->replayEllipseBox;
+  replayArrowBox = ui->replayArrowBox;
+  replayTraceBox = ui->replayTraceBox;
+  replayTraceLengthBox = ui->replayTraceLengthBox;
+  replayNumbersBox = ui->replayNumbersBox;
+  replaySizeBox = ui->replaySizeBox;
+  replayFpsBox = ui->replayFpsBox;
+  annotationFindLine = ui->annotationFindLine;
+  annotationEdit = ui->annotationEdit;
+  informationTable1 = ui->informationTable1;
+  informationTable2 = ui->informationTable2;
+  const QStringList replayShapes = {tr("Head + Tail"), tr("Head"), tr("Tail"), tr("Body"), tr("None")};
+  replayEllipseBox->addItems(replayShapes);
+  replayArrowBox->addItems(replayShapes);
+  replayTraceLengthBox->setRange(1, 50000);
+  replaySizeBox->setRange(1, 150);
+  replayFpsBox->setRange(1, 1000);
+  for (QTableWidget *table : {informationTable1, informationTable2}) {
+    table->setRowCount(5);
+    table->setColumnCount(1);
+    table->setHorizontalHeaderLabels({tr("Value")});
+    table->setVerticalHeaderLabels({tr("Object id"), tr("First appearance"), tr("Area (px)"), tr("Perimeter (px)"), tr("Eccentricity")});
+    for (int row = 0; row < table->rowCount(); ++row) {
+      table->setItem(row, 0, new QTableWidgetItem(QStringLiteral("0")));
+    }
+    table->horizontalHeader()->setStretchLastSection(true);
+  }
+  const auto applyReplay = [this]() { applyReplayDisplayControls(); };
+  connect(replayEllipseBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, applyReplay);
+  connect(replayArrowBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, applyReplay);
+  connect(replayTraceBox, &QCheckBox::toggled, this, applyReplay);
+  connect(replayTraceLengthBox, QOverload<int>::of(&QSpinBox::valueChanged), this, applyReplay);
+  connect(replayNumbersBox, &QCheckBox::toggled, this, applyReplay);
+  connect(replaySizeBox, QOverload<int>::of(&QSpinBox::valueChanged), this, applyReplay);
+  connect(replayFpsBox, QOverload<int>::of(&QSpinBox::valueChanged), this, applyReplay);
+  connect(annotationEdit, &QTextEdit::textChanged, this, [this]() { if (Interactive *interactive = activeInteractive()) interactive->replayWidget()->setAnnotationText(annotationEdit->toPlainText()); });
+  connect(annotationFindLine, &QLineEdit::textEdited, this, [this](const QString &text) { if (Interactive *interactive = activeInteractive()) interactive->replayWidget()->findAnnotation(text); });
+  connect(ui->annotationNextButton, &QPushButton::clicked, this, [this]() { if (Interactive *interactive = activeInteractive()) interactive->replayWidget()->nextAnnotation(); });
+  connect(ui->annotationPreviousButton, &QPushButton::clicked, this, [this]() { if (Interactive *interactive = activeInteractive()) interactive->replayWidget()->previousAnnotation(); });
+  QToolBar *workspaceToolBar = addToolBar(tr("Tracking"));
+  workspaceToolBar->setObjectName(QStringLiteral("trackingToolBar"));
+  previewAction = workspaceToolBar->addAction(QIcon(":/assets/buttons/preview.png"), tr("Preview"));
+  previewAction->setToolTip(tr("Preview tracking for the active workspace"));
+  trackAction = workspaceToolBar->addAction(QIcon(":/assets/buttons/track.png"), tr("Track"));
+  trackAction->setToolTip(tr("Start tracking for the active workspace"));
+  connect(previewAction, &QAction::triggered, this, [this]() {
+    if (Interactive *interactive = activeInteractive()) {
+      interactive->preview();
+      updateWorkspaceActions();
+    }
+  });
+  connect(trackAction, &QAction::triggered, this, [this]() {
+    if (Interactive *interactive = activeInteractive()) {
+      interactive->startTracking();
+      updateWorkspaceActions();
+    }
+  });
 
   mdiModeMenu = new QMenu(tr("Window mode"), this);
   QActionGroup *viewModeGroup = new QActionGroup(this);
@@ -135,8 +302,17 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
   ui->mdiArea->setAcceptDrops(false);
   ui->mdiArea->viewport()->setAcceptDrops(false);
 
-  connect(ui->mdiArea, &QMdiArea::subWindowActivated, this, &MainWindow::refreshContextMenus);
+  connect(ui->mdiArea, &QMdiArea::subWindowActivated, this, [this](QMdiSubWindow *subWindow) {
+    Interactive *interactive = qobject_cast<Interactive *>(subWindow ? subWindow->widget() : nullptr);
+    showInteractiveDocks(interactive);
+    showReplayDocks(interactive);
+    refreshContextMenus(subWindow);
+    updateWorkspaceActions();
+  });
+  showInteractiveDocks(nullptr);
+  showReplayDocks(nullptr);
   refreshContextMenus(nullptr);
+  updateWorkspaceActions();
 
 }  // Constructor
 
@@ -155,6 +331,7 @@ void MainWindow::closeEvent(QCloseEvent *event) {
   int reply = msgBox.exec();
   if (reply == QMessageBox::Yes) {
     settingsFile->setValue(QStringLiteral("geometry"), saveGeometry());
+    settingsFile->setValue(QStringLiteral("dockState"), saveState());
     event->accept();
   }
   else if (reply == QMessageBox::AcceptRole) {
@@ -208,14 +385,222 @@ void MainWindow::openInteractive() {
 
 QMdiSubWindow *MainWindow::newInteractiveWindow() {
   Interactive *interactive = new Interactive();
+  if (!savedDockState.isEmpty()) {
+    restoreState(savedDockState);
+    savedDockState.clear();
+  }
   QMdiSubWindow *subWindow = ui->mdiArea->addSubWindow(interactive);
   subWindow->setAttribute(Qt::WA_DeleteOnClose);
   subWindow->setWindowTitle(tr("Interactive tracking"));
   subWindow->show();
+  connect(interactive, &Interactive::inputOpened, this, [this, subWindow, interactive](const QString &path) {
+    subWindow->setWindowTitle(path);
+    saveWorkspaceState(interactive);
+    if (activeInteractive() == interactive) {
+      showInteractiveDocks(interactive);
+      updateWorkspaceActions();
+    }
+  });
   connect(interactive, &Interactive::status, this, [this](const QString &message) {
     trayIcon->showMessage(QStringLiteral("FastTrack"), message, QSystemTrayIcon::Information, 3000);
   });
+  connect(interactive, &Interactive::trackingAvailabilityChanged, this, [this, interactive]() {
+    if (activeInteractive() == interactive) {
+      updateWorkspaceActions();
+    }
+  });
+  connect(interactive, &Interactive::timelineEnabledChanged, this, [this, interactive](bool enabled) {
+    if (activeInteractive() == interactive) {
+      ui->slider->setEnabled(enabled);
+    }
+  });
+  connect(interactive, &Interactive::replayVisibleChanged, this, [this, interactive](bool visible) {
+    if (activeInteractive() == interactive) {
+      showInteractiveDocks(interactive);
+      showReplayDocks(interactive);
+    }
+  });
+  connect(interactive, &Interactive::activeViewChanged, this, [this, interactive](bool) {
+    if (activeInteractive() == interactive) {
+      showInteractiveDocks(interactive);
+      showReplayDocks(interactive);
+    }
+  });
+  connect(interactive, &Interactive::parameterStateChanged, this, [this, interactive](const QHash<QString, QVariant> &state) {
+    QHash<QString, QVariant> &workspaceState = workspaceStates[interactive];
+    for (auto it = state.cbegin(); it != state.cend(); ++it) {
+      workspaceState.insert(it.key(), it.value());
+    }
+  });
+  workspaceStates.insert(interactive, interactive->parameterState());
+  connect(subWindow, &QObject::destroyed, this, [this, interactive]() {
+    if (shuttingDown) {
+      return;
+    }
+    workspaceStates.remove(interactive);
+  });
+  Replay *replay = interactive->replayWidget();
+  connect(replay, &Replay::frameRequested, this, [this, interactive](int frame) {
+    if (activeInteractive() == interactive) {
+      ui->slider->setValue(frame);
+    }
+  });
+  connect(replay, &Replay::annotationTextChanged, this, [this, interactive](const QString &text) {
+    if (activeInteractive() == interactive) {
+      QSignalBlocker blocker(annotationEdit);
+      annotationEdit->setPlainText(text);
+    }
+  });
+  connect(replay, &Replay::informationChanged, this, [this, interactive](int table, const QList<QString> &values) {
+    if (activeInteractive() == interactive) {
+      updateInformationTable(table == 1 ? informationTable1 : informationTable2, values);
+    }
+  });
   return subWindow;
+}
+
+void MainWindow::showInteractiveDocks(Interactive *interactive) {
+  const bool trackingVisible = interactive && !interactive->isReplayActive();
+  imageOptionsDock->setVisible(trackingVisible);
+  trackingOptionsDock->setVisible(trackingVisible);
+  controlOptionsDock->setVisible(interactive != nullptr);
+  if (interactive) {
+    QHash<QString, QVariant> &state = workspaceStates[interactive];
+    if (state.isEmpty()) {
+      state = interactive->parameterState();
+    }
+    loadParameterControls(state);
+    const QSignalBlocker sliderBlocker(ui->slider);
+    const QSignalBlocker originalBlocker(ui->isOriginal);
+    const QSignalBlocker subBlocker(ui->isSub);
+    const QSignalBlocker binBlocker(ui->isBin);
+    ui->slider->setMinimum(0);
+    ui->slider->setMaximum(qMax(0, interactive->frameCount() - 1));
+    ui->slider->setValue(state.value(QStringLiteral("frame")).toInt());
+    switch (state.value(QStringLiteral("displayMode")).toInt()) {
+      case 1:
+        ui->isSub->setChecked(true);
+        break;
+      case 2:
+        ui->isBin->setChecked(true);
+        break;
+      default:
+        ui->isOriginal->setChecked(true);
+        break;
+    }
+    const QList<QString> values = interactive->informationValues();
+    for (int row = 0; row < values.count() && row < ui->informationTable->rowCount(); ++row) {
+      ui->informationTable->item(row, 1)->setText(values.at(row));
+    }
+    ui->trackingStatus->setText(interactive->trackingStatusText());
+  }
+}
+
+void MainWindow::saveWorkspaceState(Interactive *interactive) {
+  if (!interactive) {
+    return;
+  }
+  workspaceStates[interactive] = interactive->parameterState();
+}
+
+void MainWindow::loadParameterControls(const QHash<QString, QVariant> &state) {
+  for (auto it = parameterControls.cbegin(); it != parameterControls.cend(); ++it) {
+    QSignalBlocker blocker(it.value());
+    const QVariant value = state.value(it.key());
+    if (QSpinBox *box = qobject_cast<QSpinBox *>(it.value())) {
+      box->setValue(value.toInt());
+    }
+    else if (QDoubleSpinBox *box = qobject_cast<QDoubleSpinBox *>(it.value())) {
+      box->setValue(value.toDouble());
+    }
+    else if (QComboBox *box = qobject_cast<QComboBox *>(it.value())) {
+      box->setCurrentIndex(value.toInt());
+    }
+  }
+  const QSignalBlocker thresholdSliderBlocker(ui->threshSlider);
+  ui->threshSlider->setValue(state.value(QStringLiteral("thresh")).toInt());
+}
+
+void MainWindow::applyParameterControls() {
+  Interactive *interactive = activeInteractive();
+  if (!interactive) {
+    return;
+  }
+  QHash<QString, QVariant> state = workspaceStates.value(interactive, interactive->parameterState());
+  for (auto it = parameterControls.cbegin(); it != parameterControls.cend(); ++it) {
+    if (QSpinBox *box = qobject_cast<QSpinBox *>(it.value())) {
+      state.insert(it.key(), box->value());
+    }
+    else if (QDoubleSpinBox *box = qobject_cast<QDoubleSpinBox *>(it.value())) {
+      state.insert(it.key(), box->value());
+    }
+    else if (QComboBox *box = qobject_cast<QComboBox *>(it.value())) {
+      state.insert(it.key(), box->currentIndex());
+    }
+  }
+  workspaceStates.insert(interactive, state);
+  interactive->setParameterState(state);
+}
+
+void MainWindow::loadReplayDisplayControls(Replay *replay) {
+  const QHash<QString, QVariant> state = replay->displayParameters();
+  const QSignalBlocker ellipseBlocker(replayEllipseBox);
+  const QSignalBlocker arrowBlocker(replayArrowBox);
+  const QSignalBlocker traceBlocker(replayTraceBox);
+  const QSignalBlocker traceLengthBlocker(replayTraceLengthBox);
+  const QSignalBlocker numbersBlocker(replayNumbersBox);
+  const QSignalBlocker sizeBlocker(replaySizeBox);
+  const QSignalBlocker fpsBlocker(replayFpsBox);
+  replayEllipseBox->setCurrentIndex(state.value(QStringLiteral("ellipse")).toInt());
+  replayArrowBox->setCurrentIndex(state.value(QStringLiteral("arrow")).toInt());
+  replayTraceBox->setChecked(state.value(QStringLiteral("trace")).toBool());
+  replayTraceLengthBox->setValue(state.value(QStringLiteral("traceLength")).toInt());
+  replayNumbersBox->setChecked(state.value(QStringLiteral("numbers")).toBool());
+  replaySizeBox->setValue(state.value(QStringLiteral("size")).toInt());
+  replayFpsBox->setValue(state.value(QStringLiteral("fps")).toInt());
+}
+
+void MainWindow::applyReplayDisplayControls() {
+  Interactive *interactive = activeInteractive();
+  if (!interactive) {
+    return;
+  }
+  interactive->replayWidget()->setDisplayParameters({{QStringLiteral("ellipse"), replayEllipseBox->currentIndex()},
+                                                     {QStringLiteral("arrow"), replayArrowBox->currentIndex()},
+                                                     {QStringLiteral("trace"), replayTraceBox->isChecked()},
+                                                     {QStringLiteral("traceLength"), replayTraceLengthBox->value()},
+                                                     {QStringLiteral("numbers"), replayNumbersBox->isChecked()},
+                                                     {QStringLiteral("size"), replaySizeBox->value()},
+                                                     {QStringLiteral("fps"), replayFpsBox->value()}});
+}
+
+void MainWindow::updateInformationTable(QTableWidget *table, const QList<QString> &values) {
+  for (int row = 0; row < values.count() && row < table->rowCount(); ++row) {
+    table->item(row, 0)->setText(values.at(row));
+  }
+}
+
+void MainWindow::showReplayDocks(Interactive *interactive) {
+  const bool visible = interactive && interactive->isReplayActive();
+  replayDisplayDock->setVisible(visible);
+  annotationDock->setVisible(visible);
+  informationDock->setVisible(visible);
+  if (visible) {
+    Replay *replay = interactive->replayWidget();
+    loadReplayDisplayControls(replay);
+    replay->sliderConnection(ui->slider->value());
+  }
+}
+
+Interactive *MainWindow::activeInteractive() const {
+  QMdiSubWindow *subWindow = ui->mdiArea->activeSubWindow();
+  return qobject_cast<Interactive *>(subWindow ? subWindow->widget() : nullptr);
+}
+
+void MainWindow::updateWorkspaceActions() {
+  Interactive *interactive = activeInteractive();
+  previewAction->setEnabled(interactive && interactive->canPreview());
+  trackAction->setEnabled(interactive && interactive->canTrack());
 }
 
 QMdiSubWindow *MainWindow::newBatchWindow() {
@@ -273,23 +658,21 @@ void MainWindow::refreshContextMenus(QMdiSubWindow *subWindow) {
 
   if (Interactive *interactive = qobject_cast<Interactive *>(subWindow ? subWindow->widget() : nullptr)) {
     viewMenu->addSeparator();
-    QAction *imageOptionsAction = viewMenu->addAction(tr("Image Options"));
-    imageOptionsAction->setCheckable(true);
-    imageOptionsAction->setChecked(interactive->imageOptionsVisible());
-    connect(imageOptionsAction, &QAction::toggled, interactive, &Interactive::setImageOptionsVisible);
-    QAction *trackingOptionsAction = viewMenu->addAction(tr("Tracking Options"));
-    trackingOptionsAction->setCheckable(true);
-    trackingOptionsAction->setChecked(interactive->trackingOptionsVisible());
-    connect(trackingOptionsAction, &QAction::toggled, interactive, &Interactive::setTrackingOptionsVisible);
-    QAction *controlOptionsAction = viewMenu->addAction(tr("Video Controls"));
-    controlOptionsAction->setCheckable(true);
-    controlOptionsAction->setChecked(interactive->controlOptionsVisible());
-    connect(controlOptionsAction, &QAction::toggled, interactive, &Interactive::setControlOptionsVisible);
-    QAction *replayAction = viewMenu->addAction(tr("Tracking replay"));
-    replayAction->setCheckable(true);
-    replayAction->setChecked(interactive->isReplayVisible());
-    connect(replayAction, &QAction::toggled, interactive, &Interactive::setReplayVisible);
-    connect(interactive, &Interactive::replayVisibleChanged, replayAction, &QAction::setChecked);
+    viewMenu->addAction(imageOptionsDock->toggleViewAction());
+    viewMenu->addAction(trackingOptionsDock->toggleViewAction());
+    viewMenu->addAction(controlOptionsDock->toggleViewAction());
+    QAction *replayDisplayAction = replayDisplayDock->toggleViewAction();
+    QAction *annotationAction = annotationDock->toggleViewAction();
+    QAction *informationAction = informationDock->toggleViewAction();
+    replayDisplayAction->setEnabled(interactive->isReplayVisible());
+    annotationAction->setEnabled(interactive->isReplayVisible());
+    informationAction->setEnabled(interactive->isReplayVisible());
+    viewMenu->addAction(replayDisplayAction);
+    viewMenu->addAction(annotationAction);
+    viewMenu->addAction(informationAction);
+    connect(interactive, &Interactive::replayVisibleChanged, replayDisplayAction, &QAction::setEnabled);
+    connect(interactive, &Interactive::replayVisibleChanged, annotationAction, &QAction::setEnabled);
+    connect(interactive, &Interactive::replayVisibleChanged, informationAction, &QAction::setEnabled);
   }
 
   QMenu *styleMenu = settingsMenu->addMenu(tr("Appearance"));
@@ -310,9 +693,9 @@ void MainWindow::refreshContextMenus(QMdiSubWindow *subWindow) {
   QActionGroup *themeGroup = new QActionGroup(themeMenu);
   const QString currentTheme = settingsFile->value(QStringLiteral("theme"), QStringLiteral("ft")).toString();
   const QList<QPair<QString, QString>> themes = {{tr("Default"), QStringLiteral("default")},
-                                                   {tr("Breeze Dark"), QStringLiteral("dark")},
-                                                   {tr("Breeze Light"), QStringLiteral("light")},
-                                                   {tr("FastTrack"), QStringLiteral("ft")}};
+                                                 {tr("Breeze Dark"), QStringLiteral("dark")},
+                                                 {tr("Breeze Light"), QStringLiteral("light")},
+                                                 {tr("FastTrack"), QStringLiteral("ft")}};
   for (const auto &theme : themes) {
     QAction *themeAction = themeMenu->addAction(theme.first);
     themeAction->setCheckable(true);
@@ -368,5 +751,6 @@ void MainWindow::refreshContextMenus(QMdiSubWindow *subWindow) {
  * @brief Destructs the MainWindow object and saves the previous set of parameters.
  */
 MainWindow::~MainWindow() {
+  shuttingDown = true;
   delete ui;
 }

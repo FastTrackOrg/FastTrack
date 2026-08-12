@@ -60,7 +60,6 @@ This file is part of Fast Track.
 #include "data.h"
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
-#include "timeline.h"
 #include "videoreader.h"
 using namespace std;
 using namespace cv;
@@ -73,12 +72,18 @@ class Replay : public QMainWindow {
   Q_OBJECT
 
  public:
-  explicit Replay(QWidget *parent, Timeline *slider, VideoReader *videoReader);
+  explicit Replay(QWidget *parent, VideoReader *videoReader);
   Replay(const Replay &T) = delete;
   Replay &operator=(const Replay &T) = delete;
   Replay &operator=(Replay &&T) = delete;
   Replay(Replay &&T) = delete;
   ~Replay();
+  QHash<QString, QVariant> displayParameters() const;
+  void setDisplayParameters(const QHash<QString, QVariant> &parameters);
+  void setAnnotationText(const QString &text);
+  void findAnnotation(const QString &text);
+  void nextAnnotation();
+  void previousAnnotation();
   Data *trackingData;
   Annotation *annotation;
 
@@ -110,6 +115,9 @@ class Replay : public QMainWindow {
   int currentIndex;           /*!< Current image index. */
   QList<int> ids;
   VideoReader *video;
+  QHash<QString, QVariant> displayState{{QStringLiteral("ellipse"), 0}, {QStringLiteral("arrow"), 0}, {QStringLiteral("trace"), false}, {QStringLiteral("traceLength"), 10}, {QStringLiteral("numbers"), true}, {QStringLiteral("size"), 2}, {QStringLiteral("fps"), 25}};
+  int informationObject1 = 0;
+  int informationObject2 = 0;
 
  public slots:
 
@@ -118,7 +126,7 @@ class Replay : public QMainWindow {
   void loadTrackingDir(const QString &dir);
   void loadFrame(int frameIndex);
   bool eventFilter(QObject *target, QEvent *event) override;
-  void updateInformation(int objectId, int imageIndex, QTableWidget *table);
+  void updateInformation(int objectId, int imageIndex, int table);
   void correctTracking();
   void nextOcclusionEvent();
   void previousOcclusionEvent();
@@ -128,6 +136,9 @@ class Replay : public QMainWindow {
 
  signals:
   void opened(bool);
+  void annotationTextChanged(const QString &text);
+  void informationChanged(int table, const QList<QString> &values);
+  void frameRequested(int frame);
 };
 
 #endif  // REPLAY_H

@@ -94,3 +94,55 @@ QMenuBar {
 QTextBrowser {
     font-family: "Lato"
 }
+
+/* Main workspace */
+QMdiArea {
+    background: qradialgradient(cx: 0.5, cy: 0.2, radius: 1.1,
+        stop: 0 #F8FAFA, stop: 0.55 #EEF2F3, stop: 1 #D9E1E3);
+}
+
+QMdiSubWindow {
+    background: #FFFFFF;
+    border: 1px solid #B8C6C9;
+    border-radius: 6px;
+}
+
+QMdiSubWindow:focus {
+    border: 2px solid #3F6970;
+}
+
+QMdiArea QTabBar {
+    background: #E4EAEB;
+    qproperty-drawBase: 0;
+}
+
+QMdiArea QTabBar::tab {
+    background: #D6E0E2;
+    color: #40565B;
+    border: 1px solid #C2D0D3;
+    border-bottom: 0;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+    margin: 5px 2px 0 2px;
+    padding: 8px 18px;
+}
+
+QMdiArea QTabBar::tab:selected {
+    background: #FFFFFF;
+    color: #23383D;
+    border-color: #8EA6AB;
+}
+
+QMdiArea QTabBar::tab:hover:!selected {
+    background: #EAF0F1;
+}
+
+QMdiArea QTabBar::close-button:hover {
+    background: #C95C54;
+    border-radius: 7px;
+}
+
+QDockWidget::title {
+    padding: 7px 10px;
+    font-weight: 600;
+}

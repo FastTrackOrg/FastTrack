@@ -52,21 +52,19 @@ void Annotation::clear() {
 bool Annotation::setPath(const QString &filePath) {
   clear();
   annotationFile->setFileName(filePath + "annotation.txt");
-  if (!annotationFile->open(QIODevice::ReadOnly)) {
-    return false;
-  }
+  if (annotationFile->open(QIODevice::ReadOnly)) {
+    QTextStream in(annotationFile);
+    QString data = in.readAll();
+    QStringList annotationEntries = data.split(QStringLiteral("\n\t\n"));
 
-  QTextStream in(annotationFile);
-  QString data = in.readAll();
-  QStringList annotationEntries = data.split(QStringLiteral("\n\t\n"));
-
-  for (auto const &a : annotationEntries) {
-    QStringList entry = a.split(QStringLiteral("\t\n\t"));
-    if (entry.length() == 2) {
-      annotations->insert(entry[0].toInt(), entry[1]);
+    for (auto const &a : annotationEntries) {
+      QStringList entry = a.split(QStringLiteral("\t\n\t"));
+      if (entry.length() == 2) {
+        annotations->insert(entry[0].toInt(), entry[1]);
+      }
     }
+    annotationFile->close();
   }
-  annotationFile->close();
   isActive = true;
   return true;
 }
@@ -82,7 +80,7 @@ Annotation::Annotation(const QString &filePath) : Annotation() {
 /**
  * @brief Constructs the annotation object from a file path.
  */
-Annotation::Annotation(QWidget *parent) : annotationFile{new QFile()}, annotations{new QHash<int, QString>()}, findIndex{-1}, isActive{false} {
+Annotation::Annotation(QObject *parent) : QObject(parent), annotationFile{new QFile(this)}, annotations{new QHash<int, QString>()}, findIndex{-1}, isActive{false} {
 }
 
 /**
@@ -177,6 +175,5 @@ Annotation::~Annotation() {
   if (isActive) {
     writeToFile();
   }
-  delete annotationFile;
   delete annotations;
 }

@@ -38,15 +38,11 @@ using namespace std;
  *
  */
 
-Replay::Replay(QWidget* parent, Timeline* slider, VideoReader* videoReader) : QMainWindow(parent),
-                                                                               ui(new Ui::Replay),
-                                                                                               settingsFile(new QSettings(QStringLiteral("FastTrack"), QStringLiteral("FastTrackOrg"), this)) {
+Replay::Replay(QWidget* parent, VideoReader* videoReader) : QMainWindow(parent),
+                                                            ui(new Ui::Replay),
+                                                            settingsFile(new QSettings(QStringLiteral("FastTrack"), QStringLiteral("FastTrackOrg"), this)) {
   ui->setupUi(this);
   ui->replayDisplay->setAttribute(Qt::WA_Hover);
-
-  // Loads settings
-  settingsFile->beginGroup(QStringLiteral("replay"));
-  restoreState(settingsFile->value(QStringLiteral("windowState")).toByteArray());
 
   // Generates a color map.
   int a, b, c;
@@ -84,7 +80,8 @@ Replay::Replay(QWidget* parent, Timeline* slider, VideoReader* videoReader) : QM
   QAction* undoAction = commandStack->createUndoAction(this, tr("&Undo"));
   undoAction->setIcon(img);
   undoAction->setShortcuts(QKeySequence::Undo);
-  undoAction->setStatusTip(tr("Undo"));
+  undoAction->setStatusTip(tr("Undo (Ctrl+Z)"));
+  undoAction->setToolTip(tr("Undo (Ctrl+Z)"));
   connect(undoAction, &QAction::triggered, this, [this]() {
     object2Replay->clear();
     ids = trackingData->getId(0, static_cast<int>(video->getImageCount()));
@@ -100,7 +97,8 @@ Replay::Replay(QWidget* parent, Timeline* slider, VideoReader* videoReader) : QM
   QAction* redoAction = commandStack->createRedoAction(this, tr("&Redo"));
   redoAction->setIcon(img);
   redoAction->setShortcuts(QKeySequence::Redo);
-  redoAction->setStatusTip(tr("Redo"));
+  redoAction->setStatusTip(tr("Redo (Ctrl+Y)"));
+  redoAction->setToolTip(tr("Redo (Ctrl+Y)"));
   connect(redoAction, &QAction::triggered, this, [this]() {
     object2Replay->clear();
     ids = trackingData->getId(0, static_cast<int>(video->getImageCount()));
@@ -121,7 +119,7 @@ Replay::Replay(QWidget* parent, Timeline* slider, VideoReader* videoReader) : QM
   connect(object1Replay, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this](int index) {
     if (object1Replay->count() != 0) {
       int id = object1Replay->itemText(index).toInt();
-      updateInformation(static_cast<int>(id), ui->replaySlider->value(), ui->infoTableObject1);
+      updateInformation(static_cast<int>(id), currentIndex, 1);
       object1Replay->setStyleSheet("QComboBox { background-color: rgb(" + QString::number(colorMap[id].x) + "," + QString::number(colorMap[id].y) + "," + QString::number(colorMap[id].z) + "); }");
     }
   });
@@ -129,7 +127,9 @@ Replay::Replay(QWidget* parent, Timeline* slider, VideoReader* videoReader) : QM
 
   img = QIcon(":/assets/buttons/replace.png");
   QAction* swapAction = ui->toolBar->addAction(img, tr("&Swap"));
-  swapAction->setStatusTip(tr("Swap the two objects"));
+  swapAction->setShortcut(QKeySequence(QStringLiteral("S")));
+  swapAction->setStatusTip(tr("Swap the two objects (S)"));
+  swapAction->setToolTip(tr("Swap the two objects (S)"));
   connect(swapAction, &QAction::triggered, this, &Replay::correctTracking);
 
   object2Replay = new QComboBox(this);
@@ -139,7 +139,7 @@ Replay::Replay(QWidget* parent, Timeline* slider, VideoReader* videoReader) : QM
   connect(object2Replay, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this](int index) {
     if (object2Replay->count() != 0) {
       int id = object2Replay->itemText(index).toInt();
-      updateInformation(static_cast<int>(id), ui->replaySlider->value(), ui->infoTableObject2);
+      updateInformation(static_cast<int>(id), currentIndex, 2);
       object2Replay->setStyleSheet("QComboBox { background-color: rgb(" + QString::number(colorMap[id].x) + "," + QString::number(colorMap[id].y) + "," + QString::number(colorMap[id].z) + "); }");
     }
   });
@@ -148,10 +148,11 @@ Replay::Replay(QWidget* parent, Timeline* slider, VideoReader* videoReader) : QM
   img = QIcon(":/assets/buttons/deleteOne.png");
   QAction* deleteOneAction = ui->toolBar->addAction(img, tr("&Delete"));
   deleteOneAction->setShortcut(QKeySequence(QStringLiteral("f")));
-  deleteOneAction->setStatusTip(tr("Delete the object on this frame"));
+  deleteOneAction->setStatusTip(tr("Delete the object on this frame (F)"));
+  deleteOneAction->setToolTip(tr("Delete the object on this frame (F)"));
   connect(deleteOneAction, &QAction::triggered, this, [this]() {
     if (isReplayable) {
-      DeleteData* del = new DeleteData(object2Replay->currentText().toInt(), ui->replaySlider->value(), ui->replaySlider->value(), trackingData);
+      DeleteData* del = new DeleteData(object2Replay->currentText().toInt(), currentIndex, currentIndex, trackingData);
       commandStack->push(del);
       ids = trackingData->getId(0, static_cast<int>(video->getImageCount()));
       object2Replay->clear();
@@ -165,10 +166,11 @@ Replay::Replay(QWidget* parent, Timeline* slider, VideoReader* videoReader) : QM
   img = QIcon(":/assets/buttons/delete.png");
   QAction* deleteAction = ui->toolBar->addAction(img, tr("&Delete"));
   deleteAction->setShortcut(QKeySequence(tr("G")));
-  deleteAction->setStatusTip(tr("Delete the object from this frame on the selected number of frames"));
+  deleteAction->setStatusTip(tr("Delete the object from this frame on the selected number of frames (G)"));
+  deleteAction->setToolTip(tr("Delete the object from this frame on the selected number of frames (G)"));
   connect(deleteAction, &QAction::triggered, this, [this]() {
     if (isReplayable) {
-      DeleteData* del = new DeleteData(object2Replay->currentText().toInt(), ui->replaySlider->value(), ui->replaySlider->value() + deletedFrameNumber->value() - 1, trackingData);
+      DeleteData* del = new DeleteData(object2Replay->currentText().toInt(), currentIndex, currentIndex + deletedFrameNumber->value() - 1, trackingData);
       commandStack->push(del);
       ids = trackingData->getId(0, static_cast<int>(video->getImageCount()));
       object2Replay->clear();
@@ -180,7 +182,8 @@ Replay::Replay(QWidget* parent, Timeline* slider, VideoReader* videoReader) : QM
   });
 
   deletedFrameNumber = new QSpinBox(this);
-  deletedFrameNumber->setStatusTip(tr("Number of frames where to delete the selected object"));
+  deletedFrameNumber->setStatusTip(tr("Number of frames where to delete the selected object (C to focus)"));
+  deletedFrameNumber->setToolTip(tr("Number of frames where to delete the selected object (C to focus)"));
   deletedFrameFocus = new QShortcut(QKeySequence(QStringLiteral("c")), this);
   connect(deletedFrameFocus, &QShortcut::activated, deletedFrameNumber, static_cast<void (QSpinBox::*)(void)>(&QSpinBox::setFocus));
   connect(deletedFrameFocus, &QShortcut::activated, deletedFrameNumber, &QSpinBox::selectAll);
@@ -208,91 +211,51 @@ Replay::Replay(QWidget* parent, Timeline* slider, VideoReader* videoReader) : QM
 
   ui->toolBar->addSeparator();
 
-  img = QIcon(":/assets/buttons/annotate.png");
-  QAction* annotAction = ui->annotationDock->toggleViewAction();
-  annotAction->setIcon(img);
-  annotAction->setStatusTip(tr("Annotation"));
-  ui->toolBar->addAction(annotAction);
-
-  img = QIcon(":/assets/buttons/info.png");
-  QAction* optionAction = ui->infoDock->toggleViewAction();
-  optionAction->setIcon(img);
-  optionAction->setStatusTip(tr("Display Options"));
-  ui->toolBar->addAction(optionAction);
-
-  img = QIcon(":/assets/buttons/option.png");
-  QAction* infoAction = ui->optionDock->toggleViewAction();
-  infoAction->setIcon(img);
-  infoAction->setStatusTip(tr("Information"));
-  ui->toolBar->addAction(infoAction);
-
   // Install event filters
   ui->replayDisplay->installEventFilter(this);
 
   isReplayable = false;
-  ui->ellipseBox->addItems({"Head + Tail", "Head", "Tail", "Body", "None"});
-  connect(ui->ellipseBox, static_cast<void (QComboBox::*)(int)>(&QComboBox::activated), this, [this]() {
-    loadFrame(currentIndex);
-  });
-  ui->arrowBox->addItems({"Head + Tail", "Head", "Tail", "Body", "None"});
-  connect(ui->arrowBox, static_cast<void (QComboBox::*)(int)>(&QComboBox::activated), this, [this]() {
-    loadFrame(currentIndex);
-  });
-
-  connect(ui->replayTrace, &QCheckBox::stateChanged, this, [this]() {
-    loadFrame(currentIndex);
-  });
-  connect(ui->replayTraceLength, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, [this]() {
-    loadFrame(currentIndex);
-  });
-
-  connect(ui->replaySize, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, [this]() {
-    loadFrame(currentIndex);
-  });
-
-  // Info tables
-  connect(ui->infoTableObject1, &QTableWidget::cellClicked, this, [this](int row, int col) {
-    if (row == 1 && col == 0) {
-      ui->replaySlider->setValue(ui->infoTableObject1->item(row, col)->text().toInt());
-    }
-  });
-  connect(ui->infoTableObject2, &QTableWidget::cellClicked, this, [this](int row, int col) {
-    if (row == 1 && col == 0) {
-      ui->replaySlider->setValue(ui->infoTableObject2->item(row, col)->text().toInt());
-    }
-  });
 
   // Annotation object
-  annotation = new Annotation();
+  annotation = new Annotation(this);
   // Load annotation file
-  connect(annotation, &Annotation::annotationText, ui->annotation, &QTextEdit::setPlainText);
-  connect(ui->annotation, &QTextEdit::textChanged, annotation, [this]() {
-    int index = ui->replaySlider->currentValue();
-    QString text = ui->annotation->toPlainText();
-    annotation->write(index, text);
-  });
-  connect(ui->findLine, &QLineEdit::textEdited, annotation, &Annotation::find);
-  connect(ui->findNext, &QPushButton::pressed, annotation, [this]() {
-    int index = annotation->next();
-    ui->replaySlider->setValue(index);
-  });
-  connect(ui->findPrev, &QPushButton::pressed, annotation, [this]() {
-    int index = annotation->prev();
-    ui->replaySlider->setValue(index);
-  });
+  connect(annotation, &Annotation::annotationText, this, &Replay::annotationTextChanged);
 
   trackingData = new Data();
 
-  // Interactive owns the timeline and video reader, preventing duplicate playback state.
-  delete ui->controls;
-  ui->replaySlider = slider;
   video = videoReader;
 }
 
+QHash<QString, QVariant> Replay::displayParameters() const {
+  return displayState;
+}
+
+void Replay::setDisplayParameters(const QHash<QString, QVariant>& parameters) {
+  displayState = parameters;
+  loadFrame(currentIndex);
+}
+
+void Replay::setAnnotationText(const QString& text) {
+  annotation->write(currentIndex, text);
+}
+
+void Replay::findAnnotation(const QString& text) {
+  annotation->find(text);
+}
+
+void Replay::nextAnnotation() {
+  emit frameRequested(annotation->next());
+}
+
+void Replay::previousAnnotation() {
+  emit frameRequested(annotation->prev());
+}
+
 void Replay::sliderConnection(const int index) {
-  if (!ui->replaySlider->isAutoplay && !trackingData->isEmpty) {
-    updateInformation(ui->infoTableObject1->item(0, 0)->text().toInt(), index, ui->infoTableObject1);
-    updateInformation(ui->infoTableObject2->item(0, 0)->text().toInt(), index, ui->infoTableObject2);
+  currentIndex = index;
+  if (!trackingData->isEmpty) {
+    updateInformation(informationObject1, index, 1);
+    updateInformation(informationObject2, index, 2);
     deletedFrameNumber->setMaximum(maxIndex - index);
     deletedFrameNumber->setValue(maxIndex - index);
     annotation->read(index);
@@ -301,7 +264,6 @@ void Replay::sliderConnection(const int index) {
 }
 
 Replay::~Replay() {
-  settingsFile->setValue(QStringLiteral("windowState"), saveState());
   delete ui;
   delete trackingData;
   delete annotation;
@@ -324,13 +286,14 @@ void Replay::clear() {
   annotation->clear();
   trackingData->clear();
 
-  ui->replaySlider->setValue(0);
+  currentIndex = 0;
+  emit frameRequested(0);
   commandStack->clear();
   occlusionEvents.clear();
   object1Replay->clear();
   object2Replay->clear();
   ui->replayDisplay->clear();
-  ui->annotation->clear();
+  emit annotationTextChanged(QString());
   object = true;
   isReplayable = false;
   emit opened(isReplayable);
@@ -356,8 +319,6 @@ void Replay::loadReplay(const QString& dir) {
   try {
     // Gets the paths to all the frames in the folder and puts it in a vector.
     // Setups the ui by setting maximum and minimum of the slider bar.
-    ui->replaySlider->setMinimum(0);
-    ui->replaySlider->setMaximum(static_cast<int>(video->getImageCount()) - 1);
     maxIndex = static_cast<int>(video->getImageCount());
 
     Mat frame;
@@ -374,12 +335,9 @@ void Replay::loadReplay(const QString& dir) {
     memoryDir = dir;
     loadTrackingDir(dir);
 
-    // Block the signal to not overwrite the first annonation at ui setup
-    ui->annotation->blockSignals(true);
-    ui->replaySlider->setValue(1);  // To force the change
-    ui->replaySlider->setValue(0);
+    emit frameRequested(1);  // Force a frame refresh after loading.
+    emit frameRequested(0);
     ui->replayDisplay->fitToView();
-    ui->annotation->blockSignals(false);
     emit opened(isReplayable);
   }
   catch (const std::exception& e) {
@@ -449,15 +407,15 @@ void Replay::loadFrame(int frameIndex) {
 
     if (!trackingData->isEmpty) {
       // Takes the tracking data corresponding to the replayed frame and parse data to display
-      int scale = ui->replaySize->value();
+      int scale = displayState.value(QStringLiteral("size")).toInt();
       QList<QHash<QString, double>> dataImage = trackingData->getData(frameIndex);
       for (const QHash<QString, double>& coordinate : dataImage) {
         int id = static_cast<int>(coordinate.value(QStringLiteral("id")));
 
         object1Replay->addItem(QString::number(id));
 
-        if (ui->ellipseBox->currentIndex() != 4) {
-          switch (ui->ellipseBox->currentIndex()) {
+        if (displayState.value(QStringLiteral("ellipse")).toInt() != 4) {
+          switch (displayState.value(QStringLiteral("ellipse")).toInt()) {
             case 0:  // Head + Tail
               cv::ellipse(frame, Point(static_cast<int>(coordinate.value(QStringLiteral("xHead"))), static_cast<int>(coordinate.value(QStringLiteral("yHead")))), Size(static_cast<int>(coordinate.value(QStringLiteral("headMajorAxisLength"))), static_cast<int>(coordinate.value(QStringLiteral("headMinorAxisLength")))), 180 - (coordinate.value(QStringLiteral("tHead")) * 180) / M_PI, 0, 360, Scalar(colorMap[id].x, colorMap[id].y, colorMap[id].z), scale, cv::LINE_8);
               cv::ellipse(frame, Point(static_cast<int>(coordinate.value(QStringLiteral("xTail"))), static_cast<int>(coordinate.value(QStringLiteral("yTail")))), Size(static_cast<int>(coordinate.value(QStringLiteral("tailMajorAxisLength"))), static_cast<int>(coordinate.value(QStringLiteral("tailMinorAxisLength")))), 180 - (coordinate.value(QStringLiteral("tTail")) * 180) / M_PI, 0, 360, Scalar(colorMap[id].x, colorMap[id].y, colorMap[id].z), scale, cv::LINE_8);
@@ -477,8 +435,8 @@ void Replay::loadFrame(int frameIndex) {
           }
         }
 
-        if (ui->arrowBox->currentIndex() != 4) {
-          switch (ui->arrowBox->currentIndex()) {
+        if (displayState.value(QStringLiteral("arrow")).toInt() != 4) {
+          switch (displayState.value(QStringLiteral("arrow")).toInt()) {
             case 0:
               cv::arrowedLine(frame, Point(static_cast<int>(coordinate.value(QStringLiteral("xHead"))), static_cast<int>(coordinate.value(QStringLiteral("yHead")))), Point(static_cast<int>(coordinate.value(QStringLiteral("xHead")) + coordinate.value(QStringLiteral("headMajorAxisLength")) * cos(coordinate.value(QStringLiteral("tHead")))), static_cast<int>(coordinate.value(QStringLiteral("yHead")) - coordinate.value(QStringLiteral("headMajorAxisLength")) * sin(coordinate.value(QStringLiteral("tHead"))))), Scalar(colorMap[id].x, colorMap[id].y, colorMap[id].z), scale, cv::LINE_8, 0, double(scale) / 10);
               cv::arrowedLine(frame, Point(static_cast<int>(coordinate.value(QStringLiteral("xTail"))), static_cast<int>(coordinate.value(QStringLiteral("yTail")))), Point(static_cast<int>(coordinate.value(QStringLiteral("xTail")) + coordinate.value(QStringLiteral("tailMajorAxisLength")) * cos(coordinate.value(QStringLiteral("tTail")))), static_cast<int>(coordinate.value(QStringLiteral("yTail")) - coordinate.value(QStringLiteral("tailMajorAxisLength")) * sin(coordinate.value(QStringLiteral("tTail"))))), Scalar(colorMap[id].x, colorMap[id].y, colorMap[id].z), scale, cv::LINE_8, 0, double(scale) / 10);
@@ -498,13 +456,13 @@ void Replay::loadFrame(int frameIndex) {
           }
         }
 
-        if (ui->replayNumbers->isChecked()) {
+        if (displayState.value(QStringLiteral("numbers")).toBool()) {
           cv::putText(frame, to_string(id), Point(static_cast<int>(coordinate.value(QStringLiteral("xHead")) + coordinate.value(QStringLiteral("headMajorAxisLength")) * cos(coordinate.value(QStringLiteral("tHead")))), static_cast<int>(coordinate.value(QStringLiteral("yHead")) - coordinate.value(QStringLiteral("headMajorAxisLength")) * sin(coordinate.value(QStringLiteral("tHead"))))), cv::FONT_HERSHEY_SIMPLEX, double(scale) * 0.5, Scalar(colorMap[id].x, colorMap[id].y, colorMap[id].z), scale, cv::LINE_8);
         }
 
-        if (ui->replayTrace->isChecked()) {
+        if (displayState.value(QStringLiteral("trace")).toBool()) {
           vector<Point> memory;
-          QList<QHash<QString, double>> coordinate = trackingData->getData(frameIndex - ui->replayTraceLength->value(), frameIndex + 1, id);
+          QList<QHash<QString, double>> coordinate = trackingData->getData(frameIndex - displayState.value(QStringLiteral("traceLength")).toInt(), frameIndex + 1, id);
           for (auto const& a : coordinate) {
             memory.push_back(Point(static_cast<int>(a.value(QStringLiteral("xBody"))), static_cast<int>(a.value(QStringLiteral("yBody")))));
           }
@@ -544,7 +502,7 @@ bool Replay::eventFilter(QObject* target, QEvent* event) {
         double yTop = click.y();
 
         // Finds the id of the closest object
-        int frameIndex = ui->replaySlider->value();
+        int frameIndex = currentIndex;
         QList<int> idList = trackingData->getId(frameIndex);
 
         if (!idList.isEmpty()) {
@@ -584,13 +542,20 @@ bool Replay::eventFilter(QObject* target, QEvent* event) {
  * @param[in] imageIndex The index of the image where to extracts the data.
  * @param[in] table Pointer to a QTableWidget where to display the data.
  */
-void Replay::updateInformation(int objectId, int imageIndex, QTableWidget* table) {
+void Replay::updateInformation(int objectId, int imageIndex, int table) {
   QHash<QString, double> infoData = trackingData->getData(imageIndex, objectId);
-  table->item(0, 0)->setText(QString::number(objectId));
-  table->item(1, 0)->setText(QString::number(trackingData->getObjectInformation(objectId)));
-  table->item(2, 0)->setText(QString::number(infoData.value(QStringLiteral("areaBody"))));
-  table->item(3, 0)->setText(QString::number(infoData.value(QStringLiteral("perimeterBody"))));
-  table->item(4, 0)->setText(QString::number(infoData.value(QStringLiteral("bodyExcentricity"))));
+  if (table == 1) {
+    informationObject1 = objectId;
+  }
+  else {
+    informationObject2 = objectId;
+  }
+  emit informationChanged(table,
+                          {QString::number(objectId),
+                           QString::number(trackingData->getObjectInformation(objectId)),
+                           QString::number(infoData.value(QStringLiteral("areaBody"))),
+                           QString::number(infoData.value(QStringLiteral("perimeterBody"))),
+                           QString::number(infoData.value(QStringLiteral("bodyExcentricity")))});
 }
 
 /**
@@ -601,7 +566,7 @@ void Replay::correctTracking() {
     // Swaps the data
     int firstObject = object1Replay->currentText().toInt();
     int secondObject = object2Replay->currentText().toInt();
-    int start = ui->replaySlider->value();
+    int start = currentIndex;
     SwapData* swap = new SwapData(firstObject, secondObject, start, trackingData);
     commandStack->push(swap);
     loadFrame(currentIndex);
@@ -613,9 +578,9 @@ void Replay::correctTracking() {
  */
 void Replay::nextOcclusionEvent() {
   if (!occlusionEvents.isEmpty()) {
-    int current = ui->replaySlider->value();
+    int current = currentIndex;
     int nextOcclusion = *std::upper_bound(occlusionEvents.begin(), occlusionEvents.end(), current);
-    ui->replaySlider->setValue(nextOcclusion);
+    emit frameRequested(nextOcclusion);
   }
 }
 
@@ -624,9 +589,9 @@ void Replay::nextOcclusionEvent() {
  */
 void Replay::previousOcclusionEvent() {
   if (!occlusionEvents.isEmpty()) {
-    int current = ui->replaySlider->value();
+    int current = currentIndex;
     int previousOcclusion = occlusionEvents.at(static_cast<int>(std::upper_bound(occlusionEvents.begin(), occlusionEvents.end(), current) - occlusionEvents.begin() - 2));
-    ui->replaySlider->setValue(previousOcclusion);
+    emit frameRequested(previousOcclusion);
   }
 }
 
@@ -638,8 +603,8 @@ void Replay::saveTrackedMovie() {
   // selected folder
   if (isReplayable) {
     QString savePath = QFileDialog::getSaveFileName(this, tr("Save File"), QStringLiteral("/home/save.mp4"), tr("Videos (*.mp4)"));
-    cv::VideoWriter outputVideo(savePath.toStdString(), CAP_FFMPEG, cv::VideoWriter::fourcc('a', 'v', 'c', '1'), ui->replayFps->value(), Size(originalImageSize.width(), originalImageSize.height()));
-    int scale = ui->replaySize->value();
+    cv::VideoWriter outputVideo(savePath.toStdString(), CAP_FFMPEG, cv::VideoWriter::fourcc('a', 'v', 'c', '1'), displayState.value(QStringLiteral("fps")).toInt(), Size(originalImageSize.width(), originalImageSize.height()));
+    int scale = displayState.value(QStringLiteral("size")).toInt();
 
     QApplication::setOverrideCursor(Qt::WaitCursor);
     this->setEnabled(false);
@@ -657,8 +622,8 @@ void Replay::saveTrackedMovie() {
         object1Replay->addItem(QString::number(id));
         object2Replay->addItem(QString::number(id));
 
-        if (ui->ellipseBox->currentIndex() != 4) {
-          switch (ui->ellipseBox->currentIndex()) {
+        if (displayState.value(QStringLiteral("ellipse")).toInt() != 4) {
+          switch (displayState.value(QStringLiteral("ellipse")).toInt()) {
             case 0:  // Head + Tail
               cv::ellipse(frame, Point(static_cast<int>(coordinate.value(QStringLiteral("xHead"))), static_cast<int>(coordinate.value(QStringLiteral("yHead")))), Size(static_cast<int>(coordinate.value(QStringLiteral("headMajorAxisLength"))), static_cast<int>(coordinate.value(QStringLiteral("headMinorAxisLength")))), 180 - (coordinate.value(QStringLiteral("tHead")) * 180) / M_PI, 0, 360, Scalar(colorMap[id].x, colorMap[id].y, colorMap[id].z), scale, 8);
               cv::ellipse(frame, Point(static_cast<int>(coordinate.value(QStringLiteral("xTail"))), static_cast<int>(coordinate.value(QStringLiteral("yTail")))), Size(static_cast<int>(coordinate.value(QStringLiteral("tailMajorAxisLength"))), static_cast<int>(coordinate.value(QStringLiteral("tailMinorAxisLength")))), 180 - (coordinate.value(QStringLiteral("tTail")) * 180) / M_PI, 0, 360, Scalar(colorMap[id].x, colorMap[id].y, colorMap[id].z), scale, cv::LINE_AA);
@@ -678,8 +643,8 @@ void Replay::saveTrackedMovie() {
           }
         }
 
-        if (ui->arrowBox->currentIndex() != 4) {
-          switch (ui->arrowBox->currentIndex()) {
+        if (displayState.value(QStringLiteral("arrow")).toInt() != 4) {
+          switch (displayState.value(QStringLiteral("arrow")).toInt()) {
             case 0:
               cv::arrowedLine(frame, Point(static_cast<int>(coordinate.value(QStringLiteral("xHead"))), static_cast<int>(coordinate.value(QStringLiteral("yHead")))), Point(static_cast<int>(coordinate.value(QStringLiteral("xHead")) + coordinate.value(QStringLiteral("headMajorAxisLength")) * cos(coordinate.value(QStringLiteral("tHead")))), static_cast<int>(coordinate.value(QStringLiteral("yHead")) - coordinate.value(QStringLiteral("headMajorAxisLength")) * sin(coordinate.value(QStringLiteral("tHead"))))), Scalar(colorMap[id].x, colorMap[id].y, colorMap[id].z), scale, cv::LINE_AA, 0, double(scale) / 10);
               cv::arrowedLine(frame, Point(static_cast<int>(coordinate.value(QStringLiteral("xTail"))), static_cast<int>(coordinate.value(QStringLiteral("yTail")))), Point(static_cast<int>(coordinate.value(QStringLiteral("xTail")) + coordinate.value(QStringLiteral("tailMajorAxisLength")) * cos(coordinate.value(QStringLiteral("tTail")))), static_cast<int>(coordinate.value(QStringLiteral("yTail")) - coordinate.value(QStringLiteral("tailMajorAxisLength")) * sin(coordinate.value(QStringLiteral("tTail"))))), Scalar(colorMap[id].x, colorMap[id].y, colorMap[id].z), scale, cv::LINE_AA, 0, double(scale) / 10);
@@ -699,13 +664,13 @@ void Replay::saveTrackedMovie() {
           }
         }
 
-        if (ui->replayNumbers->isChecked()) {
+        if (displayState.value(QStringLiteral("numbers")).toBool()) {
           cv::putText(frame, to_string(id), Point(static_cast<int>(coordinate.value(QStringLiteral("xHead")) + coordinate.value(QStringLiteral("headMajorAxisLength")) * cos(coordinate.value(QStringLiteral("tHead")))), static_cast<int>(coordinate.value(QStringLiteral("yHead")) - coordinate.value(QStringLiteral("headMajorAxisLength")) * sin(coordinate.value(QStringLiteral("tHead"))))), cv::FONT_HERSHEY_SIMPLEX, double(scale) * 0.5, Scalar(colorMap[id].x, colorMap[id].y, colorMap[id].z), scale, cv::LINE_AA);
         }
 
-        if (ui->replayTrace->isChecked()) {
+        if (displayState.value(QStringLiteral("trace")).toBool()) {
           vector<Point> memory;
-          for (int j = frameIndex - ui->replayTraceLength->value(); j < frameIndex; j++) {
+          for (int j = frameIndex - displayState.value(QStringLiteral("traceLength")).toInt(); j < frameIndex; j++) {
             if (j > 0) {
               QHash<QString, double> coordinate = trackingData->getData(j, a);
               if (coordinate.contains(QStringLiteral("xBody"))) {
@@ -717,7 +682,6 @@ void Replay::saveTrackedMovie() {
         }
       }
       outputVideo.write(frame);
-      ui->replaySlider->setValue(static_cast<int>(frameIndex));
     }
     outputVideo.release();
     QApplication::restoreOverrideCursor();

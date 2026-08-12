@@ -1646,3 +1646,64 @@ QDoubleSpinBox::down-arrow:off
 {
    border-image: url(:/dark/down_arrow_disabled.svg);
 }
+
+/* Main workspace */
+QMdiArea
+{
+    background: qradialgradient(cx: 0.5, cy: 0.15, radius: 1.1,
+        stop: 0 #3B434A, stop: 0.58 #2C3339, stop: 1 #22272C);
+}
+
+QMdiSubWindow
+{
+    background-color: #31363B;
+    border: 0.1ex solid #59626A;
+    border-radius: 0.5ex;
+}
+
+QMdiSubWindow:focus
+{
+    border: 0.2ex solid #3DAEE9;
+}
+
+QMdiArea QTabBar
+{
+    background-color: #262C31;
+    qproperty-drawBase: 0;
+}
+
+QMdiArea QTabBar::tab
+{
+    background-color: #333A40;
+    color: #DCE3E8;
+    border: 0.1ex solid #4D575F;
+    border-bottom: 0;
+    border-top-left-radius: 0.5ex;
+    border-top-right-radius: 0.5ex;
+    margin: 0.5ex 0.2ex 0 0.2ex;
+    padding: 0.7ex 1.6ex;
+}
+
+QMdiArea QTabBar::tab:selected
+{
+    background-color: #31363B;
+    border-color: #3DAEE9;
+    color: #FFFFFF;
+}
+
+QMdiArea QTabBar::tab:hover:!selected
+{
+    background-color: #404950;
+}
+
+QMdiArea QTabBar::close-button:hover
+{
+    background-color: #B84A4A;
+    border-radius: 0.7ex;
+}
+
+QDockWidget::title
+{
+    padding: 0.7ex 1ex;
+    font-weight: 600;
+}

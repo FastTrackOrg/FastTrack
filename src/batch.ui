@@ -48,9 +48,12 @@
         <height>23</height>
        </size>
       </property>
-      <property name="text">
-       <string>Start tracking</string>
-      </property>
+     <property name="text">
+      <string>Start tracking</string>
+     </property>
+     <property name="toolTip">
+      <string>Start tracking (Space)</string>
+     </property>
       <property name="shortcut">
        <string>Space</string>
       </property>
@@ -85,9 +88,12 @@
         <height>23</height>
        </size>
       </property>
-      <property name="text">
-       <string>Remove</string>
-      </property>
+     <property name="text">
+      <string>Remove</string>
+     </property>
+     <property name="toolTip">
+      <string>Remove selected path (R)</string>
+     </property>
       <property name="shortcut">
        <string>R</string>
       </property>

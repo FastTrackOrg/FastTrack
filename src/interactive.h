@@ -22,33 +22,35 @@ This file is part of Fast Track.
 #include <stdlib.h>
 #include <time.h>
 #include <QAction>
+#include <QComboBox>
 #include <QDateTime>
 #include <QDir>
 #include <QDirIterator>
+#include <QDoubleSpinBox>
 #include <QElapsedTimer>
-#include <QEventLoop>
 #include <QFile>
 #include <QFileDialog>
 #include <QFuture>
 #include <QFutureWatcher>
 #include <QHash>
+#include <QHeaderView>
+#include <QLabel>
 #include <QMainWindow>
 #include <QMessageBox>
 #include <QMetaType>
-#include <QNetworkAccessManager>
-#include <QNetworkReply>
-#include <QNetworkRequest>
 #include <QPainter>
+#include <QProgressBar>
+#include <QRadioButton>
 #include <QResizeEvent>
 #include <QScopedValueRollback>
-#include <QScrollArea>
 #include <QScrollBar>
-#include <QSettings>
 #include <QSharedPointer>
+#include <QSpinBox>
 #include <QString>
 #include <QTableWidget>
 #include <QTableWidgetItem>
 #include <QUrl>
+#include <QVariant>
 #include <QWidget>
 #include <QtConcurrent/QtConcurrentRun>
 #include "autolevel.h"
@@ -77,14 +79,24 @@ class Interactive : public QMainWindow {
   Interactive(Interactive &&T) = delete;
   ~Interactive();
   void openFolder(QString path = QString());
+  QHash<QString, QVariant> parameterState() const;
+  void setParameterState(const QHash<QString, QVariant> &state);
+  Replay *replayWidget() const;
+  void preview();
+  void startTracking();
+  void computeWorkspaceBackground();
+  void selectWorkspaceBackground();
+  void cropWorkspace();
+  void resetWorkspaceCrop();
+  void levelWorkspaceParameters();
+  bool canPreview() const;
+  bool canTrack() const;
   void setReplayVisible(bool visible);
   bool isReplayVisible() const;
-  void setImageOptionsVisible(bool visible);
-  bool imageOptionsVisible() const;
-  void setTrackingOptionsVisible(bool visible);
-  bool trackingOptionsVisible() const;
-  void setControlOptionsVisible(bool visible);
-  bool controlOptionsVisible() const;
+  bool isReplayActive() const;
+  int frameCount() const;
+  QList<QString> informationValues() const;
+  QString trackingStatusText() const;
 
  private slots:
   void display(int index, int scale = 0);
@@ -103,15 +115,24 @@ class Interactive : public QMainWindow {
   void crop();
   void reset();
 
-  void saveSettings();
   void loadParameters(const QString &path);
   void level();
-  void setupParameterTabOrder();
-  void setupParameterWidgets();
-  void setupParameterTooltips();
+  void setTrackingAvailable(bool available);
+  void notifyParameterStateChanged();
+  void updateProgressEstimate(int value);
+  int parameterInt(const QString &name) const;
+  double parameterDouble(const QString &name) const;
+  void setParameter(const QString &name, const QVariant &value);
 
  private:
   Ui::Interactive *ui;
+  struct RuntimeControls
+  {
+    QProgressBar *progressBar;
+  } *controls = nullptr;
+  QHash<QString, QVariant> parameterValues;
+  QList<QString> informationValuesState{QString(), QStringLiteral("0"), QStringLiteral("0"), QStringLiteral("0"), QStringLiteral("0")};
+  QString trackingStatusState;
   QLabel *counterLabel;
   bool replayVisible = false;
   QString memoryDir;                  /*!< Saves the path to the last opened folder in dialog. */
@@ -134,13 +155,19 @@ class Interactive : public QMainWindow {
   bool displayInProgress = false;
   bool contourWarningOpen = false;
   int largeContourDisplayDecision = -1;
-
-  QSettings *settingsFile;
+  bool trackingAvailable = false;
+  bool applyingParameterState = false;
+  QElapsedTimer trackingElapsed;
 
  signals:
   void message(QString message);
   void log(QHash<QString, QString> log);
   void status(QString messsage);
   void replayVisibleChanged(bool visible);
+  void activeViewChanged(bool replayActive);
+  void trackingAvailabilityChanged();
+  void timelineEnabledChanged(bool enabled);
+  void parameterStateChanged(const QHash<QString, QVariant> &state);
+  void inputOpened(const QString &path);
 };
 #endif  // INTERACTIVE_H
