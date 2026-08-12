@@ -18,6 +18,7 @@ This file is part of Fast Track.
 #include "mainwindow.h"
 
 #include <QActionGroup>
+#include <QButtonGroup>
 #include <QDesktopServices>
 #include <QDoubleSpinBox>
 #include <QFileDialog>
@@ -106,6 +107,21 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
   replayDisplayDock = ui->replayDisplayDock;
   annotationDock = ui->annotationDock;
   informationDock = ui->informationDock;
+  QButtonGroup *displayModeGroup = new QButtonGroup(this);
+  displayModeGroup->addButton(ui->isOriginal, 0);
+  displayModeGroup->addButton(ui->isSub, 1);
+  displayModeGroup->addButton(ui->isBin, 2);
+  if (savedDockState.isEmpty()) {
+    addDockWidget(Qt::LeftDockWidgetArea, imageOptionsDock);
+    addDockWidget(Qt::LeftDockWidgetArea, trackingOptionsDock);
+    addDockWidget(Qt::LeftDockWidgetArea, replayDisplayDock);
+    addDockWidget(Qt::LeftDockWidgetArea, annotationDock);
+    addDockWidget(Qt::LeftDockWidgetArea, informationDock);
+    tabifyDockWidget(imageOptionsDock, trackingOptionsDock);
+    tabifyDockWidget(trackingOptionsDock, replayDisplayDock);
+    tabifyDockWidget(replayDisplayDock, annotationDock);
+    tabifyDockWidget(annotationDock, informationDock);
+  }
   imageOptionsDock->hide();
   trackingOptionsDock->hide();
   controlOptionsDock->hide();

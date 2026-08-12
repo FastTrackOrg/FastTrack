@@ -28,9 +28,6 @@
    <property name="windowTitle">
     <string>Image Options</string>
    </property>
-   <property name="dockLocation">
-    <enum>Qt::DockWidgetArea::RightDockWidgetArea</enum>
-   </property>
    <attribute name="dockWidgetArea">
     <number>2</number>
    </attribute>
@@ -1171,18 +1168,12 @@ li.checked::marker { content: &quot;\2612&quot;; }
              <property name="text">
               <string>Backgro&amp;und Subtracted</string>
              </property>
-             <property name="checkable">
-              <bool>false</bool>
-             </property>
             </widget>
            </item>
            <item>
             <widget class="QRadioButton" name="isBin">
              <property name="text">
               <string>Binar&amp;y</string>
-             </property>
-             <property name="checkable">
-              <bool>false</bool>
              </property>
             </widget>
            </item>

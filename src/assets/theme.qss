@@ -22,13 +22,54 @@ QComboBox::item:selected {
 }
 
 QPushButton {
-    background-color: #DEE4E7;
+    background-color: #E7EDEE;
+    color: #263B40;
+    border: 1px solid #B9C9CD;
+    border-radius: 4px;
     selection-background-color: #37474F;
+    padding: 4px 8px;
 }
 
 QPushButton::hover {
-    background-color: #37474F;
-    color: #DEE4E7;
+    background-color: #46646B;
+    color: #FFFFFF;
+    border-color: #37474F;
+}
+
+QPushButton::pressed {
+    background-color: #2F454A;
+    color: #FFFFFF;
+}
+
+QPushButton:disabled {
+    background-color: #F1F3F3;
+    color: #93A1A4;
+    border-color: #D7DFE1;
+}
+
+QComboBox {
+    background-color: #FFFFFF;
+    color: #263B40;
+    border: 1px solid #AEBFC3;
+    border-radius: 4px;
+    padding: 3px 7px;
+}
+
+QComboBox:hover, QComboBox:focus {
+    border-color: #46646B;
+}
+
+QComboBox:disabled {
+    background-color: #F1F3F3;
+    color: #93A1A4;
+}
+
+QComboBox QAbstractItemView {
+    background-color: #FFFFFF;
+    color: #263B40;
+    border: 1px solid #AEBFC3;
+    selection-background-color: #37474F;
+    selection-color: #FFFFFF;
 }
 
 QTabBar::tab {
