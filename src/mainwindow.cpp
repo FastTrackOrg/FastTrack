@@ -261,9 +261,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
   connect(ui->annotationPreviousButton, &QPushButton::clicked, this, [this]() { if (Interactive *interactive = activeInteractive()) interactive->replayWidget()->previousAnnotation(); });
   QToolBar *workspaceToolBar = addToolBar(tr("Tracking"));
   workspaceToolBar->setObjectName(QStringLiteral("trackingToolBar"));
+  workspaceToolBar->setIconSize(QSize(32, 32));
+  workspaceToolBar->setMinimumHeight(44);
   previewAction = workspaceToolBar->addAction(QIcon(":/assets/buttons/preview.png"), tr("Preview"));
   previewAction->setToolTip(tr("Preview tracking for the active workspace"));
-  trackAction = workspaceToolBar->addAction(QIcon(":/assets/buttons/track.png"), tr("Track"));
+  trackAction = workspaceToolBar->addAction(QIcon(":/assets/buttons/start.png"), tr("Track"));
   trackAction->setToolTip(tr("Start tracking for the active workspace"));
   connect(previewAction, &QAction::triggered, this, [this]() {
     if (Interactive *interactive = activeInteractive()) {
