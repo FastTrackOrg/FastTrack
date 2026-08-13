@@ -1,5 +1,31 @@
 # FastTrack changelog
 
+## 6.7.0
+
+### Added
+
+- Added an MDI workspace for multiple Interactive and Batch tracking windows.
+- Added shared main-window docks for tracking parameters, replay display, annotations, information, and video controls.
+- Added per-workspace parameter state, including the current frame and display mode.
+- Added toolbar actions for previewing and starting tracking.
+- Added replay editing shortcut hints and a shortcut for swapping objects.
+
+### Changed
+
+- Opening or dropping media now creates and activates a new Interactive workspace.
+- Moved shared workspace actions, settings persistence, dock layout persistence, and timeline ownership to the main window.
+- Moved tracking progress into the corresponding Interactive workspace.
+- New installations start with shared docks tabbed in the left dock area while Video Controls retain their default location.
+
+### Fixed
+
+- Fixed replay and annotation updates when changing frames or active workspaces.
+- Fixed binary display default threshold to 127.
+- Fixed display mode radio button selection state.
+- Fixed dock layout compatibility with older Qt 6 versions.
+- Fixed Linux builds by including `QShortcut` directly.
+- Removed orphan child widgets that could appear as floating rectangles in Interactive windows.
+
 ## 6.6.0
 
 ### Added
