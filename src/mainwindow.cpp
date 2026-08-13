@@ -411,6 +411,8 @@ QMdiSubWindow *MainWindow::newInteractiveWindow() {
   subWindow->setAttribute(Qt::WA_DeleteOnClose);
   subWindow->setWindowTitle(tr("Interactive tracking"));
   subWindow->show();
+  ui->mdiArea->setActiveSubWindow(subWindow);
+  subWindow->setFocus();
   connect(interactive, &Interactive::inputOpened, this, [this, subWindow, interactive](const QString &path) {
     subWindow->setWindowTitle(path);
     saveWorkspaceState(interactive);
