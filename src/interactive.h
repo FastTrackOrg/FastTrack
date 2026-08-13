@@ -94,6 +94,7 @@ class Interactive : public QMainWindow {
   void setReplayVisible(bool visible);
   bool isReplayVisible() const;
   bool isReplayActive() const;
+  bool isTimelineEnabled() const;
   int frameCount() const;
   QList<QString> informationValues() const;
   QString trackingStatusText() const;
@@ -156,6 +157,7 @@ class Interactive : public QMainWindow {
   bool contourWarningOpen = false;
   int largeContourDisplayDecision = -1;
   bool trackingAvailable = false;
+  bool timelineEnabled = true;
   bool applyingParameterState = false;
   QElapsedTimer trackingElapsed;
 

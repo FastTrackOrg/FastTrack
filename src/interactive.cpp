@@ -177,6 +177,10 @@ bool Interactive::isReplayActive() const {
   return replayVisible && ui->interactiveTab->currentIndex() == 1;
 }
 
+bool Interactive::isTimelineEnabled() const {
+  return timelineEnabled;
+}
+
 int Interactive::frameCount() const {
   return video->isOpened() ? static_cast<int>(video->getImageCount()) : 0;
 }
@@ -592,14 +596,16 @@ void Interactive::previewTracking() {
     connect(tracking, &Tracking::finished, this, [this]() {
       controls->progressBar->setValue(controls->progressBar->maximum());
       controls->progressBar->setFormat(tr("Done"));
-      emit timelineEnabledChanged(true);
+      timelineEnabled = true;
+      emit timelineEnabledChanged(timelineEnabled);
       setTrackingAvailable(true);
       replay->loadReplay(dir);
       setReplayVisible(true);
     });
     connect(tracking, &Tracking::forceFinished, this, [this](const QString &errorMessage) {
       controls->progressBar->setFormat(tr("Stopped"));
-      emit timelineEnabledChanged(true);
+      timelineEnabled = true;
+      emit timelineEnabledChanged(timelineEnabled);
       setTrackingAvailable(true);
       replay->loadReplay(dir);
       setReplayVisible(true);
@@ -614,7 +620,8 @@ void Interactive::previewTracking() {
     tracking->updatingParameters(parameters);
     thread->start();
 
-    emit timelineEnabledChanged(false);
+    timelineEnabled = false;
+    emit timelineEnabledChanged(timelineEnabled);
   }
 }
 
@@ -646,7 +653,8 @@ void Interactive::track() {
     });
     connect(tracking, &Tracking::forceFinished, this, [this, logMap](const QString &errorMessage) {
       controls->progressBar->setFormat(tr("Stopped"));
-      emit timelineEnabledChanged(true);
+      timelineEnabled = true;
+      emit timelineEnabledChanged(timelineEnabled);
       setTrackingAvailable(true);
       replay->loadReplay(dir);
       setReplayVisible(true);
@@ -659,7 +667,8 @@ void Interactive::track() {
     connect(tracking, &Tracking::finished, this, [this, logMap]() {
       controls->progressBar->setValue(controls->progressBar->maximum());
       controls->progressBar->setFormat(tr("Done"));
-      emit timelineEnabledChanged(true);
+      timelineEnabled = true;
+      emit timelineEnabledChanged(timelineEnabled);
       setTrackingAvailable(true);
       replay->loadReplay(dir);
       setReplayVisible(true);
@@ -676,7 +685,8 @@ void Interactive::track() {
     tracking->updatingParameters(parameters);
     thread->start();
 
-    emit timelineEnabledChanged(false);
+    timelineEnabled = false;
+    emit timelineEnabledChanged(timelineEnabled);
   }
 }
 

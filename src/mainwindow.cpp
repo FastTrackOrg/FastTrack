@@ -484,6 +484,7 @@ void MainWindow::showInteractiveDocks(Interactive *interactive) {
   imageOptionsDock->setVisible(trackingVisible);
   trackingOptionsDock->setVisible(trackingVisible);
   controlOptionsDock->setVisible(interactive != nullptr);
+  ui->slider->setEnabled(interactive && interactive->isTimelineEnabled());
   if (interactive) {
     QHash<QString, QVariant> &state = workspaceStates[interactive];
     if (state.isEmpty()) {
